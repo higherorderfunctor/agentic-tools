@@ -145,6 +145,7 @@ fixpoint
 foldl
 footgun
 formedness
+FREETEXT
 frepo
 frontloaded
 frontmatter
@@ -239,6 +240,7 @@ lockfiles
 lspservers
 ltrimstr
 manpages
+manueldiagostino
 markdownify
 materializer
 mcpconfig

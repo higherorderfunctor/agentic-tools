@@ -75,6 +75,7 @@ _: {
     pnpm_10 = {consumerPath = ["ai" "generic" "pnpm_10"];};
     pnpm_11 = {consumerPath = ["ai" "generic" "pnpm_11"];};
     pnpm_12 = {consumerPath = ["ai" "generic" "pnpm_12"];};
+    tree-sitter-strictdoc = {consumerPath = ["ai" "generic" "tree-sitter-strictdoc"];};
 
     # ── agnix + its mainProgram-override siblings ──
     # agnix itself is a flatDrvs entry at `consumerPkgs.ai.agnix`; the

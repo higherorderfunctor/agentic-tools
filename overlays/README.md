@@ -116,6 +116,16 @@ computed at eval time via `overlays/lib.nix:mkVersion`
   is a plain attr/meta overlay selecting `semble-mcp`; it shares the same
   `drvPath` and `outPath` as the CLI. Do not apply `overlays.shared-nixpkgs`,
   rebuild with local packages, or use `overrideAttrs`.
+- **Patched grammar source, regenerated at build time**
+  (`tree-sitter-strictdoc`): `pkgs.tree-sitter.buildGrammar` with
+  `generate = true` plus a `preBuild` override naming the grammar's actual entry
+  point (`grammar/<name>.js`) — its own `preBuild` runs a bare
+  `tree-sitter generate` that assumes the grammar lives at the source root,
+  which this one does not. The `patches` target the grammar DEFINITION, never
+  the generated `src/parser.c`; skipping the `preBuild` override is a silent
+  no-op that ships upstream's unpatched parser with a green build. See
+  `packages/semble/.sdoc/01-grammar-injection.sdoc` (DEC-GRAMMAR-PATCH-NOT-FORK)
+  and `checks/strictdoc-grammar-corpus.nix` for the regression gate.
 - **In-repo source**: packaged from a path in this repo (no upstream rev/hash,
   not version-tracked). **No package uses this shape today** —
   `kiro-memory-distiller` was the only one, and it was removed on 2026-09-01
@@ -168,5 +178,6 @@ computed at eval time via `overlays/lib.nix:mkVersion`
 | pnpm_10              | generic    | npm `latest-10` tag     | files only (nixpkgs ovr)  | `pnpm_10`             | —             | --version           |
 | pnpm_11              | generic    | npm `latest-11` tag     | files only (nixpkgs ovr)  | `pnpm_11`             | —             | --version           |
 | pnpm_12              | generic    | npm `latest-12` tag     | pre-built binary          | — (no `pnpm_12`)      | —             | --version           |
+| tree-sitter-strictdoc | generic | GitHub main (patched) | tree-sitter buildGrammar | — | corpus check | parser loads + language attr |
 | agnix-mcp            | mcpServers | mainProgram override    | —                         | —                     | —             | —                   |
 | agnix-lsp            | lspServers | mainProgram override    | —                         | —                     | —             | —                   |
