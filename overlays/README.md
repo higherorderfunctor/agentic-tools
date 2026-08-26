@@ -184,6 +184,7 @@ computed at eval time via `overlays/lib.nix:mkVersion`
 | glab                 | devTools   | GitLab tag (fetcher)    | go (nixpkgs override)     | `glab`                | —             | --version           |
 | oxlint               | devTools   | GitHub main             | pnpm (nixpkgs override)   | `oxlint`              | installCheck  | --type-aware        |
 | strictdoc             | devTools   | GitHub stable release   | python (nixpkgs override) | `strictdoc`           | imports only  | version == pin               |
+| strictdoc-grammar-extract | devTools   | repo-local (no src)     | makeWrapper over python env | —                     | —             | grammar builder imports      |
 | tsgolint             | devTools   | GitHub main             | go (nixpkgs override)     | `tsgolint`            | upstream      | --help              |
 | arkenfox             | generic    | GitHub archive          | files only                | —                     | —             | —                   |
 | bruno                | generic    | GitHub tag (fetcher)    | npm (nixpkgs override)    | `bruno`               | —             | —                   |

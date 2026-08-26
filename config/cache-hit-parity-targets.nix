@@ -48,6 +48,7 @@ _: {
     oxlint = {consumerPath = ["ai" "devTools" "oxlint"];};
     rumdl = {consumerPath = ["ai" "devTools" "rumdl"];};
     strictdoc = {consumerPath = ["ai" "devTools" "strictdoc"];};
+    strictdoc-grammar-extract = {consumerPath = ["ai" "devTools" "strictdoc-grammar-extract"];};
     tsgolint = {consumerPath = ["ai" "devTools" "tsgolint"];};
 
     # ── Generic supporting packages — live at `consumerPkgs.ai.generic.<name>` ──
