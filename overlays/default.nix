@@ -278,6 +278,11 @@
     rumdl = import ./dev-tools/rumdl.nix {
       inherit inputs final;
     };
+    # Release-tracked like beads, but on bare tags (`0.28.3`), so its
+    # updateScript passes `tagPrefix = ""`. See ./dev-tools/strictdoc.nix.
+    strictdoc = import ./dev-tools/strictdoc.nix {
+      inherit inputs final;
+    };
     tsgolint = import ./dev-tools/tsgolint.nix {
       inherit inputs final;
     };

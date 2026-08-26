@@ -47,6 +47,7 @@ _: {
     markdownlint-cli2 = {consumerPath = ["ai" "devTools" "markdownlint-cli2"];};
     oxlint = {consumerPath = ["ai" "devTools" "oxlint"];};
     rumdl = {consumerPath = ["ai" "devTools" "rumdl"];};
+    strictdoc = {consumerPath = ["ai" "devTools" "strictdoc"];};
     tsgolint = {consumerPath = ["ai" "devTools" "tsgolint"];};
 
     # ── Generic supporting packages — live at `consumerPkgs.ai.generic.<name>` ──
