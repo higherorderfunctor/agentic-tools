@@ -129,7 +129,10 @@ computed at eval time via `overlays/lib.nix:mkVersion`
   `bin/strictdoc` and nothing else — no interpreter, no `site-packages` — and
   its `dependencies` is a uv2nix name → extras ATTRSET, not nixpkgs' list of
   derivations. Anything wanting strictdoc as a LIBRARY has to go through that
-  script's shebang; `strictdoc-grammar-extract` is the only such consumer.
+  script's shebang. The one consumer that does is NOT an overlay:
+  `packages/strictdoc-grammar/lib/mkExtract.nix`, which the `ai.strictdoc`
+  devenv module and the `strictdoc-grammar-*` checks build. Wrapping belongs to
+  the module that consumes a package, not to the overlay that converts it.
 - **Patched grammar source, regenerated at build time**
   (`tree-sitter-strictdoc`): `pkgs.tree-sitter.buildGrammar` with
   `generate = true` plus a `preBuild` override naming the grammar's actual entry
