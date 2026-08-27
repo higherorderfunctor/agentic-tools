@@ -94,8 +94,14 @@ for majors of one package; this is the general form.
 
 ### Direct external-flake derivations
 
-Semble is the external pinned-package exception to the local-build patterns
-below. `overlays/semble.nix` returns
+Two packages take this shape, and it is a class rather than an exception: Semble
+and, since 2026-08-27, strictdoc — `overlays/dev-tools/strictdoc.nix` re-exports
+`inputs.strictdoc.packages.${system}.default` on the identical contract. What
+follows describes Semble; strictdoc differs only in the input it names and in
+tracking upstream's main rather than a release.
+
+Semble is the original external pinned-package case, against the local-build
+patterns below. `overlays/semble.nix` returns
 `inputs.llm-agents.packages.${system}.semble` directly. It does not apply the
 input's `overlays.shared-nixpkgs`, rebuild with this repository's `ourPkgs`, or
 call `overrideAttrs`; any of those would replace the upstream cache identity
