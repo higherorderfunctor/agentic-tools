@@ -141,8 +141,9 @@ computed at eval time via `overlays/lib.nix:mkVersion`
   which this one does not. The `patches` target the grammar DEFINITION, never
   the generated `src/parser.c`; skipping the `preBuild` override is a silent
   no-op that ships upstream's unpatched parser with a green build. See
-  `packages/semble/.sdoc/01-grammar-injection.sdoc` (DEC-GRAMMAR-PATCH-NOT-FORK)
-  and `checks/strictdoc-grammar-corpus.nix` for the regression gate.
+  `packages/semble/.sdoc/dec-grammar-patch-not-fork.sdoc`
+  (DEC-GRAMMAR-PATCH-NOT-FORK) and `checks/strictdoc-grammar-corpus.nix` for the
+  regression gate.
 - **In-repo source**: packaged from a path in this repo (no upstream rev/hash,
   not version-tracked). **No package uses this shape today** —
   `kiro-memory-distiller` was the only one, and it was removed on 2026-09-01
