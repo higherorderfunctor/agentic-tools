@@ -361,6 +361,7 @@ recognised
 reflog
 reftable
 regen
+regenerable
 reimplementation
 relitigate
 relpath
@@ -498,6 +499,7 @@ vendorhash
 watchlist
 webp
 wikilink
+wireline
 worklist
 worktree
 worktrees
