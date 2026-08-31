@@ -1,0 +1,18 @@
+[DOCUMENT]
+TITLE: Perspective explores the exported rows in the browser
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[MECHANISM]
+UID: MECH-SDOC-PERSPECTIVE-VIEWER
+TITLE: Perspective explores the exported rows in the browser
+DEPTH: interface-settled
+AUTHORED_BY: llm
+STATEMENT: >>>
+The page loads pinned Perspective CDN modules for the viewer, datagrid, charts and browser worker, creates a named table from the response rows, and opens the native configuration panel over a dark themed datagrid. Perspective config-update events save its native JSON-ready token to localStorage; after the table schema is loaded, reload restores that object directly and falls back to the default view if restoration fails.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: DEC-SDOC-PERSPECTIVE-LOCAL-VIEW-STATE
+  ROLE: Governed_By

@@ -1,0 +1,18 @@
+[DOCUMENT]
+TITLE: Perspective reads only exported StrictDoc JSON
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[DECISION]
+UID: DEC-SDOC-PERSPECTIVE-EXPORT-BOUNDARY
+TITLE: Perspective reads only exported StrictDoc JSON
+AUTHORED_BY: llm
+STATUS: accepted
+RETIRES_ON: The JSON exporter cannot expose data the explorer needs, or measured request-time export latency makes interactive refresh unacceptable.
+STATEMENT: >>>
+The boundary between the Perspective spike and StrictDoc is the JSON produced by the strictdoc export command. The server invokes that command as a subprocess and never imports StrictDoc. Every data request uses a fresh temporary export directory, and no generated export is retained or committed.
+<<<
+RATIONALE: >>>
+This keeps the spike decoupled from StrictDoc internals, makes refresh semantics obvious, and leaves the existing resident-library board experiment independent.
+<<<

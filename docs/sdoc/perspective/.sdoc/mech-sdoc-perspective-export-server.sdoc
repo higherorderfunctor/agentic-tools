@@ -1,0 +1,21 @@
+[DOCUMENT]
+TITLE: A read-only HTTP endpoint owns each ephemeral export
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[MECHANISM]
+UID: MECH-SDOC-PERSPECTIVE-EXPORT-SERVER
+TITLE: A read-only HTTP endpoint owns each ephemeral export
+DEPTH: interface-settled
+AUTHORED_BY: llm
+STATEMENT: >>>
+A standard-library HTTP server serves an allowlisted static UI and a GET-only data endpoint. For each data request it creates a TemporaryDirectory, runs strictdoc export on the repository root with JSON as the sole format, reads json/index.json, adapts it while the directory exists, and then lets the temporary directory clean itself. Export and schema failures become structured non-success responses.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: DEC-SDOC-PERSPECTIVE-EXPORT-BOUNDARY
+  ROLE: Governed_By
+- TYPE: Parent
+  VALUE: REQ-SDOC-PERSPECTIVE-FRESH-DATA
+  ROLE: Guarantees

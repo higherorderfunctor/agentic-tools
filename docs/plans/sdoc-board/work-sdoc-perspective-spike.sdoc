@@ -1,0 +1,30 @@
+[DOCUMENT]
+TITLE: Build the export-backed Perspective explorer
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[WORK]
+UID: WORK-SDOC-PERSPECTIVE-SPIKE
+TITLE: Build the export-backed Perspective explorer
+DEPTH: interface-settled
+AUTHORED_BY: llm
+STATEMENT: >>>
+Implement and validate the ephemeral exporter endpoint, flat row adapter, pinned Perspective browser UI, dark board-derived shell and native local view restoration as an independent spike beside the existing board.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: DEC-SDOC-PERSPECTIVE-EXPORT-BOUNDARY
+  ROLE: Governed_By
+- TYPE: Parent
+  VALUE: DEC-SDOC-PERSPECTIVE-LOCAL-VIEW-STATE
+  ROLE: Governed_By
+- TYPE: Parent
+  VALUE: MECH-SDOC-PERSPECTIVE-EXPORT-SERVER
+  ROLE: Crosses
+- TYPE: Parent
+  VALUE: MECH-SDOC-PERSPECTIVE-ROW-ADAPTER
+  ROLE: Crosses
+- TYPE: Parent
+  VALUE: MECH-SDOC-PERSPECTIVE-VIEWER
+  ROLE: Crosses

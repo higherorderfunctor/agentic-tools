@@ -1,0 +1,24 @@
+[DOCUMENT]
+TITLE: The exporter document model becomes flat Perspective rows
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[MECHANISM]
+UID: MECH-SDOC-PERSPECTIVE-ROW-ADAPTER
+TITLE: The exporter document model becomes flat Perspective rows
+DEPTH: interface-settled
+AUTHORED_BY: llm
+STATEMENT: >>>
+The adapter emits one row per entry in each exported document NODES array. It copies every scalar node field unchanged, adds DOCUMENT_TITLE, RELATION_COUNT, RELATION_ROLES and RELATION_TARGETS facets, and retains the complete exported relation list as canonical JSON text in RELATIONS_JSON. It discards the repeated GRAMMAR payload and does not infer source paths or inspect sdoc files.
+<<<
+RATIONALE: >>>
+Perspective consumes row-oriented JSON with stable scalar columns, while StrictDoc relations are nested objects and the exporter repeats the grammar in every document.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: DEC-SDOC-PERSPECTIVE-EXPORT-BOUNDARY
+  ROLE: Governed_By
+- TYPE: Parent
+  VALUE: REQ-SDOC-PERSPECTIVE-FRESH-DATA
+  ROLE: Guarantees
