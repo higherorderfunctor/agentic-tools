@@ -7,10 +7,13 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SDOC-PERSPECTIVE-SPIKE
 TITLE: Build the export-backed Perspective explorer
-DEPTH: interface-settled
+DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Implement and validate the ephemeral exporter endpoint, flat row adapter, pinned Perspective browser UI, dark board-derived shell and native local view restoration as an independent spike beside the existing board.
+<<<
+NOTES: >>>
+Implemented 2026-08-31 as a separate export-only spike beside sdoc-board. Eight contracts pass; a live 1600 by 1000 Chromium render showed 372 rows and the native query panel; local view restoration survived reload; and no generated JSON lives in the checkout.
 <<<
 RELATIONS:
 - TYPE: Parent
@@ -28,3 +31,14 @@ RELATIONS:
 - TYPE: Parent
   VALUE: MECH-SDOC-PERSPECTIVE-VIEWER
   ROLE: Crosses
+- TYPE: Child
+  VALUE: EV-SDOC-PERSPECTIVE-FIRST-EXPLORER
+  ROLE: Produces
+- TYPE: File
+  VALUE: docs/sdoc/perspective/exporter.py
+- TYPE: File
+  VALUE: docs/sdoc/perspective/server.py
+- TYPE: File
+  VALUE: docs/sdoc/perspective/assets/app.js
+- TYPE: File
+  VALUE: docs/sdoc/perspective/test_perspective.py

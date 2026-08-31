@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euETo pipefail
+shopt -s inherit_errexit 2>/dev/null || :
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+project_root="$script_dir"
+while [[ ! -f $project_root/strictdoc_config.py ]]; do
+  parent="$(dirname "$project_root")"
+  if [[ $parent == "$project_root" ]]; then
+    echo "sdoc-perspective: cannot find strictdoc_config.py above $script_dir" >&2
+    exit 1
+  fi
+  project_root="$parent"
+done
+
+strictdoc_bin="$(command -v strictdoc)"
+python_bin="$(command -v python3)"
+
+exec "$python_bin" "$script_dir/server.py" \
+  --root "$project_root" \
+  --strictdoc-bin "$strictdoc_bin" \
+  "$@"

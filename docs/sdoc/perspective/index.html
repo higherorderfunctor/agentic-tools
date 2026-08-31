@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SDoc Perspective</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@perspective-dev/viewer@5.3.0/dist/css/themes.css"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/assets/app.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i>
+        </span>
+        <span>
+          <strong>SDOC PERSPECTIVE</strong>
+          <small>fresh JSON export · local view state</small>
+        </span>
+      </div>
+
+      <dl class="stats" aria-label="Export counts">
+        <div>
+          <dt>nodes</dt>
+          <dd id="node-count">—</dd>
+        </div>
+        <div>
+          <dt>relations</dt>
+          <dd id="relation-count">—</dd>
+        </div>
+        <div>
+          <dt>documents</dt>
+          <dd id="document-count">—</dd>
+        </div>
+        <div>
+          <dt>export</dt>
+          <dd id="export-duration">—</dd>
+        </div>
+      </dl>
+
+      <div class="status" role="status" aria-live="polite">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="status-text">exporting canon</span>
+      </div>
+    </header>
+
+    <main>
+      <perspective-viewer id="viewer" theme="Pro Dark"></perspective-viewer>
+      <div id="loading" class="loading">
+        <span class="spinner" aria-hidden="true"></span>
+        <strong>Exporting StrictDoc JSON</strong>
+        <small>Every page load starts a new temporary export.</small>
+      </div>
+      <div id="error" class="error" hidden></div>
+    </main>
+
+    <script type="module" src="/assets/app.js"></script>
+  </body>
+</html>

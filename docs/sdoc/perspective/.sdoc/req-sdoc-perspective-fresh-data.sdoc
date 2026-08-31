@@ -7,7 +7,7 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: REQ-SDOC-PERSPECTIVE-FRESH-DATA
 TITLE: Each browser load observes a fresh StrictDoc JSON export
-DEPTH: interface-settled
+DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Every data API request MUST start a new strictdoc JSON export after the request arrives, read it only from a fresh temporary directory, and remove that directory whether the request succeeds or fails. A repository export, a retained export file, and a process-level data cache MUST NOT satisfy the request.
@@ -15,7 +15,17 @@ Every data API request MUST start a new strictdoc JSON export after the request 
 RATIONALE: >>>
 Reload is the explicit refresh operation for this spike, so its data must reflect the files visible to the exporter at request time.
 <<<
+NOTES: >>>
+Implemented 2026-08-31. The real CLI contract and live browser reload both observed request-time exports, and the injected runner contract proved that the unique temporary output directory no longer existed when the adapter returned.
+<<<
 RELATIONS:
 - TYPE: Parent
   VALUE: DEC-SDOC-PERSPECTIVE-EXPORT-BOUNDARY
   ROLE: Governed_By
+- TYPE: Parent
+  VALUE: EV-SDOC-PERSPECTIVE-FIRST-EXPLORER
+  ROLE: Proven_By
+- TYPE: File
+  VALUE: docs/sdoc/perspective/exporter.py
+- TYPE: File
+  VALUE: docs/sdoc/perspective/test_perspective.py

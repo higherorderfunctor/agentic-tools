@@ -1,0 +1,18 @@
+[DOCUMENT]
+TITLE: The export-backed Perspective explorer renders and restores a query
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[EVIDENCE]
+UID: EV-SDOC-PERSPECTIVE-FIRST-EXPLORER
+TITLE: The export-backed Perspective explorer renders and restores a query
+DEPTH: implemented
+AUTHORED_BY: llm
+SOURCE: StrictDoc 0.28.3 JSON export; Perspective 5.3.0 CDN build; headless Chromium; docs/sdoc/perspective contracts; 2026-08-31
+STATEMENT: >>>
+A direct request exported 372 documents and 372 nodes with 954 relations from a 9,162,301-byte json/index.json in 2,171.6 ms, then returned 372 flat rows without retaining the export. Headless Chromium defined the Perspective custom element, rendered its Pro Dark Datagrid with the native settings panel and eight selected columns, and reported the same node and relation counts. Changing Group By to _NODE_TYPE caused the native viewer token to appear in localStorage; reload started another export and restored the same group-by with status saved view restored. Eight Python contracts, shellcheck, the JavaScript syntax check, treefmt and sdoc check passed. The browser smoke exposed a blocked Perspective blob module under the initial CSP, and the final policy admits blob scripts and workers while retaining the remaining restrictions.
+<<<
+RELATIONS:
+- TYPE: File
+  VALUE: docs/sdoc/perspective/test_perspective.py
