@@ -64,62 +64,174 @@
 
     <main class="workspace">
       <section id="view-board" class="view board-view" aria-label="Board view">
-        <div class="canvas-shell" aria-label="Canon graph">
-          <div id="legend" class="legend" aria-label="Node type legend"></div>
-          <div class="viewport-actions" aria-label="Viewport controls">
-            <button id="zoom-out" type="button" title="Zoom out">−</button>
-            <button id="zoom-in" type="button" title="Zoom in">+</button>
-            <button id="fit-view" type="button">Fit</button>
+        <aside class="work-browser" aria-label="Work items">
+          <header class="work-browser-head">
+            <div>
+              <span class="pane-kicker">Navigation</span>
+              <h1>Work items</h1>
+            </div>
+            <div class="work-head-actions">
+              <span id="work-count" class="work-count">0</span>
+              <button
+                id="close-work-browser"
+                class="drawer-close"
+                type="button"
+                aria-label="Close work items"
+              >
+                ×
+              </button>
+            </div>
+          </header>
+          <label class="work-search">
+            <span class="visually-hidden">Search work items</span>
+            <span aria-hidden="true">⌕</span>
+            <input
+              id="work-search"
+              type="search"
+              autocomplete="off"
+              placeholder="Search work…"
+            />
+          </label>
+          <label class="work-state-filter">
+            <span>State</span>
+            <select id="work-state">
+              <option value="">All states</option>
+            </select>
+          </label>
+          <p id="work-list-summary" class="work-list-summary"></p>
+          <div id="work-list" class="work-list"></div>
+        </aside>
+
+        <div class="canvas-shell" aria-label="Work item neighborhood graph">
+          <header class="graph-controlbar">
+            <div class="graph-controlbar-start">
+              <details id="graph-filters" class="graph-filters">
+                <summary>
+                  <span aria-hidden="true">▽</span>
+                  Filters
+                  <span id="filter-count" class="filter-count">0</span>
+                </summary>
+                <div class="filter-popover">
+                  <fieldset>
+                    <legend>Node types</legend>
+                    <div id="type-filters" class="filter-options"></div>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Relation roles</legend>
+                    <p class="filter-note relation-filter-help">
+                      Shift-click a role to toggle that name across node types.
+                    </p>
+                    <div id="role-filters" class="relation-filter-groups"></div>
+                  </fieldset>
+                  <button id="reset-filters" class="filter-reset" type="button">
+                    Reset filters
+                  </button>
+                </div>
+              </details>
+              <button
+                id="toggle-work-browser"
+                class="mobile-work-toggle"
+                type="button"
+              >
+                Work
+              </button>
+            </div>
+            <div
+              id="depth-options"
+              class="depth-options toolbar-depth"
+              aria-label="Neighborhood distance"
+            >
+              <span class="depth-label" aria-hidden="true">Hops:</span>
+              <button
+                type="button"
+                data-depth="1"
+                class="is-active"
+                aria-label="1 hop"
+              >
+                1
+              </button>
+              <button type="button" data-depth="2" aria-label="2 hops">
+                2
+              </button>
+              <button type="button" data-depth="3" aria-label="3 hops">
+                3
+              </button>
+            </div>
+            <span aria-hidden="true"></span>
+          </header>
+          <div class="graph-stage">
+            <div class="viewport-actions" aria-label="Viewport controls">
+              <button id="zoom-out" type="button" title="Zoom out">−</button>
+              <button id="zoom-in" type="button" title="Zoom in">+</button>
+              <button id="fit-view" type="button">Fit</button>
+            </div>
+            <svg
+              id="graph"
+              role="group"
+              aria-label="Read-only StrictDoc relation graph"
+            >
+              <defs>
+                <pattern
+                  id="grid"
+                  width="28"
+                  height="28"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <circle cx="1" cy="1" r="1" class="grid-dot"></circle>
+                </pattern>
+              </defs>
+              <rect
+                class="canvas-background"
+                width="100%"
+                height="100%"
+                fill="url(#grid)"
+              ></rect>
+              <g id="viewport">
+                <g id="edges"></g>
+                <g id="nodes"></g>
+              </g>
+            </svg>
+            <div id="graph-empty" class="graph-empty">
+              <span class="empty-mark" aria-hidden="true">◇</span>
+              <strong>Choose a work item</strong>
+              <span
+                >Explore its nearest relations without loading the canon.</span
+              >
+            </div>
+            <footer class="graph-footer">
+              <div
+                id="legend"
+                class="legend"
+                aria-label="Graph visual key"
+              ></div>
+              <p class="canvas-help">
+                <span class="canvas-help-long"
+                  >Drag to pan · wheel to zoom</span
+                >
+                <span class="canvas-help-short">Drag to pan</span>
+              </p>
+              <p id="neighborhood-summary" class="neighborhood-summary">
+                Choose a work item
+              </p>
+            </footer>
           </div>
-          <svg
-            id="graph"
-            role="img"
-            aria-label="Read-only StrictDoc relation graph"
-          >
-            <defs>
-              <pattern
-                id="grid"
-                width="28"
-                height="28"
-                patternUnits="userSpaceOnUse"
-              >
-                <circle cx="1" cy="1" r="1" class="grid-dot"></circle>
-              </pattern>
-              <marker
-                id="arrow"
-                viewBox="0 0 10 10"
-                refX="9"
-                refY="5"
-                markerWidth="7"
-                markerHeight="7"
-                orient="auto-start-reverse"
-              >
-                <path d="M 0 0 L 10 5 L 0 10 z"></path>
-              </marker>
-            </defs>
-            <rect
-              class="canvas-background"
-              width="100%"
-              height="100%"
-              fill="url(#grid)"
-            ></rect>
-            <g id="viewport">
-              <g id="edges"></g>
-              <g id="nodes"></g>
-            </g>
-          </svg>
-          <p class="canvas-help">
-            Drag the canvas · wheel to zoom · select a card to inspect
-          </p>
         </div>
 
         <aside id="inspector" class="inspector" aria-live="polite">
+          <button
+            id="close-inspector"
+            class="inspector-close"
+            type="button"
+            aria-label="Close inspector"
+          >
+            ×
+          </button>
           <div id="inspector-empty" class="inspector-empty">
             <span class="empty-mark" aria-hidden="true">◇</span>
-            <h1>Read the canon</h1>
+            <h1>Inspect a neighbor</h1>
             <p>
-              Select any card to see all fields, source location, and declared
-              relations.
+              Choose work on the left, then select any visible card to read its
+              fields and relations.
             </p>
             <p class="read-only">
               Read only · one resident scribe · no mutations

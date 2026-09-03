@@ -1,0 +1,30 @@
+[DOCUMENT]
+TITLE: The graph key explains stable role hues and focal direction
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[EVIDENCE]
+UID: EV-SDOC-BOARD-GRAPH-KEY-AND-ROLE-STYLE-SMOKE
+TITLE: The graph key explains stable role hues and focal direction
+DEPTH: verified
+AUTHORED_BY: llm
+SOURCE: Independent Chromium 152 headless DevTools probes at 1440x900 and 390x844 against the live scribe daemon; 2026-09-03
+STATEMENT: >>>
+At 1440 by 900, independent headless Chromium measured a dedicated graph control bar from x=292..1089 and y=64..113, with the graph stage beginning at y=113. Filters was the first left control at x=306..408.52. The `Hops:` segmented control exposed only the visible numerals one, two, and three and its center exactly matched the graph stage center. Selecting two hops left the Filters badge at zero, Reset filters retained two hops, and a pointer press outside the Filters disclosure closed it without closing on an inside interaction.
+
+The graph-stage controls remained independent of that header. Zoom and Fit were inset 14 pixels from its top-right corner. The rounded bottom-right summary read `5 nodes · 8 relations`, with no repeated hop distance and no use of `links`. The persistent key remained visible at x=304..600.797 and contained Nodes, Relations grouped by role name, and Direction without duplicating counts. Its node colors, stable relation-role hues, and solid outgoing, dashed incoming, and dotted transit samples matched the rendered graph encodings.
+
+The bottom-center pan hint's center delta from the graph stage was exactly zero. Its x=607.578..773.422 box began 6.781 pixels after the key, while the summary occupied x=924.234..1077; no pair of footer boxes intersected. The key's client and scroll dimensions showed no clipping.
+
+At 390 by 844, Chromium measured the two-row graph control bar at y=104..191 and the graph stage at y=191..844. The hop selector again centered exactly. The persistent key occupied x=12..377 and y=713..796, the shortened pan hint occupied x=153.813..235.188 and y=803..832, and the summary occupied x=236.234..377 and y=806..832. The key-to-hint vertical gap was 7 pixels and the hint-to-summary horizontal gap was 1.047 pixels, with no overlaps or clipping. All controls remained hit-testable and the page reported no runtime, console, log, board-event, or page errors.
+
+All repeated role names continued to use one computed hue. Every labeled route matched its path, text, and arrowhead hue. On the requested focal node, outgoing pieces were solid and transit pieces dotted; an incoming-edge positive control rendered the dashed pattern. Scoped relation-filter swatches remained circular while node-type swatches retained their distinct rounded-square shape. The focal card and URL hash remained WORK-SCRIBE-RPC-AND-SERVICE throughout.
+<<<
+RELATIONS:
+- TYPE: File
+  VALUE: docs/sdoc/board/index.html
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/app.css
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/board.js

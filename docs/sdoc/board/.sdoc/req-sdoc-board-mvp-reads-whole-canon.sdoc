@@ -1,25 +1,26 @@
 [DOCUMENT]
-TITLE: The board reads the whole canon and cannot mutate it
+TITLE: The board reads without mutation and bounds graph rendering
 
 [GRAMMAR]
 IMPORT_FROM_FILE: @repo
 
 [REQUIREMENT]
 UID: REQ-SDOC-BOARD-MVP-READS-WHOLE-CANON
-TITLE: The board reads the whole canon and cannot mutate it
+TITLE: The board reads without mutation and bounds graph rendering
 DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
-The board presents every node and every resolved Parent or Child declaration
-loaded from the canon, in each of its views. It offers no filter, no editor, no
-mutation endpoint and no write-back path: selection, pan, zoom, table queries
-and inspection are reading actions only.
+The app may read every node and resolved Parent or Child declaration from the
+daemon for its different lenses, but the Graph view SHALL render only a focal
+node's bounded neighborhood and SHALL NOT offer an unbounded whole-canon
+canvas. The Graph defaults to one hop, exposes no depth beyond three, and caps
+rendering at 48 nodes. The app offers no editor, mutation endpoint or
+write-back path: search, filters, selection, pan, zoom, table queries and
+inspection are reading actions only.
 <<<
 NOTES: >>>
-Ported 2026-09-01 from the codex spike branch (feat/strictdoc-trial-codex),
-where it governed the board spike alone; the merged app extends it over the
-Perspective view. The known cost of "every node": the whole-canon canvas is
-denser than a person can read (operator, 2026-09-01). WORK-BOARD-FILTER-MODEL
-owns deciding the filter model, and this requirement's no-filter clause is
-expected to be superseded by what it decides.
+The bounded-neighborhood reference implementation superseded the no-filter
+and whole-canon Graph clauses on 2026-09-02 under
+WORK-GRAPH-NEIGHBORHOOD-VIEW. Plan and Perspective remain complete-canon
+lenses; this requirement bounds SVG rendering, not the shared payload.
 <<<

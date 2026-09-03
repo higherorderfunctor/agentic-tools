@@ -1,0 +1,45 @@
+[DOCUMENT]
+TITLE: Relation roles use color while stroke pattern shows direction
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[MECHANISM]
+UID: MECH-SDOC-BOARD-RELATION-ROLE-STYLES
+TITLE: Relation roles use color while stroke pattern shows direction
+DEPTH: implemented
+AUTHORED_BY: llm
+STATEMENT: >>>
+The Graph view assigns each payload-derived relation role a deterministic hue
+from the alphabetically sorted role vocabulary. Golden-angle hue steps keep
+adjacent assignments visually separated. The same role name therefore keeps
+one color across source-node-type filter groups, the grouped graph key, and
+visible graph edges. Edge paths, labels, and arrowheads inherit that hue, while
+filter controls show a role-colored dot without implying direction.
+
+Stroke pattern describes direction relative to the focal work item: direct
+outgoing edges are solid, direct incoming edges are dashed, and non-focal
+transit edges are dotted and subdued. Routing geometry remains independent of
+this encoding. The always-available Key disclosure names the three patterns.
+Color is an identity aid rather than normative meaning, and the vocabulary
+remains payload-derived.
+<<<
+NOTES: >>>
+Added by the WORK-GRAPH-NEIGHBORHOOD-VIEW reference implementation on 2026-09-02.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: MECH-SDOC-BOARD-SCOPED-RELATION-FILTERS
+  ROLE: Assumes
+- TYPE: Parent
+  VALUE: DEC-SDOC-BOARD-MVP-NATIVE-WEB
+  ROLE: Governed_By
+- TYPE: File
+  VALUE: docs/sdoc/board/index.html
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/app.css
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/board.js
+- TYPE: Parent
+  VALUE: EV-SDOC-BOARD-GRAPH-KEY-AND-ROLE-STYLE-SMOKE
+  ROLE: Proven_By

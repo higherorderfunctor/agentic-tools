@@ -523,6 +523,20 @@ class ServerContractTest(unittest.TestCase):
     def test_static_routes_are_allowlisted(self) -> None:
         with urllib.request.urlopen(f"{self.base_url}/") as response:
             self.assertIn(b"SDOC BOARD", response.read())
+        for asset in (
+            "/assets/vendor/elkjs/elk-api.js",
+            "/assets/vendor/elkjs/elk-worker.min.js",
+        ):
+            with urllib.request.urlopen(f"{self.base_url}{asset}") as response:
+                self.assertEqual(response.status, 200)
+                self.assertEqual(
+                    response.headers.get_content_type(), "text/javascript"
+                )
+                self.assertIn(
+                    "worker-src 'self'",
+                    response.headers["Content-Security-Policy"],
+                )
+                self.assertGreater(len(response.read()), 1_000)
         for leaked in ("/server.py", "/source.py", "/adapter.py", "/test_board.py"):
             with self.assertRaises(urllib.error.HTTPError) as error:
                 urllib.request.urlopen(f"{self.base_url}{leaked}")

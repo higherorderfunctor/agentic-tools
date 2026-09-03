@@ -106,7 +106,7 @@ async function showBoard() {
     throw new Error(`unsupported snapshot schema: ${payload.schema}`);
   }
   renderStats(payload);
-  renderBoard(payload);
+  await renderBoard(payload);
   loaded.board = true;
 }
 
@@ -200,6 +200,13 @@ for (const name of VIEWS) {
 document.querySelector("#refresh").addEventListener("click", refresh);
 window.addEventListener("sdoc:show-grammar", (event) => {
   activate("grammars", { push: true }).then(() => selectGrammar(event.detail));
+});
+window.addEventListener("sdoc:board-error", (event) => {
+  const error = event.detail;
+  elements.error.textContent = `sdoc-board: ${error?.message || error}`;
+  elements.error.hidden = false;
+  setStatus("layout failed", "error");
+  console.error(error);
 });
 document.querySelector("#retry").addEventListener("click", refresh);
 
