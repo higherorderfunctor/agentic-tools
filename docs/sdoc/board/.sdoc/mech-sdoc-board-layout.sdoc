@@ -1,26 +1,40 @@
 [DOCUMENT]
-TITLE: The board layout condenses cycles before assigning stable layers
+TITLE: The board layout keeps a focal node between incoming and outgoing ranks
 
 [GRAMMAR]
 IMPORT_FROM_FILE: @repo
 
 [MECHANISM]
 UID: MECH-SDOC-BOARD-LAYOUT
-TITLE: The board layout condenses cycles before assigning stable layers
+TITLE: The board sends only a bounded neighborhood to ELK.js
 DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
-layout.js treats the snapshot as a directed multigraph. It condenses strongly
-connected components, ranks the resulting acyclic projection from left to
-right, orders each rank with deterministic barycentric sweeps, and keeps every
-original node and edge for rendering. The layout consumes and returns
-application-owned objects so Dagre or ELK can replace it later.
+layout.js first traverses only the selected node's filtered incoming and outgoing
+adjacency to the requested hop depth, ranks candidates for deterministic
+clipping, and retains at most 48 nodes. Only that bounded induced subgraph is
+sent to the vendored ELK.js 0.12 worker; the whole canon is never serialized to
+the layout engine.
+
+ELK Layered places the measured card boxes from left to right and returns
+orthogonal edge sections. The board supplies measured relation-label boxes and
+label-label, label-node, edge-edge, edge-node, and inter-layer spacing, then
+translates ELK positions, bends, and label coordinates back into
+application-owned render objects. Fan-outs of at least three semantic edges
+sharing an endpoint, role, and direction use an invisible junction: one labeled
+trunk branches into unlabeled terminal pieces. Generic ELK edge merging stays
+disabled because it is not role-aware. Every routed piece retains its original
+semantic edge objects so filtering, inspection highlighting, direction styles,
+and counts continue to describe canon relations.
+
+Layout is asynchronous. A monotonically increasing request token makes the
+latest depth, filter, hash, or refresh selection win and discards stale worker
+results. Initial layout failures keep the app from reporting ready; later
+failures reach the shared error banner. The API and worker are pinned,
+same-origin assets served through the static allowlist.
 <<<
 NOTES: >>>
-Ported 2026-09-01 from the codex spike byte-identical. Its measured shape
-there: the real snapshot condensed to 348 strongly connected components with
-two two-node cycles preserved; oversized logical ranks pack into at most 32
-rows per adjacent lane.
+The ELK.js layout replaced the reference implementation's custom SCC, barycentric, and orthogonal router on 2026-09-02. elkjs 0.12.0 is vendored under its EPL-2.0 OR GPL-3.0-or-later license.
 <<<
 RELATIONS:
 - TYPE: Parent
@@ -28,3 +42,20 @@ RELATIONS:
   ROLE: Governed_By
 - TYPE: File
   VALUE: docs/sdoc/board/assets/layout.js
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/app.js
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/board.js
+- TYPE: File
+  VALUE: docs/sdoc/board/server.py
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/vendor/elkjs/elk-api.js
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/vendor/elkjs/elk-worker.min.js
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/vendor/elkjs/LICENSE
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/vendor/elkjs/NOTICE.txt
+- TYPE: Parent
+  VALUE: EV-SDOC-BOARD-ELK-NEIGHBORHOOD-SMOKE
+  ROLE: Proven_By

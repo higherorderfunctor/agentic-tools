@@ -13,10 +13,11 @@ and holds no graph. No daemon answering is HTTP 503 with the client's own
 remedy in the body -- the browser shows it and offers a retry, rather than
 this server quietly loading the corpus itself.
 
-The Content-Security-Policy admits cdn.jsdelivr.net, blob: scripts and
-workers, and wasm-unsafe-eval: Perspective's pinned CDN build loads its wasm
-and worker that way (EV-SDOC-PERSPECTIVE-FIRST-EXPLORER measured exactly
-which directives it needs; the board view alone needs none of them).
+The Content-Security-Policy admits same-origin workers for the board's vendored
+ELK layout engine. It also admits cdn.jsdelivr.net, blob: scripts and workers,
+and wasm-unsafe-eval: Perspective's pinned CDN build loads its wasm and worker
+that way (EV-SDOC-PERSPECTIVE-FIRST-EXPLORER measured exactly which directives
+it needs).
 """
 
 from __future__ import annotations
@@ -38,6 +39,7 @@ from scribe_paths import RootError, resolve_root  # noqa: E402
 
 from source import ClientError, DaemonSource, NoDaemon  # noqa: E402
 
+ELK_VENDOR = HERE / "assets" / "vendor" / "elkjs"
 STATIC_ROUTES = {
     "/": HERE / "index.html",
     "/index.html": HERE / "index.html",
@@ -52,6 +54,8 @@ STATIC_ROUTES = {
     "/assets/layout.js": HERE / "assets" / "layout.js",
     "/assets/perspective.js": HERE / "assets" / "perspective.js",
     "/assets/theme.css": HERE / "assets" / "theme.css",
+    "/assets/vendor/elkjs/elk-api.js": ELK_VENDOR / "elk-api.js",
+    "/assets/vendor/elkjs/elk-worker.min.js": ELK_VENDOR / "elk-worker.min.js",
 }
 CONTENT_SECURITY_POLICY = (
     "default-src 'self'; "
