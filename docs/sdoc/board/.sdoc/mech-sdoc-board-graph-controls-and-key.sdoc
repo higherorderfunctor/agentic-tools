@@ -1,0 +1,42 @@
+[DOCUMENT]
+TITLE: Graph controls stay visible while a grouped key explains encodings
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[MECHANISM]
+UID: MECH-SDOC-BOARD-GRAPH-CONTROLS-AND-KEY
+TITLE: Graph controls stay visible while a grouped key explains encodings
+DEPTH: implemented
+AUTHORED_BY: llm
+STATEMENT: >>>
+Neighborhood distance and filters occupy a dedicated control bar above the graph rather than overlaying its drawing area. Filters is the first control at the left; the depth control stays horizontally centered and presents one, two, and three as a single `Hops:` segmented pill. Changing distance does not increment the Filters badge, which counts only disabled node types and scoped relation roles, and Reset filters does not change the selected distance. A pointer press outside the open Filters disclosure closes it.
+
+Inside the graph stage, zoom and Fit remain at the top right. A persistent compact key anchors to the bottom left and presents three payload-derived groups: visible node types with their colors, visible relation roles grouped by name with their stable hues, and solid outgoing, dashed incoming, and dotted transit line samples. The key uses tight column spacing and scrolls horizontally within its available width rather than lengthening the header or clipping the graph controls.
+
+The pan and zoom hint is geometrically centered along the graph's bottom edge. A rounded status box at bottom right reports visible nodes and semantic relations; hop distance appears only in the centered selector and is not repeated in this summary. Counts appear only in this status box rather than consuming space in the key. These three footer zones remain bounded so their content cannot expand the page or load the whole canon.
+
+At narrow widths the global chrome remains two deliberate rows: compact brand and Refresh above four equal-width view buttons. The graph control bar also becomes two explicit rows, with Filters and the Work drawer control above the centered hop selector. The persistent key receives its own footer row, while a shortened pan hint and visible relation summary share the row below it. The workspace derives from the taller mobile topbar so every global and graph control remains in the viewport and hit-testable.
+<<<
+NOTES: >>>
+Added by the WORK-GRAPH-NEIGHBORHOOD-VIEW reference implementation on 2026-09-02 after comparing the beadboard control-strip and inset-legend pattern.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: MECH-SDOC-BOARD-RELATION-ROLE-STYLES
+  ROLE: Assumes
+- TYPE: Parent
+  VALUE: DEC-SDOC-BOARD-MVP-NATIVE-WEB
+  ROLE: Governed_By
+- TYPE: Parent
+  VALUE: REQ-SDOC-BOARD-POPOVER-OPERABILITY
+  ROLE: Guarantees
+- TYPE: File
+  VALUE: docs/sdoc/board/index.html
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/app.css
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/board.js
+- TYPE: Parent
+  VALUE: EV-SDOC-BOARD-GRAPH-KEY-AND-ROLE-STYLE-SMOKE
+  ROLE: Proven_By

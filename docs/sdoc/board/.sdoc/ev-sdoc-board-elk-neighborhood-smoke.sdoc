@@ -1,0 +1,35 @@
+[DOCUMENT]
+TITLE: ELK removes measured label collisions without losing semantic edges
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[EVIDENCE]
+UID: EV-SDOC-BOARD-ELK-NEIGHBORHOOD-SMOKE
+TITLE: ELK removes measured label collisions without losing semantic edges
+DEPTH: verified
+AUTHORED_BY: llm
+SOURCE: Independent Chromium 152 headless DevTools probes at 1440x900 against the live scribe daemon, plus a synthetic pre-layout cap probe; 2026-09-02
+STATEMENT: >>>
+Against the live generation-14 canon, headless Chromium rendered
+WORK-SCRIBE-RPC-AND-SERVICE at two hops as 14 cards and 20 semantic links using
+22 ELK-routed path pieces and 15 labels. Bounding-box tests found zero
+label-label and zero label-node intersections; stroke sampling across 23 broad
+path-box candidates found zero labels intersecting unrelated paths. The prior
+custom router on the same neighborhood measured 15 label-label and 10
+label-node intersections.
+
+Five Proven_By relations rendered as two labels: one direct edge plus one
+labeled trunk shared by a four-source fan-in. That group used six routed pieces.
+Selecting MECH-SCRIBE-DEVENV-PROCESS activated the two group pieces associated
+with that semantic relation and dimmed the other four without changing the
+focal hash. Rapid depth selection from three to one to two settled on the latest
+two-hop request with aria-busy cleared. A separate 101-node synthetic star probe
+retained its center and clipped to 48 nodes before invoking ELK. The page
+reported no runtime, console, log, board-event, or page errors.
+<<<
+RELATIONS:
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/layout.js
+- TYPE: File
+  VALUE: docs/sdoc/board/assets/board.js
