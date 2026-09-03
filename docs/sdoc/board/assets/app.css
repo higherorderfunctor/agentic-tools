@@ -802,10 +802,9 @@ html[data-status="error"] .status-dot {
   min-width: 0;
   width: max-content;
   max-width: 100%;
-  grid-auto-flow: column;
-  grid-auto-columns: max-content;
-  gap: calc(3 * var(--u));
-  padding: calc(4 * var(--u)) calc(3 * var(--u));
+  grid-template-columns: repeat(3, max-content);
+  gap: calc(5 * var(--u)) calc(32 * var(--u));
+  padding: calc(6 * var(--u)) calc(9 * var(--u));
   overflow-x: auto;
   border: 1px solid var(--border-subtle);
   border-radius: 7px;
@@ -818,8 +817,15 @@ html[data-status="error"] .status-dot {
   display: none;
 }
 
+@media (min-width: 681px) {
+  .legend {
+    margin-bottom: calc(36 * var(--u));
+  }
+}
+
 .legend-heading {
   align-self: start;
+  grid-column: 1 / -1;
   margin: 0;
   color: var(--text-primary);
   font-family: var(--font-mono);
