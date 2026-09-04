@@ -88,13 +88,26 @@ function buildRoleStyles(relations) {
     roles.map((role, index) => [
       role,
       {
-        // Golden-angle steps keep alphabetically adjacent roles far apart on
-        // the color wheel instead of producing a run of similar rainbow hues.
-        color: `hsl(${Math.round((164 + index * 137.508) % 360)} 82% 68%)`,
+        // Binary low-discrepancy steps spread every growing prefix around the
+        // wheel; fixed OKLCH lightness/chroma keeps those hues similarly
+        // legible on the dark canvas. Orange is intentionally the first slot.
+        color: `oklch(80% 0.15 ${distributedHue(index)})`,
         markerId: `role-arrow-${index}`,
       },
     ]),
   );
+}
+
+function distributedHue(index) {
+  let fraction = 0;
+  let place = 0.5;
+  let remaining = index;
+  while (remaining > 0) {
+    fraction += (remaining % 2) * place;
+    remaining = Math.floor(remaining / 2);
+    place /= 2;
+  }
+  return Math.round(((48 + fraction * 360) % 360) * 10) / 10;
 }
 
 function renderRoleMarkers() {
@@ -124,21 +137,6 @@ function renderRoleMarkers() {
   }
 }
 
-function textMeasurer(probeGroup, className) {
-  const probe = svgNode("text", { class: className });
-  probeGroup.append(probe);
-  const style = getComputedStyle(probe);
-  const font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-  const spacing = style.letterSpacing.endsWith("px")
-    ? style.letterSpacing
-    : "0px";
-  return (value) => {
-    measurer.font = font;
-    measurer.letterSpacing = spacing;
-    return measurer.measureText(value).width;
-  };
-}
-
 function edgeLabelMeasurer() {
   const probe = svgNode("text", { class: "edge-label", x: "0", y: "0" });
   probe.textContent = "Ag";
@@ -163,60 +161,50 @@ function edgeLabelMeasurer() {
 }
 
 function readMeasurers() {
-  const probeGroup = svgNode("g", { class: "node-card" });
-  elements.nodes.append(probeGroup);
   measure = {
     edge: edgeLabelMeasurer(),
-    id: textMeasurer(probeGroup, "card-id"),
-    state: textMeasurer(probeGroup, "card-state"),
-    title: textMeasurer(probeGroup, "card-title"),
   };
-  probeGroup.remove();
 }
 
-function truncateToWidth(value, maxWidth, width, elide = false) {
-  if (!elide && width(value) <= maxWidth) return value;
-  let end = value.length;
-  while (end > 1 && width(`${value.slice(0, end).trimEnd()}…`) > maxWidth) {
-    end -= 1;
-  }
-  return `${value.slice(0, end).trimEnd()}…`;
+function cardTabInset() {
+  return scaled(3) / view.scale;
 }
 
-function titleLines(title, maxWidth, width, maxLines = 2) {
-  const words = title.split(/\s+/).filter(Boolean);
-  const lines = [];
-  let line = "";
-  let dropped = false;
-  for (const word of words) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (width(candidate) <= maxWidth || !line) {
-      line = candidate;
-      continue;
-    }
-    if (lines.length === maxLines - 1) {
-      dropped = true;
-      break;
-    }
-    lines.push(line);
-    line = word;
+function outsideOutlineGeometry(strokeWidth) {
+  const halfStroke = scaled(strokeWidth / 2) / view.scale;
+  return {
+    height: card.height + halfStroke * 2,
+    rx: scaled(6) + halfStroke,
+    width: card.width + halfStroke * 2,
+    x: -halfStroke,
+    y: -halfStroke,
+  };
+}
+
+function updateCardChrome() {
+  const inset = cardTabInset();
+  for (const surface of elements.nodes.querySelectorAll(".card-main")) {
+    surface.setAttribute("x", inset);
+    surface.setAttribute("width", card.width - inset);
   }
-  if (line) lines.push(line);
-  if (lines.length && (dropped || width(lines.at(-1)) > maxWidth)) {
-    lines[lines.length - 1] = truncateToWidth(
-      lines.at(-1),
-      maxWidth,
-      width,
-      dropped,
-    );
+  for (const [selector, strokeWidth] of [
+    [".card-border", 1],
+    [".card-outline", 2],
+  ]) {
+    const geometry = outsideOutlineGeometry(strokeWidth);
+    for (const outline of elements.nodes.querySelectorAll(selector)) {
+      for (const [name, value] of Object.entries(geometry)) {
+        outline.setAttribute(name, value);
+      }
+    }
   }
-  return lines;
 }
 
 function setView(next) {
   view.x = next.x;
   view.y = next.y;
   view.scale = next.scale;
+  updateCardChrome();
   elements.viewport.setAttribute(
     "transform",
     `translate(${view.x} ${view.y}) scale(${view.scale})`,
@@ -266,22 +254,10 @@ function renderEdges() {
       color: "#64ffda",
       markerId: "arrow",
     };
-    const direction = semanticEdges.some(
-      (semantic) =>
-        semantic.source === state.focusId && semantic.target !== state.focusId,
-    )
-      ? "outgoing"
-      : semanticEdges.some(
-            (semantic) =>
-              semantic.target === state.focusId &&
-              semantic.source !== state.focusId,
-          )
-        ? "incoming"
-        : "transit";
     const sources = [...new Set(semanticEdges.map(({ source }) => source))];
     const targets = [...new Set(semanticEdges.map(({ target }) => target))];
     const wrapper = svgNode("g", {
-      class: `edge edge-${route.kind} direction-${direction}`,
+      class: `edge edge-${route.kind}`,
       "data-role": role,
       "data-source": edge.source,
       "data-sources": JSON.stringify(sources),
@@ -314,85 +290,54 @@ function renderNode(node) {
   const group = svgNode("g", {
     class: node.id === state.focusId ? "node-card is-center" : "node-card",
     transform: `translate(${position.x} ${position.y})`,
-    tabindex: "0",
-    role: "button",
-    "aria-label": `${node.type} ${node.id}: ${node.title}`,
     "data-id": node.id,
     "data-rank": position.rank,
     style: `--accent:${accent}`,
   });
-  group.append(
-    svgNode("rect", {
-      class: "card-body",
-      width: card.width,
-      height: card.height,
-      rx: scaled(7),
-    }),
-    svgNode("rect", {
-      class: "card-accent",
-      width: scaled(4),
-      height: card.height,
-      rx: scaled(2),
-    }),
-  );
-
-  const type = svgNode("text", {
-    class: "card-type",
-    x: scaled(15),
-    y: scaled(18),
+  const radius = scaled(6);
+  const foreignObject = svgNode("foreignObject", {
+    class: "card-foreign-object",
+    width: card.width,
+    height: card.height,
   });
-  type.textContent = node.type;
-  const uid = svgNode("text", {
-    class: "card-id",
-    x: scaled(15),
-    y: scaled(34),
-  });
-  const textWidth = card.width - scaled(25);
-  uid.textContent = truncateToWidth(node.id, textWidth, measure.id);
-  group.append(type, uid);
-
-  titleLines(node.title, textWidth, measure.title).forEach((line, index) => {
-    const text = svgNode("text", {
-      class: "card-title",
-      x: scaled(15),
-      y: scaled(57 + index * 15),
-    });
-    text.textContent = line;
-    group.append(text);
-  });
-
-  if (node.state) {
-    const label = truncateToWidth(node.state.value, scaled(120), measure.state);
-    const width = Math.max(scaled(42), measure.state(label) + scaled(14));
-    group.append(
-      svgNode("rect", {
-        class: "card-state-bg",
-        x: card.width - width - scaled(10),
-        y: card.height - scaled(23),
-        width,
-        height: scaled(16),
-        rx: scaled(3),
-      }),
-    );
-    const stateLabel = svgNode("text", {
-      class: "card-state",
-      x: card.width - width - scaled(3),
-      y: card.height - scaled(11.5),
-    });
-    stateLabel.textContent = label;
-    group.append(stateLabel);
-  }
-
-  group.addEventListener("click", (event) => {
+  const item = summaryCard(node, { graph: true });
+  item.setAttribute("aria-label", `${node.type} ${node.id}: ${node.title}`);
+  item.addEventListener("click", (event) => {
     event.stopPropagation();
     selectNode(node.id);
   });
-  group.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      selectNode(node.id);
-    }
-  });
+  foreignObject.append(item);
+  const inset = cardTabInset();
+  group.append(
+    svgNode("rect", {
+      class: "card-glow",
+      width: card.width,
+      height: card.height,
+      rx: radius,
+    }),
+    svgNode("rect", {
+      class: "card-tab",
+      width: card.width,
+      height: card.height,
+      rx: radius,
+    }),
+    svgNode("rect", {
+      class: "card-main",
+      x: inset,
+      width: card.width - inset,
+      height: card.height,
+      rx: radius,
+    }),
+    foreignObject,
+    svgNode("rect", {
+      class: "card-border",
+      ...outsideOutlineGeometry(1),
+    }),
+    svgNode("rect", {
+      class: "card-outline",
+      ...outsideOutlineGeometry(2),
+    }),
+  );
   return group;
 }
 
@@ -420,21 +365,25 @@ function renderLegend() {
     item.append(htmlNode("span", "legend-line"), htmlNode("span", null, role));
     roleItems.append(item);
   }
-  const directionItems = htmlNode("div", "legend-items legend-directions");
-  for (const [direction, label] of [
-    ["outgoing", "Outgoing"],
-    ["incoming", "Incoming"],
-    ["transit", "Transit"],
+  const outlineItems = htmlNode("div", "legend-items legend-outline-items");
+  for (const [kind, label] of [
+    ["focus", "Focused work"],
+    ["inspected", "Inspected"],
+    ["source", "Source → inspected"],
+    ["target", "Inspected → target"],
   ]) {
-    const item = htmlNode("span", "legend-item legend-direction-item");
+    const item = htmlNode("span", "legend-item legend-outline-item");
     item.append(
-      htmlNode("span", `legend-line direction-${direction}`),
+      htmlNode("span", `legend-outline-swatch outline-${kind}`),
       htmlNode("span", null, label),
     );
-    directionItems.append(item);
+    outlineItems.append(item);
   }
-  const group = (title, items) => {
-    const section = htmlNode("section", "legend-group");
+  const group = (title, items, className = "") => {
+    const section = htmlNode(
+      "section",
+      `legend-group${className ? ` ${className}` : ""}`,
+    );
     section.append(htmlNode("h3", "legend-title", title), items);
     return section;
   };
@@ -442,7 +391,7 @@ function renderLegend() {
     htmlNode("h2", "legend-heading", "Key"),
     group("Nodes", nodeItems),
     group("Relations", roleItems),
-    group("Direction", directionItems),
+    group("Card outlines", outlineItems, "legend-outline-group"),
   );
 }
 
@@ -462,8 +411,8 @@ function applyInspection() {
     const id = node.dataset.id;
     node.classList.toggle("is-center", id === state.focusId);
     node.classList.toggle("is-selected", id === inspected);
-    node.classList.toggle("is-incoming", incoming.has(id));
-    node.classList.toggle("is-outgoing", outgoing.has(id));
+    node.classList.toggle("points-to-inspected", incoming.has(id));
+    node.classList.toggle("pointed-to-by-inspected", outgoing.has(id));
     node.classList.toggle(
       "is-dim",
       Boolean(inspected) &&
@@ -475,14 +424,10 @@ function applyInspection() {
   for (const edge of elements.edges.querySelectorAll(".edge")) {
     const sources = JSON.parse(edge.dataset.sources || "[]");
     const targets = JSON.parse(edge.dataset.targets || "[]");
-    const isIncoming = targets.includes(inspected);
-    const isOutgoing = sources.includes(inspected);
-    edge.classList.toggle("is-incoming", isIncoming);
-    edge.classList.toggle("is-outgoing", isOutgoing);
-    edge.classList.toggle(
-      "is-dim",
-      Boolean(inspected) && !isIncoming && !isOutgoing,
-    );
+    const touchesInspected =
+      sources.includes(inspected) || targets.includes(inspected);
+    edge.classList.toggle("touches-inspected", touchesInspected);
+    edge.classList.toggle("is-dim", Boolean(inspected) && !touchesInspected);
   }
 }
 
@@ -518,15 +463,20 @@ function workHaystack(node) {
     .toLocaleLowerCase();
 }
 
-function workItem(node) {
-  const item = htmlNode("button", "work-item");
+function summaryCard(node, { graph = false } = {}) {
+  const item = htmlNode(
+    "button",
+    graph ? "work-item graph-work-item" : "work-item",
+  );
   item.type = "button";
-  item.dataset.id = node.id;
-  item.style.setProperty("--accent", colorOf(node.type));
   const head = htmlNode("span", "work-item-head");
   head.append(
     htmlNode("span", "work-item-uid", node.id),
-    htmlNode("span", "work-item-state", node.state?.value ?? "work"),
+    htmlNode(
+      "span",
+      "work-item-state",
+      node.state?.value ?? (graph ? "node" : "work"),
+    ),
   );
   const path = node.source?.path ?? "path unknown";
   const dir = path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : path;
@@ -535,6 +485,13 @@ function workItem(node) {
     htmlNode("strong", "work-item-title", node.title),
     htmlNode("span", "work-item-path", dir),
   );
+  return item;
+}
+
+function workItem(node) {
+  const item = summaryCard(node);
+  item.dataset.id = node.id;
+  item.style.setProperty("--accent", colorOf(node.type));
   item.addEventListener("click", () => {
     void setFocus(node.id).catch(reportLayoutError);
   });

@@ -17,10 +17,26 @@ middle canvas defaults to one hop and exposes always-visible one-, two-, and
 three-hop controls with a 48-node ceiling. Node-type filters and relation
 filters scoped by source node type constrain traversal. Selecting a node within
 the rendered graph fills the right-pane details without changing the focal work
-item or hash. A vendored ELK.js worker places cards and routes orthogonal edges
-with measured label spacing; repeated same-role fan-outs can share one labeled
-trunk. Relation hue identifies role and line pattern identifies focal direction,
-both explained by a grouped graph key.
+item or hash.
+
+A vendored ELK.js worker places cards and routes orthogonal edges with measured
+label spacing; repeated same-role fan-outs share labels and genuinely shared
+segments render once. Same-role route pieces that meet across an invisible ELK
+junction are bridged only when they share semantic relations, preventing tiny
+visible gaps without joining unrelated lines. Solid relation hues identify
+payload-derived role names, while arrowheads preserve declared
+source-to-target direction.
+
+Graph cards host the same native HTML summary button as navigation, preserving
+UID, state, title, source path, padding, and typography. SVG layers behind it
+paint an outward blurred semantic silhouette, a full rounded node-type plate,
+and a borderless main surface inset to reveal a stable three-pixel type tab.
+No-fill perimeters span the full card above the transparent HTML contents: a
+thin subtle-dark line is always visible, hover changes only a thicker line to
+the node-type color, and semantic states change that line and enable the glow.
+The body and tab geometry and fills never change between those states. Filters,
+centered Hops, and zoom out, zoom in, and Fit share the header. A grouped,
+bottom-aligned key explains encodings without covering graph controls.
 <<<
 NOTES: >>>
 Operator, 2026-09-02, verbatim: "graph, add new left pane that's a list of
@@ -62,3 +78,6 @@ RELATIONS:
 - TYPE: Child
   VALUE: EV-SDOC-BOARD-GRAPH-KEY-AND-ROLE-STYLE-SMOKE
   ROLE: Produces
+- TYPE: Parent
+  VALUE: MECH-SDOC-BOARD-CARD-OUTLINE-STATES
+  ROLE: Crosses
