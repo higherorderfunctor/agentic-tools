@@ -1,28 +1,28 @@
 [DOCUMENT]
-TITLE: Relation roles use color while stroke pattern shows direction
+TITLE: Relation roles use evenly distributed solid colors
 
 [GRAMMAR]
 IMPORT_FROM_FILE: @repo
 
 [MECHANISM]
 UID: MECH-SDOC-BOARD-RELATION-ROLE-STYLES
-TITLE: Relation roles use color while stroke pattern shows direction
+TITLE: Relation roles use evenly distributed solid colors
 DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Graph view assigns each payload-derived relation role a deterministic hue
-from the alphabetically sorted role vocabulary. Golden-angle hue steps keep
-adjacent assignments visually separated. The same role name therefore keeps
-one color across source-node-type filter groups, the grouped graph key, and
-visible graph edges. Edge paths, labels, and arrowheads inherit that hue, while
-filter controls show a role-colored dot without implying direction.
+from the alphabetically sorted role vocabulary. A binary low-discrepancy
+sequence spreads the growing set around the hue circle, beginning with orange,
+while fixed OKLCH lightness and chroma keep the hues similarly legible on the
+dark canvas. The same role name therefore keeps one color across
+source-node-type filter groups, the grouped graph key, edge paths, labels, and
+arrowheads. Color is an identity aid rather than normative meaning, and the
+vocabulary remains payload-derived.
 
-Stroke pattern describes direction relative to the focal work item: direct
-outgoing edges are solid, direct incoming edges are dashed, and non-focal
-transit edges are dotted and subdued. Routing geometry remains independent of
-this encoding. The always-available Key disclosure names the three patterns.
-Color is an identity aid rather than normative meaning, and the vocabulary
-remains payload-derived.
+All relation paths are solid. Arrowheads preserve the relation's declared
+source-to-target direction; there is no focal-relative outgoing, incoming, or
+transit stroke category. Inspecting a card may emphasize or dim relevant paths,
+but it does not change their hue or line pattern.
 <<<
 NOTES: >>>
 Added by the WORK-GRAPH-NEIGHBORHOOD-VIEW reference implementation on 2026-09-02.
