@@ -1,5 +1,5 @@
 [DOCUMENT]
-TITLE: The board layout keeps a focal node between incoming and outgoing ranks
+TITLE: The board sends only a bounded neighborhood to ELK.js
 
 [GRAMMAR]
 IMPORT_FROM_FILE: @repo
@@ -10,11 +10,11 @@ TITLE: The board sends only a bounded neighborhood to ELK.js
 DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
-layout.js first traverses only the selected node's filtered incoming and outgoing
-adjacency to the requested hop depth, ranks candidates for deterministic
-clipping, and retains at most 48 nodes. Only that bounded induced subgraph is
-sent to the vendored ELK.js 0.12 worker; the whole canon is never serialized to
-the layout engine.
+layout.js first traverses only the selected node's filtered incoming and
+outgoing adjacency to the requested hop depth, ranks candidates for
+deterministic clipping, and retains at most 48 nodes. Only that bounded induced
+subgraph is sent to the vendored ELK.js 0.12 worker; the whole canon is never
+serialized to the layout engine.
 
 ELK Layered places the measured card boxes from left to right and returns
 orthogonal edge sections. The board supplies measured relation-label boxes and
@@ -23,8 +23,18 @@ translates ELK positions, bends, and label coordinates back into
 application-owned render objects. Fan-outs of at least three semantic edges
 sharing an endpoint, role, and direction use an invisible junction: one labeled
 trunk branches into unlabeled terminal pieces. Generic ELK edge merging stays
-disabled because it is not role-aware. Every routed piece retains its original
-semantic edge objects so filtering, inspection highlighting, direction styles,
+disabled because it is not role-aware.
+
+A post-layout pass removes the subpixel route doubling and one-unit junction
+gaps that ELK can leave around its invisible junction nodes. It quantizes
+orthogonal coordinates to hundredths, clusters only overlapping same-role lanes
+within one scaled layout unit, splits partial overlaps at their breakpoints, and
+emits each occupied interval once. It bridges a remaining gap no wider than the
+junction tolerance only when the adjacent segments have the same role and
+intersecting semantic-edge sets. Normalized coordinates carry through
+perpendicular bends. Different role hues and unrelated routes never coalesce or
+bridge. Shared intervals, bridges, and label-only records retain every
+contributing semantic edge so filtering, inspection highlighting, arrowheads,
 and counts continue to describe canon relations.
 
 Layout is asynchronous. A monotonically increasing request token makes the

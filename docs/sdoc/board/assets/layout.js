@@ -353,6 +353,261 @@ function pathOf(points) {
     .join(" ");
 }
 
+const ROUTE_AXIS_QUANTUM = 0.01;
+
+function quantize(value) {
+  return Math.round(value / ROUTE_AXIS_QUANTUM) * ROUTE_AXIS_QUANTUM;
+}
+
+function intervalsTouch(left, right, tolerance = ROUTE_AXIS_QUANTUM) {
+  return Math.max(left.lo, right.lo) <= Math.min(left.hi, right.hi) + tolerance;
+}
+
+function semanticEdgesOf(routes, routeIndexes) {
+  const seen = new Set();
+  const edges = [];
+  for (const routeIndex of routeIndexes) {
+    for (const edge of routes[routeIndex].edges ?? [routes[routeIndex].edge]) {
+      if (seen.has(edge)) continue;
+      seen.add(edge);
+      edges.push(edge);
+    }
+  }
+  return edges;
+}
+
+function sharedSemanticEdges(routes, leftRouteIndexes, rightRouteIndexes) {
+  const rightEdges = new Set(semanticEdgesOf(routes, rightRouteIndexes));
+  return semanticEdgesOf(routes, leftRouteIndexes).filter((edge) =>
+    rightEdges.has(edge),
+  );
+}
+
+function terminalPath(points, terminalAtLow, terminalAtHigh) {
+  const [low, high] = points;
+  if (terminalAtLow && terminalAtHigh) {
+    const middle = {
+      x: (low.x + high.x) / 2,
+      y: (low.y + high.y) / 2,
+    };
+    // SVG applies marker-end to each open subpath. The two halves meet but do
+    // not overlap, so bidirectional traffic still draws the shared stroke once.
+    return `M ${middle.x} ${middle.y} L ${low.x} ${low.y} M ${middle.x} ${middle.y} L ${high.x} ${high.y}`;
+  }
+  return pathOf(terminalAtLow ? [high, low] : points);
+}
+
+function coalesceOrthogonalRoutes(routes, laneTolerance) {
+  const segments = [];
+  const segmentsByRoute = new Map();
+  const passthrough = [];
+  const labels = [];
+
+  routes.forEach((route, routeIndex) => {
+    if (route.label) {
+      // Labels keep their original semantic edge set. A move-only path lets
+      // the existing renderer and inspection code handle them without drawing
+      // another stroke beneath a coalesced segment.
+      labels.push({
+        ...route,
+        d: `M ${route.label.x} ${route.label.y}`,
+        points: [],
+        terminal: false,
+      });
+    }
+
+    const routeSegments = [];
+    let orthogonal = true;
+    for (let index = 1; index < route.points.length; index += 1) {
+      const start = route.points[index - 1];
+      const end = route.points[index];
+      const horizontal = Math.abs(start.y - end.y) <= ROUTE_AXIS_QUANTUM;
+      const vertical = Math.abs(start.x - end.x) <= ROUTE_AXIS_QUANTUM;
+      if (!horizontal && !vertical) {
+        orthogonal = false;
+        break;
+      }
+      const orientation = horizontal ? "horizontal" : "vertical";
+      const startAxis = quantize(horizontal ? start.x : start.y);
+      const endAxis = quantize(horizontal ? end.x : end.y);
+      if (Math.abs(startAxis - endAxis) <= ROUTE_AXIS_QUANTUM) continue;
+      routeSegments.push({
+        endAxis,
+        fixed: horizontal ? (start.y + end.y) / 2 : (start.x + end.x) / 2,
+        hi: Math.max(startAxis, endAxis),
+        lo: Math.min(startAxis, endAxis),
+        orientation,
+        role: roleOf(route.edge),
+        routeIndex,
+        startAxis,
+        terminal: route.terminal !== false && index === route.points.length - 1,
+      });
+    }
+    if (orthogonal) {
+      segments.push(...routeSegments);
+      segmentsByRoute.set(routeIndex, routeSegments);
+    } else passthrough.push({ ...route, label: null });
+  });
+
+  // ELK distributes connections across the one-unit invisible role junction,
+  // yielding visually doubled lanes about 0.2–0.6 units apart. Cluster only
+  // same-role, overlapping lanes and require the complete cluster to fit the
+  // tolerance; this avoids transitive merging of genuinely parallel routes.
+  const lanesByStyle = new Map();
+  for (const segment of segments) {
+    const key = JSON.stringify([segment.role, segment.orientation]);
+    const lanes = lanesByStyle.get(key) ?? [];
+    let lane = lanes.find(
+      (candidate) =>
+        Math.max(candidate.max, segment.fixed) -
+          Math.min(candidate.min, segment.fixed) <=
+          laneTolerance &&
+        candidate.segments.some(
+          (member) =>
+            intervalsTouch(member, segment) ||
+            (intervalsTouch(member, segment, laneTolerance) &&
+              sharedSemanticEdges(
+                routes,
+                [member.routeIndex],
+                [segment.routeIndex],
+              ).length > 0),
+        ),
+    );
+    if (!lane) {
+      lane = { max: segment.fixed, min: segment.fixed, segments: [] };
+      lanes.push(lane);
+      lanesByStyle.set(key, lanes);
+    }
+    lane.max = Math.max(lane.max, segment.fixed);
+    lane.min = Math.min(lane.min, segment.fixed);
+    lane.segments.push(segment);
+  }
+
+  for (const lanes of lanesByStyle.values()) {
+    for (const lane of lanes) {
+      const fixed = quantize((lane.min + lane.max) / 2);
+      for (const segment of lane.segments) segment.fixed = fixed;
+    }
+  }
+
+  // When one side of a bend moves onto a shared lane, carry that coordinate
+  // into its perpendicular neighbor. Otherwise the two normalized segments
+  // would retain ELK's subpixel port spread as a tiny visual gap at the bend.
+  for (const routeSegments of segmentsByRoute.values()) {
+    routeSegments.forEach((segment, index) => {
+      const previous = routeSegments[index - 1];
+      const next = routeSegments[index + 1];
+      if (previous && previous.orientation !== segment.orientation) {
+        segment.startAxis = previous.fixed;
+      }
+      if (next && next.orientation !== segment.orientation) {
+        segment.endAxis = next.fixed;
+      }
+      segment.lo = Math.min(segment.startAxis, segment.endAxis);
+      segment.hi = Math.max(segment.startAxis, segment.endAxis);
+    });
+  }
+
+  const coalesced = [];
+  for (const lanes of lanesByStyle.values()) {
+    for (const lane of lanes) {
+      const fixed = lane.segments[0].fixed;
+      const breakpoints = [
+        ...new Set(
+          lane.segments.flatMap((segment) => [segment.lo, segment.hi]),
+        ),
+      ].sort((left, right) => left - right);
+      for (let index = 1; index < breakpoints.length; index += 1) {
+        const lo = breakpoints[index - 1];
+        const hi = breakpoints[index];
+        if (hi - lo <= ROUTE_AXIS_QUANTUM) continue;
+        const middle = (lo + hi) / 2;
+        const contributors = lane.segments.filter(
+          (segment) => segment.lo < middle && segment.hi > middle,
+        );
+        let routeIndexes;
+        let semanticEdges;
+        let terminalAtLow = false;
+        let terminalAtHigh = false;
+        if (contributors.length) {
+          routeIndexes = [
+            ...new Set(contributors.map(({ routeIndex }) => routeIndex)),
+          ];
+          semanticEdges = semanticEdgesOf(routes, routeIndexes);
+          terminalAtLow = contributors.some(
+            (segment) =>
+              segment.terminal &&
+              Math.abs(segment.endAxis - lo) <= ROUTE_AXIS_QUANTUM,
+          );
+          terminalAtHigh = contributors.some(
+            (segment) =>
+              segment.terminal &&
+              Math.abs(segment.endAxis - hi) <= ROUTE_AXIS_QUANTUM,
+          );
+        } else {
+          // ELK routes to opposite faces of the one-unit invisible junction,
+          // leaving a one-unit hole between otherwise continuous pieces. Fill
+          // only a tiny gap whose two sides carry the same semantic edge; this
+          // cannot join unrelated nearby routes or draw through a visible node.
+          if (hi - lo > laneTolerance + ROUTE_AXIS_QUANTUM) continue;
+          const leftRouteIndexes = [
+            ...new Set(
+              lane.segments
+                .filter(
+                  (segment) => Math.abs(segment.hi - lo) <= ROUTE_AXIS_QUANTUM,
+                )
+                .map(({ routeIndex }) => routeIndex),
+            ),
+          ];
+          const rightRouteIndexes = [
+            ...new Set(
+              lane.segments
+                .filter(
+                  (segment) => Math.abs(segment.lo - hi) <= ROUTE_AXIS_QUANTUM,
+                )
+                .map(({ routeIndex }) => routeIndex),
+            ),
+          ];
+          semanticEdges = sharedSemanticEdges(
+            routes,
+            leftRouteIndexes,
+            rightRouteIndexes,
+          );
+          if (!semanticEdges.length) continue;
+          routeIndexes = [
+            ...new Set([...leftRouteIndexes, ...rightRouteIndexes]),
+          ];
+        }
+        const points =
+          lane.segments[0].orientation === "horizontal"
+            ? [
+                { x: lo, y: fixed },
+                { x: hi, y: fixed },
+              ]
+            : [
+                { x: fixed, y: lo },
+                { x: fixed, y: hi },
+              ];
+        const firstRoute = routes[routeIndexes[0]];
+        coalesced.push({
+          d: terminalPath(points, terminalAtLow, terminalAtHigh),
+          edge: semanticEdges[0],
+          edges: semanticEdges,
+          kind: firstRoute.kind,
+          label: null,
+          points,
+          ranks: routeIndexes.flatMap((routeIndex) =>
+            routes[routeIndex].ranks ? routes[routeIndex].ranks : [],
+          ),
+          terminal: terminalAtLow || terminalAtHigh,
+        });
+      }
+    }
+  }
+
+  return [...coalesced, ...passthrough, ...labels];
+}
+
 function fallbackLabel(points, baseline) {
   let longest = null;
   for (let index = 1; index < points.length; index += 1) {
@@ -474,12 +729,9 @@ export async function layoutNeighborhood(snapshot, centerId, options = {}) {
     edges: selection.edges,
     nodes: selection.nodes,
     positions,
-    routes: displayRoutes(
-      output,
-      pieces,
-      labelBaselines,
-      positions,
-      selection.ranks,
+    routes: coalesceOrthogonalRoutes(
+      displayRoutes(output, pieces, labelBaselines, positions, selection.ranks),
+      config.card.width / CARD.width,
     ),
     totalNodes: selection.totalNodes,
   };
