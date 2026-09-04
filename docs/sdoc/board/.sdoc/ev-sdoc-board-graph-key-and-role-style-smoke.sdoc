@@ -6,20 +6,44 @@ IMPORT_FROM_FILE: @repo
 
 [EVIDENCE]
 UID: EV-SDOC-BOARD-GRAPH-KEY-AND-ROLE-STYLE-SMOKE
-TITLE: The graph key explains stable role hues and focal direction
+TITLE: The graph key explains role hues and card outline states
 DEPTH: verified
 AUTHORED_BY: llm
-SOURCE: Independent Chromium 152 headless DevTools probes at 1440x900 and 390x844 against the live scribe daemon; 2026-09-03
+SOURCE: Independent Chromium 152 headless DevTools probes at 1440x900 and 390x844 against the live scribe daemon; 2026-09-04
 STATEMENT: >>>
-At 1440 by 900, independent headless Chromium measured a dedicated graph control bar from x=292..1089 and y=64..113, with the graph stage beginning at y=113. Filters was the first left control at x=306..408.52. The `Hops:` segmented control exposed only the visible numerals one, two, and three and its center exactly matched the graph stage center. Selecting two hops left the Filters badge at zero, Reset filters retained two hops, and a pointer press outside the Filters disclosure closed it without closing on an inside interaction.
+Against the live canon at 1440 by 900, independent headless Chromium rendered
+SLICE-CHECKPOINT-WIRING at one hop as 13 cards and 22 semantic relations. Every
+card was one 244 by 102 SVG `foreignObject` containing a native
+`button.work-item.graph-work-item`. The graph and navigation focal cards had
+the same UID, state, title, and source-directory child structure, grid layout,
+ten-by-eleven-unit padding, six-unit gap and radius, and typography. The graph
+rendered no separate node-type text.
 
-The graph-stage controls remained independent of that header. Zoom and Fit were inset 14 pixels from its top-right corner. The rounded bottom-right summary read `5 nodes · 8 relations`, with no repeated hop distance and no use of `links`. The persistent key contained Nodes, Relations grouped by role name, and Direction without duplicating counts. Its node colors, stable relation-role hues, and solid outgoing, dashed incoming, and dotted transit samples matched the rendered graph encodings.
+Each graph card painted an un-clipped glow silhouette, full rounded type-color
+plate, inset main surface, transparent HTML card, one-pixel resting perimeter,
+and two-pixel interaction perimeter in that order. At graph scales 0.234061,
+0.982973, and 1.720864, the main inset measured exactly three screen pixels;
+inverse-scale expansion error stayed below 0.0000001 pixel. The resting and
+interaction perimeters extended respectively one and two total screen pixels
+outside the silhouette and consumed effectively zero pixels of its interior.
+Raster samples found clean lines across the full silhouette, including the
+type tab, with no corner seam, gap, color contamination, or inward tab loss.
 
-After the second spacing-only revision, Chromium computed 6 pixels of vertical and 9 pixels of horizontal key padding, exactly matching the pan hint, with a 5-pixel row gap and 32-pixel column gap. At desktop size the key occupied x=304..645.672 and y=748..852; equal client and scroll dimensions proved it was unclipped. Its desktop lift left 7 pixels of vertical separation before the exactly centered pan hint at x=607.578..773.422 and y=859..888. The summary occupied x=924.234..1077, and no pair of footer boxes intersected.
+Normal cards kept main fill `rgb(22, 32, 40)`, type-specific tab fill, and a
+thin subtle-dark perimeter with no glow. Hover and focus changed only the
+perimeter to two pixels and the node-type color. Selected state changed only
+that perimeter to semantic white and enabled a solid outline-colored silhouette
+at 0.78 opacity blurred by seven pixels underneath the unchanged sharp layers.
+Source, target, inspected, and focal states similarly used yellow, light blue,
+white, and universal node-type semantic colors while preserving the same main
+fill and three-pixel type tab.
 
-At 390 by 844, Chromium measured the two-row graph control bar at y=104..191 and the graph stage at y=191..844. The hop selector again centered exactly. The persistent key occupied x=12..377 and y=692..796 with equal client and scroll dimensions, the shortened pan hint occupied x=153.813..235.188 and y=803..832, and the summary occupied x=236.234..377 and y=806..832. The key remained in its own footer row with 7 pixels of separation; no footer boxes overlapped or clipped. All controls remained hit-testable and the page reported no runtime, console, log, board-event, or page errors.
-
-The spacing revision did not change semantics: Nodes remained EVIDENCE, MECHANISM, and WORK; Relations remained Assumes, Crosses, Produces, and Proven_By with the same colors; and Direction remained outgoing solid, incoming dashed, and transit dotted. Every card ID and routed edge retained its prior source, target, role, direction, color, and dash pattern. The focal card and URL hash remained WORK-SCRIBE-RPC-AND-SERVICE throughout.
+Filters, centered Hops, and right-aligned zoom and Fit controls remained
+non-overlapping; the hop selector's center delta was zero pixels. One, two, and
+three hops rendered 13/22, 48/110, and 48/110 nodes/semantic relations, with
+the latter views reporting 48 of 60 and 48 of 206 nearest nodes under the cap.
+The focal hash remained stable and the page reported no runtime, console, or
+network errors.
 <<<
 RELATIONS:
 - TYPE: File

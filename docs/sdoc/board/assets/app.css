@@ -31,6 +31,7 @@
   --accent-success: #4ade80;
   --accent-warning: #fbbf24;
   --accent-danger: #fb7185;
+  --outline-target: #6ecbff;
 
   --font-sans:
     Inter, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -802,7 +803,7 @@ html[data-status="error"] .status-dot {
   min-width: 0;
   width: max-content;
   max-width: 100%;
-  grid-template-columns: repeat(3, max-content);
+  grid-template-columns: repeat(2, max-content);
   gap: calc(5 * var(--u)) calc(32 * var(--u));
   padding: calc(6 * var(--u)) calc(9 * var(--u));
   overflow-x: auto;
@@ -815,12 +816,6 @@ html[data-status="error"] .status-dot {
 
 .legend:empty {
   display: none;
-}
-
-@media (min-width: 681px) {
-  .legend {
-    margin-bottom: calc(36 * var(--u));
-  }
 }
 
 .legend-heading {
@@ -870,7 +865,6 @@ html[data-status="error"] .status-dot {
   border-radius: 2px;
   background: var(--accent);
   content: "";
-  box-shadow: 0 0 9px color-mix(in srgb, var(--accent), transparent 50%);
 }
 
 .legend-line {
@@ -889,17 +883,42 @@ html[data-status="error"] .status-dot {
   white-space: nowrap;
 }
 
-.legend-direction-item {
-  --role-color: var(--text-secondary);
+.legend-outline-group {
+  grid-column: 1 / -1;
 }
 
-.legend-line.direction-incoming {
-  border-top-style: dashed;
+.legend-outline-items {
+  grid-template-columns: max-content;
 }
 
-.legend-line.direction-transit {
-  border-top-style: dotted;
-  opacity: 0.58;
+.legend-outline-swatch {
+  width: calc(7 * var(--u));
+  height: calc(7 * var(--u));
+  flex: none;
+  border: 1px solid var(--outline-color);
+  border-radius: 2px;
+  background: color-mix(
+    in srgb,
+    var(--outline-color),
+    var(--surface-overlay) 72%
+  );
+  box-shadow: 0 0 9px color-mix(in srgb, var(--outline-color), transparent 28%);
+}
+
+.outline-focus {
+  --outline-color: var(--accent-success);
+}
+
+.outline-inspected {
+  --outline-color: var(--text-primary);
+}
+
+.outline-source {
+  --outline-color: var(--accent-warning);
+}
+
+.outline-target {
+  --outline-color: var(--outline-target);
 }
 
 .graph-footer {
@@ -917,12 +936,9 @@ html[data-status="error"] .status-dot {
 }
 
 .viewport-actions {
-  position: absolute;
-  z-index: 3;
-  top: 14px;
-  right: 14px;
   display: flex;
   gap: calc(7 * var(--u));
+  justify-self: end;
 }
 
 .viewport-actions button {
@@ -963,19 +979,6 @@ html[data-status="error"] .status-dot {
     stroke 120ms ease;
 }
 
-.edge.direction-incoming .edge-path {
-  stroke-dasharray: 8 5;
-}
-
-.edge.direction-transit .edge-path {
-  stroke-dasharray: 2 5;
-  opacity: 0.34;
-}
-
-.edge.direction-transit .edge-label {
-  opacity: 0.52;
-}
-
 .edge-label {
   fill: var(--role-color);
   font-family: var(--font-mono);
@@ -992,21 +995,12 @@ html[data-status="error"] .status-dot {
     fill 120ms ease;
 }
 
-.edge.is-incoming .edge-path {
+.edge.touches-inspected .edge-path {
   opacity: 1;
   stroke-width: 2.2;
 }
 
-.edge.is-incoming .edge-label {
-  opacity: 1;
-}
-
-.edge.is-outgoing .edge-path {
-  opacity: 1;
-  stroke-width: 2.2;
-}
-
-.edge.is-outgoing .edge-label {
+.edge.touches-inspected .edge-label {
   opacity: 1;
 }
 
@@ -1021,90 +1015,103 @@ html[data-status="error"] .status-dot {
   transition: opacity 120ms ease;
 }
 
-.node-card .card-body {
-  fill: var(--surface-quaternary);
-  stroke: var(--border-subtle);
-  stroke-width: 1;
+.node-card .card-border,
+.node-card .card-outline {
+  fill: none;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 7px 8px rgb(0 0 0 / 25%));
+  pointer-events: none;
+  transition: stroke 120ms ease;
+}
+
+.node-card .card-border {
+  stroke: var(--border-subtle);
+  stroke-width: calc(1 * var(--u));
+}
+
+.node-card .card-outline {
+  stroke: transparent;
+  stroke-width: calc(2 * var(--u));
+}
+
+.node-card .card-tab {
+  fill: var(--accent);
+  pointer-events: none;
+}
+
+.node-card .card-main {
+  fill: var(--surface-secondary);
+  pointer-events: none;
+}
+
+.node-card .card-glow {
+  fill: transparent;
+  opacity: 0;
+  pointer-events: none;
   transition:
     fill 120ms ease,
-    stroke 120ms ease;
+    filter 120ms ease,
+    opacity 120ms ease;
 }
 
-.node-card .card-accent {
-  fill: var(--accent);
+.card-foreign-object {
+  overflow: visible;
 }
 
-.node-card .card-type,
-.node-card .card-id,
-.node-card .card-state {
-  font-family: var(--font-mono);
+.graph-work-item {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-color: transparent;
+  border-left-color: transparent;
+  background: transparent;
 }
 
-.node-card .card-type {
-  fill: var(--accent);
-  font-size: var(--fs-small);
-  font-weight: 800;
-  letter-spacing: 0.1em;
+.graph-work-item:hover,
+.graph-work-item:focus-visible {
+  background: transparent;
 }
 
-.node-card .card-id {
-  fill: var(--text-tertiary);
-  font-size: var(--fs-micro);
-}
-
-.node-card .card-title {
-  fill: var(--text-primary);
-  font-size: var(--fs-body);
-  font-weight: 700;
-}
-
-.node-card .card-state-bg {
-  fill: color-mix(in srgb, var(--accent), var(--surface-primary) 78%);
-  stroke: color-mix(in srgb, var(--accent), transparent 55%);
-  stroke-width: 0.8;
-  vector-effect: non-scaling-stroke;
-}
-
-.node-card .card-state {
-  fill: var(--text-secondary);
-  font-size: var(--fs-micro);
-  letter-spacing: 0.04em;
-}
-
-.node-card:hover .card-body,
-.node-card:focus-visible .card-body {
-  fill: var(--surface-tertiary);
+.node-card:hover .card-outline,
+.node-card:focus-within .card-outline {
   stroke: var(--accent);
 }
 
-.node-card.is-selected .card-body {
-  fill: var(--surface-tertiary);
-  stroke: var(--text-primary);
-  stroke-width: 2;
+.node-card.pointed-to-by-inspected {
+  --outline-color: var(--outline-target);
 }
 
-.node-card.is-center .card-body {
-  fill: color-mix(in srgb, var(--accent), var(--surface-tertiary) 86%);
-  stroke: var(--accent);
-  stroke-width: 2.4;
-  filter: drop-shadow(
-      0 0 10px color-mix(in srgb, var(--accent), transparent 58%)
-    )
-    drop-shadow(0 8px 9px rgb(0 0 0 / 32%));
+.node-card.points-to-inspected {
+  --outline-color: var(--accent-warning);
 }
 
-.node-card.is-center.is-selected .card-body {
-  stroke: var(--text-primary);
+.node-card.is-center {
+  --outline-color: var(--accent);
 }
 
-.node-card.is-incoming .card-body {
-  stroke: var(--accent-warning);
+.node-card.is-selected {
+  --outline-color: var(--text-primary);
 }
 
-.node-card.is-outgoing .card-body {
-  stroke: var(--accent-info);
+.node-card:is(
+    .pointed-to-by-inspected,
+    .points-to-inspected,
+    .is-center,
+    .is-selected
+  )
+  .card-outline {
+  stroke: var(--outline-color);
+}
+
+.node-card:is(
+    .pointed-to-by-inspected,
+    .points-to-inspected,
+    .is-center,
+    .is-selected
+  )
+  .card-glow {
+  fill: var(--outline-color);
+  opacity: 0.78;
+  filter: blur(calc(7 * var(--u)));
 }
 
 .node-card.is-dim {
@@ -2119,7 +2126,7 @@ perspective-viewer {
 
   .graph-controlbar {
     min-height: calc(82 * var(--u));
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-rows: auto auto;
     gap: calc(6 * var(--u));
     padding: calc(7 * var(--u)) calc(10 * var(--u));
@@ -2130,12 +2137,13 @@ perspective-viewer {
     grid-row: 1;
   }
 
-  .graph-controlbar > span:last-child {
-    display: none;
+  .viewport-actions {
+    grid-column: 2;
+    grid-row: 1;
   }
 
   .toolbar-depth {
-    grid-column: 1;
+    grid-column: 1 / -1;
     grid-row: 2;
   }
 
