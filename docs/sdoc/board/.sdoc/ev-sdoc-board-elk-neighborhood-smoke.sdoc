@@ -9,24 +9,29 @@ UID: EV-SDOC-BOARD-ELK-NEIGHBORHOOD-SMOKE
 TITLE: ELK removes measured label collisions without losing semantic edges
 DEPTH: verified
 AUTHORED_BY: llm
-SOURCE: Independent Chromium 152 headless DevTools probes at 1440x900 against the live scribe daemon, plus a synthetic pre-layout cap probe; 2026-09-02
+SOURCE: Independent Chromium 152 headless DevTools probes at 1440x900 against the live scribe daemon, plus a synthetic pre-layout cap probe; 2026-09-03
 STATEMENT: >>>
-Against the live generation-14 canon, headless Chromium rendered
-WORK-SCRIBE-RPC-AND-SERVICE at two hops as 14 cards and 20 semantic links using
-22 ELK-routed path pieces and 15 labels. Bounding-box tests found zero
-label-label and zero label-node intersections; stroke sampling across 23 broad
-path-box candidates found zero labels intersecting unrelated paths. The prior
-custom router on the same neighborhood measured 15 label-label and 10
-label-node intersections.
+Against the live canon, independent headless Chromium rendered
+SLICE-CHECKPOINT-WIRING at one, two, and three hops as respectively 13, 48, and
+48 cards with 22, 110, and 110 semantic relations. The two- and three-hop views
+therefore exercised the deterministic 48-node nearest-neighborhood cap. The
+post-ELK coalescer produced 74, 420, and 420 real orthogonal segments with 8,
+35, and 35 labels.
 
-Five Proven_By relations rendered as two labels: one direct edge plus one
-labeled trunk shared by a four-source fan-in. That group used six routed pieces.
-Selecting MECH-SCRIBE-DEVENV-PROCESS activated the two group pieces associated
-with that semantic relation and dimmed the other four without changing the
-focal hash. Rapid depth selection from three to one to two settled on the latest
-two-hop request with aria-busy cleared. A separate 101-node synthetic star probe
-retained its center and clipped to 48 nodes before invoking ELK. The page
-reported no runtime, console, log, board-event, or page errors.
+The reported Crosses route from the focal card to MECH-PLAN-REFS-CHECK ended at
+screen x=839.743652 while the card began at x=839.743408 at fit, a 0.000244
+pixel overlap rather than a gap. Near one-to-one scale the overlap was 0.001221
+pixels, and pixel inspection found no canvas-colored column between the route
+and card. The added bridge spans ELK's one-unit invisible junction only where
+the same role's adjacent route pieces share semantic relations; the observed
+bridge retained all six contributing Crosses relations.
+
+At every depth, geometric comparison found zero exact same-role overlaps and
+zero collinear same-role overlaps whose lane coordinates differed by one layout
+unit or less. Bounding-box and stroke sampling found zero label-label,
+label-node, and label-to-unrelated-edge intersections. Every path remained
+solid, inspection and dimming semantics remained consistent across visible
+nodes, and the page reported no runtime, console, or network errors.
 <<<
 RELATIONS:
 - TYPE: File
