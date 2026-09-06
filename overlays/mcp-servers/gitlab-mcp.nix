@@ -15,11 +15,11 @@
   inherit (ourPkgs) buildNpmPackage bun fetchgit makeWrapper;
   vu = import ../lib.nix;
 
-  rev = "3662a227e52055d7823fc0af8de39c8029f3f30f";
+  rev = "a7d19ad030917cd0bb89e44b4c079001f4194f1f";
   src = fetchgit {
     url = "https://github.com/zereight/gitlab-mcp.git";
     inherit rev;
-    hash = "sha256-Ytc8jE3XzG52x494nyMsYrWZ7bxSKLhSPQY2C3uAsBY=";
+    hash = "sha256-CDFvxuKSJcgvHirERMjPgVXVaPj/BKMXljf/zzWUzhk=";
   };
 in
   buildNpmPackage {
