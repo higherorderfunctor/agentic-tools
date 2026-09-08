@@ -7,12 +7,22 @@ applyTo: ".github/actions/warm-ifd/**,.github/workflows/ci.yml,.github/workflows
 
 ## IFD Patterns and Gotchas
 
-> **Last verified:** 2026-09-08 (commit pending — `fetchPnpmDeps` reads
-> `pnpm.nodejs-slim`, so a hand-built pnpm needs that passthru or evaluation
-> dies naming neither pnpm nor the fetcher. Latent in `pnpm_12.nix` since it was
-> written; nothing threaded that pnpm through the fetcher until now.) Prior:
-> 2026-09-08 (commit pending — the oxlint `@napi-rs/cli` repin to 3.9.0 ran this
-> loop end to end. Three corrections below: the proof step is silently voided by
+> **Last verified:** 2026-09-08 (commit pending — kiro's extract now emits TWO
+> settings fields from ONE scan, and they answer to different rules. The first,
+> `workspaceOverridableSettings`, is this repo's first extractor whose EMPTY
+> result is a real answer rather than a dead anchor; the shape-assertion rule
+> below is unchanged, what is new is the rule for telling "upstream does not
+> have this" from "the anchor rotted", in the section right after it. The
+> second, `settingKeys`, is the first extracted field consumed as a DATA
+> BOUNDARY rather than as an option enum — it tells the settings flattener where
+> a key stops and its value begins. Both share one registry regex deliberately:
+> a second pass over the same binary would be a second place for it to drift.)
+> Prior: 2026-09-08 (commit pending — `fetchPnpmDeps` reads `pnpm.nodejs-slim`,
+> so a hand-built pnpm needs that passthru or evaluation dies naming neither
+> pnpm nor the fetcher. Latent in `pnpm_12.nix` since it was written; nothing
+> threaded that pnpm through the fetcher until now.) Prior: 2026-09-08 (commit
+> pending — the oxlint `@napi-rs/cli` repin to 3.9.0 ran this loop end to end.
+> Three corrections below: the proof step is silently voided by
 > `--ignore-workspace`, upstream's pnpm MAJOR moves independently of everything
 > the awk guards, and a multi-document `pnpm-lock.yaml` — never previously
 > exercised — works fine. The pnpm 12 swap itself is DEFERRED: nixpkgs' fetcher
@@ -370,6 +380,44 @@ results. The version qualification is narrow rather than an either-set
 allowance: releases before 0.149.0 require `untrusted`, while 0.149.0 and newer
 reject it, matching upstream's explicit removal. When you add a key or category,
 add its shape assertion in the same commit.
+
+#### But sometimes an empty capture is the ANSWER, not a dead anchor
+
+The rule above says a non-empty guard is worthless. It does not say every
+extractor must demand a non-empty result, and kiro's
+`workspaceOverridableSettings` is the case that separates the two.
+
+That field lists the `cli.json` keys a project-local settings file may override.
+The mechanism is NEW in kiro-cli 2.21.1: measured across the store, 2.18.1,
+2.19.0, 2.20.2 and 2.21.0 carry no such set and no workspace-merge code at all,
+so for those releases the honest answer is "this kiro honors no workspace
+override" — an empty list, not a failure. Hard-failing there would wedge the
+update pipeline the first time upstream reverted a release-old mechanism, which
+is a merge-blocking liability rather than a signal.
+
+So when a captured category can legitimately be absent, assert on the thing that
+proves the probe COULD have answered, and let the category itself be empty:
+
+- kiro's probe fails if the bundle's `SCREAMING -> "dotted.key"` settings
+  registry has no `CHAT_DEFAULT_MODEL` entry. That registry is what the members
+  resolve through, so its absence means the JS payload is not what we think it
+  is and "no allowlist" would be a guess.
+- It fails on MORE than one candidate set (ambiguous — the extract describes
+  one), mirroring `kiroLocateChatScript`'s own ambiguity refusal.
+- It fails on a member that resolves to nothing or to two different keys. A
+  PARTIAL allowlist is worse than none here, because the module uses it to
+  REJECT keys: a short list rejects settings kiro actually honors.
+
+The distinction to keep is the same one the locator draws between a location
+failure and a content failure. "Upstream does not have this" and "we can no
+longer tell what upstream has" are different findings, and an extractor that
+collapses them into one empty list is the dead-anchor failure wearing a
+different hat.
+
+One consumer-side consequence, worth stating because it is where the empty case
+actually lands: an empty allowlist makes EVERY key invalid at that scope, so the
+assertion that reads it must say "this kiro honors no workspace override at all"
+rather than listing the allowed keys and printing nothing.
 
 #### An anchor can lose its TYPE information without losing its match
 

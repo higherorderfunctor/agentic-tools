@@ -31,7 +31,7 @@
   mkIdentityMaterializer = import ./identityBundle.nix {inherit lib pkgs;};
   workflowReminder = import ./workflowReminder.nix {inherit lib pkgs;};
 
-  # Shared AI helpers (filterNulls, mkLspConfig, flattenDotKeys, …). Hoisted to
+  # Shared AI helpers (filterNulls, mkLspConfig, flattenDotKeysUntil, …). Hoisted to
   # the top-level `let` so option TYPES and renderers can reach it too — both
   # backend blocks previously imported it separately.
   aiCommon = import ../../../lib/ai/ai-common.nix {inherit lib;};
@@ -776,6 +776,108 @@
         cliVersion = (resolvePackage cfg).version;
       };
 
+  # Kiro honors a PROJECT-LOCAL `.kiro/settings/cli.json` only for the keys on
+  # the allowlist its TUI carries; everything else in that file is read and
+  # discarded with no warning. The devenv backend writes exactly that file, so
+  # it must refuse a key Kiro would drop rather than emit a plausible-looking
+  # no-op. Home Manager writes the GLOBAL file, where every key is honored —
+  # that is why this is a lowering difference and not a divergent option.
+  #
+  # An EMPTY list means this kiro honors no workspace override at all (true for
+  # every release before 2.21.1), which is a stronger statement than "this key
+  # is not allowed" and gets its own message below.
+  inherit (kiroExtracted) workspaceOverridableSettings;
+
+  # The FLATTEN BOUNDARY: every dotted path kiro's binary names as a complete
+  # setting key. Union of the two measured lists, because they cover different
+  # ground — the key registry is all `chat.*`, the workspace allowlist adds
+  # `toolSearch.*`, `compaction.*` and `knowledge.*` — and taking the union is
+  # the policy the sidecar deliberately leaves to its consumer.
+  #
+  # Without it, cli.json's flat-dotted format has no way to express an
+  # OBJECT-VALUED setting: the walk descends through `chat.modelDefaults` into
+  # the per-model records below it and writes
+  # `chat.modelDefaults.<model>.<field>`, a key kiro never matches. Both
+  # backends were affected; the setting was simply unusable from Nix.
+  kiroSettingKeys = lib.unique (kiroExtracted.settingKeys ++ workspaceOverridableSettings);
+
+  flattenKiroSettings = aiCommon.flattenDotKeysUntil kiroSettingKeys;
+
+  # The dotted keys a given config would write, in the flattened form the
+  # settings file actually carries — the same `flattenKiroSettings` both backends
+  # use, so what is checked is exactly what would be written.
+  #
+  # Deliberately the WRITTEN key, not the option path. The two used to diverge
+  # for an object-valued setting, which made this report `chat.modelDefaults`
+  # as a rejected key when the real fault was the flattener walking past it;
+  # `flattenKiroSettings` stops at a known key, so the written key is now the
+  # setting key and the two agree.
+  nativeSettingsDotKeys = cfg:
+    builtins.attrNames (flattenKiroSettings (aiCommon.filterNulls cfg.nativeSettings));
+
+  # devenv-ONLY. Never add this to `mkAssertions`: under Home Manager these same
+  # keys are correct, and asserting there would reject a working config.
+  mkDevenvWorkspaceSettingsAssertions = cfg: let
+    written = nativeSettingsDotKeys cfg;
+    dropped = builtins.filter (k: !(builtins.elem k workspaceOverridableSettings)) written;
+    listed = lib.concatStringsSep ", " dropped;
+  in
+    lib.optional (dropped != []) {
+      assertion = false;
+      message =
+        ''
+          ai.kiro: devenv writes `nativeSettings` to the PROJECT-LOCAL
+          ${cfg.configDir}/settings/cli.json, and kiro honors only an allowlist
+          of keys there. These keys would be written and then
+          silently discarded at runtime: ${listed}
+        ''
+        + (
+          if workspaceOverridableSettings == []
+          then ''
+
+            The pinned kiro honors NO workspace override at all — its TUI has no
+            workspace merge — so no key belongs in this file. Set these under
+            home-manager (`ai.kiro.nativeSettings`, which writes the global
+            ~/.kiro/settings/cli.json), or with
+            `kiro-cli settings <key> <value>`.
+          ''
+          else ''
+
+            Workspace-overridable keys for the pinned kiro:
+            ${lib.concatStringsSep ", " workspaceOverridableSettings}
+
+            Anything else is global-only: set it under home-manager
+            (`ai.kiro.nativeSettings`, which writes the global
+            ~/.kiro/settings/cli.json), or with
+            `kiro-cli settings <key> <value>`.
+
+            That list describes the binary this flake PINS, read out of
+            `overlays/kiro-cli-extracted.json`. It is not re-derived from an
+            overridden `ai.kiro.package`, so a newer kiro whose allowlist has
+            grown is still judged against the pinned one — bump the pin (and
+            its sidecar) rather than working around this.
+
+          ''
+        );
+    };
+
+  # `chat.enableWorkflows` is the THIRD gate on the `workflows` rollout feature
+  # (after the manifest patch and the `kas` engine) and it defaults to false
+  # upstream, so unlocking the feature without it is silently inert — the third
+  # such trap on this one option, see the `v3` assertion in `mkAssertions` and
+  # packages/kiro-cli/docs/workflow-gating.md. Implied together, `mkDefault` so an explicit
+  # `ai.kiro.nativeSettings.chat.enableWorkflows` still wins.
+  #
+  # HOME MANAGER ONLY, deliberately. The key is absent from
+  # `workspaceOverridableSettings`, so contributing it on the devenv backend
+  # would write a setting kiro discards — and would trip
+  # `mkDevenvWorkspaceSettingsAssertions` above, failing a config the consumer
+  # never wrote. devenv consumers set it globally; the assertion says so.
+  workflowsSettingImplication = cfg:
+    lib.mkIf (builtins.elem "workflows" cfg.unlockedRolloutFeatures) {
+      ai.kiro.nativeSettings.chat.enableWorkflows = lib.mkDefault true;
+    };
+
   # `null` means auto: the reminder is meaningless without the feature, and the
   # feature under-elicits without it, so they default on together.
   workflowReminderEnabled = cfg:
@@ -1078,6 +1180,16 @@ in
 
           Unlocking `workflows` also enables `/goal`, since the client maps the
           one flag onto both the `workflows` and `goal` session settings.
+
+          NOT SUFFICIENT ON ITS OWN for `workflows` since kiro-cli 2.19.0. The
+          patch only makes the feature AVAILABLE; the client's own check gained
+          a second condition, the `chat.enableWorkflows` setting, which upstream
+          defaults to false. Under home-manager this module implies that setting via
+          `mkDefault` when `workflows` is unlocked, so the pair stays
+          consistent and an explicit
+          `nativeSettings.chat.enableWorkflows` still wins. Under devenv the
+          setting is global-only and must be set outside the project — see
+          `nativeSettings`.
         '';
       };
       identity = lib.mkOption {
@@ -1200,6 +1312,34 @@ in
                     default = null;
                     description = "Enable thinking/reasoning mode.";
                   };
+                  enableWorkflows = lib.mkOption {
+                    type = lib.types.nullOr lib.types.bool;
+                    default = null;
+                    description = ''
+                      Enable the `/workflow` and `/goal` commands and the
+                      agent-side workflow tools (`run_workflow`,
+                      `inspect_workflow`, ...).
+
+                      This is the THIRD of the feature's gates, after the
+                      manifest patch and the `kas` engine, and independent of
+                      both: `unlockedRolloutFeatures =
+                      ["workflows"]` only makes the feature AVAILABLE, and since
+                      kiro-cli 2.19.0 the client also requires this setting,
+                      which upstream defaults to false. Unlocking without it is
+                      silently inert — no error, no log; the workflow tools
+                      simply never reach the session.
+
+                      Under home-manager you need not set it by hand: unlocking
+                      `workflows` implies it via `mkDefault`, and an explicit
+                      value here still wins. Under devenv it must be set
+                      GLOBALLY — it is not in the workspace-override allowlist,
+                      so a project-local write of it is discarded.
+
+                      Takes effect at the next kiro start, and the engine
+                      persists the flag per session, so prefer a fresh session
+                      over resuming one created while it was off.
+                    '';
+                  };
                 };
               };
               default = {};
@@ -1225,7 +1365,32 @@ in
         description = ''
           JSON settings merged into ~/.kiro/settings/cli.json on activation (HM)
           or written statically (devenv). Runtime-mutated keys are preserved in HM.
-          Known keys are typed; unknown keys are accepted via freeformType.
+          Known keys are typed; unknown keys are accepted via freeformType —
+          by the TYPE. Whether a key is then honored is a separate question the
+          backend answers, and under devenv the answer is no for anything off
+          the allowlist below, including two of the typed options above
+          (`chat.enableWorkflows`, `telemetry.enabled`). Those are global-only
+          settings; the type accepts them because Home Manager writes the file
+          where they work.
+
+          Nested Nix lowers to kiro's flat dotted keys, and it stops at a
+          COMPLETE key rather than flattening all the way, so an object-valued
+          setting works: `chat.modelDefaults.<model>.<field>` is written as
+          `"chat.modelDefaults"` with the record intact underneath. The
+          boundary is `settingKeys` from the extracted sidecar, so it tracks
+          version bumps.
+
+          THE TWO BACKENDS DO NOT HONOR THE SAME KEYS, because they write
+          different files. HM writes the GLOBAL `~/.kiro/settings/cli.json`,
+          where kiro honors everything. devenv writes the PROJECT-LOCAL
+          `<configDir>/settings/cli.json`, which kiro merges over the global one
+          through an allowlist — every other key is read and discarded with no
+          warning. The devenv backend therefore REFUSES a non-allowlisted key at
+          eval rather than writing a file that looks applied and is not; the
+          assertion names the keys the pinned kiro does honor there. That
+          allowlist is extracted from the binary
+          (`overlays/kiro-cli-extracted.json`, `workspaceOverridableSettings`),
+          so it tracks version bumps instead of being curated here.
         '';
       };
       # How settings/mcp.json is delivered on activation. Governs the
@@ -1537,7 +1702,7 @@ in
         # Kiro cli.json uses flat dot-notation keys ("chat.enableTangentMode")
         # not nested JSON. Flatten so consumers can write clean Nix:
         #   settings.chat.enableTangentMode = true;
-        flatSettings = aiCommon.flattenDotKeys filteredSettings;
+        flatSettings = flattenKiroSettings filteredSettings;
 
         # Resolve credential http headers → `${env:VAR}` placeholders in
         # mcp.json + the runtime secret-env exports (Kiro-only delivery).
@@ -1560,6 +1725,10 @@ in
             # reading it via `mkAllHookFiles` is not circular: the record
             # depends only on `workflowReminder.*` and `unlockedRolloutFeatures`.
             {ai.kiro.hooks = workflowReminderHooks cfg;}
+            # Second gate on the `workflows` rollout feature, implied with it so
+            # the pair cannot drift apart. HM-only by construction — see
+            # `workflowsSettingImplication`.
+            (workflowsSettingImplication cfg)
             # Shared assertions (see mkAssertions): exclusive inline/dir pairs
             # and hook-name/materializer guards.
             {assertions = mkAssertions cfg;}
@@ -1667,6 +1836,14 @@ in
             # ai.kiro just for MCP fanout don't clobber an externally-
             # managed cli.json. Matches upstream Claude HM behavior
             # (settings.json only written when cfg.nativeSettings != {}).
+            #
+            # `unlockedRolloutFeatures = ["workflows"]` now puts a key in that
+            # set (see `workflowsSettingImplication`), so a consumer who
+            # declared no settings at all but did unlock workflows crosses this
+            # gate and starts merging. That is intended and bounded: the point
+            # of the implication is that the setting REACHES the file, and this
+            # is a `jq` merge of one key rather than a clobber, so an
+            # externally-managed cli.json keeps everything else it had.
             # Devenv-side is unconditional (project-local, harmless).
             (lib.mkIf (filteredSettings != {}) {
               home.activation.kiroSettingsMerge = lib.hm.dag.entryAfter ["linkGeneration"] (helpers.mkSettingsActivationScript {
@@ -1726,7 +1903,7 @@ in
         hookEntries = mkHookEntries cfg;
 
         filteredSettings = aiCommon.filterNulls cfg.nativeSettings;
-        flatSettings = aiCommon.flattenDotKeys filteredSettings;
+        flatSettings = flattenKiroSettings filteredSettings;
 
         # Resolve credential http headers → `${env:VAR}` placeholders in
         # mcp.json + the runtime secret-env exports (Kiro-only delivery).
@@ -1756,8 +1933,10 @@ in
             # `workflowReminderHooks`).
             {ai.kiro.hooks = workflowReminderHooks cfg;}
             # Shared assertions (see mkAssertions): exclusive inline/dir pairs
-            # and hook-name/materializer guards.
-            {assertions = mkAssertions cfg;}
+            # and hook-name/materializer guards. The workspace-allowlist guard
+            # is devenv-ONLY and is appended here rather than merged into
+            # `mkAssertions`, because the same keys are correct under HM.
+            {assertions = mkAssertions cfg ++ mkDevenvWorkspaceSettingsAssertions cfg;}
             (lib.mkIf (hasMergedContext || sharedRules != {}) {
               ai.internal.agentsMd.${cfg.context.filename} =
                 {
