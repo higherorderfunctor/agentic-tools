@@ -424,6 +424,7 @@ def test_unknown_predicate_operation() -> None:
     model["rules"] = [
         {
             "id": "BAD-RULE",
+            "lifecycle": "L",
             "text": "fixture",
             "kind": "executable-python",
             "settled": False,
@@ -865,6 +866,31 @@ def test_presentation_order() -> None:
     assert list(emitted["machines"]) == ["ONE_F", "TWO_F"]
     assert emitted["by_type"] == {"ONE": ["ONE_F"], "TWO": ["TWO_F"]}
     assert all(not machine["diagnostics"] for machine in emitted["machines"].values())
+
+
+@contract("rule ownership is explicit and lifecycle references resolve")
+def test_rule_lifecycle() -> None:
+    model = fixture_model()
+    grammar = {"WORK": {"fields": [{"name": "F", "options": ["a", "b"]}], "roles": []}}
+    rule = {
+        "id": "OPAQUE", "text": "fixture", "kind": "open",
+        "settled": False, "cites": [], "lifecycle": "L",
+    }
+    model["rules"] = [rule]
+    validate_model(model)
+    assert payload(model, grammar)["machines"]["L"]["rules"] == [
+        {key: value for key, value in rule.items() if key != "lifecycle"}
+    ]
+    rule["lifecycle"] = None
+    validate_model(model)
+    assert payload(model, grammar)["machines"]["L"]["rules"] == []
+    rule["lifecycle"] = "missing"
+    try:
+        validate_model(model)
+    except ModelError as error:
+        assert "known lifecycles: L" in str(error)
+    else:
+        raise AssertionError("unknown rule lifecycle loaded")
 
 
 @contract("the shipped lifecycle rows exactly match the v1 baseline")
