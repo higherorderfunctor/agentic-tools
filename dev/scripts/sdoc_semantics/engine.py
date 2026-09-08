@@ -766,6 +766,11 @@ def gate_placement(model: Mapping[str, Any]) -> list[dict[str, Any]]:
 def payload(model: Mapping[str, Any], grammar: Mapping[str, Any]) -> dict:
     """Build the exact ``sdoc-semantics/2`` board contract."""
     validate_model(model, grammar)
+    return _validated_payload(model, grammar)
+
+
+def _validated_payload(model: Mapping[str, Any], grammar: Mapping[str, Any]) -> dict:
+    """Render after the public caller has validated its input exactly once."""
     machines: dict[str, dict] = {}
     for lifecycle in model.get("lifecycles", []):
         machines[lifecycle["name"]] = machine_payload(
@@ -794,7 +799,7 @@ def payload(model: Mapping[str, Any], grammar: Mapping[str, Any]) -> dict:
 
 
 def build_payload(grammar: Mapping[str, Any]) -> dict:
-    return payload(load_model(MODEL_PATH, grammar), grammar)
+    return _validated_payload(load_model(MODEL_PATH, grammar), grammar)
 
 
 def adapt_graph(loaded_graph: Any) -> dict[str, Any]:
