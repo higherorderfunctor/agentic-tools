@@ -31,19 +31,57 @@
   ciFile = ../.github/workflows/ci.yml;
   ciLines = lib.splitString "\n" (builtins.readFile ciFile);
 
-  # Match on BOTH tokens: `head_ref ==` alone could pick up an unrelated future
-  # step, and `update/` alone appears in prose comments above.
+  # SCOPED TO THE STEP, not to the file. This used to collect every
+  # `head_ref == 'update/…'` line in ci.yml and require exactly one. That was
+  # right while the heron_brook reminder was the only such gate, and it went red
+  # the moment a second tripwire step (oxlint's @napi-rs/cli necessity check)
+  # added its own — correctly, since the old matcher genuinely could no longer
+  # tell them apart.
   #
-  # Collect ALL matches and require exactly one, rather than taking the first.
-  # A `findFirst` here would silently start validating a DIFFERENT step the day
-  # someone adds another `head_ref == 'update/…'` gate earlier in the file —
-  # the heron_brook gate could then be renamed with this guard still green,
-  # which is the precise failure it exists to prevent. Same exactly-one
-  # discipline vu.mkClaudeExtract applies to its enum greps.
-  gates =
+  # The narrowing must NOT be "match `update/claude-code`". The branch name is
+  # read back OUT of ci.yml precisely so a rename that updates
+  # config.update.targets but not ci.yml fails here; hardcoding it would make
+  # this guard a third copy of the name and defeat its only purpose.
+  #
+  # So anchor on the step's own `- name:` line and read the gate from WITHIN
+  # that step's line range. `findFirst` after the anchor would not be enough
+  # either: if the heron_brook step lost its `if:`, the next step's gate would
+  # be picked up and validated in its place. Bounding at the next `- name:` at
+  # step indentation makes that case report zero gates and throw.
+  stepName = "- name: Heron-brook mitigation review tripwire";
+  stepIndent = "      - name: ";
+
+  indexed = lib.imap0 (i: line: {inherit i line;}) ciLines;
+  nameHits = builtins.filter (x: lib.hasInfix stepName x.line) indexed;
+  nameCount = builtins.length nameHits;
+
+  stepStart =
+    if nameCount == 1
+    then (builtins.head nameHits).i
+    else -1;
+  laterStepStarts =
     builtins.filter
-    (line: lib.hasInfix "head_ref ==" line && lib.hasInfix "update/" line)
-    ciLines;
+    (x: x.i > stepStart && lib.hasPrefix stepIndent x.line)
+    indexed;
+  stepEnd =
+    if laterStepStarts == []
+    then builtins.length ciLines
+    else (builtins.head laterStepStarts).i;
+
+  # Match on BOTH tokens: `head_ref ==` alone could pick up an unrelated line,
+  # and `update/` alone appears in the prose comment above the step.
+  gates =
+    if nameCount != 1
+    then []
+    else
+      map (x: x.line) (builtins.filter
+        (x:
+          x.i
+          > stepStart
+          && x.i < stepEnd
+          && lib.hasInfix "head_ref ==" x.line
+          && lib.hasInfix "update/" x.line)
+        indexed);
   gateCount = builtins.length gates;
 
   captured =
@@ -52,7 +90,18 @@
     else builtins.match ".*'update/([A-Za-z0-9._-]+)'.*" (builtins.head gates);
 in {
   claude-heron-brook =
-    if gateCount > 1
+    if nameCount != 1
+    then
+      throw ''
+        heron_brook guard: expected exactly one ci.yml step named
+        "${stepName}", found ${toString nameCount}.
+
+        This guard anchors on that step name to find the reminder's `if:` gate.
+        If the step was renamed, update `stepName` in
+        checks/claude-heron-brook.nix to match. If it was deleted on purpose,
+        delete this file and ai.claude.delegationClamp with it.
+      ''
+    else if gateCount > 1
     then
       throw ''
         heron_brook guard: ${toString gateCount} steps in
@@ -70,10 +119,14 @@ in {
         heron_brook guard: no `head_ref == 'update/…'` gate found in
         .github/workflows/ci.yml.
 
-        The heron_brook reminder step was deleted or moved. If the mitigation
+        The step named "${stepName}" exists, but carries no such gate between
+        its `- name:` line and the next step.
+
+        Without the gate the reminder fires on every PR, or never — either way
+        it no longer tracks the update branch. Restore
+        `if: github.head_ref == 'update/<key>'` on that step. If the mitigation
         was removed on purpose, delete checks/claude-heron-brook.nix and
-        ai.claude.delegationClamp along with it. If the step merely moved,
-        this guard needs re-pointing at its new home.
+        ai.claude.delegationClamp along with it.
       ''
     else if captured == null
     then

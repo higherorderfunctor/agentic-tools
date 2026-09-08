@@ -104,17 +104,24 @@ Three things follow, and each of them is a trap if you assume the old shape:
 
 ## heron_brook Delegation Clamp — the opt-in mitigation
 
-> **Last verified:** 2026-08-06 (commit pending — `delegationClamp.mitigate` is
-> now **opt-in**, and the per-update version tripwire is gone. It compared the
-> pinned claude-code version against a recorded `verifiedClaudeVersion`, so it
-> went red on every release and was right on none of them; three discharges, all
-> clean. What replaced it is a ~90-day dated reminder scoped to the claude-code
-> update PR, plus an eval-only guard that the two agree on the branch name.
-> Prior 2026-08-04: binary re-verification against 2.1.222. Prior 2026-07-29:
-> confirmed end-to-end against two LIVE sessions on 2.1.220, which turned the
-> model gate into a measurement.) If you change `ai.claude.delegationClamp`, the
-> hook script, the injected text, or the reminder and this fragment isn't
-> updated in the same commit, stop and fix it.
+> **Last verified:** 2026-09-08 (commit pending —
+> `checks/claude-heron-brook.nix` now anchors on the reminder step's `- name:`
+> line and reads its gate from within that step's line range. It used to require
+> exactly ONE `head_ref == 'update/…'` gate in the whole file, which was correct
+> while this was the only such step and went red the moment a second tripwire
+> added its own. The guard now couples to the STEP NAME — rename the step and it
+> throws, by design.) Prior: 2026-08-06 (commit pending —
+> `delegationClamp.mitigate` is now **opt-in**, and the per-update version
+> tripwire is gone. It compared the pinned claude-code version against a
+> recorded `verifiedClaudeVersion`, so it went red on every release and was
+> right on none of them; three discharges, all clean. What replaced it is a
+> ~90-day dated reminder scoped to the claude-code update PR, plus an eval-only
+> guard that the two agree on the branch name. Prior 2026-08-04: binary
+> re-verification against 2.1.222. Prior 2026-07-29: confirmed end-to-end
+> against two LIVE sessions on 2.1.220, which turned the model gate into a
+> measurement.) If you change `ai.claude.delegationClamp`, the hook script, the
+> injected text, or the reminder and this fragment isn't updated in the same
+> commit, stop and fix it.
 
 Claude Code injects a system-prompt section — internally `heron_brook` —
 instructing the model not to call the Agent tool and not to use workflows or
@@ -253,6 +260,19 @@ What replaced it:
   reads the branch name back out of `ci.yml` and fails if no such update target
   exists, so renaming the target cannot silently stop the reminder from ever
   firing again. No binary, no IFD, no derivation.
+
+  It finds that gate by **anchoring on the step's `- name:` line** and reading
+  only the lines between it and the next step. The obvious alternative —
+  matching `update/claude-code` directly — would defeat the guard entirely, by
+  making it a third copy of the name it exists to verify. The obvious cheaper
+  one, taking the first gate in the file, is what it used to do; that broke once
+  a second tripwire step gained its own gate. Bounding at the next step also
+  matters: without it, a heron_brook step that LOST its `if:` would silently
+  validate the following step's gate instead.
+
+  The cost is a coupling to the step name. **Rename that step and this guard
+  throws**, naming the string to update. That is deliberate — the alternative is
+  a guard that quietly stops guarding.
 
 Discharging means bumping `reviewBy` ~90 days or — if upstream fixed it —
 **deleting the mitigation, the ci.yml step, and that guard together**. An

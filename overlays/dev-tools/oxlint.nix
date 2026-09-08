@@ -49,16 +49,38 @@
   # `deleted file mode` stanzas it emits — and prove the result with a
   # `pnpm install --frozen-lockfile` before landing it. The ifd-patterns
   # fragment carries the full loop.
-  napi = {
+  napi = rec {
     pkg = "@napi-rs/cli";
     version = "3.9.0";
-    patchPath = "patches/@napi-rs__cli@3.9.0.patch";
+    # DERIVED, never hand-written. As two independent literals a stale patch
+    # could pair with a matching version key and build GREEN: `version =
+    # "3.8.6"` alongside `patchPath = ".../@napi-rs__cli@3.9.0.patch"` produced
+    # a tree reading `"@napi-rs/cli@3.8.6": patches/@napi-rs__cli@3.9.0.patch`.
+    # The awk builds its assertion key from `version` alone, so it cannot catch
+    # that — the two halves have to be unable to disagree instead.
+    patchPath = "patches/@napi-rs__cli@${version}.patch";
     # pnpm derives this from the patch file's CONTENT — a plain sha256 of its
     # bytes — so it moves only when that file does, not when upstream's lock
-    # does.
+    # does. It is the sha256 of the INNER pnpm patch the outer git patch
+    # creates, NOT of that outer file.
     patchHash = "a732a64909908b75156f0709c6f08cb75c6ffe313ca2fee3857dd952c317e4f4";
   };
-  src = ourPkgs.applyPatches {
+  # The other half of the coupling. Deriving patchPath stops it disagreeing
+  # with `version`; this stops BOTH disagreeing with the file on disk. A repin
+  # that bumps `version` without regenerating the patch would otherwise stamp a
+  # path pnpm never finds, and pnpm then applies nothing and says nothing.
+  napiPatchFile = builtins.readFile ./oxlint-napi-rs-cli.patch;
+  assertPatchTargetsPin =
+    ourPkgs.lib.throwIf
+    (!ourPkgs.lib.hasInfix "b/${napi.patchPath}" napiPatchFile)
+    ''
+      oxlint: overlays/dev-tools/oxlint-napi-rs-cli.patch does not create ${napi.patchPath}.
+      napi.version is "${napi.version}", so the regenerated pnpm patch must be committed as
+      that path. Regenerate it (dev/fragments/overlays/ifd-patterns.md carries the loop)
+      rather than editing the literal — a mismatch here ships an UNPATCHED dependency
+      silently, because pnpm does not error on a patchedDependencies path it cannot find.
+    '';
+  src = assertPatchTargetsPin (ourPkgs.applyPatches {
     src = unpatchedSrc;
     patches = [./oxlint-napi-rs-cli.patch];
     postPatch = ''
@@ -71,7 +93,7 @@
       apply_patch_meta "${napi.patchPath}" '"' "" pnpm-workspace.yaml
       apply_patch_meta "${napi.patchHash}" "'" stamp pnpm-lock.yaml
     '';
-  };
+  });
   version = vu.mkVersion {
     # upstream: readCargoVersion @ apps/oxlint/Cargo.toml
     upstream = "1.82.0";

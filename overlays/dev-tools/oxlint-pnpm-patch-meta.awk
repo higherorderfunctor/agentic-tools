@@ -14,6 +14,18 @@
 # real human decision rather than drift, and the END assertions stop the build
 # instead of silently producing an unpatched tree.
 #
+# WHAT THIS FILE DOES NOT CHECK, so the messages below do not claim more
+# than they verify. Every key here is built from `ver` (see catKey/snapPfx),
+# so the assertions compare
+# the CATALOG PIN against `napi.version` and nothing else. They never read the
+# patch file and never verify `patchHash`. A stale patch paired with a matching
+# version key therefore passed this file cleanly and emitted a tree reading
+# `"@napi-rs/cli@3.8.6": patches/@napi-rs__cli@3.9.0.patch` — measured, not
+# hypothetical. That hole is closed in oxlint.nix rather than here: `patchPath`
+# is DERIVED from `napi.version`, and an eval-time assertion requires the
+# committed patch to create exactly that path. Keep both halves; this one
+# cannot see the file, and that one cannot see upstream's catalog.
+#
 # Variables (all required; `ph` only read when `tag` is set):
 #   pkg  dependency name, e.g. @napi-rs/cli
 #   ver  pinned dependency version, e.g. 3.8.2
@@ -122,7 +134,8 @@ END {
         exit 1
     }
     if (tag == "" && nCatalog == 0) {
-        print "oxlint: catalog no longer pins " pkg " at " ver " — the patch file and its hash both need regenerating" > "/dev/stderr"
+        print "oxlint: catalog no longer pins " pkg " at " ver " — bump napi.version and regenerate the patch" > "/dev/stderr"
+        print "oxlint: (this guard compares the catalog pin against napi.version ONLY. It does not read the patch file or verify patchHash — oxlint.nix derives patchPath from the version and asserts the committed patch creates it.)" > "/dev/stderr"
         exit 1
     }
     if (tag != "" && nImp == 0) {

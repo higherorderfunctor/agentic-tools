@@ -1,0 +1,6 @@
+{
+  "dependency": "@napi-rs/cli",
+  "reviewBy": "2026-10-08",
+  "upstreamCheck": "executeProcessIncarnationCommand in dist/cli.js — is the execFile still outside a try/catch?",
+  "verifiedVersion": "3.9.0"
+}
