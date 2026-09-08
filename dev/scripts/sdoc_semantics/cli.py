@@ -19,7 +19,7 @@ import json
 import sys
 from pathlib import Path
 
-from .engine import MODEL_PATH, load_model, mermaid
+from .engine import mermaid
 from .grammar import parse_sgra
 
 #: Repository root as seen from dev/scripts/sdoc_semantics/cli.py.
@@ -122,12 +122,21 @@ def render(data: dict, selector: str | None = None) -> str:
 
 
 def render_mermaid(data: dict, selector: str | None = None) -> str:
-    model = load_model(MODEL_PATH)
-    by_name = {lifecycle["name"]: lifecycle for lifecycle in model["lifecycles"]}
     out: list[str] = []
     for name in select(data, selector):
+        machine = data["machines"][name]
+        lifecycle = {
+            **machine,
+            "transitions": [
+                {
+                    "trigger": row["trigger"], "from": row["source"],
+                    "to": row["dest"], "gates": row["conditions"],
+                }
+                for row in machine["transitions"]
+            ],
+        }
         out.append(f"%% {name}")
-        out.append(mermaid(by_name[name]))
+        out.append(mermaid(lifecycle))
         out.append("")
     return "\n".join(out) + "\n"
 
