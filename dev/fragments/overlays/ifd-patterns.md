@@ -1,30 +1,36 @@
 ## IFD Patterns and Gotchas
 
-> **Last verified:** 2026-08-29 (commit pending — `devenv-test.yml` retains its
-> IFD warm step for on-demand diagnostics but no longer runs on PRs or pushes;
-> automatic deterministic contracts use the normal flake-check warm path).
-> Prior: 2026-08-25 (commit pending — claude-code's settings extraction is NO
-> LONGER A GREP. `mkClaudeExtract` now unpacks the Bun single-exec's module
-> graph and calls the binary's own schema builder, zod→JSON-Schema converter and
-> `@internal` filter, so `effortLevels`, `hookEvents` and `settingsBooleanKeys`
-> are read out of upstream's own schema and a whole `settings` block joins them.
-> Two greps survive on purpose — the launch pins and the model catalog are not
-> in that schema. The boolean-key QUORUM guard documented below is RETIRED,
-> having gone to zero matches when 2.1.245 code-split the bundle; the section is
-> kept because the arms-race lesson is the reason the extraction moved). Prior:
-> 2026-08-24 (commit pending — Codex's exact approval-policy guard now follows
-> the pinned binary's version boundary: pre-0.149.0 releases must retain
-> `untrusted`, while 0.149.0 and newer must expose only `never` and
-> `on-request`. This admits upstream's intentional removal without accepting
-> either vocabulary indefinitely, so the normal version-bump path can regenerate
-> the sidecar). Prior: 2026-08-19 (commit pending — removes a retired
-> generated-skill IFD check; Stacked Workflows remains the cross-platform
-> generated-skill constraint). Prior: 2026-08-16 (commit pending —
-> `devenv-test.yml` now attributes real repository instruction projections to
-> Git portability rather than the retired claim that current Kiro skips steering
-> symlinks; its IFD warm step and closure behavior were rechecked unchanged).
-> Prior: 2026-08-14 (commit pending — this fragment now has its OWN registry
-> category, `ifd`, scoped to the paths it actually claims below:
+> **Last verified:** 2026-09-08 (commit pending — the oxlint `@napi-rs/cli`
+> repin to 3.9.0 ran this loop end to end. Three corrections below: the proof
+> step is silently voided by `--ignore-workspace`, upstream's pnpm MAJOR moves
+> independently of everything the awk guards, and a multi-document
+> `pnpm-lock.yaml` — never previously exercised — works fine. The pnpm 12 swap
+> itself is DEFERRED: nixpkgs' fetcher passes an empty registry base, which pnpm
+> 12 does not tolerate.) Prior: 2026-08-29 (commit pending — `devenv-test.yml`
+> retains its IFD warm step for on-demand diagnostics but no longer runs on PRs
+> or pushes; automatic deterministic contracts use the normal flake-check warm
+> path). Prior: 2026-08-25 (commit pending — claude-code's settings extraction
+> is NO LONGER A GREP. `mkClaudeExtract` now unpacks the Bun single-exec's
+> module graph and calls the binary's own schema builder, zod→JSON-Schema
+> converter and `@internal` filter, so `effortLevels`, `hookEvents` and
+> `settingsBooleanKeys` are read out of upstream's own schema and a whole
+> `settings` block joins them. Two greps survive on purpose — the launch pins
+> and the model catalog are not in that schema. The boolean-key QUORUM guard
+> documented below is RETIRED, having gone to zero matches when 2.1.245
+> code-split the bundle; the section is kept because the arms-race lesson is the
+> reason the extraction moved). Prior: 2026-08-24 (commit pending — Codex's
+> exact approval-policy guard now follows the pinned binary's version boundary:
+> pre-0.149.0 releases must retain `untrusted`, while 0.149.0 and newer must
+> expose only `never` and `on-request`. This admits upstream's intentional
+> removal without accepting either vocabulary indefinitely, so the normal
+> version-bump path can regenerate the sidecar). Prior: 2026-08-19 (commit
+> pending — removes a retired generated-skill IFD check; Stacked Workflows
+> remains the cross-platform generated-skill constraint). Prior: 2026-08-16
+> (commit pending — `devenv-test.yml` now attributes real repository instruction
+> projections to Git portability rather than the retired claim that current Kiro
+> skips steering symlinks; its IFD warm step and closure behavior were rechecked
+> unchanged). Prior: 2026-08-14 (commit pending — this fragment now has its OWN
+> registry category, `ifd`, scoped to the paths it actually claims below:
 > `.github/actions/warm-ifd/**` and the warm steps in ci.yml / update.yml, on
 > top of `overlays/**`. It previously rode under `overlays`, whose two globs
 > never matched any of them — so the same-commit duty asserted at the end of
@@ -505,8 +511,10 @@ feature maturities, and config-key extraction fail closed.
   - **`patchHash` is a plain `sha256sum` of the pnpm patch file's bytes.**
     Nothing derives it from the dependency; it moves only when that file does,
     which is why the awk can stamp it by key. Verify against the current pin
-    before trusting a regenerated one — the 3.8.2 file hashes to the committed
-    `0a540bf5…`.
+    before trusting a regenerated one — at the 3.9.0 pin the stripped file
+    hashes to the committed `a732a649…`. Hash the INNER pnpm patch, not the
+    outer git patch that adds it: those two differ, and only the inner one is
+    what pnpm records.
   - **`patch-commit` emits content-free stanzas that must be stripped.** For
     `@napi-rs/cli@3.8.6` it produced 37 `deleted file mode` entries for
     `__tests__` paths that exist in both the tarball and the edit dir, alongside
@@ -517,6 +525,63 @@ feature maturities, and config-key extraction fail closed.
     file's hash, `pnpm install --frozen-lockfile`, and read the patched line out
     of `node_modules/.pnpm/<pkg>@<ver>_patch_hash=…/`. A patch that parses is
     not a patch that applied.
+
+    **Never pass `--ignore-workspace` to that proof.** `patchedDependencies`
+    lives in `pnpm-workspace.yaml`, so the flag discards the patch config
+    itself: the install succeeds, the lockfile resolves, and NOTHING is patched.
+    Measured 2026-09-08 while regenerating for 3.9.0 — the store path came back
+    as plain `@napi-rs+cli@3.9.0_<peers>` with no `patch_hash=` segment and an
+    unpatched `dist/cli.js`, every exit code 0. The `patch_hash=` segment in the
+    directory name is the load-bearing tell. Reaching for the flag is natural
+    when the throwaway project sits near another checkout; put the scratch
+    project outside any workspace instead of suppressing the file that carries
+    the patch.
+
+<!-- cspell:ignore andrewbranch Funtar -->
+
+- **The pnpm MAJOR is a second, unguarded pin — and upstream moving it does NOT
+  oblige this repo to follow.** Upstream's `packageManager` is the authority for
+  what upstream uses: oxc went `pnpm@11.25.0` -> `pnpm@12.3.2` in the same
+  window that moved the `@napi-rs/cli` catalog pin. The awk asserts on the
+  catalog pin and says nothing about pnpm, so a major move surfaces only as a
+  build failure downstream of an unrelated assertion.
+
+  **Do not chase it reflexively.** As of 2026-09-08 pnpm 12 CANNOT drive
+  `fetchPnpmDeps` at this nixpkgs pin, and the reason is a nixpkgs defect rather
+  than anything about pnpm 12: `fetch-pnpm-deps/default.nix:149` interpolates
+  `--registry="$NIX_NPM_REGISTRY"` unconditionally, and that variable has no
+  default anywhere in nixpkgs — it appears only twice, both in that file. pnpm
+  11 falls back to the default registry when handed an empty base; pnpm 12's
+  Rust rewrite treats `""` as the base and every request becomes a relative URL.
+  Measured: metadata fetches against bare paths (`/@andrewbranch%2Funtar.js`),
+  ~28 minutes of retry backoff over 1004 lockfile entries, then
+  `ERR_PNPM_META_FETCH_FAIL`.
+
+  **The supply-chain banner is a symptom, and silencing it does not help.** The
+  failure is preceded by `✗ Lockfile failed supply-chain policy check`, because
+  pnpm's verification pass re-fetches registry metadata for every lockfile entry
+  even when resolution is skipped (`minimumReleaseAge` defaults to 1440 minutes
+  — since pnpm **11**, not 12). `trustLockfile` silences that pass, and measured
+  with an empty registry the build then dies one stage later at the tarball
+  endpoint with `relative URL without a base`. Turning off a supply-chain check
+  to fix a misconfigured registry buys nothing and costs a real check.
+
+  So oxlint deliberately stays on `pnpm_11` while upstream declares 12. Revisit
+  when the nixpkgs pin carries a registry guard; the swap then needs a
+  `NIX_NPM_REGISTRY` default supplied in the same change, and BOTH pnpm sites
+  must move together or `checks/pnpm-fetcher-parity.nix` fails on the store-path
+  mismatch. Leave `fetcherVersion = 4` alone: 4 is the maximum the pinned
+  nixpkgs supports.
+
+- **A multi-document `pnpm-lock.yaml` is fine for the awk.** pnpm 12 writes a
+  leading `---` document carrying its own self-management deps
+  (`packageManagerDependencies`) ahead of the real lock, and oxc's lock has that
+  shape from `d198982c` on even though we build it with pnpm 11. The insert
+  anchor still lands correctly — the first top-level key after `overrides:` —
+  and the counters traverse both documents without false matches. Measured:
+  `patch_hash stamped on 10 importer + 4 snapshot entries`. **That stderr line
+  is the receipt**; its absence, or any END assertion from the awk, is the
+  multi-document path failing.
 - **Apply that metadata BY KEY in `postPatch`, never as lock hunks.** The patch
   FILE is a new file and never conflicts, but the workspace and lock entries
   pointing pnpm at it track upstream's peer resolution, which reshuffles on its
