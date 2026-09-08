@@ -34,6 +34,9 @@ cross-lifecycle entries. The three lifecycle declarations are a transcription of
 the former Python machines, including their open rules; shaping those questions
 belongs to the operator.
 
+Related predicates traverse at most one hop; logical nesting cannot introduce a
+second relation traversal. A relation contract's `propagates` value is a list.
+
 READINESS IS NOT MODELLED, and must not be added here. It is a graph query over
 a node and its parents, not a value a node carries — see `docs/sdoc/status.py`,
 whose closure verdict no state machine can express.
