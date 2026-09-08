@@ -70,8 +70,8 @@
     "scope": "global",
     "type": "bool",
     "default": "true",
-    "description": "Allow glab to automatically check for updates and notify you when there are new updates.",
-    "envVars": ["CHECK_UPDATE"],
+    "description": "Allow glab to automatically check for updates and notify you when there are new updates.\nSetting the environment variable to true also forces a check, bypassing the once-a-day interval.",
+    "envVars": ["GLAB_CHECK_UPDATE", "CHECK_UPDATE"],
     "userSettable": true,
     "keyring": false,
     "fallback": false
@@ -258,7 +258,7 @@
     "type": "string",
     "default": "dark",
     "description": "Set your desired Markdown renderer style. Available options are [dark, light, notty]. To set a custom style, refer to https://github.com/charmbracelet/glamour#styles",
-    "envVars": ["GLAMOUR_STYLE"],
+    "envVars": ["GLAB_GLAMOUR_STYLE", "GLAMOUR_STYLE"],
     "userSettable": true,
     "keyring": false,
     "fallback": true
@@ -335,7 +335,7 @@
     "type": "bool",
     "default": "false",
     "description": "Set to true (1) to disable prompts, or false (0) to enable them.",
-    "envVars": ["NO_PROMPT", "PROMPT_DISABLED"],
+    "envVars": ["GLAB_NO_PROMPT", "NO_PROMPT", "PROMPT_DISABLED"],
     "userSettable": true,
     "keyring": false,
     "fallback": false
