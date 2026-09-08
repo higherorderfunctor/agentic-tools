@@ -620,7 +620,7 @@ def validate_model(
     for rule in model.get("rules", []):
         _require_shape(
             rule,
-            ("id", "text", "kind", "settled", "cites"),
+            ("id", "text", "kind", "settled", "cites", "lifecycle"),
             f"rule {rule.get('id')!r}",
         )
         if rule["kind"] not in RULE_KINDS:
@@ -629,6 +629,10 @@ def validate_model(
                 f"{_known('rule kinds', RULE_KINDS)}"
             )
         _require_list(rule["cites"], f"rule {rule['id']!r} cites")
+        if rule["lifecycle"] is not None:
+            _require_reference(
+                rule["lifecycle"], lifecycle_names, "lifecycle", f"rule {rule['id']!r}"
+            )
 
 
 def load_model(
@@ -736,8 +740,11 @@ def diagnostics(
 def _rules_for(
     lifecycle: Mapping[str, Any], rules: Iterable[Mapping[str, Any]]
 ) -> list[dict[str, Any]]:
-    prefix = str(lifecycle["name"]).replace("_", "-") + "-"
-    return [dict(rule) for rule in rules if str(rule["id"]).startswith(prefix)]
+    return [
+        {key: value for key, value in rule.items() if key != "lifecycle"}
+        for rule in rules
+        if rule["lifecycle"] == lifecycle["name"]
+    ]
 
 
 def machine_payload(

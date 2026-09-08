@@ -51,7 +51,7 @@ The document shape, fixed here and documented in a short file beside it:
   steps, each a transition reference plus an expected outcome (taken, or
   refused by a named gate).
 - A rule: id, text, kind (transcription, policy, derived or open), settled,
-  cites.
+  cites, lifecycle (a lifecycle name, or null for a rule about the whole model).
 
 Every name that refers to another entry resolves, or the loader refuses the
 document. Loading and validating is WORK-SEMANTICS-STDLIB-INTERPRETER's; this

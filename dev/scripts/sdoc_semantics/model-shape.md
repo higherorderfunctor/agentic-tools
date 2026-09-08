@@ -23,9 +23,10 @@ collections are the vocabulary for the interpreter: references are names and are
 validated when the document is loaded. A gate or checkpoint `sees` list uses
 `field:<field>` and `role:<role>` for grammar vocabulary, plus the closed
 literals `actor` and `git_base_ref`. Top-level rules have `id`, `text`, `kind`,
-`settled`, and `cites`. The compatibility payload groups a rule under a
-lifecycle when its id begins with that lifecycle's normalized name (`_` becomes
-`-`) plus `-`; rules without that prefix remain model-wide rules only.
+`settled`, `cites`, and `lifecycle`: a lifecycle name, or null for a rule about
+the whole model. The compatibility payload groups rules by that explicit
+reference and omits the association key from its existing machine rows. A
+model-wide rule is not assigned to any lifecycle.
 
 This first document deliberately has no gates, operations, events, or other
 cross-lifecycle entries. The three lifecycle declarations are a transcription of
