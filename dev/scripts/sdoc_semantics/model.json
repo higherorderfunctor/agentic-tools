@@ -42,6 +42,7 @@
       ],
       "initial": "sketch",
       "terminal": ["verified"],
+      "note": "Transcribed for the spike. Every transition is unsettled by design.",
       "transitions": [
         {
           "trigger": "advance",
@@ -126,6 +127,7 @@
       ],
       "initial": "open",
       "terminal": ["rejected", "superseded"],
+      "note": "Branching on purpose: two terminal states, and one rule no machine can hold.",
       "transitions": [
         {
           "trigger": "accept",
@@ -189,6 +191,7 @@
       ],
       "initial": "llm",
       "terminal": ["human"],
+      "note": "Shape is settled by an accepted DECISION; the actor is not.",
       "transitions": [
         {
           "trigger": "raise",

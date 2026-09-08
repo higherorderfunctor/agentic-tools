@@ -355,8 +355,11 @@ def validate_model(
             lifecycle,
             ("name", "subject", "states", "initial", "terminal", "transitions"),
             f"lifecycle {lifecycle.get('name')!r}",
+            ("note",),
         )
         name = lifecycle["name"]
+        if "note" in lifecycle and not isinstance(lifecycle["note"], str):
+            raise ModelError(f"lifecycle {name!r} note must be a string")
         _require_list(lifecycle["states"], f"lifecycle {name!r} states")
         _require_list(lifecycle["terminal"], f"lifecycle {name!r} terminal")
         _require_list(lifecycle["transitions"], f"lifecycle {name!r} transitions")

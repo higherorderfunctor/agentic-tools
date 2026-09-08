@@ -28,7 +28,7 @@ The document shape, fixed here and documented in a short file beside it:
   checkpoints, milestones, flows and rules, each a LIST in presentation order. Never an object whose key
   order carries meaning: Nix alphabetises attribute keys on emission, and the
   existing test that ladder order survives is what catches it.
-- A lifecycle: name; subject, a tagged object with one of three kinds (field:
+- A lifecycle: name; note (optional); subject, a tagged object with one of three kinds (field:
   every element declaring that field, derived from the grammar; element: one
   tag plus the field; role: one relation role plus the field), so the
   operator's open question of one machine per field or per type and field
