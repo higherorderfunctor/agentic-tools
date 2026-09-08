@@ -96,6 +96,18 @@ the recorded sdoc-semantics/1 baseline. The board serves sdoc-semantics/2 on
 listings before and after has zero changed lines below the schema header; that
 header alone moves from sdoc-semantics/1 to sdoc-semantics/2. The daemon remains
 an observer: no write path calls fire().
+
+Follow-up 2026-09-08: 41 semantics contracts pass under plain python3.
+With a step bound of 24, the two-transition cycle previously logged 24 steps;
+it now logs start, forward and back, then refuses the first repeated forward
+transition (3 steps), leaving the graph unchanged. The step bound remains a
+separate backstop. Relation diagnostics now return one deterministic cycle
+witness per role with an explicit scan bound, as requested in the follow-up.
+An isolated copy without sdoc_semantics imports scribe_cmd and accepts --help
+for all 9 non-semantics verbs; the semantics verb reports unavailable.
+DEPTH, STATUS and AUTHORED_BY still differ from the base only in the schema
+header. Rule ownership is explicit data, edge subject identities are stable,
+and every provenance step carries the same keys with a gate-name list.
 <<<
 RELATIONS:
 - TYPE: Parent
