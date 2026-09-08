@@ -1,7 +1,9 @@
 # bd (beads) — tool reference
 
-> **Last verified:** 2026-08-18 against the repository package pin at stable
-> Beads v1.2.2, nixpkgs Beads 1.0.3 and Dolt 2.3.0, plus the upstream and
+> **Last verified:** 2026-09-08 against the repository package pin at stable
+> Beads v1.2.2 and Dolt 2.3.2. nixpkgs' own `beads` has caught up to 1.2.2, so
+> the cross-version pair this document used to cite no longer exists — see
+> **Version-skew boundary** below. Plus the upstream and
 > `numtide/llm-agents.nix` derivations. Companion documents:
 > `dolt-git-remotes.md` (remote/sync mechanics) and `ecosystem.md` (integrations
 > and prior art). GitHub issue
@@ -62,8 +64,11 @@ design-doc corpus than an issue tracker (see `dolt-git-remotes.md`).
 
 - **Upstream**: latest stable release **v1.2.2** (2026-08-15). The immediately
   preceding **v1.2.1** release remains marked prerelease. `[upstream]`
-- **nixpkgs**: `beads` **1.0.3** on nixos-unstable (`pkgs/by-name/be/beads/`),
-  absent from the 25.11 release. `buildGoModule`, `subPackages = ["cmd/bd"]`,
+- **nixpkgs**: `beads` **1.2.2** on nixos-unstable (`pkgs/by-name/be/beads/`),
+  absent from the 25.11 release. It carried 1.0.3 until 2026-09, which is why
+  older revisions of this document describe a version skew against the
+  repository pin; nixpkgs now matches it exactly, same `src` hash and
+  `vendorHash`. `buildGoModule`, `subPackages = ["cmd/bd"]`,
   `buildInputs = [icu]`, MIT, `mainProgram = "bd"`, and a `postInstall` that
   wraps `dolt` onto `bd`'s PATH. One test is skipped everywhere
   (`TestCheckMetadataVersionTracking`), a second on Darwin
@@ -170,15 +175,28 @@ rolled back unattended. Issue
 [#995](https://github.com/higherorderfunctor/nix-agentic-tools/issues/995) owns
 that lifecycle hardening.
 
-**Version-skew boundary.** The packaged 1.0.3 client refuses a fresh 1.2.2 DB
-with `table has unknown fields`. The 1.2.2 client can open and write a 1.0.3 DB,
-after which 1.0.3 can still read it. `bd migrate --inspect --json` reports the
-version-label mismatch, while `bd migrate schema --json` reports schema v53
-already current; this version pair therefore does not exercise a destructive
-migration or post-migration bootstrap. Supporting one remains gated by #995.
-Until then, one pinned `bd` package is authoritative and rollback requires a
-pre-upgrade `bd backup` or recoverable remote ref plus the previous binary.
-`[measured contract @1.2.2/2.2.3]`
+**Version-skew boundary — measured once, no longer enforced.** When nixpkgs
+still carried 1.0.3 alongside the repository's 1.2.2 pin, the contract check
+measured the pair directly: the 1.0.3 client refused a fresh 1.2.2 DB with
+`table has unknown fields`; the 1.2.2 client could open and write a 1.0.3 DB,
+after which 1.0.3 could still read it; `bd migrate --inspect` reported the
+version-label mismatch while `bd migrate schema --json` reported schema v53
+already current, so that pair exercised no destructive migration or
+post-migration bootstrap.
+
+nixpkgs has since moved its `beads` to 1.2.2, which is the same version the
+repository pins, so no tracked input supplies a second `bd` client and nothing
+re-measures any of the above. Treat it as a dated observation about the
+1.0.3/1.2.2 pair, not a standing contract. What the check still asserts on a
+database the packaged client created itself is the recorded schema label and the
+`Schema already at v53` migration state.
+
+The operational conclusion is unchanged and does not depend on the skew: one
+pinned `bd` package is authoritative, and rollback requires a pre-upgrade
+`bd backup` or recoverable remote ref plus the previous binary. Supporting an
+unattended upgrade or rollback remains gated by #995.
+`[measured contract @1.2.2/2.3.2]` for the self-created assertions;
+`[historical @1.0.3/1.2.2]` for the skew observations.
 
 ## Config surface
 
