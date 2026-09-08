@@ -13,6 +13,7 @@ import sys
 import tempfile
 from pathlib import Path
 from types import SimpleNamespace
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -914,6 +915,21 @@ def test_payload_keys() -> None:
     assert tuple(SHIPPED_PAYLOAD) == PAYLOAD_KEYS
     assert set(SHIPPED_PAYLOAD) == set(PAYLOAD_KEYS)
     assert SHIPPED_PAYLOAD["schema"] == SCHEMA
+
+
+@contract("payload and Mermaid rendering validate once without reloading the model")
+def test_single_payload_validation() -> None:
+    from sdoc_semantics import cli, engine
+
+    with mock.patch.object(engine, "validate_model", wraps=engine.validate_model) as validate:
+        data = build_payload(GRAMMAR)
+        assert validate.call_count == 1
+        diagram = cli.render_mermaid(data, "DEPTH")
+        assert diagram == "%% DEPTH\n" + mermaid(SHIPPED["lifecycles"][0]) + "\n\n"
+        assert validate.call_count == 1
+    with mock.patch.object(engine, "validate_model", wraps=engine.validate_model) as validate:
+        assert payload(SHIPPED, GRAMMAR) == data
+        assert validate.call_count == 1
 
 
 @contract("presentation order survives model loading and payload emission")
