@@ -398,13 +398,10 @@ the repo before committing.
 
 ## Delegate Sizing — choose the model AND the effort per delegate
 
-> **Last verified:** 2026-09-02 (commit pending — first version, corrected
-> before merge after a Codex review found that the initial draft mistook
-> `[agents]` defaults for the only sizing controls. Codex also supports explicit
-> spawn overrides and model/effort settings in custom agent files.) If a harness
-> gains or loses a per-delegate model or effort control, update the routing
-> table in the same commit — a table cell that is wrong is worse than one that
-> says `unknown`.
+> **Last verified:** 2026-09-08 — a delegate must never inherit the interactive
+> session's model and effort by default. If a harness gains or loses a
+> per-delegate model or effort control, update the routing table in the same
+> commit: a wrong cell is worse than one saying `unknown`.
 
 An unsized delegate inherits the session's model and reasoning effort unless a
 spawn override, agent default or custom agent configuration says otherwise. When
@@ -412,12 +409,9 @@ the session is pinned to the most capable model at the highest effort, **every
 unsized delegate repeats that expensive choice**. That is the failure this
 section exists to prevent.
 
-In the operator's words:
-
-> "not sure i need to spend fable token prices on all your subagents when opus
-> for reasoning or sonnet for mechanical extraction is likely fine. size the
-> correct model, and also effort level. you are cranked to the max, when
-> medium/high would otherwise be fine."
+A delegate must never default to the interactive session's model and effort.
+Size every one deliberately, both dimensions, and say the choice in its launch
+message so it is reviewable.
 
 ### The rule
 
@@ -593,329 +587,88 @@ threads must be resolved, an unaddressed Copilot comment holds the PR — a bot
 reviewer has an open question on it. A stalled update PR is not lost; the next
 4x/day sweep rebuilds and re-arms it.
 
-### When Copilot is unavailable, YOU are not the reviewer — a subagent is
+### After you open or update a PR, the loop is YOURS
 
-> **Standing as of 2026-08-15.** Copilot's quota is exhausted for roughly two
-> weeks, so the automatic review below produces nothing. **This section is the
-> substitute, and it is not optional while that holds.** It is also the right
-> shape whenever the automatic review is absent for any other reason: a draft PR
-> that never flipped, a re-request that no-ops, a repo without the rule.
+Not the operator's. They should not have to notice CI went red, notice a review
+landed, or hand the PR back to you. You are the one still holding the context.
 
-**An agent cannot review its own output.** Reading back your own diff produces
-agreement, because the same reasoning that wrote the code evaluates it. The
-substitute is not "read it more carefully" — it is **dispatching an independent
-reviewer that never saw you write it.**
+**Never end a turn on a promise.** "I'll check when it lands" with no mechanism
+is worse than saying nothing: it looks like ownership and behaves like a block.
+Arm something that re-invokes you — a backgrounded watcher whose exit wakes the
+session — and only then report. Kill it once the signal arrives.
 
-So when there is no automatic review, run this before marking a PR ready:
+On every push, including the first:
 
-1. **Finders, in a subagent, one per lens.** Give each an explicit lens (factual
-   accuracy / reasoning and scope / document or code integrity / security) and
-   the standing instruction that **the PR body is an argument, not evidence**,
-   and that its confident tone is not a signal. Tell them plainly that the
-   author is orchestrating the review and cannot be deferred to.
-2. **Contest every finding TWICE — refute AND defend.** A refuter alone is a
-   second discard filter stacked on an author who was already grading their own
-   work, so the dismissal rate goes up for reasons that have nothing to do with
-   the code. Pair every refuter with a DEFENDER whose job is to argue the
-   finding is real, and who may not concede merely because a fix is awkward.
-3. **Never self-adjudicate a split.** Where refuter and defender disagree,
-   SURFACE the disagreement to the operator with both arguments. Resolving it
-   yourself reintroduces exactly the bias the whole structure exists to remove.
-4. **Fix what survives, and say what did not.** Report dismissed findings by
-   title and count — a review that reports only confirmed findings is
-   indistinguishable from one that found nothing.
+1. **Watch CI to completion.** Read the exit status of the tool, not a
+   notification's summary — a pipeline's status is the last command's, so
+   `nix flake check | tail` reports the tail's success. Capture the real code.
+2. **A conflicted PR gets ZERO check runs and reads exactly like slow CI.**
+   `mergeStateStatus: DIRTY` with an empty check list means rebase, not wait.
+   The same shape appears when the base moves under a long-running branch.
+3. **React to a red check by reading the failing job's log**, not by guessing
+   from the check name. Fix, push, re-arm the watcher.
+4. **Then read the review** (next section).
 
-#### Sizing — STANDARD by default, thorough only when asked
+Only report back when the PR is green and reviewed, or when something needs a
+decision that is genuinely the operator's.
 
-**The cost blows up in the CONTEST phase, not the finders.** Finders are bounded
-by however many lenses you pick. Findings are NOT bounded, and a refute+defend
-pair per finding is `2 × findings`. Measured on a 94-line docs PR: 3 lenses
-produced ~28 findings, so the run cost **59 agents** — the finders were 3 of
-them. A verbose finder triples the bill. Bound the contest phase first, and only
-then think about lenses.
+### Copilot reviews once, automatically. Do not trigger the first one
 
-**STANDARD — the default, target 5-9 agents total:**
+The ruleset requests it when the PR **becomes ready for review** — which covers
+a PR opened non-draft as well as a draft flipped later. It is automatic. Do not
+request it by hand, and do not treat an absent run on a fresh push as a missed
+trigger: pushes never trigger a review, so absent is the resting state.
 
-1. **2-3 finders, on a CHEAPER MODEL (Sonnet).** Finder work is mechanical: open
-   the cited line, check whether it says what the PR claims. Reserve the strong
-   model for contest and synthesis, where judgement actually decides something.
-2. **Deduplicate before contesting.** Several lenses over one diff overlap
-   heavily, and contesting the same defect three times is pure waste.
-3. **Triage by severity.** Contest BLOCKER and SHOULD-FIX. NITs are REPORTED,
-   not litigated.
-4. **Batch the contest** — one agent takes ~5 findings, not one agent each.
-5. **Two-agent refute/defend for BLOCKERs only.** Below that, a single agent
-   argues both sides and returns a verdict plus the strongest counter-argument.
-   That is weaker — one context means correlated errors — which is precisely why
-   the genuine blockers keep the two-agent treatment.
+**Re-request only after a significant change since the last run.** New scope, a
+mechanism the previous review never saw, an approach rewritten rather than
+corrected. Applying the review's own findings is NOT a significant change, and
+neither is rewording, reformatting or renaming. There is no round count to spend
+down — there is one question, asked each time: is there materially new code to
+review? Every review after the first is a paid manual request.
 
-**THOROUGH — only when the operator asks.** Per-finding refute/defend on
-everything, more lenses, strong model throughout. Still deduplicate, and still
-cap the total: an uncapped fan-out has no terminus.
+Read BOTH buckets. The inline threads gate the merge; the review body carries a
+suppressed block that creates no thread and that a heading grep will silently
+miss. Reply and resolve each gating thread **in the same turn as the fix**, not
+after the checks pass. Mechanics, and the API traps that each report a clean
+round that did not happen, are in the `pr-review-loop` skill.
 
-**Scale lenses with BLAST RADIUS, not diff size.** A thirty-line change to a
-shared `lib/` file earns more than a thousand-line docs PR; a fragment edit
-warrants one or two.
+### When Copilot does not review, a SEPARATE agent does
 
-**Do not ask which tier to use per PR.** Standard is the default and the
-operator says "thorough" when they want it — asking is friction paid on every
-review.
+Triggers, any of them: the review errored, the account is out of quota, the PR
+never left draft, or a significant change landed after the last review.
 
-**Do not skip this because the change is "just docs".** The failure this repo
-actually experienced was a design document whose PR sequence sent a later
-session to build the wrong thing for a day. Prose that directs future work has a
-blast radius; treat it like code.
+**You cannot review your own diff.** Reading it back produces agreement, because
+the reasoning that wrote the code is the reasoning evaluating it. Dispatch a
+reviewer that did not write it, told plainly that the PR body is an argument
+rather than evidence and that its author cannot be deferred to. One independent
+reviewer is the default. Report what was dismissed as well as what was fixed.
 
-### Copilot review: ALWAYS read the suppressed-comments block
+This is not a fallback for one outage. It is the standing substitute whenever
+the automatic review did not happen, and github.com Copilot fails on this repo
+often enough that it is the common case, not the rare one.
 
-**This loop is yours to start, unprompted, as soon as the PR is non-draft — it
-is part of landing the change, not a follow-up the operator has to request.** A
-PR handed back with its review unread is unfinished work. The loop is ONE round;
-a second needs a significant change in reviewed scope, and anything beyond that
-needs explicit approval (see the round rule below).
+### Complex changes to main: prosecute, defend, judge
 
-Copilot records its findings in two places, and only one of them creates a
-thread:
+For a complex change headed to `main`, one independent reviewer is not enough.
+Run the three-role protocol: an agent that prosecutes, a separate agent that
+defends, and a third that judges on evidence. If the judge cannot converge, loop
+— at most three rounds, each narrowed to what stayed unresolved. Surface a
+genuine split to the operator rather than adjudicating it yourself.
 
-1. **Inline review comments** — these become resolvable threads, appear in
-   `pull_request_read` with `method: get_review_comments`, and now gate merge.
-2. **A `<details>` block inside the review BODY** — no thread, nothing to
-   resolve, invisible to any thread query. **Its heading is NOT stable.** Two
-   spellings have been observed on this repo:
-   `Comments suppressed due to low confidence (N)`, and plain
-   `Suppressed comments (N)` (PR #766 round 2, 2026-08-05). Do not anchor a read
-   on either — see the command below.
+**Scope, deliberately narrow:**
 
-**The two endpoints attribute Copilot to DIFFERENT logins, and mixing them up
-reads as a clean review.** `/pulls/N/reviews` credits the review to
-`copilot-pull-request-reviewer[bot]`; `/pulls/N/comments` credits the inline
-comments to plain `Copilot`. Filtering the comments endpoint by the `[bot]`
-login returns ZERO while gating threads are open — measured on PR #614, where
-four unresolved threads were invisible and the body's "generated 4 comments"
-line was the only tell. Since threads now block merge, that failure mode
-presents as a PR that mysteriously will not land.
+- Only for changes going to `main`. A draft PR, or a long-lived experiment
+  branch where the design is not settled yet, forgoes it — if it is a draft, it
+  is not ready for this.
+- **Local runtimes only, always.** Never hand this to github.com Copilot: it
+  cannot be given a model or an effort level, and the cost belongs where those
+  controls exist.
+- Size the roles separately, and never let a delegate inherit an interactive
+  session's model and effort by default — see the delegate-sizing orientation.
 
-Prefer the GraphQL `reviewThreads` query over the REST comments endpoint: it
-sidesteps the login discrepancy entirely and returns `isResolved` plus the
-thread id you need for `resolveReviewThread` anyway.
-
-```bash
-gh api graphql -f query='
-query {
-  repository(owner:"OWNER", name:"REPO") {
-    pullRequest(number:N) {
-      reviewThreads(first:50) {
-        nodes { id isResolved path comments(first:1){nodes{author{login} body}} }
-      }
-    }
-  }
-}' --jq '.data.repository.pullRequest.reviewThreads.nodes[]
-         | select(.isResolved==false)'
-```
-
-**Reading only the threads is not reading the review.** Measured on PR #568
-across seven review rounds: the suppressed bucket produced **7 findings, all
-genuine**, including a functional bug (`api_protocol` hardcoded while the scheme
-was stripped), a regex that could not match bracketed IPv6 hosts, and a doc that
-would have had readers create a directory literally named `~`. The gating bucket
-over the same period produced two, one of which was a diagnostics improvement
-over already-correct behavior. On that sample the confidence signal was
-inverted.
-
-So whenever you check Copilot feedback — CLI, MCP, a monitor loop, anything —
-fetch the review BODY too, not just the threads:
-
-```bash
-gh api --paginate "repos/OWNER/REPO/pulls/N/reviews" \
-  --jq '[.[] | select(.user.login=="copilot-pull-request-reviewer[bot]")]
-        | last | .body'
-```
-
-**Print the WHOLE body and read it. Do not pipe it through a heading grep.**
-This command used to end in `sed -n '/low confidence/,$p'`, and that is exactly
-how the bucket gets missed: on PR #766 round 2 the block was titled
-`Suppressed comments (1)`, the `sed` matched nothing, and the round was about to
-be reported clean in both buckets. The finding underneath was real — a security
-positive control whose greps were basic regexes, so `.` matched any character. A
-phrase grep that returns empty is indistinguishable from a genuinely clean
-bucket, which makes this failure silent and self-confirming.
-
-**"generated no new comments" does NOT mean there is nothing to read.** That is
-the count of INLINE comments. The same review body carried a suppressed finding
-alongside that line. Cross-check the two independently: the count line describes
-bucket 1, the `<details>` block is bucket 2.
-
-`--paginate` is load-bearing, not tidiness. The endpoint pages at 30, and a PR
-that has been through a review loop reaches that easily — #568 took twenty.
-Without it `last` returns the last review on the FIRST page, which is an OLD
-one, and the answer looks exactly like a fresh clean review.
-
-**Gate on `commit_id`, not on the timestamp.** The only condition that means
-"this review saw my code" is the review's `commit_id` equalling the PR head:
-
-```bash
-gh api --paginate "repos/OWNER/REPO/pulls/N/reviews" \
-  --jq '[.[] | select(.user.login=="copilot-pull-request-reviewer[bot]")]
-        | last | .commit_id'
-```
-
-This was arrived at by getting it wrong three times in a row, each fix looking
-sufficient until it wasn't:
-
-1. reading `.[-1]` → returns a stale review, reported as new;
-2. taking `submitted_at` as a baseline → better, but a review of an OLDER commit
-   still advances the timestamp, so it reads as fresh;
-3. requiring `commit_id == head` → correct.
-
-A related tell, useful because it needs no baseline at all: **check whether a
-check run named `copilot-pull-request-reviewer` exists on the head commit.** It
-distinguishes "never ran on this commit" from "ran and found nothing" — which
-otherwise look identical.
-
-```bash
-gh api --paginate "repos/OWNER/REPO/commits/<head-sha>/check-runs" \
-  --jq '.check_runs[] | select(.name=="copilot-pull-request-reviewer") | .status'
-```
-
-Absent means no review ran on this commit; `in_progress` means wait; `completed`
-means the review is there to read. Ask for the run BY NAME rather than counting
-the checks: a total count is only correct until the CI matrix changes.
-
-**The automatic review fires exactly once per PR, when the PR becomes ready for
-review. Pushes never trigger it.** That is how the ruleset's
-`Copilot review for default branch` rule is configured and always has been, so
-after any push the head commit has no reviewer check run and never will acquire
-one on its own. Absent is not a miss to wait out — it is the resting state.
-
-**"Becomes ready" covers both paths, and the narrower phrasing is a trap.** A
-draft flipped to ready fires it, and so does a PR **opened non-draft in the
-first place**, which never has a draft → ready transition at all. Measured on PR
-#801: `gh pr create` without `--draft` produced `requested_reviewers: [Copilot]`
-and a `queued` reviewer check run within seconds. Writing this rule as "on the
-draft → ready transition" reads as excluding never-drafted PRs — it is the right
-mechanism stated too narrowly, and it would have you re-request a review you had
-already been given.
-
-This corrects a datum that read as flakiness. An earlier revision recorded "a
-push auto-triggered a review only ONCE in 5 pushes" (0 for 4 on PR #640, 1 for 1
-on the first push of PR #644) and concluded the trigger was unreliable. It is
-not unreliable; it is not a push trigger at all. The single hit was PR #644's
-draft → ready transition landing on the same push, and the four misses were the
-rule behaving correctly. **Do not re-derive an auto-trigger rate from
-observations like these** — the sampling looks like a flaky trigger and is
-actually a deterministic one being read through the wrong event.
-
-Two consequences, and the second is the expensive one:
-
-- **Never poll or wait for a review after a push.** Nothing is coming. Read the
-  run once to confirm which commit the existing review covers, then decide.
-- **Every review after the first is a deliberate, paid manual request.** The
-  default is not to spend it: one round is the policy, and a second is earned
-  only by a significant change in what there is to review — never by having
-  applied round one's findings. Never spend one re-establishing a trigger.
-
-Pair this with the `commit_id` gate below. The two compound: after a push the
-previous commit's review stays readable and is indistinguishable from a fresh
-clean one, so a stale review plus an absent run is the normal post-push state
-and reads exactly like a PR that has been reviewed.
-
-**A re-request issued while a review is still in flight is silently dropped.**
-The API returns success, no new check run appears, and the call is
-indistinguishable from one that worked. Measured on #614: a push followed
-immediately by a re-request left the head commit with NO reviewer check run at
-all, while the previous commit's review completed normally and then read as the
-"latest" one.
-
-So the request is not the confirmation — the check run is. After requesting,
-verify the run exists on the head SHA before trusting it, and if a review is
-already running for an older commit, let it land first. This composes with the
-`commit_id` gate above: that gate tells you a review is stale, this tells you
-why no fresh one is coming.
-
-**Re-request through the GitHub MCP server's copilot-review request tool, NOT
-`gh api …/requested_reviewers`.** The GitHub MCP server exposes a dedicated
-"request a Copilot review" operation — `request_copilot_review` on the server
-side, though the name your client shows is prefixed and varies by MCP client
-config, so match on the trailing segment rather than the full identifier. That
-REST endpoint silently no-ops for Copilot: it answers HTTP 200 with
-`requested_reviewers: []` and never creates a check run. Measured on PR #766
-(2026-08-05) with NO review in flight, so this is a SEPARATE failure from the
-in-flight drop above — Copilot is simply not addressable as an ordinary reviewer
-login there. Both spellings failed identically across ~40s of polling:
-
-```bash
-# both of these return 200 and do NOTHING
-gh api --method POST "repos/OWNER/REPO/pulls/N/requested_reviewers" \
-  -f "reviewers[]=Copilot"
-echo '{"reviewers":["Copilot"]}' | gh api --method POST \
-  "repos/OWNER/REPO/pulls/N/requested_reviewers" --input -
-```
-
-The MCP tool produced `requested_reviewers: [Copilot]` and a `queued` run on the
-first try. Because BOTH failure modes present as "200 and nothing happened",
-always confirm by polling for the run on the head SHA rather than trusting the
-call's response.
-
-**`requested_reviewers` is the INTERMEDIATE state, and the request is CONSUMED
-by the review it triggers.** So an empty list there does not mean "no request
-was made" — it is also what you see after a request has already been answered.
-Read it together with the check run:
-
-```bash
-gh api "repos/OWNER/REPO/pulls/N" \
-  --jq '[.requested_reviewers[].login]'
-```
-
-Empty **plus** no `copilot-pull-request-reviewer` check run on the head SHA
-means a re-request is genuinely needed. Empty **plus** a completed run means the
-review already happened and is there to read. A NON-empty list is the one state
-where requesting again is pointless — a request is pending. Reading the list
-alone inverts the first case into the third and leaves you waiting for a review
-nobody asked for.
-
-### ONE round — the automatic review. A second is earned by scope, not by fixes
-
-Run **one** round: take the review the ready transition triggers, read BOTH
-buckets, fix what is real, reply, resolve the gating threads, and stop. Do not
-re-request to see whether your fixes satisfied it.
-
-Round one is free. Every round after it spends a paid manual request, and that
-is the whole constraint — the operator exhausted a usage allowance in about ten
-days under the previous, looser rule. Set 2026-09-01; this is the standing
-policy, not a dated budget window.
-
-**A second round is earned by a significant change in what there is to review,
-never by having addressed round one.** Applying the review's own findings is not
-new scope, and neither is rewording prose, reformatting, or renaming.
-Re-requesting on those spends a credit to be told about the thing you already
-fixed. What does earn one: a new file or mechanism the previous review never
-saw, an approach rewritten rather than corrected, or scope added to the PR after
-the review ran. When it is genuinely unclear, it is not significant.
-
-If findings remain unfixed after round one, **summarize them for the operator
-instead of looping** — what was found, what was fixed, what is outstanding, and
-why. Landing a PR with known-but-unfixed review comments is the operator's call.
-So is spending another review; ask rather than assume.
-
-The failure mode this prevents is not a bad round, it is a good one repeating.
-On PR #568 every round produced a genuine finding, so each was individually
-defensible while the aggregate churned the PR through eight force-pushes and
-seven reviews. An uncapped loop has no guaranteed terminus.
-
-Suppressed findings have no thread to resolve, so reply on the PR itself saying
-what you did with each. Resolve each gating thread as you fix it — they gate the
-merge now, and a PAT-authenticated MCP client cannot resolve them, so use the
-GraphQL `resolveReviewThread` mutation through `gh api`.
-
-**Never commit directly to `main`.** Two backstops enforce this. A local
-`reject-default-branch-commit` pre-commit hook (installed through devenv's
-git-hooks framework) rejects any commit made while the default branch (`main`)
-is the checked-out HEAD — caught at _commit_ time, in whichever worktree has
-`main` checked out (normally the primary checkout, since git allows a branch in
-only one worktree at a time); worktrees on other branches are unaffected, and
-`--no-verify` bypasses it by design. Independently, the branch-protection
-ruleset rejects the _push_. Still branch **before** you start — the guard is a
-safety net, not the workflow.
+The recipe is in the `pr-review-loop` skill. It lives there rather than here
+because a skill is the only manual-load carrier that works across runtimes —
+Kiro's `inclusion: manual` steering is inert in the CLI.
 
 ### Every change goes through an isolated worktree + PR
 

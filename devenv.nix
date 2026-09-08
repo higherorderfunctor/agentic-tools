@@ -409,6 +409,7 @@ in {
         # (a bare `./dir` handed to ai.skills is copied, never read inside, so
         # an edit would otherwise be served from a stale eval cache).
         index-repo-docs = traceSource.tracedPath ./dev/skills/index-repo-docs;
+        pr-review-loop = traceSource.tracedPath ./dev/skills/pr-review-loop;
         repo-review = traceSource.tracedPath ./dev/skills/repo-review;
       };
   };
