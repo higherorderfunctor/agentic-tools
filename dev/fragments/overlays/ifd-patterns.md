@@ -1,124 +1,25 @@
 ## IFD Patterns and Gotchas
 
-> **Last verified:** 2026-09-08 (commit pending — the awk's catalog assertion is
-> a VERSION-KEY check, not a content check, and its message used to claim
-> otherwise. `napi.patchPath` is now DERIVED from `napi.version`, an eval-time
-> assertion requires the committed patch to create that path, and a CI tripwire
-> re-asks whether the patch is still needed. Measured hole: a stale patch with a
-> matching version key built green.) Prior: 2026-09-08 (commit pending — kiro's
-> extract now emits TWO settings fields from ONE scan, and they answer to
-> different rules. The first, `workspaceOverridableSettings`, is this repo's
-> first extractor whose EMPTY result is a real answer rather than a dead anchor;
-> the shape-assertion rule below is unchanged, what is new is the rule for
-> telling "upstream does not have this" from "the anchor rotted", in the section
-> right after it. The second, `settingKeys`, is the first extracted field
-> consumed as a DATA BOUNDARY rather than as an option enum — it tells the
-> settings flattener where a key stops and its value begins. Both share one
-> registry regex deliberately: a second pass over the same binary would be a
-> second place for it to drift.) Prior: 2026-09-08 (commit pending —
-> `fetchPnpmDeps` reads `pnpm.nodejs-slim`, so a hand-built pnpm needs that
-> passthru or evaluation dies naming neither pnpm nor the fetcher. Latent in
-> `pnpm_12.nix` since it was written; nothing threaded that pnpm through the
-> fetcher until now.) Prior: 2026-09-08 (commit pending — the oxlint
-> `@napi-rs/cli` repin to 3.9.0 ran this loop end to end. Three corrections
-> below: the proof step is silently voided by `--ignore-workspace`, upstream's
-> pnpm MAJOR moves independently of everything the awk guards, and a
-> multi-document `pnpm-lock.yaml` — never previously exercised — works fine. The
-> pnpm 12 swap itself is DEFERRED: nixpkgs' fetcher passes an empty registry
-> base, which pnpm 12 does not tolerate.) Prior: 2026-08-29 (commit pending —
-> `devenv-test.yml` retains its IFD warm step for on-demand diagnostics but no
-> longer runs on PRs or pushes; automatic deterministic contracts use the normal
-> flake-check warm path). Prior: 2026-08-25 (commit pending — claude-code's
-> settings extraction is NO LONGER A GREP. `mkClaudeExtract` now unpacks the Bun
-> single-exec's module graph and calls the binary's own schema builder,
-> zod→JSON-Schema converter and `@internal` filter, so `effortLevels`,
-> `hookEvents` and `settingsBooleanKeys` are read out of upstream's own schema
-> and a whole `settings` block joins them. Two greps survive on purpose — the
-> launch pins and the model catalog are not in that schema. The boolean-key
-> QUORUM guard documented below is RETIRED, having gone to zero matches when
-> 2.1.245 code-split the bundle; the section is kept because the arms-race
-> lesson is the reason the extraction moved). Prior: 2026-08-24 (commit pending
-> — Codex's exact approval-policy guard now follows the pinned binary's version
-> boundary: pre-0.149.0 releases must retain `untrusted`, while 0.149.0 and
-> newer must expose only `never` and `on-request`. This admits upstream's
-> intentional removal without accepting either vocabulary indefinitely, so the
-> normal version-bump path can regenerate the sidecar). Prior: 2026-08-19
-> (commit pending — removes a retired generated-skill IFD check; Stacked
-> Workflows remains the cross-platform generated-skill constraint). Prior:
-> 2026-08-16 (commit pending — `devenv-test.yml` now attributes real repository
-> instruction projections to Git portability rather than the retired claim that
-> current Kiro skips steering symlinks; its IFD warm step and closure behavior
-> were rechecked unchanged). Prior: 2026-08-14 (commit pending — this fragment
-> now has its OWN registry category, `ifd`, scoped to the paths it actually
-> claims below: `.github/actions/warm-ifd/**` and the warm steps in ci.yml /
-> update.yml, on top of `overlays/**`. It previously rode under `overlays`,
-> whose two globs never matched any of them — so the same-commit duty asserted
-> at the end of this block was unreachable from every CI path it governs, and PR
-> #946 edited `warm-ifd/action.yml` without loading a word of it. A fragment
-> that claims authority over a path it does not scope is worse than silent,
-> because the claim reads as enforced. Splitting rather than widening `overlays`
-> keeps a ci.yml editor from also being handed unfree-guard and
-> cache-hit-parity). Prior: 2026-08-14 (commit pending — records that an anchor
-> can lose its TYPE information without losing its match. claude-code 2.1.232
-> moved its settings schema onto bare zod-mini factories, so
-> `ultracode:w.boolean()` became `ultracode:jt()` and the guard's whole type
-> assertion lived in the `.boolean` token it no longer has. Relaxing the regex
-> would have kept the match and silently demoted the guard to a presence check,
-> so the type is now re-derived by constructor quorum. The effort enum needed
-> only an optional `.enum` segment because it validates through its extracted
-> payload. Also records why that failure was diagnostically silent: the effort
-> enum was the one assignment without a trailing `|| true`, so errexit killed
-> the script before its own guard could speak — a guard's message is worthless
-> if the guard is unreachable). Prior: 2026-08-14 (commit d8a72e1b — records the
-> blocker that kept oxlint held back on EVERY sweep for ten days and was
-> invisible because it spells itself exactly like a patch conflict: an
-> `applyPatches` src cannot be re-hashed by nix-update at all, since
-> `outputHash = ""` forces flat hashing over a directory, so its update row
-> needs `--no-src`. Measured on the 2026-08-08 sweep, where the patch applied
-> cleanly and the run still died. Also records how to regenerate the pnpm patch
-> file when upstream repins the dependency, that `patchHash` is a plain sha256
-> of that file, and that `pnpm patch-commit` emits content-free stanzas needing
-> removal). Prior: 2026-08-10 (commit pending — adds the LOCATE-vs-PROBE split
-> every binary-probing extractor now owes its reader. `mkKiroExtract` hardcoded
-> `bin/.kiro-cli-chat-wrapped`; when nixpkgs f13ff45a dissolved that name,
-> twelve greps failed with "No such file or directory" and the build announced
-> "upstream changed the hook-trigger vocabulary". The target is now resolved by
-> CONTENT inside the builder through the shared `vu.kiroChatLocatorPy`, and a
-> location failure can no longer be spelled as a content failure). Prior:
-> 2026-08-04 (commit pending — the pnpm patched-dependency guidance below said
-> to "make the minimal lock edit", and a minimal edit expressed as HUNKS is what
-> held oxlint back in every sweep once upstream reshuffled its peer variants.
-> Records that the metadata is applied by key in `postPatch` instead, and that a
-> patch conflict surfaces as nix-update's "failed to retrieve hash" rather than
-> as anything naming a patch). Prior: 2026-08-03 (commit pending — records
-> Oxlint's source-before-fetcher pattern for pnpm patched dependencies: patch
-> the workspace metadata and lock before `fetchPnpmDeps` reads them, keeping a
-> sandboxed dependency fix out of workflow-wide host policy). Prior: 2026-08-03
-> (commit pending — moves glab and its committed extracted sidecar together from
-> `overlays/generic/` to `overlays/dev-tools/`, preserving the eval-pure read
-> and regeneration loop). Prior: 2026-08-02 (commit pending — distinguishes
-> Codex's new human-reviewed reverse-coverage gate from generated-sidecar drift
-> and shape checks: update automation may refresh extracted facts but cannot
-> classify a new command, flag, field, maturity, or config seam). Prior:
-> 2026-08-01 (commit pending — documents the sidecar SELF-HEAL loop as a loop:
-> which half is the self-heal and which the backstop, that a red drift check
-> reports a MECHANISM failure rather than a stale file, that it fires on the
-> version-bump path ONLY so an edited extractor does not self-heal, how it
-> differs from the `fix_sidecar_hashes` self-heal, and four debugging entry
-> points. Names `glab` as the fourth extracted package and records that all four
-> now share `vu.mkExtractRegen`; glab had no regeneration at all and proved the
-> latency on PR #621). Prior: 2026-08-01 (Codex joins the extracted sidecar
-> pipeline with recursive Clap help, feature-list, and bundled-model probes plus
-> category-specific shape assertions). Prior: 2026-07-25 (the warm composite now
-> forces `drvPath` instead of `version`, so sidecar-versioned packages are
-> covered; also corrects the claim that the check job's `nix flake check`
-> evaluates ALL systems, which it does not, and the devenv-test job moved to its
-> own workflow). If you touch `overlays/lib.nix`, any overlay `.nix` file that
-> calls `vu.mkVersion`, the shared `.github/actions/warm-ifd/action.yml`
-> composite, or any of the five warm steps that consume it across
-> `.github/workflows/ci.yml`, `.github/workflows/devenv-test.yml` and
-> `.github/workflows/update.yml`, and this fragment isn't updated in the same
-> commit, stop and fix it.
+> **Last verified:** 2026-09-08 — the oxlint awk's catalog assertion is a
+> VERSION-KEY check, not a content check, and `napi.patchPath` is derived from
+> the pin rather than restated. kiro's extract emits two settings fields from
+> one scan under opposite guards: `workspaceOverridableSettings` (used to
+> REJECT, so under-capture is the danger) and `settingKeys` (used as a flatten
+> BOUNDARY, so over-capture is).
+>
+> **Settled — do not relitigate.** Full lineage:
+> `git show 52e86965:dev/fragments/overlays/ifd-patterns.md`.
+>
+> - **The pnpm 12 swap inside the fetcher stays deferred.** It was attempted and
+>   blocked: nixpkgs' fetcher passes an empty registry base, which pnpm 12 does
+>   not tolerate. Packaging the major is not the same as making it usable as a
+>   fetcher argument, and `checks/pnpm-fetcher-parity.nix` enumerates only
+>   packages that already ship a `pnpmDeps`, so nothing exercised the pair.
+> - **An empty capture can be the ANSWER, not a dead anchor.** Demand a
+>   non-empty result only where absence is impossible. Where a mechanism can
+>   legitimately not exist, assert instead on the thing proving the probe COULD
+>   have answered, and let the category be empty — the section below has the
+>   worked case.
 
 ### What is IFD in this repo
 
