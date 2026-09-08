@@ -33,5 +33,30 @@
     "v3_prompt",
     "voice",
     "workflows"
+  ],
+  "workspaceOverridableSettings": [
+    "chat.defaultAgent",
+    "chat.defaultModel",
+    "chat.disableAutoCompaction",
+    "chat.enableCheckpoint",
+    "chat.enableCodeIntelligence",
+    "chat.enableDelegate",
+    "chat.enableKnowledge",
+    "chat.enableSubagent",
+    "chat.enableTangentMode",
+    "chat.enableThinking",
+    "chat.enableTodoList",
+    "chat.modelDefaults",
+    "compaction.excludeContextWindowPercent",
+    "compaction.excludeMessages",
+    "knowledge.chunkOverlap",
+    "knowledge.chunkSize",
+    "knowledge.defaultExcludePatterns",
+    "knowledge.defaultIncludePatterns",
+    "knowledge.indexType",
+    "knowledge.maxFiles",
+    "toolSearch.enabled",
+    "toolSearch.minPct",
+    "toolSearch.minTokens"
   ]
 }

@@ -7830,6 +7830,166 @@ in {
       && builtins.length extracted.rolloutFeatures >= 6
   );
 
+  # ── workflows: the SECOND gate ─────────────────────────────────────────────
+  # `unlockedRolloutFeatures = ["workflows"]` patches the binary, which since
+  # kiro-cli 2.19.0 only makes the feature AVAILABLE. The client also reads
+  # `chat.enableWorkflows`, default false, so the unlock alone is silently
+  # inert. HM implies the setting with the unlock; these pin that it happens,
+  # that an explicit value still beats it, and that it does NOT happen where the
+  # setting cannot work.
+  module-kiro-workflows-unlock-implies-setting = mkTest "kiro-workflows-unlock-implies-setting" (
+    let
+      ev = evalHm {
+        ai.kiro = {
+          enable = true;
+          v3 = true;
+          unlockedRolloutFeatures = ["workflows"];
+        };
+      };
+    in
+      (ev.config.ai.kiro.nativeSettings.chat.enableWorkflows or null) == true
+  );
+
+  # The implication is a DEFAULT, not a mandate. Without `mkDefault` this would
+  # be a definition conflict rather than a losing contribution, so the explicit
+  # `false` is the only thing that distinguishes the two.
+  module-kiro-workflows-explicit-setting-beats-unlock = mkTest "kiro-workflows-explicit-setting-beats-unlock" (
+    let
+      ev = evalHm {
+        ai.kiro = {
+          enable = true;
+          v3 = true;
+          unlockedRolloutFeatures = ["workflows"];
+          nativeSettings.chat.enableWorkflows = false;
+        };
+      };
+    in
+      (ev.config.ai.kiro.nativeSettings.chat.enableWorkflows or null) == false
+  );
+
+  # Positive control for the two above: without the unlock nothing writes the
+  # key, so a test that merely found `true` everywhere would be vacuous.
+  module-kiro-workflows-no-unlock-leaves-setting-unset = mkTest "kiro-workflows-no-unlock-leaves-setting-unset" (
+    let
+      ev = evalHm {
+        ai.kiro = {
+          enable = true;
+          v3 = true;
+        };
+      };
+    in
+      (ev.config.ai.kiro.nativeSettings.chat.enableWorkflows or null) == null
+  );
+
+  # devenv must NOT inherit the implication: it writes the project-local
+  # cli.json, where kiro discards this key, so implying it there would both
+  # mislead the consumer and trip the workspace-allowlist assertion below on a
+  # config nobody wrote.
+  module-kiro-devenv-workflows-unlock-implies-nothing = mkTest "kiro-devenv-workflows-unlock-implies-nothing" (
+    let
+      ev = evalDevenv {
+        ai.kiro = {
+          enable = true;
+          v3 = true;
+          unlockedRolloutFeatures = ["workflows"];
+        };
+      };
+    in
+      (ev.config.ai.kiro.nativeSettings.chat.enableWorkflows or null)
+      == null
+      && builtins.all (a: a.assertion) ev.config.assertions
+  );
+
+  # ── workspace-settings allowlist (devenv only) ─────────────────────────────
+  # A global-only key written to the project-local cli.json is read and dropped
+  # by kiro with no warning, so the module refuses it instead of emitting a file
+  # that looks applied.
+  module-kiro-devenv-rejects-global-only-setting = mkTest "kiro-devenv-rejects-global-only-setting" (
+    let
+      ev = evalDevenv {
+        ai.kiro = {
+          enable = true;
+          v3 = true;
+          nativeSettings.chat.enableWorkflows = true;
+        };
+      };
+      asserts =
+        builtins.filter (a: lib.hasInfix "silently discarded at runtime" a.message)
+        (ev.config.assertions or []);
+    in
+      asserts != [] && (builtins.head asserts).assertion == false
+  );
+
+  # Positive control: an ALLOWLISTED key must sail through the same guard, or
+  # the negative above would hold equally for an assertion that always fires.
+  module-kiro-devenv-accepts-workspace-setting = mkTest "kiro-devenv-accepts-workspace-setting" (
+    let
+      ev = evalDevenv {
+        ai.kiro = {
+          enable = true;
+          v3 = true;
+          nativeSettings.chat.enableTangentMode = true;
+        };
+      };
+      asserts =
+        builtins.filter (a: lib.hasInfix "silently discarded at runtime" a.message)
+        (ev.config.assertions or []);
+    in
+      asserts == [] && builtins.all (a: a.assertion) ev.config.assertions
+  );
+
+  # The HM backend writes the GLOBAL file, where every key is honored. The same
+  # config that fails under devenv must pass here, or the guard has leaked out
+  # of the backend that owns it.
+  module-kiro-hm-accepts-global-only-setting = mkTest "kiro-hm-accepts-global-only-setting" (
+    let
+      ev = evalHm {
+        ai.kiro = {
+          enable = true;
+          v3 = true;
+          nativeSettings.chat.enableWorkflows = true;
+        };
+      };
+    in
+      builtins.all (a: a.assertion) ev.config.assertions
+  );
+
+  # Sidecar WIRING: that the field exists, parses, and says what the devenv
+  # assertion assumes about the pinned binary. It is NOT a test of the
+  # extractor — it reads a committed list of strings and runs none of that
+  # code, so it cannot tell a key resolved through the symbolic registry from
+  # one that was always a literal. `checks/kiro-workspace-settings-fixtures`
+  # drives the real script and is where the extraction paths are controlled.
+  #
+  # Every content claim is gated on the list being NON-EMPTY, and that gate is
+  # load-bearing rather than defensive. An empty allowlist is a legitimate
+  # answer — no kiro before 2.21.1 merges a workspace cli.json at all — and the
+  # whole reason the extractor does not hard-fail on absence is that a pin back
+  # to such a release must not wedge the pipeline. A bare `length >= 10` here
+  # would have re-imposed exactly that wedge one layer up.
+  #
+  # The absence check is deliberate and is the fact the devenv assertion's whole
+  # message rests on: if upstream ever adds `chat.enableWorkflows` to the
+  # allowlist, this failing is the signal to relax that guidance rather than a
+  # defect to route around.
+  module-kiro-workspace-allowlist-from-sidecar = mkTest "kiro-workspace-allowlist-from-sidecar" (
+    let
+      extracted = builtins.fromJSON (builtins.readFile ../overlays/kiro-cli-extracted.json);
+      allowlist = extracted.workspaceOverridableSettings;
+    in
+      builtins.isList allowlist
+      && !(lib.elem "chat.enableWorkflows" allowlist)
+      && (
+        allowlist
+        == []
+        || (
+          lib.elem "chat.enableTangentMode" allowlist
+          && lib.elem "chat.defaultModel" allowlist
+          && builtins.length allowlist >= 10
+        )
+      )
+  );
+
   # ── identity ───────────────────────────────────────────────────────────────
   # Same drvPath discipline as the rollout tests above, and for the same reason:
   # both sides are named `kiro-cli-wrapped`, so a name check cannot tell a

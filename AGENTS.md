@@ -111,6 +111,12 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
   - Read:
     [`packages/kiro-cli/docs/steering-inclusion.md`](packages/kiro-cli/docs/steering-inclusion.md)
 
+- **`kiro-workflows`**
+  - Match: `overlays/kiro-cli.nix`, `overlays/lib.nix`,
+    `packages/kiro-cli/lib/mkKiro.nix`
+  - Read:
+    [`packages/kiro-cli/docs/workflow-gating.md`](packages/kiro-cli/docs/workflow-gating.md)
+
 - **`kiro-wrapper`**
   - Match: `checks/kiro-fhs-contract.nix`, `checks/kiro-wrapper-argv.nix`,
     `lib/idempotentFlags.nix`, `overlays/kiro-cli.nix`,

@@ -275,6 +275,26 @@ _: {
         }
       ];
     };
+    # kiro-workflows: the THREE independent gates on the `workflows` feature,
+    # all of which fail silently, and the extracted workspace-settings allowlist
+    # that makes gate 3 global-only. Scoped to the module that implies the
+    # setting and asserts the allowlist, plus the two overlay files that
+    # extract and patch — a change to any of those changes what a consumer must
+    # set to get a working `/workflow`.
+    kiro-workflows = {
+      scopes = [
+        "overlays/kiro-cli.nix"
+        "overlays/lib.nix"
+        "packages/kiro-cli/lib/mkKiro.nix"
+      ];
+      sources = [
+        {
+          location = "package";
+          name = "workflow-gating";
+          dir = "kiro-cli";
+        }
+      ];
+    };
     # kiro-wrapper: the argv contract of the generated kiro-cli launcher /
     # chat wrappers — which subcommands accept `--tui`/`--v3`/`--trust-tools`,
     # why the appends are gated rather than unconditional, and how to

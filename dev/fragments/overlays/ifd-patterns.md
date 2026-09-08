@@ -1,11 +1,21 @@
 ## IFD Patterns and Gotchas
 
-> **Last verified:** 2026-09-08 (commit pending — `fetchPnpmDeps` reads
-> `pnpm.nodejs-slim`, so a hand-built pnpm needs that passthru or evaluation
-> dies naming neither pnpm nor the fetcher. Latent in `pnpm_12.nix` since it was
-> written; nothing threaded that pnpm through the fetcher until now.) Prior:
-> 2026-09-08 (commit pending — the oxlint `@napi-rs/cli` repin to 3.9.0 ran this
-> loop end to end. Three corrections below: the proof step is silently voided by
+> **Last verified:** 2026-09-08 (commit pending — kiro's extract now emits TWO
+> settings fields from ONE scan, and they answer to different rules. The first,
+> `workspaceOverridableSettings`, is this repo's first extractor whose EMPTY
+> result is a real answer rather than a dead anchor; the shape-assertion rule
+> below is unchanged, what is new is the rule for telling "upstream does not
+> have this" from "the anchor rotted", in the section right after it. The
+> second, `settingKeys`, is the first extracted field consumed as a DATA
+> BOUNDARY rather than as an option enum — it tells the settings flattener where
+> a key stops and its value begins. Both share one registry regex deliberately:
+> a second pass over the same binary would be a second place for it to drift.)
+> Prior: 2026-09-08 (commit pending — `fetchPnpmDeps` reads `pnpm.nodejs-slim`,
+> so a hand-built pnpm needs that passthru or evaluation dies naming neither
+> pnpm nor the fetcher. Latent in `pnpm_12.nix` since it was written; nothing
+> threaded that pnpm through the fetcher until now.) Prior: 2026-09-08 (commit
+> pending — the oxlint `@napi-rs/cli` repin to 3.9.0 ran this loop end to end.
+> Three corrections below: the proof step is silently voided by
 > `--ignore-workspace`, upstream's pnpm MAJOR moves independently of everything
 > the awk guards, and a multi-document `pnpm-lock.yaml` — never previously
 > exercised — works fine. The pnpm 12 swap itself is DEFERRED: nixpkgs' fetcher
@@ -15,26 +25,58 @@
 > deterministic contracts use the normal flake-check warm path). Prior:
 > 2026-08-25 (commit pending — claude-code's settings extraction is NO LONGER A
 > GREP. `mkClaudeExtract` now unpacks the Bun single-exec's module graph and
-> calls the binary's own schema builder, zod→JSON-Schema converter and
-> `@internal` filter, so `effortLevels`, `hookEvents` and `settingsBooleanKeys`
-> are read out of upstream's own schema and a whole `settings` block joins them.
-> Two greps survive on purpose — the launch pins and the model catalog are not
-> in that schema. The boolean-key QUORUM guard documented below is RETIRED,
-> having gone to zero matches when 2.1.245 code-split the bundle; the section is
-> kept because the arms-race lesson is the reason the extraction moved). Prior:
-> 2026-08-24 (commit pending — Codex's exact approval-policy guard now follows
-> the pinned binary's version boundary: pre-0.149.0 releases must retain
-> `untrusted`, while 0.149.0 and newer must expose only `never` and
-> `on-request`. This admits upstream's intentional removal without accepting
-> either vocabulary indefinitely, so the normal version-bump path can regenerate
-> the sidecar). Prior: 2026-08-19 (commit pending — removes a retired
-> generated-skill IFD check; Stacked Workflows remains the cross-platform
-> generated-skill constraint). Prior: 2026-08-16 (commit pending —
-> `devenv-test.yml` now attributes real repository instruction projections to
-> Git portability rather than the retired claim that current Kiro skips steering
-> symlinks; its IFD warm step and closure behavior were rechecked unchanged).
-> Prior: 2026-08-14 (commit pending — this fragment now has its OWN registry
-> category, `ifd`, scoped to the paths it actually claims below:
+> calls the binary's own schema builder, zod→JSON-Schema converter and |||||||
+> parent of 7fc648ef (feat(kiro-cli): imply chat.enableWorkflows on unlock,
+> guard devenv settings) **Last verified:** 2026-09-08 (commit pending — the
+> oxlint `@napi-rs/cli` repin to 3.9.0 ran this loop end to end. Three
+> corrections below: the proof step is silently voided by `--ignore-workspace`,
+> upstream's pnpm MAJOR moves independently of everything the awk guards, and a
+> multi-document `pnpm-lock.yaml` — never previously exercised — works fine. The
+> pnpm 12 swap itself is DEFERRED: nixpkgs' fetcher passes an empty registry
+> base, which pnpm 12 does not tolerate.) Prior: 2026-08-29 (commit pending —
+> `devenv-test.yml` retains its IFD warm step for on-demand diagnostics but no
+> longer runs on PRs or pushes; automatic deterministic contracts use the normal
+> flake-check warm path). Prior: 2026-08-25 (commit pending — claude-code's
+> settings extraction is NO LONGER A GREP. `mkClaudeExtract` now unpacks the Bun
+> single-exec's module graph and calls the binary's own schema builder,
+> zod→JSON-Schema converter and `@internal` filter, so `effortLevels`,
+> `hookEvents` and `settingsBooleanKeys` are read out of upstream's own schema
+> and a whole `settings` block joins them. Two greps survive on purpose — the
+> launch pins and the model catalog are not in that schema. The boolean-key
+> QUORUM guard documented below is RETIRED, having gone to zero matches when
+> 2.1.245 code-split the bundle; the section is kept because the arms-race
+> lesson is the reason the extraction moved). Prior: 2026-08-24 (commit pending
+> — Codex's exact approval-policy guard now follows the pinned binary's version
+> boundary: pre-0.149.0 releases must retain `untrusted`, while 0.149.0 and
+> newer must expose only `never` and `on-request`. This admits upstream's
+> intentional removal without accepting either vocabulary indefinitely, so the
+> normal version-bump path can regenerate the sidecar). Prior: 2026-08-19
+> (commit pending — removes a retired generated-skill IFD check; Stacked
+> Workflows remains the cross-platform generated-skill constraint). Prior:
+> 2026-08-16 (commit pending — `devenv-test.yml` now attributes real repository
+> instruction projections to Git portability rather than the retired claim that
+> current Kiro skips steering symlinks; its IFD warm step and closure behavior
+> were rechecked unchanged). Prior: 2026-08-14 (commit pending — this fragment
+> now has its OWN registry category, `ifd`, scoped to the paths it actually
+> claims below: `@internal` filter, so `effortLevels`, `hookEvents` and
+> `settingsBooleanKeys` are read out of upstream's own schema and a whole
+> `settings` block joins them. Two greps survive on purpose — the launch pins
+> and the model catalog are not in that schema. The boolean-key QUORUM guard
+> documented below is RETIRED, having gone to zero matches when 2.1.245
+> code-split the bundle; the section is kept because the arms-race lesson is the
+> reason the extraction moved). Prior: 2026-08-24 (commit pending — Codex's
+> exact approval-policy guard now follows the pinned binary's version boundary:
+> pre-0.149.0 releases must retain `untrusted`, while 0.149.0 and newer must
+> expose only `never` and `on-request`. This admits upstream's intentional
+> removal without accepting either vocabulary indefinitely, so the normal
+> version-bump path can regenerate the sidecar). Prior: 2026-08-19 (commit
+> pending — removes a retired generated-skill IFD check; Stacked Workflows
+> remains the cross-platform generated-skill constraint). Prior: 2026-08-16
+> (commit pending — `devenv-test.yml` now attributes real repository instruction
+> projections to Git portability rather than the retired claim that current Kiro
+> skips steering symlinks; its IFD warm step and closure behavior were rechecked
+> unchanged). Prior: 2026-08-14 (commit pending — this fragment now has its OWN
+> registry category, `ifd`, scoped to the paths it actually claims below:
 > `.github/actions/warm-ifd/**` and the warm steps in ci.yml / update.yml, on
 > top of `overlays/**`. It previously rode under `overlays`, whose two globs
 > never matched any of them — so the same-commit duty asserted at the end of
@@ -65,6 +107,62 @@
 > `pnpm patch-commit` emits content-free stanzas needing removal). Prior:
 > 2026-08-10 (commit pending — adds the LOCATE-vs-PROBE split every
 > binary-probing extractor now owes its reader. `mkKiroExtract` hardcoded
+> ||||||| parent of 6d5345c8 (feat(kiro-cli): imply chat.enableWorkflows on
+> unlock, guard devenv settings) **Last verified:** 2026-08-29 (commit pending —
+> `devenv-test.yml` retains its IFD warm step for on-demand diagnostics but no
+> longer runs on PRs or pushes; automatic deterministic contracts use the normal
+> flake-check warm path). Prior: 2026-08-25 (commit pending — claude-code's
+> settings extraction is NO LONGER A GREP. `mkClaudeExtract` now unpacks the Bun
+> single-exec's module graph and calls the binary's own schema builder,
+> zod→JSON-Schema converter and `@internal` filter, so `effortLevels`,
+> `hookEvents` and `settingsBooleanKeys` are read out of upstream's own schema
+> and a whole `settings` block joins them. Two greps survive on purpose — the
+> launch pins and the model catalog are not in that schema. The boolean-key
+> QUORUM guard documented below is RETIRED, having gone to zero matches when
+> 2.1.245 code-split the bundle; the section is kept because the arms-race
+> lesson is the reason the extraction moved). Prior: 2026-08-24 (commit pending
+> — Codex's exact approval-policy guard now follows the pinned binary's version
+> boundary: pre-0.149.0 releases must retain `untrusted`, while 0.149.0 and
+> newer must expose only `never` and `on-request`. This admits upstream's
+> intentional removal without accepting either vocabulary indefinitely, so the
+> normal version-bump path can regenerate the sidecar). Prior: 2026-08-19
+> (commit pending — removes a retired generated-skill IFD check; Stacked
+> Workflows remains the cross-platform generated-skill constraint). Prior:
+> 2026-08-16 (commit pending — `devenv-test.yml` now attributes real repository
+> instruction projections to Git portability rather than the retired claim that
+> current Kiro skips steering symlinks; its IFD warm step and closure behavior
+> were rechecked unchanged). Prior: 2026-08-14 (commit pending — this fragment
+> now has its OWN registry category, `ifd`, scoped to the paths it actually
+> claims below: `.github/actions/warm-ifd/**` and the warm steps in ci.yml /
+> update.yml, on top of `overlays/**`. It previously rode under `overlays`,
+> whose two globs never matched any of them — so the same-commit duty asserted
+> at the end of this block was unreachable from every CI path it governs, and PR
+> #946 edited `warm-ifd/action.yml` without loading a word of it. A fragment
+> that claims authority over a path it does not scope is worse than silent,
+> because the claim reads as enforced. Splitting rather than widening `overlays`
+> keeps a ci.yml editor from also being handed unfree-guard and
+> cache-hit-parity). Prior: 2026-08-14 (commit pending — records that an anchor
+> can lose its TYPE information without losing its match. claude-code 2.1.232
+> moved its settings schema onto bare zod-mini factories, so
+> `ultracode:w.boolean()` became `ultracode:jt()` and the guard's whole type
+> assertion lived in the `.boolean` token it no longer has. Relaxing the regex
+> would have kept the match and silently demoted the guard to a presence check,
+> so the type is now re-derived by constructor quorum. The effort enum needed
+> only an optional `.enum` segment because it validates through its extracted
+> payload. Also records why that failure was diagnostically silent: the effort
+> enum was the one assignment without a trailing `|| true`, so errexit killed
+> the script before its own guard could speak — a guard's message is worthless
+> if the guard is unreachable). Prior: 2026-08-14 (commit d8a72e1b — records the
+> blocker that kept oxlint held back on EVERY sweep for ten days and was
+> invisible because it spells itself exactly like a patch conflict: an
+> `applyPatches` src cannot be re-hashed by nix-update at all, since
+> `outputHash = ""` forces flat hashing over a directory, so its update row
+> needs `--no-src`. Measured on the 2026-08-08 sweep, where the patch applied
+> cleanly and the run still died. Also records how to regenerate the pnpm patch
+> file when upstream repins the dependency, that `patchHash` is a plain sha256
+> of that file, and that `pnpm patch-commit` emits content-free stanzas needing
+> removal). Prior: 2026-08-10 (commit pending — adds the LOCATE-vs-PROBE split
+> every binary-probing extractor now owes its reader. `mkKiroExtract` hardcoded
 > `bin/.kiro-cli-chat-wrapped`; when nixpkgs f13ff45a dissolved that name,
 > twelve greps failed with "No such file or directory" and the build announced
 > "upstream changed the hook-trigger vocabulary". The target is now resolved by
@@ -363,6 +461,44 @@ results. The version qualification is narrow rather than an either-set
 allowance: releases before 0.149.0 require `untrusted`, while 0.149.0 and newer
 reject it, matching upstream's explicit removal. When you add a key or category,
 add its shape assertion in the same commit.
+
+#### But sometimes an empty capture is the ANSWER, not a dead anchor
+
+The rule above says a non-empty guard is worthless. It does not say every
+extractor must demand a non-empty result, and kiro's
+`workspaceOverridableSettings` is the case that separates the two.
+
+That field lists the `cli.json` keys a project-local settings file may override.
+The mechanism is NEW in kiro-cli 2.21.1: measured across the store, 2.18.1,
+2.19.0, 2.20.2 and 2.21.0 carry no such set and no workspace-merge code at all,
+so for those releases the honest answer is "this kiro honors no workspace
+override" — an empty list, not a failure. Hard-failing there would wedge the
+update pipeline the first time upstream reverted a release-old mechanism, which
+is a merge-blocking liability rather than a signal.
+
+So when a captured category can legitimately be absent, assert on the thing that
+proves the probe COULD have answered, and let the category itself be empty:
+
+- kiro's probe fails if the bundle's `SCREAMING -> "dotted.key"` settings
+  registry has no `CHAT_DEFAULT_MODEL` entry. That registry is what the members
+  resolve through, so its absence means the JS payload is not what we think it
+  is and "no allowlist" would be a guess.
+- It fails on MORE than one candidate set (ambiguous — the extract describes
+  one), mirroring `kiroLocateChatScript`'s own ambiguity refusal.
+- It fails on a member that resolves to nothing or to two different keys. A
+  PARTIAL allowlist is worse than none here, because the module uses it to
+  REJECT keys: a short list rejects settings kiro actually honors.
+
+The distinction to keep is the same one the locator draws between a location
+failure and a content failure. "Upstream does not have this" and "we can no
+longer tell what upstream has" are different findings, and an extractor that
+collapses them into one empty list is the dead-anchor failure wearing a
+different hat.
+
+One consumer-side consequence, worth stating because it is where the empty case
+actually lands: an empty allowlist makes EVERY key invalid at that scope, so the
+assertion that reads it must say "this kiro honors no workspace override at all"
+rather than listing the allowed keys and printing nothing.
 
 #### An anchor can lose its TYPE information without losing its match
 
