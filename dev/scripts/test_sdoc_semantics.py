@@ -704,6 +704,37 @@ def test_ripple() -> None:
     assert SHIPPED["events"] == [] and SHIPPED["operations"] == []
 
 
+@contract("provenance has one shape for operations transitions and gate refusals")
+def test_provenance_shape() -> None:
+    gate = {"name": "ready", "sees": ["field:READY"], "predicate": {
+        "op": "field_is", "field": "READY", "value": "yes",
+    }}
+    model = fixture_model(gate=gate)
+    model["events"] = [{"name": "go", "external": False}]
+    model["operations"] = [{
+        "name": "start", "subject": {"kind": "field", "field": "F"},
+        "writes": [], "emits": ["go"],
+    }]
+    expected_keys = {"subject", "transition", "event", "emitter", "gate", "rule", "verdict", "operation"}
+    for name in ("move", "start"):
+        for ready in ("yes", "no"):
+            result = Interpreter(model).fire(
+                graph(node("N", F="a", READY=ready)), {"name": name, "subject": "N"}, "human"
+            )
+            assert result.taken == (ready == "yes")
+            assert len(result.log) == (2 if name == "start" else 1)
+            for step in result.log:
+                assert set(step) == expected_keys
+                assert isinstance(step["gate"], list)
+                assert all(isinstance(gate_name, str) for gate_name in step["gate"])
+                for key in expected_keys - {"gate"}:
+                    assert step[key] is None or isinstance(step[key], str)
+            assert result.log[-1]["gate"] == ["ready"]
+            assert result.log[-1]["operation"] is None
+            if name == "start":
+                assert result.log[0]["gate"] == [] and result.log[0]["operation"] == "start"
+
+
 @contract("a cyclic ripple refuses at its first repeat with the bound as backstop")
 def test_ripple_bound() -> None:
     model = empty_model()
