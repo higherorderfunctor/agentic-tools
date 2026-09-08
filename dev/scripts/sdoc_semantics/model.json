@@ -235,6 +235,7 @@
   "rules": [
     {
       "id": "DEPTH-ORDERED",
+      "lifecycle": "DEPTH",
       "text": "The six values are a LADDER in the order the grammar declares them, and the spike reads that order as the only legal path: one trigger, adjacent rungs, no skipping.",
       "kind": "transcription",
       "settled": false,
@@ -242,6 +243,7 @@
     },
     {
       "id": "DEPTH-REGRESSION-UNDECIDED",
+      "lifecycle": "DEPTH",
       "text": "May DEPTH fall? A design invalidated by a spike arguably returns to needs-design, but a falling DEPTH also erases the record that it once stood higher. Nobody has ruled.",
       "kind": "open",
       "settled": false,
@@ -249,6 +251,7 @@
     },
     {
       "id": "DEPTH-RUNGS-UNDECIDED",
+      "lifecycle": "DEPTH",
       "text": "Do implemented and verified belong to DEPTH? They describe the artifact rather than the thinking, and a node can be interface-settled forever without either being false.",
       "kind": "open",
       "settled": false,
@@ -256,6 +259,7 @@
     },
     {
       "id": "DEPTH-SHARED-MACHINE-UNDECIDED",
+      "lifecycle": "DEPTH",
       "text": "One machine per FIELD is the cheapest shape and is what the spike builds: the six types carrying DEPTH share this lifecycle exactly. The alternative is one machine per (type, field), which lets a REQUIREMENT and a WORK disagree about what a rung means, at the cost of six tables to keep aligned.",
       "kind": "open",
       "settled": false,
@@ -263,6 +267,7 @@
     },
     {
       "id": "STATUS-SUPERSEDE-NEVER-EDIT",
+      "lifecycle": "STATUS",
       "text": "Never edit an accepted DECISION's STATEMENT. Set STATUS to superseded, add Superseded_By, and write a new decision (dev/skills/sdoc/SKILL.md rule 4; DEC-UID-OUTLIVES-TYPE records four accepted decisions whose statements are frozen).",
       "kind": "transcription",
       "settled": true,
@@ -270,6 +275,7 @@
     },
     {
       "id": "STATUS-SUPERSEDE-NEEDS-A-TARGET",
+      "lifecycle": "STATUS",
       "text": "Reaching superseded without a Superseded_By relation is a dangling supersession. That is a rule ABOUT TWO NODES, so no state machine can carry it -- it wants the graph query the closure verdict already uses.",
       "kind": "open",
       "settled": false,
@@ -277,6 +283,7 @@
     },
     {
       "id": "STATUS-WITHDRAWN-MISSING-UNDECIDED",
+      "lifecycle": "STATUS",
       "text": "COMMENTARY's STANDING carries a withdrawn value and STATUS does not. Whether an open DECISION can be taken back without being rejected is unruled.",
       "kind": "open",
       "settled": false,
@@ -284,6 +291,7 @@
     },
     {
       "id": "AUTHORED-BY-RISES-ONLY",
+      "lifecycle": "AUTHORED_BY",
       "text": "The ladder is one-directional: a value may rise and never fall, so there is no reachability question and no way to launder a human commitment back into a free one.",
       "kind": "transcription",
       "settled": true,
@@ -291,6 +299,7 @@
     },
     {
       "id": "AUTHORED-BY-TREATMENT",
+      "lifecycle": "AUTHORED_BY",
       "text": "Three classes over four values: llm is FREE to reverse, llm-accepted is SOFT (an undo has to surface in the closing report), llm-adopted and human are HARD -- being unable to meet one is a STOP condition, not a workaround.",
       "kind": "transcription",
       "settled": true,
@@ -298,6 +307,7 @@
     },
     {
       "id": "AUTHORED-BY-WHO-MAY-RAISE-UNDECIDED",
+      "lifecycle": "AUTHORED_BY",
       "text": "No actor is attached to any transition. The decision's own notes say raising to llm-accepted is a human act with no natural place to happen, and the write guard makes the field the operator's, so the machine below is a shape with no hand on it yet.",
       "kind": "open",
       "settled": false,
