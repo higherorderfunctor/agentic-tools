@@ -662,6 +662,10 @@ feature maturities, and config-key extraction fail closed.
   outPath is byte-identical with and without it — so adding it is inert for
   existing consumers and cannot be validated by any build product.
 
+  `checks/pnpm-fetcher-contract.nix` now enforces this across every
+  `pnpm_<major>` the flake exposes, discovering them by name so a future major
+  is covered the day it is added.
+
 - **Apply that metadata BY KEY in `postPatch`, never as lock hunks.** The patch
   FILE is a new file and never conflicts, but the workspace and lock entries
   pointing pnpm at it track upstream's peer resolution, which reshuffles on its
