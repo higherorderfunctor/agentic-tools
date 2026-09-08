@@ -805,9 +805,33 @@ def test_relation_contracts() -> None:
     assert any("no relation contract" in message for message in found)
     assert [message for message in found if "admits no cycles:" in message] == [
         "role 'Assumes' admits no cycles: A -> B -> A",
-        "role 'Assumes' admits no cycles: C -> D -> C",
     ]
     assert SHIPPED["relation_contracts"] == []
+
+
+@contract("cycle diagnostics return one witness per role and report scan exhaustion")
+def test_cycle_scan_bound() -> None:
+    from sdoc_semantics.engine import _simple_cycles
+
+    chain = {str(index): [str(index + 1)] for index in range(1200)}
+    assert _simple_cycles(chain) == []  # deeper than recursive DFS can safely walk
+    model = empty_model()
+    model["relation_contracts"] = [
+        {"role": role, "from_types": ["WORK"], "to_types": ["WORK"],
+         "admits_cycles": False, "propagates": []}
+        for role in ("Assumes", "Cites")
+    ]
+    data = graph(node("A"), node("B"), node("C"), edges=[
+        {"role": role, "source": source, "target": target}
+        for role in ("Assumes", "Cites")
+        for source, target in (("A", "B"), ("B", "A"), ("A", "C"), ("C", "A"))
+    ])
+    found = Interpreter(model).check(data)
+    assert len(found) == 2 and all("admits no cycles" in message for message in found)
+    assert "Assumes" in found[0] and "Cites" in found[1]
+    exhausted = Interpreter(model, cycle_bound=1).check(data)
+    assert len(exhausted) == 2 and all("cycle scan exceeded step bound 1" in message for message in exhausted)
+    assert Interpreter(SHIPPED, cycle_bound=1).check(graph()) == []
 
 
 @contract("gate placement derives checkpoint visibility in list order")

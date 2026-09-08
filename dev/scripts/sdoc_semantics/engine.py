@@ -1067,11 +1067,13 @@ class Interpreter:
         grammar: Mapping[str, Any] | None = None,
         *,
         step_bound: int = 1000,
+        cycle_bound: int = 10000,
     ) -> None:
         validate_model(model, grammar)
         self.model = copy.deepcopy(model)
         self.grammar = grammar
         self.step_bound = step_bound
+        self.cycle_bound = cycle_bound
         self._lifecycles = {
             row["name"]: row for row in self.model.get("lifecycles", [])
         }
@@ -1352,7 +1354,12 @@ class Interpreter:
                     adjacency.setdefault(str(edge["source"]), []).append(
                         str(edge["target"])
                     )
-            for cycle in _simple_cycles(adjacency):
+            try:
+                cycles = _simple_cycles(adjacency, step_bound=self.cycle_bound)
+            except ModelError as error:
+                found.append(f"role {role!r}: {error}")
+                continue
+            for cycle in cycles:
                 found.append(
                     f"role {role!r} admits no cycles: {' -> '.join(cycle)}"
                 )
@@ -1372,23 +1379,37 @@ def check(graph: Mapping[str, Any]) -> list[str]:
     return Interpreter(load_model()).check(graph)
 
 
-def _simple_cycles(adjacency: Mapping[str, Iterable[str]]) -> list[tuple[str, ...]]:
-    """Enumerate each directed simple cycle once, with its least UID first."""
-    cycles: list[tuple[str, ...]] = []
+def _simple_cycles(
+    adjacency: Mapping[str, Iterable[str]], *, step_bound: int = 10000
+) -> list[tuple[str, ...]]:
+    """Find one deterministic cycle witness with iterative, bounded DFS."""
     nodes = sorted(
         set(adjacency) | {target for targets in adjacency.values() for target in targets}
     )
+    finished: set[str] = set()
+    steps = 0
     for start in nodes:
-
-        def walk(current: str, path: tuple[str, ...], seen: set[str]) -> None:
-            for target in sorted(set(adjacency.get(current, ()))):
-                if target == start:
-                    cycles.append((*path, start))
-                elif target >= start and target not in seen:
-                    walk(target, (*path, target), seen | {target})
-
-        walk(start, (start,), {start})
-    return cycles
+        if start in finished:
+            continue
+        path = [start]
+        active = {start: 0}
+        stack = [iter(sorted(set(adjacency.get(start, ()))))]
+        while stack:
+            steps += 1
+            if steps > step_bound:
+                raise ModelError(f"cycle scan exceeded step bound {step_bound}")
+            target = next(stack[-1], None)
+            if target is None:
+                stack.pop()
+                finished.add(path[-1])
+                del active[path.pop()]
+            elif target in active:
+                return [tuple([*path[active[target]:], target])]
+            elif target not in finished:
+                active[target] = len(path)
+                path.append(target)
+                stack.append(iter(sorted(set(adjacency.get(target, ())))))
+    return []
 
 
 def mermaid(lifecycle: Mapping[str, Any]) -> str:
