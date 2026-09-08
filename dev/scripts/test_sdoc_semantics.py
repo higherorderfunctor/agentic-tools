@@ -313,6 +313,10 @@ def test_not() -> None:
 
 @contract("the closed operation table and shipped empty gates are explicit")
 def test_closed_operation_table() -> None:
+    from sdoc_semantics.engine import _OPERATION_TABLE, _OPERATIONS
+
+    assert set(PREDICATE_OPERATIONS) == set(_OPERATION_TABLE) == set(_OPERATIONS)
+    assert all(callable(entry[1]) for entry in _OPERATION_TABLE.values())
     assert tuple(sorted(PREDICATE_OPERATIONS)) == PREDICATE_OPERATIONS
     assert len(PREDICATE_OPERATIONS) == 9
     assert SHIPPED["gates"] == []

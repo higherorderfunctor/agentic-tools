@@ -35,17 +35,6 @@ MODEL_KEYS = (
     "flows",
     "rules",
 )
-PREDICATE_OPERATIONS = (
-    "actor_in",
-    "all_related",
-    "and",
-    "any_related",
-    "field_at_least",
-    "field_is",
-    "has_relation",
-    "not",
-    "or",
-)
 RULE_KINDS = ("transcription", "policy", "derived", "open")
 SEES_LITERALS = ("actor", "git_base_ref")
 PAYLOAD_KEYS = (
@@ -163,24 +152,7 @@ def _validate_predicate(predicate: Any, location: str) -> None:
             f"{location} names unknown predicate operation {operation!r}; "
             f"{_known('operations', PREDICATE_OPERATIONS)}"
         )
-    shapes = {
-        "actor_in": (("op", "actors"), ()),
-        "all_related": (
-            ("op", "role", "predicate", "empty"),
-            ("direction",),
-        ),
-        "and": (("op", "predicates"), ()),
-        "any_related": (
-            ("op", "role", "predicate", "empty"),
-            ("direction",),
-        ),
-        "field_at_least": (("op", "field", "value"), ()),
-        "field_is": (("op", "field", "value"), ()),
-        "has_relation": (("op", "role"), ("direction", "target_type")),
-        "not": (("op", "predicate"), ()),
-        "or": (("op", "predicates"), ()),
-    }
-    required, optional = shapes[operation]
+    required, optional = _OPERATION_TABLE[operation][0]
     _require_shape(predicate, required, f"{location} predicate", optional)
     if operation in ("and", "or"):
         _require_list(predicate["predicates"], f"{location}.{operation}.predicates")
@@ -982,17 +954,27 @@ def _op_not(predicate, node, graph, actor, model) -> bool:
     return not evaluate(predicate["predicate"], node, graph, actor, model)
 
 
-_OPERATIONS: dict[str, Callable[..., bool]] = {
-    "actor_in": _op_actor_in,
-    "all_related": _op_all_related,
-    "and": _op_and,
-    "any_related": _op_any_related,
-    "field_at_least": _op_field_at_least,
-    "field_is": _op_field_is,
-    "has_relation": _op_has_relation,
-    "not": _op_not,
-    "or": _op_or,
+_OPERATION_TABLE: dict[
+    str, tuple[tuple[tuple[str, ...], tuple[str, ...]], Callable[..., bool]]
+] = {
+    "actor_in": ((("op", "actors"), ()), _op_actor_in),
+    "all_related": (
+        (("op", "role", "predicate", "empty"), ("direction",)), _op_all_related,
+    ),
+    "and": ((("op", "predicates"), ()), _op_and),
+    "any_related": (
+        (("op", "role", "predicate", "empty"), ("direction",)), _op_any_related,
+    ),
+    "field_at_least": ((("op", "field", "value"), ()), _op_field_at_least),
+    "field_is": ((("op", "field", "value"), ()), _op_field_is),
+    "has_relation": (
+        (("op", "role"), ("direction", "target_type")), _op_has_relation,
+    ),
+    "not": ((("op", "predicate"), ()), _op_not),
+    "or": ((("op", "predicates"), ()), _op_or),
 }
+PREDICATE_OPERATIONS = tuple(_OPERATION_TABLE)
+_OPERATIONS = {name: entry[1] for name, entry in _OPERATION_TABLE.items()}
 
 
 def evaluate(
