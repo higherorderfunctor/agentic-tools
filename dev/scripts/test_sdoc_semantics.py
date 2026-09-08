@@ -156,9 +156,11 @@ PREDICATE_GRAPH = graph(
     node("A", "WORK", DEPTH="implemented", FLAG="yes"),
     node("B", "REQUIREMENT", DEPTH="verified", FLAG="yes"),
     node("C", "EVIDENCE", DEPTH="sketch", FLAG="no"),
+    node("D", "WORK", DEPTH="implemented", FLAG="yes"),
     edges=(
         {"role": "Assumes", "source": "A", "target": "B"},
         {"role": "Assumes", "source": "A", "target": "C"},
+        {"role": "Assumes", "source": "D", "target": "B"},
     ),
 )
 PREDICATE_NODE = PREDICATE_GRAPH["nodes"]["A"]
@@ -227,6 +229,10 @@ def test_all_related() -> None:
         "predicate": {"op": "field_is", "field": "FLAG", "value": "yes"},
     }
     assert evaluate(
+        dict(common, empty="fail"), PREDICATE_GRAPH["nodes"]["D"],
+        PREDICATE_GRAPH, "human", SHIPPED,
+    )
+    assert evaluate(
         dict(common, empty="pass"),
         PREDICATE_GRAPH["nodes"]["C"],
         PREDICATE_GRAPH,
@@ -257,6 +263,10 @@ def test_any_related() -> None:
         "direction": "out",
         "predicate": {"op": "field_is", "field": "FLAG", "value": "no"},
     }
+    assert not evaluate(
+        dict(common, empty="pass"), PREDICATE_GRAPH["nodes"]["D"],
+        PREDICATE_GRAPH, "human", SHIPPED,
+    )
     assert evaluate(
         dict(common, empty="fail"),
         PREDICATE_NODE,
