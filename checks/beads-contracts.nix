@@ -653,14 +653,25 @@ in
     mkdir -p "$migrate/cwd"
     run_bd "$migrate" "$migrate/cwd" "$migrate/state" "''${init_args[@]}" \
       > "$migrate/init.out" 2>&1
-    run_bd "$migrate" "$migrate/cwd" "$migrate/state" migrate --inspect --json \
+    # NO `--json` on either `migrate` call below, deliberately, and the grep
+    # assertions are therefore correct rather than lazy. Measured against the
+    # packaged 1.2.2 client: `migrate --inspect --json` and `migrate schema
+    # --json` emit output byte-identical to the flagless form, and neither is
+    # valid JSON — `jq .` rejects both. The flag is accepted and silently
+    # ignored by these two subcommands; it is not loose parsing, since
+    # `migrate --inspect --bogus-flag` is rejected with `unknown flag`.
+    # Passing `--json` here would advertise a contract the binary does not
+    # honor and invite a future `jq` rewrite that cannot work. If a later
+    # release makes these emit real JSON, this check should fail on the
+    # changed text and be rewritten to parse it.
+    run_bd "$migrate" "$migrate/cwd" "$migrate/state" migrate --inspect \
       > "$migrate/inspect.out" 2>&1
     grep -Fq "Schema Version: ${qualifiedBeads.version}" "$migrate/inspect.out" \
       || fail "migration inspection no longer records the packaged version"
     if grep -Fq "schema version mismatch" "$migrate/inspect.out"; then
       fail "self-created database reports a schema version mismatch"
     fi
-    run_bd "$migrate" "$migrate/cwd" "$migrate/state" migrate schema --json \
+    run_bd "$migrate" "$migrate/cwd" "$migrate/state" migrate schema \
       > "$migrate/schema.out" 2>&1
     grep -Fq "Schema already at v53" "$migrate/schema.out" \
       || fail "explicit schema migration result changed"
