@@ -110,6 +110,12 @@
     ".pre-commit-config.yaml"
     "overlays/sources/**"
     "node_modules/**"
+    # The board's vendored elkjs layout bundle. Third-party code biome
+    # can neither fix nor read: elk-api.js is a browserify build with 22
+    # unfixable lints, and elk-worker.min.js is 1.5 MiB against biome's
+    # 1 MiB maximum. Stopgap — DEC-DEPS-VIA-NIX rules that the bundle
+    # should arrive through Nix instead (WORK-BOARD-ELKJS-VIA-NIX).
+    "docs/sdoc/board/assets/vendor/**"
     "result/**"
     "result-*/**"
     # Sentinel-tip scratch files. Prettier's markdown handler

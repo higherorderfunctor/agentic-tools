@@ -117,6 +117,7 @@ dsolve
 dunder
 EEXIST
 elicitations
+elkjs
 emnapi
 endgroup
 endswith
