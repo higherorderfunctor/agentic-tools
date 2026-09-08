@@ -1274,15 +1274,20 @@ class Interpreter:
                         transition_reference(lifecycle["name"], transition),
                         event,
                     )
-                    repeated = key in visited
-                    visited.add(key)
-                    steps += 1
-                    if steps > self.step_bound:
-                        kind = "cyclic ripple" if repeated else "ripple"
+                    if key in visited:
                         return FireResult(
                             "refused",
                             tuple(log),
-                            f"{kind} exceeded step bound {self.step_bound}",
+                            f"cyclic ripple repeated {key!r}",
+                            "cycle",
+                        )
+                    visited.add(key)
+                    steps += 1
+                    if steps > self.step_bound:
+                        return FireResult(
+                            "refused",
+                            tuple(log),
+                            f"ripple exceeded step bound {self.step_bound}",
                             "step-bound",
                         )
                     taken, gate = self._apply(
