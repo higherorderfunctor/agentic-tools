@@ -70,6 +70,8 @@ shape rather than a missing key.
 <<<
 NOTES: >>>
 DEPTH implemented, not verified: a completed observation run by its own author, not independently re-taken -- this corpus's convention.
+
+The `File` relation to `dev/scripts/sdoc_semantics/machines/depth.py` went with the file in `fefad4af`; the transcription is now `dev/scripts/sdoc_semantics/model.json`.
 <<<
 RELATIONS:
 - TYPE: File

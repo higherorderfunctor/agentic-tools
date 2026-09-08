@@ -42,6 +42,8 @@ the contradiction while checking settled nodes against the semantics spike. Not
 a finding against the spike: the waiver was the operator's and is recorded. The
 gap is that an accepted decision's text still forbids what the tree now does,
 and nothing in the canon says for how long.
+
+The premise that three Python lifecycles live under `dev/scripts/sdoc_semantics/machines/` is retired by this branch.
 <<<
 RELATIONS:
 - TYPE: Parent
