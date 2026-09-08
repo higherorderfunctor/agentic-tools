@@ -882,6 +882,26 @@ def test_presentation_order() -> None:
     assert all(not machine["diagnostics"] for machine in emitted["machines"].values())
 
 
+@contract("lifecycle notes preserve the transcription and are optional strings")
+def test_lifecycle_notes() -> None:
+    assert [row["note"] for row in SHIPPED["lifecycles"]] == [
+        "Transcribed for the spike. Every transition is unsettled by design.",
+        "Branching on purpose: two terminal states, and one rule no machine can hold.",
+        "Shape is settled by an accepted DECISION; the actor is not.",
+    ]
+    model = fixture_model()
+    validate_model(model)  # no note is valid
+    model["lifecycles"][0]["note"] = "fixture"
+    validate_model(model)
+    model["lifecycles"][0]["note"] = False
+    try:
+        validate_model(model)
+    except ModelError as error:
+        assert "note must be a string" in str(error)
+    else:
+        raise AssertionError("non-string lifecycle note loaded")
+
+
 @contract("rule ownership is explicit and lifecycle references resolve")
 def test_rule_lifecycle() -> None:
     model = fixture_model()
