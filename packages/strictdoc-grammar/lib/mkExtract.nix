@@ -101,6 +101,20 @@
     pkgs.python3Packages.ast-grep-py
   ];
 
+  # Only the interpreter participates in this build-time import check. Other
+  # dev scripts, test fixtures and local bytecode must not invalidate the wrap.
+  semanticsSource = builtins.path {
+    name = "sdoc-semantics-install-check";
+    path = ../../../dev/scripts;
+    filter = path: _type: let
+      relative = lib.removePrefix "${toString ../../../dev/scripts}/" path;
+    in
+      relative
+      == "sdoc_semantics"
+      || (lib.hasPrefix "sdoc_semantics/" relative
+        && !(lib.elem (baseNameOf path) ["__pycache__" "tests"]));
+  };
+
   # The one grammar registry. Shared with devenv.nix, which needs the same
   # paths in the dev shell's env for a hand-run `strictdoc export`; see that
   # file's header for why the list may not be written twice.
@@ -158,7 +172,7 @@ in
     doInstallCheck = true;
     installCheckPhase = ''
       runHook preInstallCheck
-      PYTHONPATH="${../../../dev/scripts}:''${PYTHONPATH-}" \
+      PYTHONPATH="${semanticsSource}:''${PYTHONPATH-}" \
         "$out/bin/strictdoc-grammar-extract" -c '
       import ast_grep_py, arpeggio, textx, sdoc_semantics
       from strictdoc.backend.sdoc.grammar.grammar_builder import SDocGrammarBuilder
