@@ -144,4 +144,19 @@ The full matrix, the maintenance table with commands, the eight verified
 assessments and every probe are archived untracked under
 private/semantics-engine/ in the worktree (5 MB; gitignored). Nothing in this
 node depends on them; they are the working papers.
+
+Critic (ran after the synthesis, with the Codex dump in view): no candidate the
+dump names was missed; Sismic stays dropped at shortlist. Nine tool classes
+were never searched: SMT solvers (Z3), embeddable expression languages
+delivered as data (CEL, JSONLogic), actor-axis authorization engines (Casbin,
+Oso), requirements tools with built-in constraint checking (Sphinx-Needs
+needs_constraints, Doorstop suspect links), incremental recomputation, graph
+rewriting, Python contract libraries, model-to-code generators, and decision
+tables (DMN). None changes the decision's shape: the closed predicate tree IS a
+small expression-as-data language, and the graph operations it needs
+(has_relation, all_related) are the part no standard evaluator supplies. Two
+are worth the operator's eye later: decision tables as the form for many gate
+instances over few shapes (the open question on gate-shape count), and
+incremental recomputation for the ripple at corpus scale
+(WORK-SEMANTICS-CORPUS-SCALE-MEASURE).
 <<<
