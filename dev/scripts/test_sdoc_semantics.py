@@ -633,7 +633,7 @@ def test_ripple() -> None:
     assert SHIPPED["events"] == [] and SHIPPED["operations"] == []
 
 
-@contract("a cyclic ripple refuses by the bound without committing")
+@contract("a cyclic ripple refuses at its first repeat with the bound as backstop")
 def test_ripple_bound() -> None:
     model = empty_model()
     model["events"] = [
@@ -653,10 +653,17 @@ def test_ripple_bound() -> None:
     ]
     data = graph(node("N", F="a"))
     before = copy.deepcopy(data)
-    result = Interpreter(model, step_bound=4).fire(
+    result = Interpreter(model, step_bound=24).fire(
         data, {"name": "start", "subject": "N"}, "human"
     )
-    assert result.verdict == "refused" and result.refused_by == "step-bound"
+    assert result.verdict == "refused" and result.refused_by == "cycle"
+    assert len(result.log) == 3  # start, forward, back; refuse the next forward
+    assert "L:forward:a:b" in result.reason
+    assert data == before
+    bounded = Interpreter(model, step_bound=2).fire(
+        data, {"name": "start", "subject": "N"}, "human"
+    )
+    assert bounded.refused_by == "step-bound" and len(bounded.log) == 2
     assert data == before
 
 
