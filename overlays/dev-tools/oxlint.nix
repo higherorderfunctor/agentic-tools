@@ -1,3 +1,4 @@
+# cspell:ignore andrewbranch Funtar
 # oxlint — HEAD-tracked JS/TS linter with type-aware (tsgo) support, pinned
 # against `ourPkgs` for cache-hit parity. Thin override of nixpkgs' oxlint:
 # inject our sibling tsgolint via .override (so --type-aware uses our HEAD
@@ -15,12 +16,12 @@
   vu = import ../lib.nix;
   tsgolint = import ./tsgolint.nix {inherit inputs final;};
 
-  rev = "007a9fdc640a7bf83aadf8a7e91d8a3f91bea04f";
+  rev = "d198982c084e92e7c923d8a57f6b8ab87baefdda";
   unpatchedSrc = ourPkgs.fetchFromGitHub {
     owner = "oxc-project";
     repo = "oxc";
     inherit rev;
-    hash = "sha256-wSf5SKEqa25+fWJ78kDYCAonhJ+vcLVOVNrkM01V46w=";
+    hash = "sha256-+LAcZ9Rlw6SORelFyUmqwn9Y8DerTZAqMBbfyvCDAqk=";
   };
   # @napi-rs/cli's filesystem reconciliation probes a process incarnation with
   # execFile(/bin/ps) on Darwin. Node can reject that spawn synchronously under
@@ -33,7 +34,7 @@
   # to null, preserving napi-rs's fail-closed stale-lock behavior. Drop this
   # when the catch ships upstream — re-read `executeProcessIncarnationCommand`
   # in `dist/cli.js` on each repin rather than assuming; it was still uncaught
-  # in 3.8.6.
+  # in 3.9.0.
   #
   # The patch file itself is added as a NEW file, which never conflicts. The
   # workspace/lock metadata that points pnpm at it is applied by key in
@@ -50,12 +51,12 @@
   # fragment carries the full loop.
   napi = {
     pkg = "@napi-rs/cli";
-    version = "3.8.6";
-    patchPath = "patches/@napi-rs__cli@3.8.6.patch";
+    version = "3.9.0";
+    patchPath = "patches/@napi-rs__cli@3.9.0.patch";
     # pnpm derives this from the patch file's CONTENT — a plain sha256 of its
     # bytes — so it moves only when that file does, not when upstream's lock
     # does.
-    patchHash = "d6d478f3b84607df7e4453132b48893a86b679e22a0df6151173305350e2c269";
+    patchHash = "a732a64909908b75156f0709c6f08cb75c6ffe313ca2fee3857dd952c317e4f4";
   };
   src = ourPkgs.applyPatches {
     src = unpatchedSrc;
@@ -73,7 +74,7 @@
   };
   version = vu.mkVersion {
     # upstream: readCargoVersion @ apps/oxlint/Cargo.toml
-    upstream = "1.81.0";
+    upstream = "1.82.0";
     inherit rev;
   };
 in
@@ -81,16 +82,30 @@ in
     inherit version src;
     cargoDeps = ourPkgs.rustPlatform.fetchCargoVendor {
       inherit (finalAttrs) pname version src;
-      hash = "sha256-dCZqFCSMgnU9Kyjxkoqxq2BiTwu82d1HFeFSyFavj38=";
+      hash = "sha256-rrWmArsSfYmCD+kAjJ1eSz/mHt3N+cEKoO+/zjcV94k=";
     };
     pnpmDeps = ourPkgs.fetchPnpmDeps {
       inherit (finalAttrs) pname version src;
       pnpm = ourPkgs.pnpm_11;
       fetcherVersion = 4;
-      hash = "sha256-zjR8H8omRoEZ1+P4txJDitvV4RkYVZXJ5DIO5tltmgA=";
+      hash = "sha256-cc7akTBLfj7YR37x/DVcPLOcGOd/B8kcOioP8wNvuiM=";
     };
-    # Oxc declares pnpm 11.17.0. Replace nixpkgs Oxlint's pnpm 10 build input
-    # as well as its dependency fetcher so both phases use the upstream major.
+    # Oxc declares pnpm@12.3.2 in `packageManager`, and we DELIBERATELY stay on
+    # pnpm 11. nixpkgs' fetcher interpolates `--registry="$NIX_NPM_REGISTRY"`
+    # unconditionally (fetch-pnpm-deps/default.nix:149) and that variable has no
+    # default anywhere in nixpkgs, so the fetcher hands pnpm an EMPTY registry
+    # base. pnpm 11 falls back to the default registry; pnpm 12's Rust rewrite
+    # does not, and every request becomes a relative URL — measured, the install
+    # dies with metadata fetches against bare paths like `/@andrewbranch%2Funtar.js`.
+    # Disabling pnpm's supply-chain check does NOT work around it: the same
+    # empty-base failure just resurfaces one stage later at the tarball endpoint.
+    #
+    # Revisit when the nixpkgs pin carries a registry-guard fix; the swap then
+    # needs a `NIX_NPM_REGISTRY` default supplied here in the same change.
+    # Replace nixpkgs Oxlint's own pnpm in BOTH places — the dependency fetcher
+    # above and the build input here — so both phases use the same major.
+    # checks/pnpm-fetcher-parity.nix asserts those two are the same store path,
+    # so they can never drift apart silently.
     nativeBuildInputs =
       map
       (input:

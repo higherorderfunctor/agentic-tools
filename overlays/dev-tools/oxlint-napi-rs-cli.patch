@@ -1,11 +1,11 @@
-diff --git a/patches/@napi-rs__cli@3.8.6.patch b/patches/@napi-rs__cli@3.8.6.patch
+diff --git a/patches/@napi-rs__cli@3.9.0.patch b/patches/@napi-rs__cli@3.9.0.patch
 new file mode 100644
-index 0000000..facaffb
+index 0000000..1e5dee7
 --- /dev/null
-+++ b/patches/@napi-rs__cli@3.8.6.patch
++++ b/patches/@napi-rs__cli@3.9.0.patch
 @@ -0,0 +1,90 @@
 +diff --git a/dist/cli.js b/dist/cli.js
-+index ebd25a97ef15895ec89ef026cc1b091fa204cd61..34ceb953d0c9b57543d67d5b8f37e374019ed213 100755
++index c068261bdd3ddf628b8f51b76048a8cb66cacd37..0600b16381c911c89224426860420d9f40afa3a4 100755
 +--- a/dist/cli.js
 ++++ b/dist/cli.js
 +@@ -1651,18 +1651,22 @@ async function readPosixProcessIncarnation(pid) {
