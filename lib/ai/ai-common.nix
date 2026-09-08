@@ -114,10 +114,12 @@
   # stops as soon as the accumulated path is in `terminal`, so the rest of the
   # value survives as JSON.
   #
-  # Pass `[]` (what the `flattenDotKeys` alias does) for the historical
-  # flatten-everything behavior. The boundary list belongs to whichever runtime
-  # owns the format, and is extracted from its binary rather than curated —
-  # see `settingKeys` in overlays/kiro-cli-extracted.json.
+  # Pass `[]` for the historical flatten-everything behavior. There is no
+  # `flattenDotKeys` alias for that: kiro is the only consumer of this format
+  # and it always passes a boundary, so an alias would be dead code. The
+  # boundary belongs to whichever runtime owns the format and is extracted from
+  # its binary rather than curated — see `settingKeys` in
+  # overlays/kiro-cli-extracted.json.
   flattenDotKeysUntil = terminal: let
     go = prefix: attrs:
       lib.foldlAttrs (acc: name: value: let
@@ -138,12 +140,7 @@ in {
   # Context and rules share one home.file-shaped content record. Keeping paths
   # as `source` data avoids writeText/IFD and preserves direct symlink emission
   # when a single source is not being concatenated with another contribution.
-  # Both names are exported: `flattenDotKeysUntil` for a format that needs a
-  # key boundary (kiro), and the historical `flattenDotKeys` for one that
-  # does not. Defined in the `let` above rather than here, because the
-  # exported attrset is not recursive and the alias must see the function.
   inherit flattenDotKeysUntil;
-  flattenDotKeys = flattenDotKeysUntil [];
 
   contentModule = mkContentModule {};
   optionalContentModule = mkContentModule {};

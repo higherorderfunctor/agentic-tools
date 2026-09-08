@@ -8009,6 +8009,27 @@ in {
       builtins.all (a: a.assertion) ev.config.assertions
   );
 
+  # No boundary key may be a strict dotted PREFIX of another. If one ever is, the walk stops at the SHORTER key and
+  # writes nested JSON kiro cannot read — the exact defect the boundary fixed,
+  # reintroduced by data rather than by code, and invisible to every other test
+  # here because `module-kiro-scalar-setting-still-flattens` uses `chat`, which
+  # is never terminal, so it never engages the boundary at all.
+  #
+  # `chat.tools` is the live candidate: `chat.tools.*` is already eleven
+  # registry entries, so upstream naming the parent would trip this.
+  module-kiro-flatten-boundary-has-no-prefix-pairs = mkTest "kiro-flatten-boundary-has-no-prefix-pairs" (
+    let
+      extracted = builtins.fromJSON (builtins.readFile ../overlays/kiro-cli-extracted.json);
+      keys = lib.unique (extracted.settingKeys ++ extracted.workspaceOverridableSettings);
+      nested =
+        builtins.filter (
+          a: builtins.any (b: a != b && lib.hasPrefix "${a}." b) keys
+        )
+        keys;
+    in
+      nested == []
+  );
+
   # Sidecar WIRING: that the field exists, parses, and says what the devenv
   # assertion assumes about the pinned binary. It is NOT a test of the
   # extractor — it reads a committed list of strings and runs none of that

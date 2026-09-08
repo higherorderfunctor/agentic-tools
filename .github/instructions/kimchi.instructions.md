@@ -77,8 +77,8 @@ deliberately unimplemented.
 
 ## Gotcha: config.json is NESTED, not flat
 
-Do **not** run `config.json` settings through `aiCommon.flattenDotKeys` — that
-helper is Kiro-specific (Kiro's `cli.json` wants flat dot keys like
+Do **not** run `config.json` settings through `aiCommon.flattenDotKeysUntil` —
+that helper is Kiro-specific (Kiro's `cli.json` wants flat dot keys like
 `chat.enableTangentMode`). Kimchi's `config.json` is nested JSON; flattening
 turns `settings.telemetry.enabled` into a literal `"telemetry.enabled"` string
 key Kimchi cannot read. Locked by `module-kimchi-config-json-nested`.

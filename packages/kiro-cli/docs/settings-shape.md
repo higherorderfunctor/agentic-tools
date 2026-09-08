@@ -36,8 +36,13 @@ setting keys and stops recursing the moment the accumulated path is one of them.
 
 - `settingKeys`: the bundle's own `SCREAMING -> "dotted.key"` registry, 52 keys
   at 2.21.1, all `chat.*`.
-- `workspaceOverridableSettings`: the workspace allowlist, which adds the
-  `toolSearch.*`, `compaction.*` and `knowledge.*` families the registry omits.
+- `workspaceOverridableSettings`: the workspace allowlist, which adds 21 keys
+  the registry omits — the whole `toolSearch.*`, `compaction.*` and
+  `knowledge.*` families, plus ten `chat.*` keys including
+  `chat.enableTangentMode`. That last one is the extractor's own PROBE anchor,
+  which makes it the sharpest available evidence that the registry is not the
+  settings universe: the probe the allowlist scan keys off is itself absent from
+  the registry scan.
 
 Neither alone covers the format, which is why the sidecar reports them
 separately and the union is taken at the consumer. Both come out of one scan of

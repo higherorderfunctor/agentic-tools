@@ -884,6 +884,23 @@ rec {
               else:
                   keys.add(next(iter(vals)))
 
+      # The two emitted lists fail in OPPOSITE directions and therefore need
+      # opposite guards. For the allowlist, which is used to REJECT, the danger
+      # is under-capture. For `settingKeys`, which is used to STOP A WALK, the
+      # danger is OVER-capture: a spurious key makes the flattener halt early
+      # and emit nested JSON kiro cannot read. The guards below all constrain
+      # the allowlist, so this one constrains the registry — every symbol must
+      # name exactly one key, not merely every symbol the allowlist references.
+      registry_ambiguous = sorted(
+          "%s -> %s" % (k, sorted(v)) for k, v in symbols.items() if len(v) > 1
+      )
+      if registry_ambiguous:
+          die(
+              "the settings-key registry maps symbols to more than one key (%s), "
+              "so the regex is over-matching and `settingKeys` would carry an "
+              "invented boundary." % registry_ambiguous
+          )
+
       if unresolved:
           die(
               "the workspace-override set references key symbols with no registry "

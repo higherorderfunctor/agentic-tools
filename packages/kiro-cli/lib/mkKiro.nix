@@ -31,7 +31,7 @@
   mkIdentityMaterializer = import ./identityBundle.nix {inherit lib pkgs;};
   workflowReminder = import ./workflowReminder.nix {inherit lib pkgs;};
 
-  # Shared AI helpers (filterNulls, mkLspConfig, flattenDotKeys, …). Hoisted to
+  # Shared AI helpers (filterNulls, mkLspConfig, flattenDotKeysUntil, …). Hoisted to
   # the top-level `let` so option TYPES and renderers can reach it too — both
   # backend blocks previously imported it separately.
   aiCommon = import ../../../lib/ai/ai-common.nix {inherit lib;};
@@ -1372,6 +1372,13 @@ in
           (`chat.enableWorkflows`, `telemetry.enabled`). Those are global-only
           settings; the type accepts them because Home Manager writes the file
           where they work.
+
+          Nested Nix lowers to kiro's flat dotted keys, and it stops at a
+          COMPLETE key rather than flattening all the way, so an object-valued
+          setting works: `chat.modelDefaults.<model>.<field>` is written as
+          `"chat.modelDefaults"` with the record intact underneath. The
+          boundary is `settingKeys` from the extracted sidecar, so it tracks
+          version bumps.
 
           THE TWO BACKENDS DO NOT HONOR THE SAME KEYS, because they write
           different files. HM writes the GLOBAL `~/.kiro/settings/cli.json`,
