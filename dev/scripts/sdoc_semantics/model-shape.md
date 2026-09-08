@@ -7,8 +7,9 @@ top-level value is an object with schema `sdoc-semantics-model/1`, a
 `checkpoints`, `milestones`, `flows`, and `rules`. Every collection is a list;
 order is data and must not be recovered from object keys.
 
-A lifecycle has a `name`, tagged `subject`, ordered `states`, `initial` and
-`terminal` state names, and `transitions`. A subject is one of:
+A lifecycle has a `name`, optional string `note`, tagged `subject`, ordered
+`states`, `initial` and `terminal` state names, and `transitions`. A subject is
+one of:
 
 - `{ "kind": "field", "field": "..." }`, for every grammar element carrying the
   field;
@@ -32,3 +33,7 @@ This first document deliberately has no gates, operations, events, or other
 cross-lifecycle entries. The three lifecycle declarations are a transcription of
 the former Python machines, including their open rules; shaping those questions
 belongs to the operator.
+
+READINESS IS NOT MODELLED, and must not be added here. It is a graph query over
+a node and its parents, not a value a node carries — see `docs/sdoc/status.py`,
+whose closure verdict no state machine can express.
