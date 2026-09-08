@@ -143,7 +143,7 @@ def _validate_sees(
         _require_reference(name, vocabulary, kind, location)
 
 
-def _validate_predicate(predicate: Any, location: str) -> None:
+def _validate_predicate(predicate: Any, location: str, related_depth: int = 0) -> None:
     if not isinstance(predicate, dict):
         raise ModelError(f"{location} predicate must be an object")
     operation = predicate.get("op")
@@ -154,19 +154,28 @@ def _validate_predicate(predicate: Any, location: str) -> None:
         )
     required, optional = _OPERATION_TABLE[operation][0]
     _require_shape(predicate, required, f"{location} predicate", optional)
+    if operation in ("all_related", "any_related", "has_relation"):
+        if related_depth:
+            raise ModelError(f"{location}: relation traversal is limited to one hop")
+        direction = predicate.get("direction", "out")
+        if direction not in ("in", "out", "either"):
+            raise ModelError(
+                f"{location}.{operation} has unknown direction {direction!r}; "
+                "known directions: in, out, either"
+            )
     if operation in ("and", "or"):
         _require_list(predicate["predicates"], f"{location}.{operation}.predicates")
         for index, child in enumerate(predicate.get("predicates", [])):
-            _validate_predicate(child, f"{location}.{operation}[{index}]")
+            _validate_predicate(child, f"{location}.{operation}[{index}]", related_depth)
     elif operation == "not":
-        _validate_predicate(predicate.get("predicate"), f"{location}.not")
+        _validate_predicate(predicate.get("predicate"), f"{location}.not", related_depth)
     elif operation in ("all_related", "any_related"):
         if predicate.get("empty") not in ("pass", "fail"):
             raise ModelError(
                 f"{location}.{operation} must say whether empty is 'pass' or 'fail'"
             )
         _validate_predicate(
-            predicate.get("predicate"), f"{location}.{operation}.predicate"
+            predicate.get("predicate"), f"{location}.{operation}.predicate", related_depth + 1
         )
 
 
@@ -187,12 +196,6 @@ def _validate_predicate_references(
             predicate["predicate"], model, grammar, f"{location}.not"
         )
     elif operation in ("all_related", "any_related"):
-        direction = predicate.get("direction", "out")
-        if direction not in ("in", "out", "either"):
-            raise ModelError(
-                f"{location}.{operation} has unknown direction {direction!r}; "
-                "known directions: in, out, either"
-            )
         if grammar is not None:
             _require_reference(
                 predicate.get("role"),
@@ -207,12 +210,6 @@ def _validate_predicate_references(
             f"{location}.{operation}.predicate",
         )
     elif operation == "has_relation" and grammar is not None:
-        direction = predicate.get("direction", "out")
-        if direction not in ("in", "out", "either"):
-            raise ModelError(
-                f"{location}.has_relation has unknown direction {direction!r}; "
-                "known directions: in, out, either"
-            )
         _require_reference(
             predicate.get("role"),
             _grammar_roles(grammar),
@@ -225,13 +222,6 @@ def _validate_predicate_references(
                 grammar.keys(),
                 "element",
                 f"{location}.has_relation",
-            )
-    elif operation == "has_relation":
-        direction = predicate.get("direction", "out")
-        if direction not in ("in", "out", "either"):
-            raise ModelError(
-                f"{location}.has_relation has unknown direction {direction!r}; "
-                "known directions: in, out, either"
             )
     elif operation == "actor_in":
         declared = _names(model.get("actors", []))
@@ -500,6 +490,9 @@ def validate_model(
         _require_list(
             contract["to_types"],
             f"relation contract {contract['role']!r} to_types",
+        )
+        _require_list(
+            contract["propagates"], f"relation contract {contract['role']!r} propagates"
         )
         if grammar is not None:
             _require_reference(
@@ -936,7 +929,7 @@ def _op_any_related(predicate, node, graph, actor, model) -> bool:
 
 def _op_actor_in(predicate, node, graph, actor, model) -> bool:
     del node, graph, model
-    return actor in predicate.get("actors", predicate.get("values", []))
+    return actor in predicate["actors"]
 
 
 def _op_and(predicate, node, graph, actor, model) -> bool:
