@@ -7,37 +7,41 @@ applyTo: ".github/actions/warm-ifd/**,.github/workflows/ci.yml,.github/workflows
 
 ## IFD Patterns and Gotchas
 
-> **Last verified:** 2026-09-08 (commit pending — the oxlint `@napi-rs/cli`
-> repin to 3.9.0 ran this loop end to end. Three corrections below: the proof
-> step is silently voided by `--ignore-workspace`, upstream's pnpm MAJOR moves
-> independently of everything the awk guards, and a multi-document
-> `pnpm-lock.yaml` — never previously exercised — works fine. The pnpm 12 swap
-> itself is DEFERRED: nixpkgs' fetcher passes an empty registry base, which pnpm
-> 12 does not tolerate.) Prior: 2026-08-29 (commit pending — `devenv-test.yml`
-> retains its IFD warm step for on-demand diagnostics but no longer runs on PRs
-> or pushes; automatic deterministic contracts use the normal flake-check warm
-> path). Prior: 2026-08-25 (commit pending — claude-code's settings extraction
-> is NO LONGER A GREP. `mkClaudeExtract` now unpacks the Bun single-exec's
-> module graph and calls the binary's own schema builder, zod→JSON-Schema
-> converter and `@internal` filter, so `effortLevels`, `hookEvents` and
-> `settingsBooleanKeys` are read out of upstream's own schema and a whole
-> `settings` block joins them. Two greps survive on purpose — the launch pins
-> and the model catalog are not in that schema. The boolean-key QUORUM guard
-> documented below is RETIRED, having gone to zero matches when 2.1.245
-> code-split the bundle; the section is kept because the arms-race lesson is the
-> reason the extraction moved). Prior: 2026-08-24 (commit pending — Codex's
-> exact approval-policy guard now follows the pinned binary's version boundary:
-> pre-0.149.0 releases must retain `untrusted`, while 0.149.0 and newer must
-> expose only `never` and `on-request`. This admits upstream's intentional
-> removal without accepting either vocabulary indefinitely, so the normal
-> version-bump path can regenerate the sidecar). Prior: 2026-08-19 (commit
-> pending — removes a retired generated-skill IFD check; Stacked Workflows
-> remains the cross-platform generated-skill constraint). Prior: 2026-08-16
-> (commit pending — `devenv-test.yml` now attributes real repository instruction
-> projections to Git portability rather than the retired claim that current Kiro
-> skips steering symlinks; its IFD warm step and closure behavior were rechecked
-> unchanged). Prior: 2026-08-14 (commit pending — this fragment now has its OWN
-> registry category, `ifd`, scoped to the paths it actually claims below:
+> **Last verified:** 2026-09-08 (commit pending — `fetchPnpmDeps` reads
+> `pnpm.nodejs-slim`, so a hand-built pnpm needs that passthru or evaluation
+> dies naming neither pnpm nor the fetcher. Latent in `pnpm_12.nix` since it was
+> written; nothing threaded that pnpm through the fetcher until now.) Prior:
+> 2026-09-08 (commit pending — the oxlint `@napi-rs/cli` repin to 3.9.0 ran this
+> loop end to end. Three corrections below: the proof step is silently voided by
+> `--ignore-workspace`, upstream's pnpm MAJOR moves independently of everything
+> the awk guards, and a multi-document `pnpm-lock.yaml` — never previously
+> exercised — works fine. The pnpm 12 swap itself is DEFERRED: nixpkgs' fetcher
+> passes an empty registry base, which pnpm 12 does not tolerate.) Prior:
+> 2026-08-29 (commit pending — `devenv-test.yml` retains its IFD warm step for
+> on-demand diagnostics but no longer runs on PRs or pushes; automatic
+> deterministic contracts use the normal flake-check warm path). Prior:
+> 2026-08-25 (commit pending — claude-code's settings extraction is NO LONGER A
+> GREP. `mkClaudeExtract` now unpacks the Bun single-exec's module graph and
+> calls the binary's own schema builder, zod→JSON-Schema converter and
+> `@internal` filter, so `effortLevels`, `hookEvents` and `settingsBooleanKeys`
+> are read out of upstream's own schema and a whole `settings` block joins them.
+> Two greps survive on purpose — the launch pins and the model catalog are not
+> in that schema. The boolean-key QUORUM guard documented below is RETIRED,
+> having gone to zero matches when 2.1.245 code-split the bundle; the section is
+> kept because the arms-race lesson is the reason the extraction moved). Prior:
+> 2026-08-24 (commit pending — Codex's exact approval-policy guard now follows
+> the pinned binary's version boundary: pre-0.149.0 releases must retain
+> `untrusted`, while 0.149.0 and newer must expose only `never` and
+> `on-request`. This admits upstream's intentional removal without accepting
+> either vocabulary indefinitely, so the normal version-bump path can regenerate
+> the sidecar). Prior: 2026-08-19 (commit pending — removes a retired
+> generated-skill IFD check; Stacked Workflows remains the cross-platform
+> generated-skill constraint). Prior: 2026-08-16 (commit pending —
+> `devenv-test.yml` now attributes real repository instruction projections to
+> Git portability rather than the retired claim that current Kiro skips steering
+> symlinks; its IFD warm step and closure behavior were rechecked unchanged).
+> Prior: 2026-08-14 (commit pending — this fragment now has its OWN registry
+> category, `ifd`, scoped to the paths it actually claims below:
 > `.github/actions/warm-ifd/**` and the warm steps in ci.yml / update.yml, on
 > top of `overlays/**`. It previously rode under `overlays`, whose two globs
 > never matched any of them — so the same-commit duty asserted at the end of
@@ -589,6 +593,27 @@ feature maturities, and config-key extraction fail closed.
   `patch_hash stamped on 10 importer + 4 snapshot entries`. **That stderr line
   is the receipt**; its absence, or any END assertion from the awk, is the
   multi-document path failing.
+
+- **`fetchPnpmDeps` reads `pnpm.nodejs-slim`**, via
+  `pnpm-fixup-state-db.override {inherit (pnpm) nodejs-slim;}`. Any pnpm handed
+  to that fetcher must carry the passthru, or evaluation dies with a bare
+  `attribute 'nodejs-slim' missing` that names neither pnpm nor the fetcher.
+  nixpkgs' own pnpm exposes it from `generic.nix`'s argument of the same name; a
+  hand-built one does not get it for free.
+
+  Counter-intuitive for pnpm 12, which ships as a self-contained native binary
+  and needs no Node to RUN — the Node is for the fetcherVersion-4 SQLite
+  state-db fixup helper, which is a JS program. So "this pnpm needs no Node" is
+  true of the tool and false of the fetcher contract.
+
+  **Packaging a pnpm major is not the same as proving it usable as a fetcher
+  argument.** This was latent in `overlays/generic/pnpm_12.nix` from the day it
+  was written: `checks/pnpm-fetcher-parity.nix` enumerates only packages that
+  already ship a `pnpmDeps`, and none of them used pnpm 12, so nothing evaluated
+  the combination. The passthru is not a derivation input — the `pnpm_12`
+  outPath is byte-identical with and without it — so adding it is inert for
+  existing consumers and cannot be validated by any build product.
+
 - **Apply that metadata BY KEY in `postPatch`, never as lock hunks.** The patch
   FILE is a new file and never conflicts, but the workspace and lock entries
   pointing pnpm at it track upstream's peer resolution, which reshuffles on its

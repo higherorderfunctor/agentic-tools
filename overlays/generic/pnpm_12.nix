@@ -301,6 +301,20 @@ in
         runHook postInstallCheck
       '';
 
+      # `fetchPnpmDeps` reads `pnpm.nodejs-slim` — it does
+      # `pnpm-fixup-state-db.override {inherit (pnpm) nodejs-slim;}` — so any
+      # pnpm handed to that fetcher MUST carry this attribute or evaluation
+      # dies with a bare `attribute 'nodejs-slim' missing` that names neither
+      # pnpm nor the fetcher. nixpkgs' own pnpm exposes it from generic.nix's
+      # argument of the same name.
+      #
+      # Counter-intuitive here, because pnpm 12 ships as a self-contained
+      # native binary and needs no Node to RUN. The Node is not for pnpm: it
+      # is for the fetcherVersion-4 SQLite state-db fixup helper, which is a
+      # JS program. Dropping this to "clean up an unused input" re-breaks
+      # every `fetchPnpmDeps` caller that passes this derivation.
+      passthru.nodejs-slim = ourPkgs.nodejs-slim;
+
       passthru.updateScript = vu.mkUpdateScript {
         pkgs = ourPkgs;
         platforms = builtins.mapAttrs (_: assetUrl) assets;
