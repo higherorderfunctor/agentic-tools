@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# cspell:ignore PYTHONDONTWRITEBYTECODE sdoc sgra
+# cspell:ignore PYTHONDONTWRITEBYTECODE sdoc sgra unrelate
 """Executable contracts for the standard-library semantics interpreter."""
 
 from __future__ import annotations
@@ -7,6 +7,7 @@ from __future__ import annotations
 import copy
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -870,6 +871,45 @@ def test_cli_stdlib() -> None:
     )
     assert completed.returncode == 0, completed.stderr
     assert "DEPTH   [sdoc-semantics/2]" in completed.stdout
+
+
+@contract("non-semantics verbs remain available without the semantics package")
+def test_scribe_isolation() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        scripts = Path(directory) / "scripts"
+        shutil.copytree(
+            REPO_ROOT / "dev" / "scripts", scripts,
+            ignore=shutil.ignore_patterns("sdoc_semantics", "__pycache__"),
+        )
+        probe = """
+import contextlib
+import importlib.util
+import io
+import sys
+sys.path.insert(0, sys.argv[1])
+assert importlib.util.find_spec("sdoc_semantics") is None
+import scribe_cmd
+grammar = scribe_cmd.parse_sgra(scribe_cmd.Path(sys.argv[2]) / "docs/sdoc/grammar.sgra")
+parser = scribe_cmd.build_parser(grammar, None, None)
+verbs = next(action.choices for action in parser._actions if isinstance(action.choices, dict))
+for verb in verbs:
+    if verb != "semantics":
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            assert scribe_cmd.main(["--root", sys.argv[2], verb, "--help"]) == 0, verb
+        assert "usage: scribe" in output.getvalue(), verb
+        print(verb)
+with contextlib.redirect_stderr(io.StringIO()) as error:
+    assert scribe_cmd.main(["--root", sys.argv[2], "semantics"]) == 1
+assert "semantics engine is unavailable" in error.getvalue()
+"""
+        result = subprocess.run(
+            [sys.executable, "-I", "-c", probe, str(scripts), str(REPO_ROOT)],
+            capture_output=True, text=True, check=False,
+        )
+        assert result.returncode == 0, result.stderr
+        assert set(result.stdout.splitlines()) == {
+            "check", "delete", "list", "move", "new", "relate", "set", "show", "unrelate",
+        }
 
 
 @contract("load_model reads and validates a JSON fixture")
