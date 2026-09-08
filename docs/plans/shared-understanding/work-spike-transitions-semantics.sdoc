@@ -64,6 +64,8 @@ Revisited 2026-09-03: the engine choice was re-opened before shaping
 vocabulary, and DEC-SEMANTICS-MODEL-IS-DATA (open) proposes the model as a
 data document over a standard-library interpreter, with transitions removed.
 The three open questions above are unchanged by that and stay the operator's.
+
+WHERE TO SHAPE a lifecycle is now `dev/scripts/sdoc_semantics/model.json`; the shape is documented in `dev/scripts/sdoc_semantics/model-shape.md`, and `registry.py` is gone.
 <<<
 RELATIONS:
 - TYPE: Parent
