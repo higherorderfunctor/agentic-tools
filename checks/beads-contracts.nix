@@ -4,7 +4,6 @@
 # module must defend against. If a future package fixes one, this check should
 # fail so the lifecycle and reference can be simplified from fresh evidence.
 {pkgs, ...}: let
-  inherit (pkgs) beads;
   qualifiedBeads = pkgs.ai.devTools.beads;
   inherit (qualifiedBeads) dolt;
   vu = import ../overlays/lib.nix;
@@ -13,7 +12,6 @@ in
     nativeBuildInputs = [
       qualifiedBeads
       dolt
-      beads
       pkgs.coreutils
       pkgs.findutils
       pkgs.git
@@ -92,22 +90,6 @@ in
       )
     }
 
-    run_old_bd() {
-      local root="$1" cwd="$2" state="$3"
-      shift 3
-      (
-        cd "$cwd"
-        env -i \
-          HOME="$root/home" \
-          XDG_CACHE_HOME="$root/home/.cache" \
-          XDG_CONFIG_HOME="$root/home/.config" \
-          XDG_DATA_HOME="$root/home/.local/share" \
-          BEADS_DIR="$state" \
-          PATH="$PATH" \
-          timeout --signal=TERM 120 ${beads}/bin/bd "$@"
-      )
-    }
-
     init_args=(
       init
       --init-if-missing
@@ -131,7 +113,6 @@ in
       "paired Dolt Go floor" \
       "${dolt.goFloor}" \
       "$(go_floor_of "${dolt.src}/go/go.mod")"
-    expect_eq "comparison bd version" "bd version 1.0.3 (dev)" "$(${beads}/bin/bd --version)"
 
     # The contained init primitive: a neutral, non-Git cwd plus an explicit
     # out-of-tree BEADS_DIR. The config has to exist before init so no-git-ops
@@ -658,47 +639,30 @@ in
       fail "metrics.disabled=true still created Dolt event payloads"
     fi
 
-    # The available older client rejects a dedicated freshly initialized 1.2.2
-    # database before any issue write.
-    fresh_new="$probe/fresh-new"
-    make_home "$fresh_new"
-    make_state "$fresh_new/state"
-    mkdir -p "$fresh_new/cwd"
-    run_bd "$fresh_new" "$fresh_new/cwd" "$fresh_new/state" "''${init_args[@]}" \
-      > "$fresh_new/init.out" 2>&1
-    if run_old_bd "$fresh_new" "$fresh_new/cwd" "$fresh_new/state" list --json \
-      > "$fresh_new/old-client.out" 2>&1; then
-      fail "bd 1.0.3 unexpectedly opened a fresh 1.2.2 database"
+    # Migration inspection on a database this same client created. There is no
+    # second bd client to compare against: nixpkgs' `beads` tracked 1.0.3 when
+    # this file was written and has since caught up to the packaged version, so
+    # a cross-version pair can no longer be sourced from any tracked input.
+    # What survives the loss of that pair is asserted here rather than deleted:
+    # the recorded schema label and the migration state a fresh database
+    # reports. Both were re-measured against a new-client database before this
+    # block replaced the cross-version one.
+    migrate="$probe/migrate"
+    make_home "$migrate"
+    make_state "$migrate/state"
+    mkdir -p "$migrate/cwd"
+    run_bd "$migrate" "$migrate/cwd" "$migrate/state" "''${init_args[@]}" \
+      > "$migrate/init.out" 2>&1
+    run_bd "$migrate" "$migrate/cwd" "$migrate/state" migrate --inspect --json \
+      > "$migrate/inspect.out" 2>&1
+    grep -Fq "Schema Version: ${qualifiedBeads.version}" "$migrate/inspect.out" \
+      || fail "migration inspection no longer records the packaged version"
+    if grep -Fq "schema version mismatch" "$migrate/inspect.out"; then
+      fail "self-created database reports a schema version mismatch"
     fi
-    grep -Fq "table has unknown fields" "$fresh_new/old-client.out" \
-      || fail "older-client refusal shape changed"
-
-    # The reverse direction opens and remains writable, while migration
-    # inspection only reports a version-label mismatch; this release pair does
-    # not exercise a destructive migration.
-    upgrade="$probe/upgrade"
-    make_home "$upgrade"
-    make_state "$upgrade/state"
-    mkdir -p "$upgrade/cwd"
-    run_old_bd "$upgrade" "$upgrade/cwd" "$upgrade/state" \
-      init --non-interactive --prefix upgrade --skip-agents --skip-hooks \
-      > "$upgrade/init.out" 2>&1
-    run_old_bd "$upgrade" "$upgrade/cwd" "$upgrade/state" \
-      create "old issue" --silent > /dev/null
-    run_bd "$upgrade" "$upgrade/cwd" "$upgrade/state" list --json > /dev/null
-    run_bd "$upgrade" "$upgrade/cwd" "$upgrade/state" \
-      create "new issue" --silent > /dev/null
-    expect_eq \
-      "new client remains writable on older database" \
-      "2" \
-      "$(run_old_bd "$upgrade" "$upgrade/cwd" "$upgrade/state" list --json | jq length)"
-    run_bd "$upgrade" "$upgrade/cwd" "$upgrade/state" migrate --inspect --json \
-      > "$upgrade/inspect.out" 2>&1
-    grep -Fq "schema version mismatch (current: 1.0.3, expected: 1.2.2)" \
-      "$upgrade/inspect.out" || fail "upgrade inspection mismatch warning changed"
-    run_bd "$upgrade" "$upgrade/cwd" "$upgrade/state" migrate schema --json \
-      > "$upgrade/schema.out" 2>&1
-    grep -Fq "Schema already at v53" "$upgrade/schema.out" \
+    run_bd "$migrate" "$migrate/cwd" "$migrate/state" migrate schema --json \
+      > "$migrate/schema.out" 2>&1
+    grep -Fq "Schema already at v53" "$migrate/schema.out" \
       || fail "explicit schema migration result changed"
 
     touch "$out"

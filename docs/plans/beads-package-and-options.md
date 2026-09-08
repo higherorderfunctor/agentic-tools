@@ -379,8 +379,13 @@ session against the phase 2 package. Feeds noted.
   `git config beads.role`; timer-gate batch semantics; Dolt session-branches as
   an isolation mechanism; the FULLTEXT ID-tokenization hazard. →
   `docs/beads/bd-reference.md` unverified tags.
-- **PB11 — complete:** packaged bd 1.0.3 refuses a 1.2.2-schema database; the
-  durable contract records the failure. → the one-flake-owns-the-version rule.
+- **PB11 — complete, no longer enforced:** packaged bd 1.0.3 refuses a
+  1.2.2-schema database. The durable contract recorded that failure until
+  2026-09, when nixpkgs moved its own `beads` to 1.2.2 and left no tracked input
+  supplying a second client; the cross-version assertions were removed rather
+  than left asserting a pair that no longer exists. The finding stands as a
+  dated measurement. → the one-flake-owns-the-version rule, which it motivated
+  and which does not depend on re-measuring it.
 - **PB12** — beads-mcp env surface at the pinned version: confirm which of
   `BEADS_DIR`/`BEADS_DB`/`BEADS_WORKING_DIR` the server reads and their
   precedence, and the bd-version-skew tolerance of a non-lockstep pairing. →
