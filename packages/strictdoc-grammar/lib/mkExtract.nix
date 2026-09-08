@@ -103,16 +103,14 @@
 
   # Only the interpreter participates in this build-time import check. Other
   # dev scripts, test fixtures and local bytecode must not invalidate the wrap.
-  semanticsSource = builtins.path {
-    name = "sdoc-semantics-install-check";
-    path = ../../../dev/scripts;
-    filter = path: _type: let
-      relative = lib.removePrefix "${toString ../../../dev/scripts}/" path;
-    in
-      relative
-      == "sdoc_semantics"
-      || (lib.hasPrefix "sdoc_semantics/" relative
-        && !(lib.elem (baseNameOf path) ["__pycache__" "tests"]));
+  semanticsSource = lib.fileset.toSource {
+    root = ../../../dev/scripts;
+    fileset =
+      lib.fileset.difference
+      (lib.fileset.fileFilter
+        (file: file.hasExt "py" || file.name == "model.json")
+        ../../../dev/scripts/sdoc_semantics)
+      ../../../dev/scripts/sdoc_semantics/tests;
   };
 
   # The one grammar registry. Shared with devenv.nix, which needs the same
