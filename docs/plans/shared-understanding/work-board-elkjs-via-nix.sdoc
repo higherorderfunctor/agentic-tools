@@ -1,0 +1,42 @@
+[DOCUMENT]
+TITLE: Deliver the board's elkjs layout engine through Nix
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[WORK]
+UID: WORK-BOARD-ELKJS-VIA-NIX
+TITLE: Deliver the board's elkjs layout engine through Nix
+DEPTH: sketch
+AUTHORED_BY: llm
+STATEMENT: >>>
+The Graph neighborhood view ported on 2026-09-08 vendors the elkjs layout
+engine under docs/sdoc/board/assets/vendor/elkjs/ (elk-api.js 9,782 bytes,
+elk-worker.min.js 1,595,334 bytes, plus LICENSE and NOTICE), served by
+docs/sdoc/board/server.py under two static routes. DEC-DEPS-VIA-NIX rules
+that runtime dependencies enter through Nix, so the bundle should come from
+a nixpkgs attribute or a pinned buildNpmPackage, with its store path handed
+to the server by an environment variable set in devenv.nix the way the
+tree-sitter grammars reach the extractor, and the vendored directory
+removed. Until then the directory is excluded from treefmt, because biome
+can neither fix the browserify-built elk-api.js nor read the worker above
+its one-mebibyte limit; that exclude leaves with the vendored files.
+<<<
+NOTES: >>>
+Debt left by porting the Codex reference build
+(archive/work-graph-neighborhood-reference, 6499f270) as commits
+adf8e8d1..5ee1cc63; found when the formatting check went red on landing.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: DEC-DEPS-VIA-NIX
+  ROLE: Governed_By
+- TYPE: Parent
+  VALUE: MECH-DEBT-SHARED-UNDERSTANDING
+  ROLE: Assumes
+- TYPE: Parent
+  VALUE: WORK-GRAPH-NEIGHBORHOOD-VIEW
+  ROLE: Assumes
+- TYPE: Parent
+  VALUE: MECH-BACKLOG-SHARED-UNDERSTANDING
+  ROLE: Backlogged_In
