@@ -251,6 +251,25 @@ _: {
         }
       ];
     };
+    # kiro-settings: how nested `nativeSettings` lowers into kiro's FLAT
+    # cli.json, and why the flatten boundary has to come from the binary rather
+    # than from attrset shape. Scoped to the flattener, the extractor that
+    # measures the boundary, and the module that applies it — an edit to any of
+    # those decides whether an object-valued setting reaches the file at all.
+    kiro-settings = {
+      scopes = [
+        "lib/ai/ai-common.nix"
+        "overlays/lib.nix"
+        "packages/kiro-cli/lib/mkKiro.nix"
+      ];
+      sources = [
+        {
+          location = "package";
+          name = "settings-shape";
+          dir = "kiro-cli";
+        }
+      ];
+    };
     # kiro-steering: what kiro-cli ACTUALLY does with each steering
     # `inclusion` mode, which is not what the vendor's IDE-oriented docs
     # describe — `manual` is inert in the CLI and a frontmatter fault degrades

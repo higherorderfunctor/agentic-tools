@@ -95,11 +95,56 @@
           inclusion = kiroInclusionOption;
         };
     };
+  # Flatten nested Nix attrsets into dot-notation keys for CLIs that
+  # expect flat JSON (e.g., Kiro's cli.json uses `"chat.enableTangentMode"`
+  # not `{"chat":{"enableTangentMode":...}}`). Supports grouping:
+  #
+  #   { mcp.loadedBefore = true; chat = { enableTangentMode = true; enableCheckpoint = true; }; }
+  #   → { "mcp.loadedBefore" = true; "chat.enableTangentMode" = true; "chat.enableCheckpoint" = true; }
+  #
+  # Leaf values (non-attrset, or attrsets with `_type` like mkOption
+  # results) are kept as-is. Only plain nested attrsets are flattened.
+  #
+  # `terminal` is the list of dotted paths that are complete SETTING KEYS, and
+  # it exists because attrset shape alone cannot say where a key stops and its
+  # value begins. A flat-dotted config format may still have object-valued
+  # settings — kiro's `chat.modelDefaults` maps model ids to records — and
+  # without a boundary the walk descends straight through the key and emits
+  # `chat.modelDefaults.<model>.<field>`, which the CLI never matches. Recursion
+  # stops as soon as the accumulated path is in `terminal`, so the rest of the
+  # value survives as JSON.
+  #
+  # Pass `[]` (what the `flattenDotKeys` alias does) for the historical
+  # flatten-everything behavior. The boundary list belongs to whichever runtime
+  # owns the format, and is extracted from its binary rather than curated —
+  # see `settingKeys` in overlays/kiro-cli-extracted.json.
+  flattenDotKeysUntil = terminal: let
+    go = prefix: attrs:
+      lib.foldlAttrs (acc: name: value: let
+        key =
+          if prefix == ""
+          then name
+          else "${prefix}.${name}";
+      in
+        if lib.isAttrs value && !(value ? _type) && !(builtins.elem key terminal)
+        then acc // (go key value)
+        else acc // {${key} = value;})
+      {}
+      attrs;
+  in
+    go "";
 in {
   # ── Markdown content records ───────────────────────────────────────
   # Context and rules share one home.file-shaped content record. Keeping paths
   # as `source` data avoids writeText/IFD and preserves direct symlink emission
   # when a single source is not being concatenated with another contribution.
+  # Both names are exported: `flattenDotKeysUntil` for a format that needs a
+  # key boundary (kiro), and the historical `flattenDotKeys` for one that
+  # does not. Defined in the `let` above rather than here, because the
+  # exported attrset is not recursive and the alias must see the function.
+  inherit flattenDotKeysUntil;
+  flattenDotKeys = flattenDotKeysUntil [];
+
   contentModule = mkContentModule {};
   optionalContentModule = mkContentModule {};
   validateOptionalContent = validateContent false;
@@ -348,31 +393,6 @@ in {
       '';
     };
   };
-
-  # Flatten nested Nix attrsets into dot-notation keys for CLIs that
-  # expect flat JSON (e.g., Kiro's cli.json uses `"chat.enableTangentMode"`
-  # not `{"chat":{"enableTangentMode":...}}`). Supports grouping:
-  #
-  #   { mcp.loadedBefore = true; chat = { enableTangentMode = true; enableCheckpoint = true; }; }
-  #   → { "mcp.loadedBefore" = true; "chat.enableTangentMode" = true; "chat.enableCheckpoint" = true; }
-  #
-  # Leaf values (non-attrset, or attrsets with `_type` like mkOption
-  # results) are kept as-is. Only plain nested attrsets are flattened.
-  flattenDotKeys = let
-    go = prefix: attrs:
-      lib.foldlAttrs (acc: name: value: let
-        key =
-          if prefix == ""
-          then name
-          else "${prefix}.${name}";
-      in
-        if lib.isAttrs value && !(value ? _type)
-        then acc // (go key value)
-        else acc // {${key} = value;})
-      {}
-      attrs;
-  in
-    go "";
 
   # Recursively filter null values from an attrset (for typed settings
   # with freeformType where defaults are null). Also removes empty

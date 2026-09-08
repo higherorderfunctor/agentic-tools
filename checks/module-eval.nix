@@ -7900,6 +7900,61 @@ in {
       && builtins.all (a: a.assertion) ev.config.assertions
   );
 
+  # ── flatten boundary: object-valued settings ───────────────────────────────
+  # cli.json is flat dotted keys whose VALUES may be objects, and attrset shape
+  # alone cannot say where the key stops. Before the boundary these emitted
+  # `chat.modelDefaults.claude-opus-5.effort`, which kiro never matches, so the
+  # setting was unusable from Nix on BOTH backends.
+  module-kiro-devenv-object-valued-setting-stays-nested = mkTest "kiro-devenv-object-valued-setting-stays-nested" (
+    let
+      result = evalDevenv {
+        ai.kiro = {
+          enable = true;
+          nativeSettings.chat.modelDefaults."claude-opus-5".effort = "high";
+        };
+      };
+      text = (result.config.files.".kiro/settings/cli.json" or {}).text or "";
+    in
+      lib.hasInfix ''"chat.modelDefaults":{"claude-opus-5":{"effort":"high"}}'' text
+      && !lib.hasInfix "chat.modelDefaults.claude-opus-5" text
+      # It is an allowlisted key, so the workspace guard must stay silent —
+      # otherwise this would pass while the config was still rejected.
+      && builtins.all (a: a.assertion) result.config.assertions
+  );
+
+  # Parity: the HM activation merge carries the same nesting. Both backends
+  # share one `flattenKiroSettings`, and this is what pins that they do.
+  module-kiro-hm-object-valued-setting-stays-nested = mkTest "kiro-hm-object-valued-setting-stays-nested" (
+    let
+      result = evalHm {
+        ai.kiro = {
+          enable = true;
+          nativeSettings.chat.modelDefaults."claude-opus-5".effort = "high";
+        };
+      };
+      text = (result.config.home.activation.kiroSettingsMerge or {}).text or "";
+    in
+      lib.hasInfix ''"chat.modelDefaults":{"claude-opus-5":{"effort":"high"}}'' text
+      && !lib.hasInfix "chat.modelDefaults.claude-opus-5" text
+  );
+
+  # Control: the boundary must stop the walk only AT a known key, never before
+  # it. Without this, a flattener that gave up at depth one would pass both
+  # tests above while writing nested `{"chat":{...}}` that kiro cannot read.
+  module-kiro-scalar-setting-still-flattens = mkTest "kiro-scalar-setting-still-flattens" (
+    let
+      result = evalDevenv {
+        ai.kiro = {
+          enable = true;
+          nativeSettings.chat.enableTangentMode = true;
+        };
+      };
+      text = (result.config.files.".kiro/settings/cli.json" or {}).text or "";
+    in
+      lib.hasInfix ''"chat.enableTangentMode":true'' text
+      && !lib.hasInfix ''"chat":{'' text
+  );
+
   # ── workspace-settings allowlist (devenv only) ─────────────────────────────
   # A global-only key written to the project-local cli.json is read and dropped
   # by kiro with no warning, so the module refuses it instead of emitting a file
@@ -7978,6 +8033,12 @@ in {
       allowlist = extracted.workspaceOverridableSettings;
     in
       builtins.isList allowlist
+      # The flatten boundary rides the same sidecar. `chat.modelDefaults` is the
+      # object-valued key the boundary exists for, so its presence is what makes
+      # the nesting tests above more than a coincidence of the current data.
+      && lib.elem "chat.modelDefaults" extracted.settingKeys
+      && lib.elem "chat.enableWorkflows" extracted.settingKeys
+      && builtins.length extracted.settingKeys >= 20
       && !(lib.elem "chat.enableWorkflows" allowlist)
       && (
         allowlist
@@ -9356,14 +9417,19 @@ in {
       result = evalDevenv {
         ai.kiro = {
           enable = true;
-          nativeSettings.telemetry.enabled = false;
+          # Workspace-overridable on purpose: `telemetry.enabled` used to stand
+          # here, and the workspace-allowlist guard now (correctly) rejects it,
+          # which would leave this exercising a config the module declares
+          # invalid. The subject of the test — that settings reach the file at
+          # all — is unchanged.
+          nativeSettings.chat.enableTangentMode = true;
         };
       };
       settingsFile = result.config.files.".kiro/settings/cli.json" or null;
     in
       settingsFile
       != null
-      && lib.hasInfix "telemetry" (settingsFile.text or "")
+      && lib.hasInfix "chat.enableTangentMode" (settingsFile.text or "")
   );
 
   # Devenv: Kiro context joins the shared repository-root AGENTS.md.

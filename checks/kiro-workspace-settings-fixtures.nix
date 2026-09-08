@@ -34,20 +34,25 @@ in
     python3="${pkgs.python3}/bin/python3"
     printf="${pkgs.coreutils}/bin/printf"
     grep="${pkgs.gnugrep}/bin/grep"
+    jq="${pkgs.jq}/bin/jq"
 
-    # Runs the script and requires it to SUCCEED with exactly the given JSON.
-    expect_json() {
-      local name="$1" want="$2" got=""
-      if ! got=$("$python3" ${script} "./$name" 2>./err); then
+    # Runs the script and requires it to SUCCEED with the given field equal to
+    # the given compact JSON. Comparing one field at a time rather than the
+    # whole object keeps each case's expectation readable and lets a case say
+    # which of the two emitted lists it is actually about.
+    expect_field() {
+      local name="$1" filter="$2" want="$3" got=""
+      if ! "$python3" ${script} "./$name" >./out 2>./err; then
         echo "FAIL [$name]: expected success, got exit failure:" >&2
         cat ./err >&2
         exit 1
       fi
+      got=$("$jq" -c "$filter" ./out)
       if [ "$got" != "$want" ]; then
-        echo "FAIL [$name]: expected $want, got $got" >&2
+        echo "FAIL [$name]: $filter expected $want, got $got" >&2
         exit 1
       fi
-      echo "ok [$name]"
+      echo "ok [$name $filter]"
     }
 
     # Runs the script and requires it to FAIL with a message naming the cause.
@@ -71,8 +76,14 @@ in
     #    back resolved, or the symbolic path is silently dead and the allowlist
     #    is short by exactly the keys nobody notices missing.
     "$printf" '%s' '${registry}${marker}${realSet}' > ./case-happy
-    expect_json case-happy \
-      '["chat.defaultAgent", "chat.defaultModel", "chat.disableAutoCompaction", "chat.enableCheckpoint", "chat.enableCodeIntelligence", "chat.enableDelegate", "chat.enableKnowledge", "chat.enableSubagent", "chat.enableTangentMode", "chat.enableThinking", "chat.enableTodoList", "chat.modelDefaults"]'
+    expect_field case-happy .workspaceOverridableSettings \
+      '["chat.defaultAgent","chat.defaultModel","chat.disableAutoCompaction","chat.enableCheckpoint","chat.enableCodeIntelligence","chat.enableDelegate","chat.enableKnowledge","chat.enableSubagent","chat.enableTangentMode","chat.enableThinking","chat.enableTodoList","chat.modelDefaults"]'
+
+    # 1b. The same scan's OTHER output: the key registry, which is the flatten
+    #     boundary rather than an allowlist. It is emitted even when nothing is
+    #     workspace-overridable, so cases 1b and 3 together show the two fields
+    #     are independent.
+    expect_field case-happy .settingKeys '["chat.defaultModel","chat.modelDefaults"]'
 
     # 2. THE case this design exists for: the merge code is present but the set
     #    cannot be read (here, a nested array member truncates the body). An
@@ -85,7 +96,8 @@ in
     #    would pass case 2 just as well. No merge code means an empty allowlist
     #    is the TRUE answer, and every kiro before 2.21.1 is this case.
     "$printf" '%s' '${registry}nothing here merges anything' > ./case-no-merge
-    expect_json case-no-merge '[]'
+    expect_field case-no-merge .workspaceOverridableSettings '[]'
+    expect_field case-no-merge .settingKeys '["chat.defaultModel","chat.modelDefaults"]'
 
     # 4. Registry gone: the JS payload is not what we think it is, so "no
     #    allowlist" would be a guess rather than a finding.

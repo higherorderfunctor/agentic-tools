@@ -788,20 +788,32 @@
   # is not allowed" and gets its own message below.
   inherit (kiroExtracted) workspaceOverridableSettings;
 
-  # The dotted keys a given config would write, in the flattened form the
-  # settings file actually carries — the same shape `flattenDotKeys` produces in
-  # each backend, so what is checked is what would be written.
+  # The FLATTEN BOUNDARY: every dotted path kiro's binary names as a complete
+  # setting key. Union of the two measured lists, because they cover different
+  # ground — the key registry is all `chat.*`, the workspace allowlist adds
+  # `toolSearch.*`, `compaction.*` and `knowledge.*` — and taking the union is
+  # the policy the sidecar deliberately leaves to its consumer.
   #
-  # Deliberately the WRITTEN key, not the option path, and the two differ for an
-  # object-valued setting: `flattenDotKeys` recurses through every plain
-  # attrset, so `chat.modelDefaults.<model>.<field>` is what lands in the file
-  # rather than `chat.modelDefaults`. Kiro matches the literal key it reads, so
-  # that IS dropped and reporting it is correct — but the cause is the
-  # flattening, not the allowlist, which is why the message says so. (The same
-  # over-flattening reaches the global file under HM; kiro ignores the key there
-  # too. Pre-existing, separate from this guard.)
+  # Without it, cli.json's flat-dotted format has no way to express an
+  # OBJECT-VALUED setting: the walk descends through `chat.modelDefaults` into
+  # the per-model records below it and writes
+  # `chat.modelDefaults.<model>.<field>`, a key kiro never matches. Both
+  # backends were affected; the setting was simply unusable from Nix.
+  kiroSettingKeys = lib.unique (kiroExtracted.settingKeys ++ workspaceOverridableSettings);
+
+  flattenKiroSettings = aiCommon.flattenDotKeysUntil kiroSettingKeys;
+
+  # The dotted keys a given config would write, in the flattened form the
+  # settings file actually carries — the same `flattenKiroSettings` both backends
+  # use, so what is checked is exactly what would be written.
+  #
+  # Deliberately the WRITTEN key, not the option path. The two used to diverge
+  # for an object-valued setting, which made this report `chat.modelDefaults`
+  # as a rejected key when the real fault was the flattener walking past it;
+  # `flattenKiroSettings` stops at a known key, so the written key is now the
+  # setting key and the two agree.
   nativeSettingsDotKeys = cfg:
-    builtins.attrNames (aiCommon.flattenDotKeys (aiCommon.filterNulls cfg.nativeSettings));
+    builtins.attrNames (flattenKiroSettings (aiCommon.filterNulls cfg.nativeSettings));
 
   # devenv-ONLY. Never add this to `mkAssertions`: under Home Manager these same
   # keys are correct, and asserting there would reject a working config.
@@ -845,10 +857,6 @@
             grown is still judged against the pinned one — bump the pin (and
             its sidecar) rather than working around this.
 
-            If a key above looks like an allowlisted one with extra segments
-            (`chat.modelDefaults.<model>...`), the cause is not the allowlist:
-            nested attrsets flatten all the way down, so an object-valued
-            setting cannot currently be expressed through this option at all.
           ''
         );
     };
@@ -1687,7 +1695,7 @@ in
         # Kiro cli.json uses flat dot-notation keys ("chat.enableTangentMode")
         # not nested JSON. Flatten so consumers can write clean Nix:
         #   settings.chat.enableTangentMode = true;
-        flatSettings = aiCommon.flattenDotKeys filteredSettings;
+        flatSettings = flattenKiroSettings filteredSettings;
 
         # Resolve credential http headers → `${env:VAR}` placeholders in
         # mcp.json + the runtime secret-env exports (Kiro-only delivery).
@@ -1888,7 +1896,7 @@ in
         hookEntries = mkHookEntries cfg;
 
         filteredSettings = aiCommon.filterNulls cfg.nativeSettings;
-        flatSettings = aiCommon.flattenDotKeys filteredSettings;
+        flatSettings = flattenKiroSettings filteredSettings;
 
         # Resolve credential http headers → `${env:VAR}` placeholders in
         # mcp.json + the runtime secret-env exports (Kiro-only delivery).

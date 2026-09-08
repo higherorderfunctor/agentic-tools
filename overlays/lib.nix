@@ -784,8 +784,8 @@ rec {
   #   * more than one candidate set (ambiguous; the extract describes one);
   #   * a member that resolves to nothing or to two different keys (a PARTIAL
   #     allowlist is worse than none — it would reject valid keys).
-  kiroWorkspaceSettingsExtractScript = pkgs:
-    pkgs.writeText "kiro-workspace-settings-extract.py" ''
+  kiroSettingsExtractScript = pkgs:
+    pkgs.writeText "kiro-settings-extract.py" ''
       import json, mmap, re, sys
 
       # `[^\]]` bounds the body at the first `]`, so the match cannot run away
@@ -906,7 +906,27 @@ rec {
               "member shape changed." % len(keys)
           )
 
-      json.dump(sorted(keys), sys.stdout)
+      # `settingKeys` is every key the bundle's own registry names, and it is
+      # emitted for a different consumer than the allowlist: it is the FLATTEN
+      # BOUNDARY. Kiro's cli.json is flat dotted keys whose VALUES may be
+      # objects, and nothing in the shape of a Nix attrset says where the key
+      # stops and the value begins. `chat.modelDefaults` is a key whose value is
+      # an object of per-model records; without this list the module flattens
+      # straight through it and writes `chat.modelDefaults.<model>.<field>`,
+      # which kiro does not match. Knowing the key lets the flattener stop
+      # there.
+      #
+      # Registry-only, deliberately NOT merged with the allowlist here. The
+      # sidecar reports what each probe measured; combining two measurements
+      # into one field is a policy decision and belongs at the consumer, where
+      # it can be read.
+      json.dump(
+          {
+              "settingKeys": sorted({v for vals in symbols.values() for v in vals}),
+              "workspaceOverridableSettings": sorted(keys),
+          },
+          sys.stdout,
+      )
     '';
 
   mkKiroExtract = {
@@ -973,12 +993,15 @@ rec {
     # Appended rather than slotted in alphabetically: the field order here is
     # the sidecar's on-disk order, and reordering it would churn the committed
     # JSON for every reader without telling anyone anything.
-    workspaceOverridableSettingsJson=$("$python3" ${kiroWorkspaceSettingsExtractScript pkgs} "$kiroChatBin")
+    # ONE scan for both settings fields: they share the key registry, and a
+    # second pass over a ~800 MB binary to re-derive the same regex would be
+    # both slower and a second place for that regex to drift.
+    settingsJson=$("$python3" ${kiroSettingsExtractScript pkgs} "$kiroChatBin")
 
     "$jq" -n --argjson hookTriggers "$hookTriggersJson" --argjson documentedAbsent "$documentedAbsentJson" \
       --argjson rolloutFeatures "$rolloutFeaturesJson" \
-      --argjson workspaceOverridableSettings "$workspaceOverridableSettingsJson" \
-      '{hookTriggers: $hookTriggers, documentedAbsent: $documentedAbsent, rolloutFeatures: $rolloutFeatures, workspaceOverridableSettings: $workspaceOverridableSettings}' > "${dest}"
+      --argjson settings "$settingsJson" \
+      '{hookTriggers: $hookTriggers, documentedAbsent: $documentedAbsent, rolloutFeatures: $rolloutFeatures, settingKeys: $settings.settingKeys, workspaceOverridableSettings: $settings.workspaceOverridableSettings}' > "${dest}"
   '';
 
   # Same-LENGTH in-place rewrite of a rollout-manifest entry, flipping it to
