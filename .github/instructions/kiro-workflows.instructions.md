@@ -116,9 +116,9 @@ DECLARATION is shared, which is where parity actually lives.
 ### The allowlist is extracted, and an empty result is a real answer
 
 `overlays/kiro-cli-extracted.json` carries `workspaceOverridableSettings`,
-produced by `kiroWorkspaceSettingsExtractScript` in `overlays/lib.nix`. It is
-extracted rather than curated for the same reason `rolloutFeatures` is: the set
-IS the contract.
+produced by `kiroSettingsExtractScript` in `overlays/lib.nix`. It is extracted
+rather than curated for the same reason `rolloutFeatures` is: the set IS the
+contract.
 
 Unlike the rollout extractor, **absence is not fatal here**, and that is
 deliberate. Every release before 2.21.1 genuinely honors no workspace override,

@@ -8,7 +8,7 @@
 # binary, on the happy path; it cannot fail on a shape that binary does not
 # have, which is precisely where the guards live.
 #
-# So each case below drives the REAL script — `vu.kiroWorkspaceSettingsExtract`,
+# So each case below drives the REAL script — `vu.kiroSettingsExtractScript`,
 # not a copy — over a synthesized input, and states what it proves. Synthesized
 # rather than committed, because the alternative is checking ~800 MB of
 # proprietary ELF into the tree to test a regex.
@@ -18,7 +18,7 @@
 # has one and we could not read it".
 {pkgs, ...}: let
   vu = import ../overlays/lib.nix;
-  script = vu.kiroWorkspaceSettingsExtractScript pkgs;
+  script = vu.kiroSettingsExtractScript pkgs;
   # The registry pair every case needs: the script refuses to conclude anything
   # without it, so its absence is case 4 rather than a property of the others.
   registry = ''CHAT_DEFAULT_MODEL:"chat.defaultModel",CHAT_MODEL_DEFAULTS:"chat.modelDefaults",'';
