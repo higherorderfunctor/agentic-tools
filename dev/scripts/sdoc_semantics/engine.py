@@ -1063,6 +1063,30 @@ def _write(subject: MutableMapping[str, Any], write: Mapping[str, Any]) -> None:
         subject["fields"] = fields
 
 
+def _provenance(
+    subject: str,
+    *,
+    transition: str | None = None,
+    event: str | None = None,
+    emitter: str | None = None,
+    gates: Iterable[str] = (),
+    rule: str | None = None,
+    verdict: str = "taken",
+    operation: str | None = None,
+) -> dict[str, Any]:
+    """Every step has the same keys; gate is always a list of gate names."""
+    return {
+        "subject": subject,
+        "transition": transition,
+        "event": event,
+        "emitter": emitter,
+        "gate": list(gates),
+        "rule": rule,
+        "verdict": verdict,
+        "operation": operation,
+    }
+
+
 class Interpreter:
     """A validated model bound to an optional grammar and a termination bound."""
 
@@ -1114,15 +1138,11 @@ class Interpreter:
             gate = self._gates[gate_name]
             if not evaluate(gate["predicate"], subject, staged, actor, self.model):
                 log.append(
-                    {
-                        "subject": subject["uid"],
-                        "transition": reference,
-                        "event": event,
-                        "emitter": emitter,
-                        "gate": gate_name,
-                        "rule": transition.get("rule_text") or None,
-                        "verdict": "refused",
-                    }
+                    _provenance(
+                        subject["uid"], transition=reference, event=event,
+                        emitter=emitter, gates=[gate_name],
+                        rule=transition.get("rule_text") or None, verdict="refused",
+                    )
                 )
                 return False, gate_name
         field = lifecycle["subject"]["field"]
@@ -1130,15 +1150,11 @@ class Interpreter:
         for write in transition.get("writes", []):
             _write(subject, write)
         log.append(
-            {
-                "subject": subject["uid"],
-                "transition": reference,
-                "event": event,
-                "emitter": emitter,
-                "gate": list(transition.get("gates", [])) or None,
-                "rule": transition.get("rule_text") or None,
-                "verdict": "taken",
-            }
+            _provenance(
+                subject["uid"], transition=reference, event=event,
+                emitter=emitter, gates=transition.get("gates", []),
+                rule=transition.get("rule_text") or None,
+            )
         )
         return True, None
 
@@ -1194,16 +1210,7 @@ class Interpreter:
             for write in operation.get("writes", []):
                 _write(subject, write)
             log.append(
-                {
-                    "subject": subject["uid"],
-                    "transition": None,
-                    "event": None,
-                    "emitter": None,
-                    "gate": None,
-                    "rule": None,
-                    "verdict": "taken",
-                    "operation": command_name,
-                }
+                _provenance(subject["uid"], operation=command_name)
             )
             queued.extend(
                 (event, str(subject["uid"]))
