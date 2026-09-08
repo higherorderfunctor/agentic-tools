@@ -1017,19 +1017,28 @@ def _matches_subject(node: Mapping[str, Any], subject: Mapping[str, Any]) -> boo
     return subject["field"] in node.get("fields", {})
 
 
+class _EdgeSubject(dict):
+    """A subject view with a stable identity; only writes reach the staged edge."""
+
+    def __init__(self, edge: MutableMapping[str, Any], uid: str) -> None:
+        super().__init__({**edge, "uid": uid})
+        self.edge = edge
+
+
 def _matching_subjects(
     graph: Mapping[str, Any], subject: Mapping[str, Any]
 ) -> list[MutableMapping[str, Any]]:
     if subject["kind"] == "role":
-        rows = [
-            edge for edge in _edges(graph) if edge.get("role") == subject["role"]
-        ]
-        for index, edge in enumerate(rows):
-            edge.setdefault(
-                "uid",
-                f"{edge.get('source')}:{subject['role']}:{edge.get('target')}:{index}",
-            )
-            edge.setdefault("fields", {})
+        rows = []
+        seen = set()
+        for edge in _edges(graph):
+            if edge.get("role") != subject["role"]:
+                continue
+            uid = f"{edge.get('source')}:{subject['role']}:{edge.get('target')}"
+            if uid in seen:
+                raise ModelError(f"duplicate edge subject {uid!r}")
+            seen.add(uid)
+            rows.append(_EdgeSubject(edge, uid))
         return sorted(rows, key=lambda row: str(row["uid"]))
     return sorted(
         (
@@ -1057,7 +1066,11 @@ def _subject_by_uid(
 
 
 def _write(subject: MutableMapping[str, Any], write: Mapping[str, Any]) -> None:
-    subject.setdefault("fields", {})[write["field"]] = write.get("value")
+    target = subject.edge if isinstance(subject, _EdgeSubject) else subject
+    fields = target.setdefault("fields", {})
+    fields[write["field"]] = write.get("value")
+    if isinstance(subject, _EdgeSubject):
+        subject["fields"] = fields
 
 
 class Interpreter:
@@ -1121,7 +1134,7 @@ class Interpreter:
                 )
                 return False, gate_name
         field = lifecycle["subject"]["field"]
-        subject.setdefault("fields", {})[field] = transition["to"]
+        _write(subject, {"field": field, "value": transition["to"]})
         for write in transition.get("writes", []):
             _write(subject, write)
         log.append(
@@ -1170,6 +1183,12 @@ class Interpreter:
             )
 
         staged = copy.deepcopy(graph)
+        try:
+            for declaration in (*self.model["lifecycles"], *operations.values()):
+                if declaration["subject"]["kind"] == "role":
+                    _matching_subjects(staged, declaration["subject"])
+        except ModelError as error:
+            return FireResult("refused", (), str(error), "subject")
 
         log: list[dict[str, Any]] = []
         queued: deque[tuple[str, str]] = deque()

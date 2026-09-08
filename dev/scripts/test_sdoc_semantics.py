@@ -667,6 +667,36 @@ def test_ripple_bound() -> None:
     assert data == before
 
 
+@contract("edge subjects have stable keys and mutate only the selected staged edge")
+def test_edge_subjects() -> None:
+    from sdoc_semantics.engine import _matching_subjects
+
+    model = fixture_model()
+    subject = {"kind": "role", "role": "Assumes", "field": "F"}
+    model["lifecycles"][0]["subject"] = subject
+    chosen = {"role": "Assumes", "source": "A", "target": "B", "fields": {"F": "a"}}
+    untouched = {"role": "Assumes", "source": "X", "target": "Y"}
+    data = graph(edges=[copy.deepcopy(chosen), copy.deepcopy(untouched)])
+    before = copy.deepcopy(data)
+    keys = [row["uid"] for row in _matching_subjects(data, subject)]
+    assert data == before and keys == ["A:Assumes:B", "X:Assumes:Y"]
+    inserted = {"role": "Assumes", "source": "0", "target": "1"}
+    data["edges"].insert(0, inserted)
+    assert [row["uid"] for row in _matching_subjects(data, subject)] == [
+        "0:Assumes:1", *keys,
+    ]
+    result = Interpreter(model).fire(data, {"name": "move", "subject": keys[0]}, "human")
+    assert result.taken and result.log[0]["subject"] == keys[0]
+    assert data["edges"][1] == {**chosen, "fields": {"F": "b"}}
+    assert data["edges"][0] == inserted and data["edges"][2] == untouched
+    assert all("uid" not in edge for edge in data["edges"])
+    data["edges"].append(copy.deepcopy(data["edges"][1]))
+    before = copy.deepcopy(data)
+    refused = Interpreter(model).fire(data, {"name": "move", "subject": keys[0]}, "human")
+    assert refused.refused_by == "subject" and "duplicate edge subject" in refused.reason
+    assert data == before
+
+
 @contract("relation contracts report role endpoint and cycle violations")
 def test_relation_contracts() -> None:
     model = empty_model()
