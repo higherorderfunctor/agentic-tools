@@ -41,7 +41,7 @@ environment.
 - strictdocGrammarExtract: 1,020,635,152 bytes before
   (/nix/store/i4irxk8h3057261bw5nr6w3pvznli4lp-strictdoc-grammar-extract-0.1.0),
   928,235,704 bytes after
-  (/nix/store/k90nymxmi1v5i4d63gpg9cpp4dabvkw4-strictdoc-grammar-extract-0.1.0):
+  (/nix/store/8lvip18cn9b1v8w8jrlij1y183bl9k76-strictdoc-grammar-extract-0.1.0):
   -92,399,448 bytes (-88.12 MiB).
 
 Each number is `nix path-info -S` on the named realized path. Recursive path
@@ -49,6 +49,11 @@ inspection finds neither transitions nor pygraphviz in either after closure;
 `nix why-depends` against both former store paths reports no dependency. The
 daemon and board were taken down and brought up on the new environment; the
 board again serves sdoc-semantics/2 without its unavailable marker.
+
+Follow-up 2026-09-08: the after path above now names the measured wrapper
+with the install-check input restricted to sdoc_semantics; tests and
+__pycache__ directories and all unrelated dev scripts are excluded. Later
+interpreter edits can change the store path without changing its closure size.
 <<<
 RELATIONS:
 - TYPE: Parent
