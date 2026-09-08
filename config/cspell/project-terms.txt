@@ -407,6 +407,7 @@ statix
 stdenv
 stopword
 streamable
+strictdoc
 strs
 subdirs
 subkeys
