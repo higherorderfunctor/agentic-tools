@@ -591,6 +591,61 @@ def test_subject_validation() -> None:
         raise AssertionError("malformed sees token loaded")
 
 
+@contract("relation predicates reject second hops and invalid directions at load")
+def test_predicate_traversal_limits() -> None:
+    leaf = {"op": "field_is", "field": "F", "value": "a"}
+    for outer in ("all_related", "any_related"):
+        predicate = {"op": outer, "role": "Assumes", "empty": "fail", "predicate": leaf}
+        model = fixture_model(gate={"name": "g", "sees": [], "predicate": predicate})
+        validate_model(model)
+        for inner in ("all_related", "any_related", "has_relation"):
+            child = {"op": inner, "role": "Assumes"}
+            if inner != "has_relation":
+                child.update(empty="fail", predicate=leaf)
+            predicate["predicate"] = {"op": "not", "predicate": {"op": "and", "predicates": [child]}}
+            try:
+                validate_model(model)
+            except ModelError as error:
+                assert "one hop" in str(error)
+            else:
+                raise AssertionError("second relation hop loaded")
+        predicate["predicate"] = leaf
+        predicate["direction"] = "sideways"
+        try:
+            validate_model(model)
+        except ModelError as error:
+            assert "known directions: in, out, either" in str(error)
+        else:
+            raise AssertionError("invalid relation direction loaded")
+    model = fixture_model(gate={"name": "g", "sees": [], "predicate": {
+        "op": "has_relation", "role": "Assumes", "direction": "either",
+    }})
+    validate_model(model)
+    model["gates"][0]["predicate"]["direction"] = "sideways"
+    try:
+        validate_model(model)
+    except ModelError as error:
+        assert "known directions" in str(error)
+    else:
+        raise AssertionError("invalid has_relation direction loaded")
+
+
+@contract("relation contract propagation must be a list")
+def test_propagates_type() -> None:
+    model = empty_model()
+    row = {"role": "Assumes", "from_types": [], "to_types": [], "admits_cycles": False, "propagates": []}
+    model["relation_contracts"] = [row]
+    validate_model(model)
+    for invalid in (False, "all", None, {}):
+        row["propagates"] = invalid
+        try:
+            validate_model(model)
+        except ModelError as error:
+            assert "propagates must be a list" in str(error)
+        else:
+            raise AssertionError("non-list propagation loaded")
+
+
 @contract("a refused gate leaves the graph byte-for-byte unchanged")
 def test_transaction_refusal() -> None:
     gate = {
