@@ -31,5 +31,6 @@
       "filename": ["**/*.md", "**/*.mjs", "**/*.nix", "**/*.py", "**/*.sh"]
     }
   ],
-  "version": "0.2"
+  "version": "0.2",
+  "words": ["relitigate"]
 }

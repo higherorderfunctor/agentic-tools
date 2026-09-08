@@ -1,11 +1,9 @@
 ## ai.\* Dir Helpers
 
-> **Last verified:** 2026-08-15 (commit pending — directory-generated
-> per-runtime entries now replace or null-suppress same-key root entries under
-> the normalized keyed-pool contract). Prior: 2026-04-21 (commit pending —
-> refactor of ai-factory-collision plan §4 / commits 4–7). If you add a new
-> `*FromDir` helper or change the polymorphic input shape or the filter
-> signature and this fragment isn't updated in the same commit, stop and fix it.
+> **Last verified:** 2026-08-15 — directory-generated per-runtime entries
+> replace or null-suppress same-key root entries under the normalized keyed-pool
+> contract; see "Consumer patterns" below. Full lineage:
+> `git show bfb6b663:dev/fragments/ai-module/dir-helpers.md`.
 
 ### The helpers
 

@@ -43,10 +43,10 @@ bubblewrap
 bunfs
 bunmap
 bunsh
-bypassable
 bununpack
 burndown
 bwrap
+bypassable
 cachix
 caddy
 caddyfile
@@ -350,6 +350,7 @@ reflog
 reftable
 regen
 reimplementation
+relitigate
 relpath
 remapper
 reparent

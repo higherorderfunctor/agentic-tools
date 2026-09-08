@@ -1,73 +1,13 @@
 # Diagnostic-lean devenv closure taxonomy
 
-> **Last verified:** 2026-09-02 (commit pending — the factory-CLI-wrapper bucket
-> gained two unconditional members. `claude-code` was always meant to be here
-> and never installed at all on devenv; `kimchi` is newly enabled and adds 118.3
-> MiB (124,037,485 bytes) of NEW store to every shell, CI included. Both are
-> accepted at full weight: the bucket's treatment is unchanged, and `!isCI` is
-> NOT available to shrink them — see the decision rule, which forbids that
-> branch for anything a guard depends on). Prior: 2026-08-31 (commit pending —
-> full-corpus validation moved out of the activation task graph and into
-> enterTest after shell setup; normal shell entry now performs activation setup
-> without full-corpus scans). Prior: 2026-08-30 (the Home Manager layer has
-> migrated to named permissions, while this repository temporarily selects
-> `danger-full-access`; the obsolete workspace-write roots and diagnostic
-> assertions are gone). Prior: 2026-08-29 (`devenv test` is now an on-demand
-> diagnostic instead of an automatic PR/push workflow. Deterministic
-> instruction-copy, shared-hook-isolation, and validation-projection contracts
-> moved under `nix flake check`; `$CI` no longer removes validation hooks).
-> Prior: 2026-08-17 (commit pending — the staged Codex named-profile migration
-> now receives the canonical Git common directory automatically, including from
-> linked worktrees, while this repository's still-legacy config retains its
-> existing `.git` workspace root until the separate migration). Prior:
-> 2026-08-17 (commit pending — enabled treefmt now contributes its effective
-> cache through the same permission-model-aware Codex root pool; enterTest
-> expects five local roots and four in CI). Prior: 2026-08-17 (commit pending —
-> named Codex permission tables are enabled at the module boundary, but this
-> repository deliberately remains on legacy workspace-write until its Home
-> Manager user layer migrates first; Codex does not compose the two models
-> across config layers). Prior: 2026-08-15 (commit pending — the
-> interactive-only Semble gate moved unchanged to
-> `ai.codex.programs.semble.enable`; grammar and path customization now follow
-> the same generated runtime program tree). Prior: 2026-08-14 (commit pending —
-> the local shell now enables the flake-pinned Semble module with AWK and jq
-> parsers plus repository path mappings, while the `!isCI` gate keeps the CI
-> devenv-test closure unchanged). Prior: 2026-08-12 (commit pending — the job
-> now carries always-on telemetry for issue #821's intermittent local-source
-> store-path failure. The closure taxonomy below is untouched: nothing was added
-> to the shell, and the cache key, prefix fallback and `gc-max-store-size-linux`
-> bound are all unchanged. The new section at the end records only the ONE fact
-> about that telemetry that is invisible from the code — the cache step now
-> carries `id: nix-cache` because a later step reads its restore outputs. Every
-> other rationale is commented at its own site in `devenv-test.yml` and is
-> deliberately NOT restated here; a fragment that duplicates a comment is a
-> second copy to keep true). Prior: 2026-08-05 (commit pending — the repo-aware
-> Codex wrapper and the `nix-agentic-tools` permission profile are both DELETED;
-> this shell converges on the legacy `workspace-write` sandbox that every other
-> repository the maintainer runs already uses, and the beta permission model is
-> locked out at the factory. Two measured facts drove it, both from
-> `codex sandbox` on 0.146.1 with no model in the loop: the profile denied
-> `~/.cache/nix` while the identical grant was live everywhere else, and it
-> ALLOWED the primary checkout's working tree, which is the opposite of what its
-> own comment claimed). Prior: 2026-08-05 (commit pending — records that
-> `devenv-test` remains always-reporting but is no longer required by branch
-> protection; the path-filter constraint is therefore optional rather than
-> load-bearing). Prior: 2026-08-03 (commit pending — makes `devenv-test` an
-> always-reporting required context while preserving the cold closure only for
-> relevant paths). Prior: 2026-08-03 (commit pending — updates the
-> consumer-export taxonomy after dev tools move beneath `pkgs.ai.devTools`;
-> shell membership is unchanged). Prior: 2026-08-02 (commit pending — the repo's
-> beta Codex permission profile explicitly grants the user-global Semble cache
-> because beta profiles do not compose with the legacy user sandbox table).
-> Prior: 2026-08-02 (commit pending — the repo-aware Codex wrapper now
-> distinguishes runtime commands from administrative commands before injecting
-> the worktree root and named profile; an argv-probe build lets enterTest verify
-> runtime injection (including `apply` and `exec-server`) and doctor
-> pass-through exactly). Prior: 2026-08-02 (PR #698 — introduced the wrapper and
-> verified PATH precedence plus explicit-flag idempotence). Prior: 2026-07-22
-> (PR #439). If you change what `devenv.nix` puts in the shell, which factories
-> install CLI wrappers, or the `devenv-test.yml` cache wiring, re-verify this
-> and bump the marker.
+> **Last verified:** 2026-09-02 — the factory-CLI-wrapper bucket now includes
+> `claude-code` (always meant to ride here, but until now installed on neither
+> backend) and `kimchi` (newly enabled, adding roughly 118 MiB of new store to
+> every shell). Both are accepted at full weight; `!isCI` cannot shrink them,
+> since the decision rule below forbids that branch for anything a guard depends
+> on.
+>
+> Full lineage: `git show d1c28a21:dev/fragments/devenv/ci-lean-closure.md`.
 
 The Devenv Diagnostic workflow (`.github/workflows/devenv-test.yml`) runs only
 on `workflow_dispatch`. Its cold interactive shell closure is therefore an

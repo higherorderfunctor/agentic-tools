@@ -1,88 +1,20 @@
 # kiro-cli wrapper: the argv contract
 
-> **Last verified:** 2026-08-16 (commit pending — Linux `trustedMcpTools` now
-> wraps the payload inside nixpkgs' FHS package, restoring launcher-dispatched
-> devenv grants without moving environment or secret exports across the
-> boundary. `useFhsSandbox = false` explicitly selects that same unwrapped
-> payload). Prior: 2026-08-16 (commit pending — nixpkgs 9ddfd8a replaced the
-> three per-command FHS environments with one shared environment behind thin
-> command wrappers. The extra layer changes structural traversal but not this
-> repo's argv or environment contract; launcher-mediated sessions still skip the
-> outer configured chat wrapper inside the synthesized root). Prior: 2026-08-15
-> (commit pending — Kiro-specific environment variables may now null-suppress
-> same-key root defaults before wrapper construction; this does not change argv
-> ordering). Prior: 2026-08-14 (commit pending — the launcher now prepends
-> `ai.kiro.extraPackages` to PATH in both wrapper entry points while preserving
-> the ambient or explicitly configured base; this changes environment only,
-> never argv. Also corrects the older pre-split claim that current Linux
-> launcher dispatch traverses the outer chat wrapper). Prior: 2026-08-11 (commit
-> pending — the sandbox's effect on PATH resolution is no longer unverified, so
-> the prior entry's "treat it as unverified there" is retired: PATH is
-> **preserved** inside, and a decoy still resolves provided it sits outside a
-> shadowed directory and can load its libraries. The bind rule, the shadowed
-> set, the silent-substitution hazard and the loader trap are their own concern
-> and now live in [`fhs-sandbox.md`](fhs-sandbox.md); this document stays about
-> argv). Prior: 2026-08-10 (commit pending — records that on a post-split
-> nixpkgs (f13ff45a and later) Linux gains a THIRD layer below the two wrappers
-> here: `pkgs.ai.kiro-cli` is a `symlinkJoin` of `buildFHSEnv` sandboxes and
-> `$out/bin/*` are bubblewrap launchers, not our wrapProgram shims. The argv
-> contract itself is unchanged — flags still pass through — but the Linux
-> PATH-resolution measurement below was taken on the pre-split layout and has
-> NOT been re-run inside the sandbox, so treat it as unverified there rather
-> than as known-good. Darwin is untouched: upstream hands back the unwrapped
-> derivation and no FHS layer exists). Prior: 2026-08-05 (commit pending — the
-> wrapper now also exports `KIRO_KAS_SERVER_PATH` when `ai.kiro.identity` is
-> set, which is the first thing it injects that is NOT argv and the first that
-> can fail without aborting the launch. Recorded because the two existing
-> injections are both argv and both infallible, so "what the wrapper does" no
-> longer means "what flags it adds"). Prior: 2026-08-04 (commit pending — the
-> PATH-resolution claim below is now **Linux-scoped**, and treating it as
-> general is what made the darwin workflows outage expensive: on darwin the
-> launcher locates `kiro-cli-chat` by argv[0]-relative `.app` BUNDLE DISCOVERY
-> and never consults PATH — a decoy first on PATH is never invoked there, while
-> the same decoy IS invoked on Linux. wrapProgram's `--inherit-argv0` therefore
-> broke discovery and every session silently fell back to the DMG's unpatched
-> `~/.local/bin/kiro-cli-chat`. Fixed in `overlays/kiro-cli.nix` with a
-> darwin-only trailing `--argv0` naming the bundle path — measured working on
-> hardware, including the trap that a SYMLINK to the .app binary still fails
-> because argv[0] is not canonicalized. Also records the standing decision that
-> the two-wrapper composition does not exist on darwin. If you touch
-> `overlays/kiro-cli.nix`'s wrapProgram calls, update this too). Prior:
-> 2026-08-01 (the `ai.kiro.tui` option is REMOVED, so nothing here injects
-> `--tui` any more; `--tui` selects the new TUI harness for the OLD engine and
-> v3 already uses it. Also corrects the chat binary's clap default, which is
-> **v1** on 2.16.0 and not the `v2` this page asserted: measured via
-> `kiro-cli-chat chat --tui` failing with
-> `--tui cannot be used with --agent-engine=v1`. That also shows the old
-> `tui`-implies-`v3` behavior was load-bearing rather than decorative — bare
-> `--tui` never worked). Prior: 2026-07-31 against kiro-cli **2.16.0** (commit
-> pending — qualifies the "grep the JS, not the ELF" rule, which was true for
-> POLICY but false for feature GATING and nearly shipped a wrong answer: the
-> rollout manifest lives in the ELF, the rust binary OVERWRITES
-> `KIRO_ENABLED_FEATURES` before spawning bun, and the manifest's own "enable
-> locally through KIRO_ENABLED_FEATURES" line is stale. Adds
-> `ai.kiro.unlockedRolloutFeatures`. Prior: 2026-07-30 against **2.15.2** — adds
-> the measured launcher FORWARDING TABLE: it injects `chat` on a bare launch,
-> skips `--agent`'s value, strips `--`, rewrites `settings all` to
-> `settings list`, and keeps `whoami` in-process. Corrects the `--v3` rewrite to
-> its real TWO-TOKEN form `--agent-engine v3`; the `--agent-engine=v3` in the
-> error text is clap's diagnostic formatting, not the argv. Prior: records that
-> the launcher resolves `kiro-cli-chat` through PATH, so the two wrappers
-> COMPOSE, and that `--trust-tools` therefore has to be withheld from `acp`
-> under v3. Prior: first revision). If you touch `lib/idempotentFlags.nix`,
-> `packages/kiro-cli/lib/wrapPackage.nix`, or bump the kiro-cli version and this
-> fragment isn't updated in the same commit, stop and fix it.
+> **Last verified:** 2026-08-16 — Linux `trustedMcpTools` now wraps the payload
+> inside nixpkgs' FHS package, restoring launcher-dispatched devenv grants
+> without moving environment or secret exports across the boundary;
+> `useFhsSandbox = false` explicitly selects that same unwrapped payload.
 >
-> **How much to trust a line here.** The argv/parse claims are measured against
-> 2.15.2 and re-measurable with the recipe at the end. Claims about the v3
-> bundle and about this repo's Nix are sourced to the file they came from. An
-> earlier revision opened with a blanket "every claim below is a MEASURED parse
-> result", and that sentence is exactly what let four wrong claims ship
-> unqualified — an audit refuted the `--tui` inertness mechanism, the "on
-> `chat`, v3 accepts all five" claim, the `tui.js` `--trust-tools` auto-answer,
-> and a probe-script reference to files that do not exist. Re-measure, don't
-> reason, and prefer a probe that reaches the check you care about (see the
-> input-must-be-supplied trap below).
+> **Settled — do not relitigate.** Full lineage:
+> `git show 0057d8ed:packages/kiro-cli/docs/launcher-argv.md`.
+>
+> - A blanket "every claim below is a MEASURED parse result" framing once
+>   shipped four wrong claims unqualified: an audit refuted the `--tui`
+>   inertness mechanism, the "on `chat`, v3 accepts all five" claim, the
+>   `tui.js` `--trust-tools` auto-answer, and a probe-script reference to files
+>   that do not exist. Source each claim individually — measured vs.
+>   sourced-to-file — and re-measure rather than reason; do not trust a blanket
+>   claim of "measured" again.
 
 ## The one thing to know
 

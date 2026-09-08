@@ -1,54 +1,12 @@
 ## CI Update Workflow
 
-> **Last verified:** 2026-08-29 (commit pending — update PRs no longer trigger
-> the costly, non-required devenv workflow; its deterministic contracts moved
-> into the required flake-check path and the full diagnostic is manual). Prior:
-> 2026-08-25 (commit pending — `overlays/claude-code-extracted.json` now carries
-> the binary's whole settings schema and is ~3.2k lines, so the `update-pkg.sh`
-> formatter pass over a bot-regenerated sidecar went from a cosmetic array
-> reflow to something `checks.formatting` will actually fail on). Prior:
-> 2026-08-14 (commit pending — the required-context count was stale in BOTH
-> places it appeared here: there are SIX, not four, because both `kiro-patched`
-> contexts were promoted 2026-08-13 with PR #895. Found while landing PR #946;
-> `.github/workflows/update.yml` disagreed a third way, saying "five" and naming
-> the demoted `devenv-test` inside the safety rationale for unattended
-> auto-merge. Three surfaces, three different wrong answers, none of them
-> checked against the ruleset — so this entry records the query rather than just
-> the number). Prior: 2026-08-05 (commit pending — `devenv-test` still reports
-> on update PRs but is no longer one of the required status contexts). Prior:
-> 2026-08-03 (commit pending — removes package targets' scheduling-only
-> nixpkgs/nix-update predecessors and the ineffective base-checkout format/build
-> finalizer). Prior: 2026-08-03 (commit pending — makes the hidden update report
-> artifact upload real and fails loudly when the report is absent). Prior:
-> 2026-08-03 (commit pending — records `devenv-test` as an always-reporting
-> fifth merge gate and corrects the auto-merge thread rule). Prior: 2026-08-03
-> (commit pending — updates the pnpm detector's documented lookup after all
-> package groups move under `pkgs.ai`). Prior: 2026-08-01 (commit pending —
-> Phase 2 now runs on `if: always()` so a timed-out sweep SHIPS what it finished
-> instead of discarding it, and the `ninja-completed.flag` sentinel is re-gated
-> on `steps.ninja.outcome` so a partial sweep can never let the close step
-> delete the PRs it did not reach. Measured on run 30713330569: 47 of 52 edges
-> done, step `skipped`, everything thrown away). Prior: 2026-08-01 — documents
-> the SECOND `extraExtract` self-heal, `vu.mkExtractRegen`, alongside the hash
-> one: which failure it answers, that a red drift check reports a broken
-> MECHANISM rather than a stale file, why extracts get no
-> `fix_sidecar_hashes`-style standalone hatch, and how to tell "never wired"
-> from "ran and failed". glab had no hook at all, which stayed invisible from
-> #560 until PR #621). Prior: 2026-07-27 — adds the three-valued
-> `git diff --quiet` rule and the `git_diff_quiet` helper every dirtiness gate
-> in the update scripts now goes through; the bare form had routed a git ERROR
-> into "there are changes" in `update-input.sh` and into "the tree is dirty" at
-> both of `update-pkg.sh`'s gates. Earlier: the
-> `Detect a newer @aihubmix/mcp on npm` annotation step and the
-> excluded-because-a-local-patch-cannot-be-swept rule behind it, which is about
-> SWEEPABILITY and not about lagging: aihubmix-mcp tracks `dist-tags.latest` and
-> is still excluded. Earlier: the `NAT_UPDATE_JOBS` evaluator budget that killed
-> run 30181958460, the `verify_all_packages` single-definition build gate and
-> the `fix_sidecar_hashes` repair-on-failure retry, and the non-blocking
-> annotation-step family plus the new-pnpm-major raise). If you touch
-> `.github/workflows/update.yml`, `dev/scripts/update-common.sh`,
-> `dev/scripts/update-input.sh`, `dev/scripts/update-pkg.sh`, or the PR creation
-> logic, and this fragment isn't updated in the same commit, stop and fix it.
+> **Last verified:** 2026-08-29 — update PRs no longer trigger the costly,
+> non-required Devenv Diagnostic; its deterministic contracts run inside the
+> required `test` context instead, and the full diagnostic stays
+> `workflow_dispatch`-only.
+>
+> Full lineage:
+> `git show ff610ca0:dev/fragments/pipeline/ci-update-workflow.md`.
 
 ### Design: Renovate-style per-dependency PRs
 

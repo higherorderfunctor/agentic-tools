@@ -1,30 +1,16 @@
 ## ai.\* Pool Composition and Collision Semantics
 
-> **Last verified:** 2026-08-16 (commit pending — B7 now terminates at the
-> atomic `ai.<runtime>.files` registry: generated whole entries use `mkDefault`,
+> **Last verified:** 2026-08-16 — B7 terminates at the atomic
+> `ai.<runtime>.files` registry: generated whole entries use `mkDefault`,
 > ordinary entries replace, null suppresses, and divergent same-priority files
-> fail before backend lowering; shared AGENTS.md public entries arbitrate inside
-> the single owner only for enabled runtimes, discarded source-backed defaults
-> stay lazy, and size checks follow the surviving inline entry). Prior:
-> 2026-08-16 (commit pending — this fragment now owns the complete root/runtime
-> boundary matrix formerly kept in the retired normalized interface plan,
-> including capability degradation, translation, file-level native arbitration,
-> and the same-commit maintenance gate). Prior: 2026-08-15 (commit pending — B4
-> now also governs every generated `ai.programs.*` runtime-override leaf; null
-> inherits and non-null wins without acquiring keyed-pool tombstone semantics).
-> Prior: 2026-08-15 (commit pending — proxied MCP declarations now carry
-> explicit managed-unit ownership: a used root declaration owns one shared
-> proxy, runtime declarations own directly, reused ownership keys fail, and
-> unused root proxies do not materialize). Prior: 2026-08-15 (commit pending —
-> all six normalized keyed pools now support per-runtime replacement and null
-> tombstones; the former root↔runtime collision assertion is deleted, and
-> definition provenance now rejects two packages claiming one key at the same
-> root or runtime scope, including claims hidden by whole-option priority in a
-> combined evaluation). Prior: 2026-08-15 (commit pending — the list-shaped
-> instructions exception retired in favor of keyed rules). If you add a
-> normalized pool or change its cross-level merge, null behavior, or package
-> ownership rule and this fragment is not updated in the same commit, stop and
-> fix it.
+> fail before backend lowering.
+>
+> **Settled — do not relitigate.** Full lineage:
+> `git show ce31eaaa:dev/fragments/ai-module/collision-semantics.md`.
+>
+> - **Do not reintroduce a list-shaped instructions pool.** That shape was
+>   retired in favor of the current keyed `rules` pool; keep normalized rule
+>   content keyed, not list-shaped.
 
 ### Root/runtime boundary contract
 

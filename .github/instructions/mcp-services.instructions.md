@@ -7,14 +7,11 @@ applyTo: "checks/factory-eval.nix,checks/module-eval.nix,lib/ai/mcpServer/mkServ
 
 ## Managed MCP Service Bind-Address Contract
 
-> **Last verified:** 2026-09-01 (commit pending — the native-declaration table
-> drops to a single row: `openmemory-mcp` was retired, and with it the only
-> `honorsHost = true` backed by a patch this repo authored rather than an
-> upstream primitive. The shape is kept in prose because it is legitimate but
-> only as durable as the patch). Prior: 2026-08-05 (commit pending — native HTTP
-> modes must now declare whether they honor `service.host`; unsupported modes
-> reject every concrete address, and Context7 joins the centrally covered
-> `mcp-proxy` bridges because its native HTTP path cannot honor the option).
+> **Last verified:** 2026-09-01 — the native-declaration table has one row
+> (`nixos-mcp`); `openmemory-mcp` was retired, taking with it the only
+> `honorsHost = true` backed by a repo-authored patch rather than an upstream
+> primitive. Full lineage:
+> `git show ed5898b1:dev/fragments/mcp-services/service-host-contract.md`.
 
 `services.mcp-servers.servers.<name>.service.host` is a security control, not
 descriptive metadata. An address is valid only when it reaches the process that

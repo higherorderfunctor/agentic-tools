@@ -16,20 +16,13 @@ Per-platform binary packages store versions and hashes in a
 
 ### Shell Wrappers: Absolute Paths Required
 
-> **Last verified:** 2026-08-25 (commit pending — `mkClaudeExtract` grew bare
-> `python3` and `node` invocations, carrying `# bare-commands: ok` markers.
-> Neither name is in `BARE_CMDS` or `WRAPPER_CMDS` today, so the markers are
-> documentation rather than suppression — recorded here so a later widening of
-> those lists does not read them as stale). Prior: 2026-07-30 (commit pending —
-> re-runs the `/bin/`-filter enumeration: five subtracted lines now, not four,
-> after glab's `symlinkJoin` landed and the kiro `rm -f` pair moved from
-> `mkKiro.nix` into the extracted `wrapPackage.nix`. Prior 2026-07-25: records
-> that measured enumeration behind the whole-line scan's surviving `/bin/`
-> filter, on top of the `versionCheck.cmd` scan across all of `overlays/`, its
-> wider `WRAPPER_CMDS` list, the path-prefix-aware comment filter, and the
-> reason that scan carries no `/bin/` filter). If you add a new
-> `writeShellScript`, `writeShellScriptBin`, `versionCheck.cmd`, or inline shell
-> snippet in any `.nix` file and this section isn't consulted, stop and read it.
+> **Last verified:** 2026-08-25 — `mkClaudeExtract` carries bare `python3` and
+> `node` invocations marked `# bare-commands: ok`. Neither name is in
+> `BARE_CMDS` or `WRAPPER_CMDS` yet, so the markers are documentation, not
+> suppression, against a later widening of those lists.
+>
+> Full lineage:
+> `git show 6d2fbeef:dev/fragments/nix-standards/nix-standards.md`.
 
 **Every command in generated shell wrapper scripts MUST use an absolute Nix
 store path.** Never use bare command names like `cat`, `mkdir`, `cp`, `mv`,

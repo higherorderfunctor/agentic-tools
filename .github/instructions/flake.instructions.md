@@ -7,32 +7,22 @@ applyTo: "flake.nix,devenv.nix"
 
 ## Binary Cache Maintenance
 
-> **Last verified:** 2026-08-15 (commit pending — the interactive closure gate
-> moved unchanged from `semble.enable` to the capability-gated
-> `ai.codex.programs.semble.enable` path). Prior: 2026-08-14 (commit pending —
-> the "CI package-build runners only" rule below was being HONOURED IN FORM AND
-> BROKEN IN FACT. The numtide substituter sat on ci.yml's installer step, and
-> cachix-action runs after it and exports NIX_USER_CONF_FILES pointing at a conf
-> that ASSIGNS `substituters` rather than extending it, so `extra_nix_config`
-> was discarded before anything built. Measured on run 31865858320:
-> `substituters = https://cache.nixos.org https://nix-agentic-tools.cachix.org`
-> on BOTH legs, no numtide key in trusted-public-keys, and `cache.numtide.com`
-> nowhere in `nix config show`. Semble was therefore never substituted from
-> Numtide anywhere — CI included — and the project cache alone carried it. Fixed
-> by moving it to a job-level `NIX_CONFIG`, which nix applies on top of the
-> resolved conf files and which cachix-action cannot reach. The prohibition
-> below is UNCHANGED and was re-affirmed rather than relaxed: `nixConfig` was
-> tried first and reverted, because it would have pushed numtide onto every
-> consumer. Verify with the build job's Diagnostic dump — NIX_CONFIG, unlike
-> flake `nixConfig`, does show up in `nix config show`). Prior: 2026-08-14
-> (commit pending — Semble's nixpkgs AWK and jq grammar paths remain
-> consumer-owned inputs supplied by the nixpkgs Cachix follow, while its
-> grammar/path-mapping-patched Python derivation is built only by the
-> unauthenticated check job and cannot enter the public cache). Prior:
-> 2026-08-02 (commit pending — records Semble's external pinned-package
-> exception: Numtide substitution is CI-only and accepted main builds are
-> mirrored into the public project cache without exposing the upstream cache in
-> consumer flake/devenv configuration).
+> **Last verified:** 2026-08-15 — the interactive closure gate lives at
+> `ai.codex.programs.semble.enable` (moved, unchanged in effect, from bare
+> `semble.enable`; capability-gated).
+>
+> **Settled — do not relitigate.** Full lineage:
+> `git show b330b5af:dev/fragments/flake/binary-cache.md`.
+>
+> - **Numtide substitution must be a job-level `NIX_CONFIG`, never
+>   `extra_nix_config` on the installer step or flake `nixConfig`.**
+>   cachix-action's installer step exports `NIX_USER_CONF_FILES` pointing at a
+>   conf that ASSIGNS `substituters` instead of extending it, discarding
+>   `extra_nix_config` before anything builds — measured on run 31865858320,
+>   with no numtide key present anywhere, CI included. Flake-level `nixConfig`
+>   was tried and reverted first, since it would push numtide onto every
+>   consumer; job-level `NIX_CONFIG` works because nix applies it after
+>   cachix-action's conf, and it shows up in `nix config show` for verification.
 
 When adding or removing flake inputs, check whether the input has a public
 Cachix cache. If so, add it to:

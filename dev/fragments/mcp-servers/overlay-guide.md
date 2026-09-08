@@ -1,30 +1,11 @@
 ## MCP Server Packages
 
-> **Last verified:** 2026-09-01 (commit pending — `openmemory-mcp` was RETIRED:
-> upstream renamed itself to LongMemory and rewrote the tree, killing every
-> `--replace-fail` anchor, and had by then adopted a loopback default of its
-> own. The security-patch subsection keeps it as a past-tense worked example
-> because this repo now carries no other source-level security patch, and
-> records the two things it proved — the held-back sweep behaving as designed,
-> and a source patch's success condition being its own deletion). Prior:
-> 2026-08-04 (commit pending — the local-patch section claimed "excludePattern +
-> detector, OR a targets row — never both" as though it covered every patch, but
-> it was written about patching published BUILD OUTPUT only. openmemory-mcp's
-> loopback-bind patch is a SOURCE patch on a package that runs tsc itself, and
-> it correctly KEEPS its targets row; a new subsection draws that line, and
-> records why a held-back sweep is the desired signal for a security patch
-> rather than a nuisance). Prior: 2026-08-02 (commit pending — adds Semble's
-> identity-preserving external-flake MCP role, which shares its CLI derivation
-> and is updated with the flake input rather than a package target). Prior:
-> 2026-07-27 (commit pending — absorbing `aihubmix-mcp` corrected three stale
-> claims in the "Adding a New Server" checklist below:
-> `overlays/mcp-servers/locks/` has never existed, `flake.nix` needs no
-> per-package edit, and the top-level `modules/` directory is gone. It also adds
-> the vendored-lockfile + local-patch shape and the excluded-with-an-annotation
-> update class, which is about sweepability and not about lagging upstream). If
-> you add or remove an `overlays/mcp-servers/*.nix` file, or change how one is
-> wired into the flake, and this fragment isn't updated in the same commit, stop
-> and fix it.
+> **Last verified:** 2026-09-01 — `openmemory-mcp` was retired upstream (renamed
+> to LongMemory, tree rewritten); the security-patch subsection below keeps it
+> as a past-tense worked example since this repo now carries no other
+> source-level security patch.
+>
+> Full lineage: `git show ed5898b1:dev/fragments/mcp-servers/overlay-guide.md`.
 
 ### Overlay Architecture
 

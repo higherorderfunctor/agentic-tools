@@ -181,16 +181,10 @@ Each skill's own description states which operations it covers.
 
 ## Architecture Fragments
 
-> **Last verified:** 2026-08-02 (commit pending — AGENTS.md now carries a
-> compact registry-generated routing index so Codex and other flat consumers can
-> find applicable source fragments without flattening every fragment body).
-> Prior: 2026-07-27 (the worked registration example is now explicitly
-> fictional, so it can no longer drift out of sync with a real category's
-> `scopes`; it previously named `ai-clis` and `claude-code` and had gone stale
-> against both. Prior 2026-07-27, that example stopped teaching
-> `packages/ai-clis/**`, a directory that does not exist; prior 2026-07-24, the
-> `packagePaths` + `devFragmentNames` registries dissolved into
-> `config.fragments.categories`).
+> **Last verified:** 2026-09-08 — the `Last verified` marker is now capped at
+> ONE entry; the rule and its cost are in "The marker is one entry, not a
+> changelog" below. Full lineage:
+> `git show a25e8832:dev/fragments/monorepo/architecture-fragments.md`.
 
 This repo ships path-scoped architecture fragments as dev-only context for
 agents working on it. They are SEPARATE from the published consumer-facing
@@ -246,6 +240,36 @@ commit, not a follow-up.
 This is not an etiquette rule. Research on LLM context shows out-of-date
 instructions degrade task success more than missing instructions. A lie is worse
 than silence.
+
+### The marker is ONE entry, not a changelog
+
+Update the `Last verified` marker in place. **Do not append the old entry as a
+`Prior:`.** These fragments are LLM context: one source fans out to Claude,
+Codex, Copilot and Kiro, so every byte is paid four times, on every turn that
+matches the scope.
+
+The habit of chaining `Prior:` entries grew to **82 KB across 31 fragments — 15%
+of all fragment text** — and it broke a consumer outright: github.com's Copilot
+PR reviewer began failing with `Prompt too big after adding system message`
+before it read a line of any diff.
+
+**The body is the record.** A correction that was applied to the body needs no
+changelog entry — the body already says the true thing, and the entry only
+restates it at four times the cost. That is what nearly all of those 82 KB were.
+
+Keep exactly two things beyond the current entry, and only when they earn it:
+
+- A **`Settled — do not relitigate`** bullet, for an approach that was TRIED and
+  REJECTED, or a measurement that would otherwise be re-derived wrongly. Name
+  the rejected thing and why it failed, keep the evidence (dates, PR numbers,
+  counts), and stop. This is the one thing git does not give you cheaply,
+  because reading a diff tells you WHAT changed and not what was ruled out.
+- A **git ref** to the last fuller version, when the reasoning is worth being
+  able to re-read: `` `git show <hash>:<path>` ``. One ref, not a chain.
+
+Everything else — re-verification with no change, restatements of what a commit
+did, dates with no claim attached — is dropped. Deleting it loses nothing: it is
+in the file's history, which is what history is for.
 
 ### When to add a new fragment
 
@@ -502,136 +526,34 @@ exists and WHERE, and stops there.
 
 ## Git Workflow — trunk-based, worktree-per-branch
 
-> **Last verified:** 2026-09-01 (commit pending — the fix-and-re-review loop is
-> now ONE round, not five. Round one is the free automatic review; a second is
-> earned only by a significant change in what there is to review, never by
-> having applied round one's own findings. Operator instruction 2026-09-01,
-> after exhausting a usage allowance in about ten days under the five-round
-> rule. This supersedes a temporary one-review credit budget that ran through
-> 2026-08-31 and was deliberately kept OUT of this fragment as dated; the new
-> rule is standing policy, so it belongs here). Prior: 2026-08-29 (commit
-> pending — `devenv-test` no longer runs automatically; its full shell smoke
-> suite is an on-demand diagnostic, while extracted runtime contracts and all
-> code-validator corpora now run inside the existing required `test` context.
-> The six-context ruleset is unchanged). Prior: 2026-08-19 (commit pending — the
-> rebase backup advice recommended a local TAG, reasoning that `--update-refs`
-> moves branches but not tags. True, but incomplete: tags are refs in the COMMON
-> git dir, so a fetch from ANY worktree can prune them all in one shot when
-> `fetch.pruneTags` is set, which is a global (not per-repo) git config setting
-> — measured twice on 2026-08-15, the second time by the same session's own
-> fetch. Neither a local tag nor a local branch survives both hazards; only a
-> ref actually pushed to `origin` does. Backup guidance now says
-> `git push origin refs/heads/archive/<slug>`, created and pushed in the same
-> sequence as the rebase rather than verified afterward, since verifying is
-> itself a fetch that can destroy the thing being verified. Also adds local tags
-> to the shared-across-worktrees list, since the root cause is that tags are
-> common-dir refs, not anything about rebasing specifically.) Prior: 2026-08-18
-> (commit pending — the per-worktree bootstrap requirement is GONE. The shared
-> prek hooks now resolve `.pre-commit-config.yaml` from the PRIMARY CHECKOUT,
-> derived from the shared common git dir, so a linked worktree that has never
-> entered `devenv shell` commits fine. `PREK_HOME` stays anchored to the
-> committing worktree, because under the agent sandbox the primary checkout is a
-> read-only bind. Written for the sandbox-stack pivot's "devenv is never
-> activated in a worktree" topology (#1106), under which the old model rejected
-> every worktree commit by design. Do NOT re-add a `devenv shell` step to the
-> worktree recipe below.) Prior: 2026-08-17 (commit pending — shared prek hooks
-> now derive `PREK_HOME` from the committing worktree, so commits launched
-> outside a devenv shell retain isolated project-local state instead of falling
-> back to the user-global XDG cache; the bootstrap diagnostic now names shell
-> entry as the only materialization path, and shared-hook rewrites serialize and
-> publish by atomic rename). Prior: 2026-08-15 (commit pending — adds the
-> adversarial subagent-review protocol that SUBSTITUTES for the Copilot loop
-> while its quota is exhausted, roughly two weeks from 2026-08-15. Written
-> because an agent cannot review its own output, and because the operator had
-> been having to ask for an independent reviewer by hand each time. Includes the
-> refuter+defender pairing and the never-self-adjudicate rule, both of which
-> exist because refute-by-default on your own work is a second discard filter
-> rather than a check). Prior: 2026-08-14 (commit pending — TWO corrections. (1)
-> The required-status-check list said FOUR; there are SIX, both `kiro-patched`
-> contexts having been promoted 2026-08-13 with PR #895. This file was wrong in
-> two places, `ci-update-workflow.md` was wrong in two more, and
-> `.github/workflows/update.yml` was wrong a third way — "five", including the
-> demoted `devenv-test` — so read the ruleset back rather than trusting any
-> prose count, this one included. (2) Copilot review can now fail in a way that
-> READS AS CLEAN: when the requesting account is out of quota it still submits a
-> review object on the head SHA with `state: COMMENTED`, an empty
-> `requested_reviewers`, and ZERO threads. Every mechanical signal the loop
-> gates on says "reviewed, nothing found". The only tell is the BODY — "Copilot
-> was unable to review this pull request because the user who requested the
-> review has reached their quota limit." A zero-finding round is clean ONLY if
-> the body says the review ran; re-requesting cannot help, since the quota
-> belongs to the requesting user). Prior: 2026-08-05 (commit pending — the
-> Copilot TRIGGER MODEL was wrong and is corrected: the automatic review fires
-> once, on the PR becoming ready for review, and a push NEVER triggers one.
-> "Becomes ready" covers a PR opened non-draft as well as a draft flipped later
-> — measured on PR #801, which was opened non-draft and got a queued reviewer
-> run within seconds, so the narrower "draft → ready transition" spelling is
-> deliberately avoided as it reads as excluding never-drafted PRs. The old "only
-> ONCE in 5 pushes" datum was not a flaky trigger — it was #644's ready
-> transition landing on the same push, with #640's four misses being correct
-> behavior — so the advice to treat re-requesting as the expected next step is
-> dropped, along with any reason to wait on a run that is never coming. Every
-> review after the first is a paid manual request, which is now stated where the
-> round cap is. Also adds agent memory to the shared-across-worktrees list:
-> concurrent sessions share the memory directory, neither sees the other's
-> write, and a duplicate under a different name is invisible to the wikilink
-> graph). Prior: 2026-08-05 (commit pending — "change" now EXPLICITLY includes
-> untracked drafts and working docs: authoring any repo-destined file in the
-> primary checkout is a violation, with a pre-flight `git rev-parse` check added
-> to the worktree section. Driven by a reference doc drafted in the primary
-> checkout whose lint findings failed the shared stop/commit hooks in every
-> parallel session sharing that cwd). Prior: 2026-08-05 (commit pending —
-> `devenv-test` is NO LONGER a required check; the ruleset now lists FOUR,
-> verified by reading it back rather than by trusting this file. It was made
-> required on 2026-08-03 and demoted two days later as a merge-blocking
-> liability, risk accepted. The entry below that announced the promotion is kept
-> so the reversal is legible rather than looking like drift). Prior: 2026-08-05
-> (commit pending — two corrections, both from operating the loop on PR #766 and
-> both making it silently unreliable when unknown. The suppressed-block heading
-> is NOT stable, so the documented `sed -n '/low confidence/,$p'` matched
-> nothing against a `Suppressed comments (1)` block and nearly reported a real
-> finding as a clean round; the command now prints the whole body. And
-> `gh api …/requested_reviewers` silently no-ops for Copilot — 200 with an empty
-> list, no check run, with nothing in flight — so re-requests go through the
-> github-mcp tool). Prior: 2026-08-04 (commit pending — records that
-> `requested_reviewers` is the INTERMEDIATE state and the request is CONSUMED by
-> the review it triggers, so an empty list plus no reviewer check run on the
-> head SHA means a re-request is genuinely needed rather than one being pending;
-> observed 2026-08-01 on the retired probe-fixtures branch and re-validated on
-> PR #749's round-2 re-request). Prior: 2026-08-03 (commit pending — adds the
-> always-reporting `devenv-test` context to the required checks). Prior:
-> 2026-08-03 (commit pending — makes post-merge removal of the feature worktree
-> and local branch an explicit agent-owned completion condition). Prior:
-> 2026-07-31 (commit pending — the bootstrap step's "or any devenv task" was
-> WRONG and is removed: `devenv tasks run` does not materialize
-> `.pre-commit-config.yaml`, measured in two fresh worktrees where the task
-> succeeded and the next commit was still rejected. Also records that a push
-> auto-triggered a Copilot review only ONCE in 5 pushes — 0/4 on PR #640, 1/1 on
-> the first push of #644 — so checking the run is mandatory and re-requesting is
-> the expected next step rather than a rare fallback). Prior: 2026-07-31 (commit
-> e06e7601 — the Copilot review loop is the agent's to START, unprompted, the
-> moment the PR is open and non-draft; only continuing past the 5-round cap
-> needs the operator's say-so). Prior: 2026-07-30 (commit pending — records that
-> a re-request issued while a review is still in flight is silently dropped, so
-> the check run, not the API response, is the confirmation). Prior: 2026-07-30
-> (commit d42d805a) — records that the reviews and comments endpoints attribute
-> Copilot's output to DIFFERENT logins, so the documented
-> `copilot-pull-request-reviewer[bot]` filter returns zero on
-> `/pulls/N/comments` and reads as a clean review while gating threads are open;
-> measured on PR #614. Prior: 2026-07-29 — the ruleset now sets
-> `required_review_thread_resolution: true`, so an unresolved review thread
-> blocks merge including on auto-merging `update/*` PRs, and the claim that
-> Copilot "never gates its merge" is retired; adds the rule that Copilot's
-> SUPPRESSED findings must be read on every review, since they create no thread;
-> gates re-review polling on `commit_id` rather than a timestamp, and caps the
-> fix-and-re-review loop at 5 rounds). Prior: 2026-07-24 — the bot's `update/*`
-> PRs now arm GitHub-native auto-merge and land themselves, the manual
-> `pr:merge-updates` task and `merge-update-prs` skill are deleted, the update
-> sweep runs 4x/day, and squash-only is re-attributed to the repository settings
-> rather than the ruleset. If you change the branch-protection ruleset, the
-> repository merge settings, the worktree convention, the bootstrap step, the
-> local commit guard, the auto-merge arming, or the PR flow and this fragment
-> isn't updated in the same commit, stop and fix it.
+> **Last verified:** 2026-09-01 — the fix-and-re-review loop is ONE round, not
+> five. Round one is the free automatic review; a second is earned only by a
+> significant change in what there is to review, never by having applied round
+> one's findings. Operator instruction, after the five-round rule exhausted a
+> usage allowance in about ten days.
+>
+> **Settled — do not relitigate.** Each of these records an approach that was
+> TRIED and rejected, so the reasoning is not re-derived from scratch. Full
+> lineage: `git show ca236499:dev/fragments/monorepo/git-workflow.md`.
+>
+> - **Back up with a ref pushed to `origin`, never a local tag or branch.** The
+>   tag was tried, on the sound reasoning that `--update-refs` moves branches
+>   and not tags. Tags are refs in the COMMON git dir, so any worktree's fetch
+>   prunes them all when the author's global `fetch.pruneTags` is set — measured
+>   twice on 2026-08-15, the second time by the verifying fetch itself.
+> - **Do NOT re-add a `devenv shell` bootstrap to the worktree recipe.** It was
+>   required until 2026-08-18 and is now actively wrong under the sandbox-stack
+>   topology. `devenv tasks run` was the obvious substitute and does NOT
+>   materialize `.pre-commit-config.yaml` either — measured 2026-07-31 in two
+>   fresh worktrees, where the task succeeded and the next commit was still
+>   rejected.
+> - **Do not restore `devenv-test` as a required context.** It was promoted
+>   2026-08-03 and demoted two days later as a merge-blocking liability, risk
+>   accepted; it left automatic PR/push execution entirely on 2026-08-29.
+> - **Do not re-derive a Copilot auto-trigger rate from push observations.** The
+>   "1 review in 5 pushes" datum was a ready-transition coinciding with a push,
+>   not a flaky trigger. Sampling this way produces a confident wrong model and
+>   costs a paid review re-establishing a trigger that fires on readiness only.
 
 `main` is the trunk. Its branch-protection ruleset requires a pull request, no
 force-push, no deletion, and six required status checks —
@@ -1266,12 +1188,9 @@ the merged `flake.nix` / `devenv.yaml`.
 
 ## Linting
 
-> **Last verified:** 2026-08-31 (commit pending — full-corpus treefmt and hook
-> diagnostics are detached from shell activation; serialized treefmt hooks now
-> use their cache, while Stop keeps its two convergence passes uncached). Prior:
-> 2026-08-29 (repository hooks now declare their local, Stop, and CI lifecycles
-> once in `config/repo-validation.nix`; every code validator has a
-> merge-blocking whole-corpus gate).
+> **Last verified:** 2026-08-31 — full-corpus treefmt and hook diagnostics run
+> only as explicit devenv tasks, detached from shell activation. Full lineage:
+> `git show f7189d05:dev/fragments/monorepo/linting.md`.
 
 `nix flake check` is the authoritative CI gate. Local hooks provide earlier
 feedback, but neither a successful changeset scan nor a `--no-verify` commit is

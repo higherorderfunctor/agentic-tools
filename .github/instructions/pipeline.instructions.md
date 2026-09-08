@@ -7,55 +7,13 @@ applyTo: ".github/workflows/update.yml,config/fragment-categories.nix,config/gen
 
 ## CI Update Workflow
 
-> **Last verified:** 2026-08-29 (commit pending — update PRs no longer trigger
-> the costly, non-required devenv workflow; its deterministic contracts moved
-> into the required flake-check path and the full diagnostic is manual). Prior:
-> 2026-08-25 (commit pending — `overlays/claude-code-extracted.json` now carries
-> the binary's whole settings schema and is ~3.2k lines, so the `update-pkg.sh`
-> formatter pass over a bot-regenerated sidecar went from a cosmetic array
-> reflow to something `checks.formatting` will actually fail on). Prior:
-> 2026-08-14 (commit pending — the required-context count was stale in BOTH
-> places it appeared here: there are SIX, not four, because both `kiro-patched`
-> contexts were promoted 2026-08-13 with PR #895. Found while landing PR #946;
-> `.github/workflows/update.yml` disagreed a third way, saying "five" and naming
-> the demoted `devenv-test` inside the safety rationale for unattended
-> auto-merge. Three surfaces, three different wrong answers, none of them
-> checked against the ruleset — so this entry records the query rather than just
-> the number). Prior: 2026-08-05 (commit pending — `devenv-test` still reports
-> on update PRs but is no longer one of the required status contexts). Prior:
-> 2026-08-03 (commit pending — removes package targets' scheduling-only
-> nixpkgs/nix-update predecessors and the ineffective base-checkout format/build
-> finalizer). Prior: 2026-08-03 (commit pending — makes the hidden update report
-> artifact upload real and fails loudly when the report is absent). Prior:
-> 2026-08-03 (commit pending — records `devenv-test` as an always-reporting
-> fifth merge gate and corrects the auto-merge thread rule). Prior: 2026-08-03
-> (commit pending — updates the pnpm detector's documented lookup after all
-> package groups move under `pkgs.ai`). Prior: 2026-08-01 (commit pending —
-> Phase 2 now runs on `if: always()` so a timed-out sweep SHIPS what it finished
-> instead of discarding it, and the `ninja-completed.flag` sentinel is re-gated
-> on `steps.ninja.outcome` so a partial sweep can never let the close step
-> delete the PRs it did not reach. Measured on run 30713330569: 47 of 52 edges
-> done, step `skipped`, everything thrown away). Prior: 2026-08-01 — documents
-> the SECOND `extraExtract` self-heal, `vu.mkExtractRegen`, alongside the hash
-> one: which failure it answers, that a red drift check reports a broken
-> MECHANISM rather than a stale file, why extracts get no
-> `fix_sidecar_hashes`-style standalone hatch, and how to tell "never wired"
-> from "ran and failed". glab had no hook at all, which stayed invisible from
-> #560 until PR #621). Prior: 2026-07-27 — adds the three-valued
-> `git diff --quiet` rule and the `git_diff_quiet` helper every dirtiness gate
-> in the update scripts now goes through; the bare form had routed a git ERROR
-> into "there are changes" in `update-input.sh` and into "the tree is dirty" at
-> both of `update-pkg.sh`'s gates. Earlier: the
-> `Detect a newer @aihubmix/mcp on npm` annotation step and the
-> excluded-because-a-local-patch-cannot-be-swept rule behind it, which is about
-> SWEEPABILITY and not about lagging: aihubmix-mcp tracks `dist-tags.latest` and
-> is still excluded. Earlier: the `NAT_UPDATE_JOBS` evaluator budget that killed
-> run 30181958460, the `verify_all_packages` single-definition build gate and
-> the `fix_sidecar_hashes` repair-on-failure retry, and the non-blocking
-> annotation-step family plus the new-pnpm-major raise). If you touch
-> `.github/workflows/update.yml`, `dev/scripts/update-common.sh`,
-> `dev/scripts/update-input.sh`, `dev/scripts/update-pkg.sh`, or the PR creation
-> logic, and this fragment isn't updated in the same commit, stop and fix it.
+> **Last verified:** 2026-08-29 — update PRs no longer trigger the costly,
+> non-required Devenv Diagnostic; its deterministic contracts run inside the
+> required `test` context instead, and the full diagnostic stays
+> `workflow_dispatch`-only.
+>
+> Full lineage:
+> `git show ff610ca0:dev/fragments/pipeline/ci-update-workflow.md`.
 
 ### Design: Renovate-style per-dependency PRs
 
@@ -632,64 +590,17 @@ The directory is gitignored.
 
 ## Fragment Pipeline Architecture
 
-> **Last verified:** 2026-08-19 (commit pending — removes a retired
-> package-sourced category and its generated consumer documentation). Prior:
-> 2026-08-16 (commit pending — generated README guidance now documents the
-> per-runtime literal-file seam and removes the superseded Kiro steering-copy
-> uninstall sequence). Prior: 2026-08-16 (commit pending — the `kiro-wrapper`
-> category now scopes `checks/kiro-fhs-contract.nix`, so an editor changing the
-> upstream sandbox tripwire receives the FHS and launcher architecture sources
-> it enforces). Prior: 2026-08-16 (commit pending — the Stacked Workflows guide
-> moved from `dev/fragments/` to its package `docs/` directory through the
-> existing location discriminator). Prior: 2026-08-16 (commit pending —
-> generated README guidance now uses `ai.programs.stacked-workflows.enable`,
-> documents B4 runtime negation, and keeps the HM-only
-> `stacked-workflows.gitPreset` companion visibly separate). Prior: 2026-08-15
-> (commit pending — Semble's co-located architecture document is now a
-> registered package-sourced category scoped to `packages/semble/**`). Prior:
-> 2026-08-15 (commit pending — the `mcp-secrets` category now follows
-> managed-proxy ownership through its shared option aggregator,
-> declaration-scope lowering transform, proxy helper, and module/factory
-> behavioral checks). Prior: 2026-08-15 (commit pending — the ai-module routing
-> comment now names `mergePool` after the retired collision helper; category
-> scopes and sources are unchanged). Prior: 2026-08-15 (commit pending —
-> generated README guidance now uses typed context and keyed rules, including
-> Semble's single exported `rule` helper; retired instruction helpers no longer
-> appear). Prior: 2026-08-15 (commit pending — generated README guidance now
-> distinguishes the closed normalized `ai.<runtime>.settings` surface from
-> runtime-shaped `nativeSettings`, including Codex security and Claude
-> environment examples). Prior: 2026-08-05 (commit pending — adds the
-> `mcp-services` category so the managed-service bind-address contract follows
-> its schema, server metadata, Home Manager implementation, and behavioral
-> checks). Prior: 2026-08-03 (commit pending — generated README guidance now
-> describes the temporary `pkgs.ai.generic` bucket and classifies `gh`/`glab` as
-> dev tools). Prior: 2026-08-03 (commit pending — the kiro auto-memory category
-> now scopes its moved implementation sources under `overlays/`, keeping the
-> fragment routed to both sides of that abstraction). Prior: 2026-08-03 (commit
-> pending — the generated README now keeps `nix-agentic-tools` on its own
-> nixpkgs pin so consumer store paths match the published binary cache). Prior:
-> 2026-08-02 (commit pending — generated Semble guidance now exposes its
-> runtime-specific direct instruction records: unnamed for the Claude/Codex
-> single-file composers and named for Kiro's `semble.md` steering file). Prior:
-> 2026-08-02 (commit pending — the generated README now documents shared typed
-> Codex profile ownership and devenv's native user-layer materialization).
-> Prior: 2026-08-02 (commit pending — Kiro's transformer now accepts an explicit
-> typed `always | auto | fileMatch | manual` inclusion mode while preserving the
-> legacy paths-derived default, and the shared renderer resolves typed
-> path-valued instruction bodies before node normalization). Prior 2026-08-02:
-> AGENTS.md now derives a compact source-fragment routing index from the
-> category registry for flat consumers, without flattening scoped fragment
-> bodies. Prior: 2026-08-01 (generated instruction and repo-document derivations
-> remain flake packages but are excluded from the authenticated all-packages
-> build, preventing revision-by-revision Cachix churn while `nix flake check`
-> retains drift coverage). Prior: 2026-07-24 (the `packagePaths` +
-> `devFragmentNames` registries dissolved into `config.fragments.categories`).
-> If you touch `lib/fragments.nix`, `config/fragment-categories.nix`,
-> `lib/fragments-registry.nix`, `dev/generate.nix`, `lib/ai/transformers/`, or
-> any content-package `passthru.fragments` surface and this fragment isn't
-> updated in the same commit, stop and fix it. This is a cross-cutting pipeline
-> — changes that look small in one file frequently ripple into generator outputs
-> for four ecosystems.
+> **Last verified:** 2026-08-19 — no dead package-sourced categories remain: a
+> retired one, and the consumer documentation it generated, were removed
+> together.
+>
+> **Settled — do not relitigate.** Full lineage:
+> `git show 25ec0738:dev/fragments/pipeline/fragment-pipeline.md`.
+>
+> - The old dual-registry split (`packagePaths` + `devFragmentNames`) is gone,
+>   dissolved into the single `config.fragments.categories` registry
+>   (2026-07-24). Don't resurrect the split — one registry drives both fragment
+>   composition and category scoping.
 
 ### The four layers
 
@@ -862,12 +773,10 @@ validation.
 
 ## Generation Architecture
 
-> **Last verified:** 2026-08-29 (commit pending — instruction tasks and the
-> merge-blocking materialization contract now execute the same packaged
-> real-file copier). Prior: 2026-08-16 (commit pending — generated repository
-> instruction projections remain real copies for Git portability, while consumer
-> runtime instructions now traverse `ai.<runtime>.files`; Kiro 2.18.1 follows
-> the resulting steering symlinks).
+> **Last verified:** 2026-08-29 — instruction tasks and the merge-blocking
+> materialization check now execute the same packaged real-file copier
+> (`lib/materialize-repo-instructions.nix`). Full lineage:
+> `git show 2ac8d522:dev/fragments/pipeline/generation-architecture.md`.
 
 Content is generated via Nix derivations wrapped in devenv tasks, organized by
 scope:
@@ -944,43 +853,11 @@ aggregate but skips its dependency leaves.
 
 ## Update Pipeline Architecture
 
-> **Last verified:** 2026-09-01 (commit pending — `updateTargetExempt`'s only
-> instance, the repository-local `kiro-memory-distiller`, was removed, so that
-> exemption currently has no consumer). Prior: 2026-08-29 (commit pending —
-> update PR auto-merge still waits on the same six required contexts; the
-> non-required full devenv run is now manual and its deterministic contracts are
-> part of `test`). Prior: 2026-08-24 (commit pending — makes the existing Beads
-> binary target a grouped owner: its compound update script independently checks
-> the Beads and paired Dolt release sidecars, then commits either or both onto
-> the one `update/beads` branch without changing Ninja, Cachix warming, build
-> verification, or PR publication). Prior: 2026-08-15 (commit pending —
-> registers the sidecar-owned stable Beads release as a binary update target
-> without introducing a second source tracker). Prior: 2026-08-03 (commit
-> pending — adds reverse package-to-target completeness coverage using
-> derivation, source, update-script, flake-input, package-exemption, and
-> registry-exemption properties). Prior: 2026-08-03 (commit pending — limits
-> package DAG edges to initialization plus explicit target-specific constraints
-> and removes base-checkout finalizers that could not observe isolated update
-> branches). Prior: 2026-08-03 (commit pending — repairs the always-uploaded
-> hidden update-report artifact and makes its absence fail loudly). Prior:
-> 2026-08-03 (commit pending — records the fifth required `devenv-test` context
-> in the update workflow's auto-merge contract). Prior: 2026-08-03 (commit
-> pending — moves the `gh` and `glab` update targets with their overlay files
-> from `generic/` to `dev-tools/`). Prior: 2026-08-02 (commit pending — the
-> `llm-agents` input update regenerates Semble's upstream-template snapshot
-> through its separate extraction derivation, while human-reviewed content
-> hashes intentionally remain manual and make CI stop on unreviewed drift).
-> Prior: 2026-07-27 (commit pending — re-points the reference-submodule-shape
-> pointer from the gitignored `private/slice-fixture/lib/concerns.nix` at the
-> tracked in-tree registries `lib/fragments-registry.nix` and `lib/checks.nix`;
-> also deletes the hardcoded "29 packages — 16 main-tracking + 13 binary" target
-> count, which had gone stale, in favour of a derivation command; prior
-> 2026-07-24, dissolves `config/update-matrix.nix` into `config.update.targets`,
-> now the single source of truth). If you touch `dev/scripts/update-*.sh`,
-> `dev/scripts/resolve-overlay-file.sh`, `config/generate-update-ninja.nix`,
-> `config/update-targets.nix`, `lib/update.nix`, any
-> `overlays/**/<pkg>.update.nix`, or `.github/workflows/update.yml` and this
-> fragment isn't updated in the same commit, stop and fix it.
+> **Last verified:** 2026-09-01 — the `updateTargetExempt` exemption has no live
+> consumer: its only instance, the repository-local `kiro-memory-distiller`, was
+> removed.
+>
+> Full lineage: `git show ed5898b1:dev/fragments/pipeline/update-pipeline.md`.
 
 ### Execution model: ninja DAG
 

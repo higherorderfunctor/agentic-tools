@@ -1,29 +1,11 @@
 ## Per-runtime pool capability and nullable overrides
 
-> **Last verified:** 2026-08-16 (commit pending — resolves #877's Kiro default
-> question: the FHS root containing bash but hiding a host zsh does not justify
-> a runtime-specific implicit shell. `ai.shell` remains null; consumers may set
-> a store-backed package explicitly or choose Kiro's FHS opt-out independently).
-> Prior: 2026-08-15 (commit pending — the new program factory applies
-> null-as-inherit recursively across capability-gated
-> `ai.<runtime>.programs.<pkg>` option trees). Prior: 2026-08-15 (commit pending
-> — distinguishes scalar null-as-inherit from keyed-pool null tombstones and
-> removes the retired collision-assertion rationale for internal process
-> defaults). Prior: 2026-08-15 (commit pending — package guidance now uses keyed
-> per-runtime rules; the pool census no longer includes the retired instructions
-> list). Prior: 2026-08-15 (commit pending — `supportedPools` now gates all
-> normalized pool declarations and fanout, while the new normalized `settings`
-> surface is deliberately present on every runtime and resolves nullable fields
-> per runtime through the same override rule as `ai.shell`). Prior: 2026-08-14
-> (commit pending — the escape hatch at the end of the Copilot section was
-> half-wrong: at 1.0.80 the plain `@github/copilot` npm tarball is a 24K loader
-> shim, not readable JS. The readable app code is in the per-platform dep — and,
-> better, the SEA self-extracts a byte-identical copy on first run, so no
-> download is needed at all. The Copilot `ai.shell` gap itself is UNCHANGED and
-> still open). Prior: 2026-08-10 (commit pending — first landing of `ai.shell`.
-> If you add another nullable-scalar `ai.*` option, change which runtimes
-> consume this one, or touch `resolveOverride`, update this fragment in the same
-> commit.)
+> **Last verified:** 2026-08-16 — resolves #877: Kiro's FHS root supplies bash
+> but hides a host zsh, and that does not justify a runtime-specific implicit
+> shell default. `ai.shell` stays null; see below for the standing decision and
+> the override rule it shares with normalized `settings`.
+>
+> Full lineage: `git show 0057d8ed:dev/fragments/ai-module/shell-option.md`.
 
 ### One record is the capability source
 

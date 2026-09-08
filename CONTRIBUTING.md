@@ -37,12 +37,10 @@ nix flake check       # linters + evaluation (does NOT build packages)
 
 ## Generation Architecture
 
-> **Last verified:** 2026-08-29 (commit pending — instruction tasks and the
-> merge-blocking materialization contract now execute the same packaged
-> real-file copier). Prior: 2026-08-16 (commit pending — generated repository
-> instruction projections remain real copies for Git portability, while consumer
-> runtime instructions now traverse `ai.<runtime>.files`; Kiro 2.18.1 follows
-> the resulting steering symlinks).
+> **Last verified:** 2026-08-29 — instruction tasks and the merge-blocking
+> materialization check now execute the same packaged real-file copier
+> (`lib/materialize-repo-instructions.nix`). Full lineage:
+> `git show 2ac8d522:dev/fragments/pipeline/generation-architecture.md`.
 
 Content is generated via Nix derivations wrapped in devenv tasks, organized by
 scope:
