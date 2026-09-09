@@ -1,8 +1,15 @@
 ## Update Pipeline Architecture
 
-> **Last verified:** 2026-09-01 — the `updateTargetExempt` exemption has no live
-> consumer: its only instance, the repository-local `kiro-memory-distiller`, was
-> removed.
+> **Last verified:** 2026-09-09 — a target is HELD BACK only when the PR cannot
+> be WRITTEN. A failing build is no longer a hold-back reason; it ships as a red
+> PR and branch CI reports it.
+>
+> **Settled — do not relitigate.** Gating the PR on a passing build was tried
+> and rejected. It parks every later bump of that input behind one broken
+> package — measured on PR #1527, red from 2026-09-07 to 2026-09-09 on a single
+> `versionCheckHook` mismatch — and it makes the sweep, not the PR list, the
+> thing a human has to poll. The Renovate shape is: the bot writes the change,
+> branch CI judges it.
 >
 > Full lineage: `git show ed5898b1:dev/fragments/pipeline/update-pipeline.md`.
 
@@ -186,10 +193,36 @@ Every target writes exactly one line to `.update-report.txt`:
 
 - `UPDATED: <name> | <version-detail>` — successfully updated.
 - `NO UPDATES: <name>` — already at latest.
-- `HELD BACK: <name> | <version-detail> (<reason>)` — update found but build or
-  merge failed.
+- `HELD BACK: <name> | <version-detail> (<reason>)` — the update was found but
+  could not be WRITTEN: the lock update failed, a hash could not be derived, the
+  formatter errored, or the commit failed. A failing BUILD is deliberately not
+  on this list — see "What holds a target back" below.
 
 `update-report.sh` sorts entries by status and prints a summary.
+
+### What holds a target back
+
+One rule: **hold back only when the PR cannot be written.**
+
+| Failure                             | PR writable?                                  | Outcome                                        |
+| ----------------------------------- | --------------------------------------------- | ---------------------------------------------- |
+| `nix flake update` fails            | no — no lock to commit                        | `HELD BACK`                                    |
+| a dependency hash cannot be derived | no — the PR needs a value that does not exist | `HELD BACK`                                    |
+| formatter errors                    | no — tree left non-canonical                  | `HELD BACK`                                    |
+| `git add` / `git commit` fails      | no                                            | `HELD BACK`                                    |
+| everything written, build fails     | **yes**                                       | `UPDATED` — red PR, `::warning::` in the sweep |
+
+The last row is the whole point. A bump whose hashes all resolved is a complete,
+committable change; that it does not build is a fact about the code, and the six
+required checks on the PR are what report it. Withholding the PR there converts
+a visible red check into an invisible line in a sweep log.
+
+**Every one of these needs an explicit `exit`.** Each target's body is the
+CONDITION of an `if ! ( … )`, and bash disables `errexit` for a condition — so a
+bare failing command does not abort the subshell, it falls through to the
+trailing `git commit`, whose success becomes the subshell's status. That is not
+theory: it is how a nixpkgs bump with a verified-failing build shipped as
+`UPDATED` on every sweep from at least 2026-04-13 to 2026-09-09.
 
 ### Key files
 

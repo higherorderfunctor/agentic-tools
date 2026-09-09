@@ -264,7 +264,8 @@ if ! (
   # Gated on a dirty tree so a no-op update doesn't trigger a spurious reformat
   # commit. `nix fmt` exits 0 on successful in-place
   # format (no --fail-on-change); a non-zero exit is a real formatter
-  # error and correctly aborts the subshell -> reports HELD BACK.
+  # error, which leaves the tree non-canonical and therefore holds the
+  # package back.
   #
   # Both dirtiness gates below go through git_diff_quiet, which discriminates
   # the THREE-valued diff status by value instead of by truthiness. Under the
@@ -275,7 +276,13 @@ if ! (
   # gate below is the harmless half (a redundant reformat); the gate after it
   # is the one that stages everything and commits or amends.
   if ! git_diff_quiet -C "$wt" diff || ! git_diff_quiet -C "$wt" diff --staged; then
-    run_build nix fmt
+    # Explicit `exit`, because this body is the CONDITION of the `if ! (`
+    # above and bash disables errexit for a condition — a bare failing
+    # call falls through to the build below instead of aborting.
+    if ! run_build nix fmt; then
+      log_failure "formatter errored"
+      exit 1
+    fi
   fi
 
   # Commit dep hash changes (amend if update commit exists, new commit
@@ -284,11 +291,23 @@ if ! (
   # bare form reached `commit --amend`, which succeeds on an unchanged tree and
   # rewrote the update commit for no reason.
   if ! git_diff_quiet -C "$wt" diff || ! git_diff_quiet -C "$wt" diff --staged; then
-    git -C "$wt" add -A
+    # Same explicit-exit rule as the formatter gate above: a failure to
+    # stage or commit means the PR cannot be written, which is a
+    # hold-back, and errexit will not deliver it for us.
+    if ! git -C "$wt" add -A; then
+      log_failure "git add failed"
+      exit 1
+    fi
     if [ "$(git -C "$wt" rev-parse HEAD)" != "$base_head" ]; then
-      git -C "$wt" commit --amend --no-edit
+      git -C "$wt" commit --amend --no-edit || {
+        log_failure "git commit --amend failed"
+        exit 1
+      }
     else
-      git -C "$wt" commit -m "chore(overlays): update $name"
+      git -C "$wt" commit -m "chore(overlays): update $name" || {
+        log_failure "git commit failed"
+        exit 1
+      }
     fi
   fi
 
@@ -297,8 +316,25 @@ if ! (
     exit 0
   fi
 
-  # Phase 2: Build verification
-  run_build nix build ".#$name" --no-link --log-format bar-with-logs
+  # Phase 2: Build verification — INFORMATIONAL, not a gate.
+  #
+  # nix-update already derived every dependency hash the PR needs, and its
+  # own failure exits above. So reaching here means the tree is complete
+  # and committable: rev, src and hashes are all written. A build that
+  # still fails means the update is well-formed but does not build —
+  # a dependency floor the pinned nixpkgs cannot satisfy, say — and that
+  # is a red PR for branch CI to report, not a reason to withhold it.
+  #
+  # This USED to be the last command in the subshell, which is the only
+  # reason a failing build held the package back: errexit is disabled for
+  # an `if` condition, so position was doing the work, not intent.
+  if ! run_build nix build ".#$name" --no-link --log-format bar-with-logs; then
+    log_info "Build failed — opening the PR; branch CI is the gate"
+    echo "::warning::${name}: build verification failed, PR opens red"
+  fi
+  # Belt and braces: keep the subshell'"'"'s exit status independent of the
+  # build above even if a later edit adds a statement here.
+  true
 ); then
   version_detail=$(parse_pkg_version "$version_file")
   # Roll back the Phase 0 rev+src commit so a held-back package does
@@ -307,7 +343,7 @@ if ! (
   # resetting here is what makes held-back packages skip their PR.
   # Successful targets keep their commit and open their PR as before.
   git -C "$wt" reset --hard "$base_head"
-  report_held_back "$name" "nix-update or build failed" "$version_detail"
+  report_held_back "$name" "nix-update, formatter or commit failed" "$version_detail"
   exit 0
 fi
 

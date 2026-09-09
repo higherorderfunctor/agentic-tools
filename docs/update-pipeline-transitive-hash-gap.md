@@ -2,6 +2,17 @@
 
 > **Status:** open. Documented 2026-05-20 to resume in a future session.
 > **Branch context:** `refactor/ai-factory-architecture`.
+>
+> **Superseded in part, 2026-09-09.** This document's remedy — "run the build in
+> the bot job and let `report_held_back` catch every failure" — bundled two
+> failure classes that are now handled differently. Mode D (a hash the PR needs
+> and we cannot derive) still holds back. **Mode C (every hash derived, the
+> package simply does not build) no longer does**: the tree is complete and
+> committable, so it ships as a red PR and branch CI reports it. The rule is
+> "hold back only when the PR cannot be WRITTEN" —
+> `dev/fragments/pipeline/update-pipeline.md` § What holds a target back is
+> authoritative. Read the mode analysis below as still-correct diagnosis and the
+> `HELD BACK` prescriptions as superseded.
 
 ## TL;DR
 
@@ -169,12 +180,12 @@ the fetcher default tracks another.
 
 ## Summary table
 
-| PR                   | Mode | What pipeline updates                                | What it should have done                                                        | Why it can't                                                                                                                 |
-| -------------------- | ---- | ---------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| #148 nixpkgs         | A    | `flake.lock`, `devenv.lock`                          | Refresh `pnpmDeps.hash` on effect-mcp (+ likely other pnpm/npm/cargo consumers) | Cross-target propagation: nixpkgs PR isolated to lock; downstream worktrees can't see it in CI mode                          |
-| #145 mcp-servers rev | B    | `rev`, `src.hash`, `upstream` literals on `all-mcps` | Refresh the (correctly) shared `npmDepsHash` let-binding                        | Matrix points at the meta-derivation `all-mcps` (no hash attrs); should point at any JS child so nix-update sees the literal |
-| #144 mcp-proxy ver   | C    | `rev`, `src.hash`                                    | Build the package and let `pythonRuntimeDepsCheckHook` flag it → `HELD BACK`    | Leftover dead-code `CI_MODE` guard on `run_build` (`update-common.sh:91-97`) — local mode is deprecated                      |
-| #160 context7-mcp    | D    | `pnpmDeps.hash` (spurious regen)                     | Bind fetcher + buildPhase to same pnpm version + build before PR                | Overlay's `fetchPnpmDeps` defaults to `pnpmLatest`; parent pins `pnpm_10`; nixpkgs default moved 10→11 silently              |
+| PR                   | Mode | What pipeline updates                                | What it should have done                                                        | Why it can't                                                                                                                                                 |
+| -------------------- | ---- | ---------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| #148 nixpkgs         | A    | `flake.lock`, `devenv.lock`                          | Refresh `pnpmDeps.hash` on effect-mcp (+ likely other pnpm/npm/cargo consumers) | Cross-target propagation: nixpkgs PR isolated to lock; downstream worktrees can't see it in CI mode                                                          |
+| #145 mcp-servers rev | B    | `rev`, `src.hash`, `upstream` literals on `all-mcps` | Refresh the (correctly) shared `npmDepsHash` let-binding                        | Matrix points at the meta-derivation `all-mcps` (no hash attrs); should point at any JS child so nix-update sees the literal                                 |
+| #144 mcp-proxy ver   | C    | `rev`, `src.hash`                                    | Open the PR red — every hash resolved; see the 2026-09-09 note above            | Was a dead `CI_MODE` guard on `run_build`; that guard is GONE (`run_build` is now just `"$@"`), so the build does run — Mode C is deliberately not held back |
+| #160 context7-mcp    | D    | `pnpmDeps.hash` (spurious regen)                     | Bind fetcher + buildPhase to same pnpm version + build before PR                | Overlay's `fetchPnpmDeps` defaults to `pnpmLatest`; parent pins `pnpm_10`; nixpkgs default moved 10→11 silently                                              |
 
 ## One-time manual exception applied 2026-05-20
 
@@ -367,23 +378,26 @@ helper entirely; either way, the dead branch goes). This makes
 `update-pkg.sh:180`'s `nix build .#$name --no-link --log-format bar-with-logs`
 actually run during the bot job, before the PR is opened.
 
-The existing `report_held_back` machinery at `update-pkg.sh:181-189` already
-catches the build failure cleanly: on non-zero exit it logs
-`HELD BACK: <name> | <detail> (nix-update or build failed)`, resets the worktree
-to base (so the PR-creation step at `update.yml:139-141` filters it out), and
-the workflow's `^HELD BACK:` gate at `update.yml:295-304` turns the run red.
-**No new code paths needed.**
+**Superseded 2026-09-09 — see the note at the top.** The paragraph below
+prescribed routing every build failure through `report_held_back`. Two of the
+three bullets under it are still right about DETECTION and wrong about the
+CONSEQUENCE.
 
-What this catches automatically:
+What the build actually catches, and what now happens:
 
 - **Mode C** — `pythonRuntimeDepsCheckHook` fires during the build's
-  `pypaBuildPhase` follow-up, fails with the exact dep-floor message we saw on
-  #144, build exits non-zero, `report_held_back` runs.
-- **Mode D** — the build attempts to consume the FOD output, hits
-  `ERR_PNPM_NO_OFFLINE_TARBALL`, fails, same path.
+  `pypaBuildPhase` follow-up and fails with the exact dep-floor message we saw
+  on #144. Every hash resolved, so the PR is writable: it opens RED and the
+  sweep emits a `::warning::`. Holding it back would have parked it for the four
+  to eight weeks the upstream dep floors needed, invisibly.
+- **Mode D** — the build hits `ERR_PNPM_NO_OFFLINE_TARBALL` because the FOD
+  output does not match. This one IS a hash we could not produce, so it still
+  holds back — provided a fixer exists for that hash kind. **It currently does
+  not for pnpmDeps or cargoDeps**; see the KNOWN GAP comment on
+  `fix_sidecar_hashes` in `dev/scripts/update-common.sh`.
 - **Any future class of build-time failure** specific to the targeted package
-  (test failures, missing native deps, etc.) — caught for free because we're
-  running the same build the consumer runs.
+  (test failures, missing native deps, etc.) — still caught for free, and still
+  reported, but as a red PR rather than a withheld one.
 
 Cost analysis: each package bump pays one extra build in the bot job.
 Cachix-action is already configured in `update.yml` and pushes successful

@@ -1,9 +1,9 @@
 ## CI Update Workflow
 
-> **Last verified:** 2026-08-29 — update PRs no longer trigger the costly,
-> non-required Devenv Diagnostic; its deterministic contracts run inside the
-> required `test` context instead, and the full diagnostic stays
-> `workflow_dispatch`-only.
+> **Last verified:** 2026-09-09 — hold-back means "the PR could not be written",
+> never "the build failed"; see `update-pipeline.md` § What holds a target back
+> for the table and the `errexit`-in-a-condition trap that made every one of
+> these silent.
 >
 > Full lineage:
 > `git show ff610ca0:dev/fragments/pipeline/ci-update-workflow.md`.
@@ -447,8 +447,11 @@ byte-identical; when copies drifted they silently verified different things.
 
 Upstream has a known bug where `async_main`'s `finally: stack.aclose()` can
 swallow non-zero exit on the build-failure path — per-build failures silently
-exit 0. Effect: a broken peer package would let `nixpkgs` (or any other input
-update) ship as UPDATED instead of HELD BACK.
+exit 0. Effect: a broken peer package would be indistinguishable from a clean
+build. That still matters after the hold-back split, because the FIRST
+verification decides whether `fix_sidecar_hashes` runs at all: a build failure
+read as success skips the hash repair, and the hash it could not derive is never
+reported.
 
 `run_nfb_build` in `update-common.sh` defends against this with four independent
 gates — any of them tripping fails the build:
@@ -481,9 +484,10 @@ nothing else.
 
 A **nixpkgs or Go-toolchain bump can invalidate a `vendorHash` with no version
 change at all.** `extraExtract` never fires, so nothing re-derives the hash. The
-stale hash then fails the input bump's own build verification and the input is
-reported HELD BACK — the breakage does NOT leak into the tree, but every later
-`nixpkgs` update parks behind a hash a human has to fix by hand.
+stale hash then fails the input bump's own build verification, which is what
+triggers the repair below. If the repair cannot derive the hash, the input IS
+held back — that is the "PR needs a value that does not exist" case, and it is
+the only reason a build failure ever withholds an input PR.
 
 So Phase 2 retries ONCE through `fix_sidecar_hashes`: it discovers every
 `passthru.fixVendorHash` / `passthru.fixNpmDepsHash` across `packages.<system>`
