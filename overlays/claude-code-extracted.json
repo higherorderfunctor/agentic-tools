@@ -2120,6 +2120,10 @@
       "policyHelpers.linux.interpreter": {
         "type": "string"
       },
+      "policyHelpers.linux.onFailure": {
+        "enum": ["continue", "refuse"],
+        "type": "string"
+      },
       "policyHelpers.linux.outputBehavior": {
         "enum": ["merge", "replace"],
         "type": "string"
@@ -2134,6 +2138,9 @@
         "type": "number"
       },
       "policyHelpers.linux.refreshIntervalMs|1": {
+        "type": "any"
+      },
+      "policyHelpers.linux.retries": {
         "type": "any"
       },
       "policyHelpers.linux.script": {
@@ -2154,6 +2161,10 @@
       "policyHelpers.macos.interpreter": {
         "type": "string"
       },
+      "policyHelpers.macos.onFailure": {
+        "enum": ["continue", "refuse"],
+        "type": "string"
+      },
       "policyHelpers.macos.outputBehavior": {
         "enum": ["merge", "replace"],
         "type": "string"
@@ -2168,6 +2179,9 @@
         "type": "number"
       },
       "policyHelpers.macos.refreshIntervalMs|1": {
+        "type": "any"
+      },
+      "policyHelpers.macos.retries": {
         "type": "any"
       },
       "policyHelpers.macos.script": {
@@ -2188,6 +2202,10 @@
       "policyHelpers.windows.interpreter": {
         "type": "string"
       },
+      "policyHelpers.windows.onFailure": {
+        "enum": ["continue", "refuse"],
+        "type": "string"
+      },
       "policyHelpers.windows.outputBehavior": {
         "enum": ["merge", "replace"],
         "type": "string"
@@ -2202,6 +2220,9 @@
         "type": "number"
       },
       "policyHelpers.windows.refreshIntervalMs|1": {
+        "type": "any"
+      },
+      "policyHelpers.windows.retries": {
         "type": "any"
       },
       "policyHelpers.windows.script": {
@@ -2222,6 +2243,10 @@
       "policyHelpers.wsl.interpreter": {
         "type": "string"
       },
+      "policyHelpers.wsl.onFailure": {
+        "enum": ["continue", "refuse"],
+        "type": "string"
+      },
       "policyHelpers.wsl.outputBehavior": {
         "enum": ["merge", "replace"],
         "type": "string"
@@ -2236,6 +2261,9 @@
         "type": "number"
       },
       "policyHelpers.wsl.refreshIntervalMs|1": {
+        "type": "any"
+      },
+      "policyHelpers.wsl.retries": {
         "type": "any"
       },
       "policyHelpers.wsl.script": {
