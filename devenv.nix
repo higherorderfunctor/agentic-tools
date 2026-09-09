@@ -35,6 +35,11 @@
   # Stop-hook validator (runs the git-hooks suite when Claude hands control
   # back, instead of racing the Edit tool on every PostToolUse). See the
   # claude.code.hooks block below.
+  # Refuses the hand-back while this branch's PR is unfinished. Separate from
+  # validateAtStop because it answers a different question (is the PR done?)
+  # with different failure semantics (fails OPEN on any network ambiguity).
+  prWatchAtStop = import ./lib/pr-watch-at-stop.nix {inherit pkgs;};
+
   validateAtStop = import ./lib/validate-at-stop.nix {
     inherit pkgs config;
     inherit (repoValidation) formatterHookId judgmentHookIds;
@@ -437,16 +442,29 @@ in {
     # at the Stop boundary via validate-at-stop, where a rewrite has no
     # following Edit to race. Root cause assessed in:
     # docs/plans/prek-posttooluse-hook-feedback-channel.md.
-    hooks.git-hooks-run.enable = false;
+    hooks = {
+      git-hooks-run.enable = false;
 
-    # Run the git-hooks suite when Claude hands control back (Stop): auto-fix
-    # formatting silently, block-with-reason on judgment lint. See the
-    # assessment cited above.
-    hooks.validate-at-stop = {
-      enable = true;
-      name = "validate-at-stop";
-      hookType = "Stop";
-      command = lib.getExe validateAtStop;
+      # Run the git-hooks suite when Claude hands control back (Stop): auto-fix
+      # formatting silently, block-with-reason on judgment lint. See the
+      # assessment cited above.
+      validate-at-stop = {
+        enable = true;
+        name = "validate-at-stop";
+        hookType = "Stop";
+        command = lib.getExe validateAtStop;
+      };
+
+      # Second Stop gate: the PR loop. The rule this enforces lived in
+      # always-loaded steering and was ignored twice in one session after a
+      # mid-session correction, which is the signal that it needed a mechanism
+      # rather than more prose.
+      pr-watch-at-stop = {
+        enable = true;
+        name = "pr-watch-at-stop";
+        hookType = "Stop";
+        command = lib.getExe prWatchAtStop;
+      };
     };
 
     permissions.rules = {
