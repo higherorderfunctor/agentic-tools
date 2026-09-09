@@ -26,10 +26,16 @@ Read them with GraphQL, not the REST comments endpoint:
 ```bash
 gh api graphql -f query='
 query { repository(owner:"OWNER", name:"REPO") {
-  pullRequest(number:N) { reviewThreads(first:50) {
+  pullRequest(number:N) { reviewThreads(first:100) {
     nodes { id isResolved path comments(first:1){nodes{author{login} body}} } } } } }' \
   --jq '.data.repository.pullRequest.reviewThreads.nodes[]|select(.isResolved==false)'
 ```
+
+`first:100` is the maximum page size, and it is a CAP, not a guarantee. A PR
+with more threads than that returns a truncated set with no error — which is
+this document's own failure mode, a query that reports a clean round it never
+established. Check `pageInfo.hasNextPage` and page through `endCursor` before
+concluding a PR has no unresolved threads.
 
 REST attributes the same output to two DIFFERENT logins —
 `copilot-pull-request-reviewer[bot]` on `/pulls/N/reviews`, plain `Copilot` on
@@ -84,9 +90,13 @@ arrive as `state: COMMENTED` with zero threads — every mechanical signal reads
 ## Re-requesting
 
 Only ever after a significant change since the last run (the orientation
-fragment defines significant). Use the github-mcp `request_copilot_review` tool;
-`gh api .../requested_reviewers` returns HTTP 200 and does nothing for Copilot.
-The request is not the confirmation — poll for the check run on the head SHA. A
+fragment defines significant). Use the GitHub MCP server's request-a-Copilot-
+review operation — `request_copilot_review` on the server side, but the
+identifier your client shows is PREFIXED and varies by MCP client config, so
+match on the trailing segment rather than the full name. Do NOT use
+`gh api .../requested_reviewers`: it returns HTTP 200 and does nothing for
+Copilot, which is not addressable as an ordinary reviewer login there. The
+request is not the confirmation — poll for the check run on the head SHA. A
 request issued while a review is in flight is silently dropped.
 
 ## Separate-agent review
