@@ -158,6 +158,45 @@
   # `python3 -m sdoc_semantics` reaches it from a hand-run shell.
   grammarPython = pkgs.python3.withPackages (ps: [ps.ast-grep-py]);
 
+  # elkjs 0.12.0 — the layout engine docs/sdoc/board/assets/layout.js loads in a
+  # worker (MECH-SDOC-BOARD-LAYOUT). DEC-DEPS-VIA-NIX rules that runtime
+  # dependencies enter through Nix; until 2026-09-08 this one did not, its two
+  # files sitting in the tree under docs/sdoc/board/assets/vendor/elkjs/.
+  #
+  # A derivation HERE rather than an overlay under `overlays/generic/`, and the
+  # reason is what an overlay entry COSTS rather than any doubt about the
+  # pattern. An overlay is a PUBLISHED package of this flake: it lands in
+  # `pkgs.ai.*` and `packages.<system>`, owes a `config.checks.cacheHitParity`
+  # row, owes either a `config.update.targets` row or a written
+  # `passthru.updateTargetExempt` reason, and — being version-tracked against a
+  # registry — owes a sidecar plus an update script the 4x/day sweep runs. None
+  # of that buys anything for a browser asset that only the dev-only board app
+  # under `docs/` ever loads, and publishing elkjs as a product of
+  # nix-agentic-tools misstates what this repo ships. `grammarPython` above is
+  # the precedent: a dev-shell-only dependency of a dev-only tool, declared here
+  # and nowhere else. If the board ever ships as a package, this moves and takes
+  # the whole overlay contract with it.
+  #
+  # The pin is upstream's published tarball; its hash came from
+  # `nix store prefetch-file`. Its `lib/elk-api.js` and `lib/elk-worker.min.js`
+  # were verified byte-identical (sha256) to the vendored files they replace, so
+  # this swap moved no bytes the browser sees.
+  boardElkjs =
+    pkgs.runCommand "elkjs-0.12.0" {
+      src = pkgs.fetchurl {
+        url = "https://registry.npmjs.org/elkjs/-/elkjs-0.12.0.tgz";
+        hash = "sha256-wddxlyPgILEHJOPMvJNWlqKITx5402HN0DdmMJ6Ojio=";
+      };
+      meta = {
+        description = "ELK layout engine, as the sdoc board's worker loads it";
+        homepage = "https://github.com/kieler/elkjs";
+        license = with lib.licenses; [epl20 gpl3Plus];
+      };
+    } ''
+      mkdir -p "$out"
+      tar -xzf "$src" -C "$out" --strip-components=1
+    '';
+
   # The typed `.sgra` surface, imported here for ONE reason: its consumer DSL.
   # `ai.strictdoc.grammars.<name>.elements` is declared with the NORMALIZED
   # type, and packages/strictdoc-grammar/values.nix is written against the sugar
@@ -219,7 +258,17 @@ in {
   # get the same values from the wrapper's `--set-default`, which these
   # deliberately override — that is the developer's lever for pointing at a
   # locally built grammar.
-  inherit (sdocTsGrammars) env;
+  #
+  # SDOC_BOARD_ELKJS_DIR joins them because it is the same kind of thing: a
+  # store path a program resolves at RUN time and cannot guess. It reaches both
+  # readers from this one place — the dev shell, where `docs/sdoc/board/serve`
+  # is hand-run and `test_board.py` imports the server, and `processes.board`,
+  # which devenv launches out of this same environment.
+  env =
+    sdocTsGrammars.env
+    // {
+      SDOC_BOARD_ELKJS_DIR = "${boardElkjs}/lib";
+    };
 
   # ── Packages ──────────────────────────────────────────────────────────
   packages = with pkgs;
