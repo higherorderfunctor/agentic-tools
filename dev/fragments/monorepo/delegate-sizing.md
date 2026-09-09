@@ -1,12 +1,9 @@
 ## Delegate Sizing — choose the model AND the effort per delegate
 
-> **Last verified:** 2026-09-02 (commit pending — first version, corrected
-> before merge after a Codex review found that the initial draft mistook
-> `[agents]` defaults for the only sizing controls. Codex also supports explicit
-> spawn overrides and model/effort settings in custom agent files.) If a harness
-> gains or loses a per-delegate model or effort control, update the routing
-> table in the same commit — a table cell that is wrong is worse than one that
-> says `unknown`.
+> **Last verified:** 2026-09-08 — a delegate must never inherit the interactive
+> session's model and effort by default. If a harness gains or loses a
+> per-delegate model or effort control, update the routing table in the same
+> commit: a wrong cell is worse than one saying `unknown`.
 
 An unsized delegate inherits the session's model and reasoning effort unless a
 spawn override, agent default or custom agent configuration says otherwise. When
@@ -14,12 +11,9 @@ the session is pinned to the most capable model at the highest effort, **every
 unsized delegate repeats that expensive choice**. That is the failure this
 section exists to prevent.
 
-In the operator's words:
-
-> "not sure i need to spend fable token prices on all your subagents when opus
-> for reasoning or sonnet for mechanical extraction is likely fine. size the
-> correct model, and also effort level. you are cranked to the max, when
-> medium/high would otherwise be fine."
+A delegate must never default to the interactive session's model and effort.
+Size every one deliberately, both dimensions, and say the choice in its launch
+message so it is reviewable.
 
 ### The rule
 

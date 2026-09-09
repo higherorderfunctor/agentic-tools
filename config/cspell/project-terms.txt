@@ -28,6 +28,7 @@ autostash
 autoupdater
 avifenesh
 backgrounded
+backticked
 basenames
 bashisms
 bashpid
@@ -169,6 +170,8 @@ goproxy
 GOTOOLCHAIN
 GOWORK
 gpgsign
+gradeability
+gradeable
 gsub
 headlessly
 heredocs
@@ -450,6 +453,7 @@ undmg
 unexecutable
 unflushed
 ungated
+ungradeable
 ungroomed
 unheld
 unhide

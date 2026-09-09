@@ -35,6 +35,11 @@
   # Stop-hook validator (runs the git-hooks suite when Claude hands control
   # back, instead of racing the Edit tool on every PostToolUse). See the
   # claude.code.hooks block below.
+  # Refuses the hand-back while this branch's PR is unfinished. Separate from
+  # validateAtStop because it answers a different question (is the PR done?)
+  # with different failure semantics (fails OPEN on any network ambiguity).
+  prWatchAtStop = import ./lib/pr-watch-at-stop.nix {inherit pkgs;};
+
   validateAtStop = import ./lib/validate-at-stop.nix {
     inherit pkgs config;
     inherit (repoValidation) formatterHookId judgmentHookIds;
@@ -409,6 +414,7 @@ in {
         # (a bare `./dir` handed to ai.skills is copied, never read inside, so
         # an edit would otherwise be served from a stale eval cache).
         index-repo-docs = traceSource.tracedPath ./dev/skills/index-repo-docs;
+        pr-review-loop = traceSource.tracedPath ./dev/skills/pr-review-loop;
         repo-review = traceSource.tracedPath ./dev/skills/repo-review;
       };
   };
@@ -436,16 +442,29 @@ in {
     # at the Stop boundary via validate-at-stop, where a rewrite has no
     # following Edit to race. Root cause assessed in:
     # docs/plans/prek-posttooluse-hook-feedback-channel.md.
-    hooks.git-hooks-run.enable = false;
+    hooks = {
+      git-hooks-run.enable = false;
 
-    # Run the git-hooks suite when Claude hands control back (Stop): auto-fix
-    # formatting silently, block-with-reason on judgment lint. See the
-    # assessment cited above.
-    hooks.validate-at-stop = {
-      enable = true;
-      name = "validate-at-stop";
-      hookType = "Stop";
-      command = lib.getExe validateAtStop;
+      # Run the git-hooks suite when Claude hands control back (Stop): auto-fix
+      # formatting silently, block-with-reason on judgment lint. See the
+      # assessment cited above.
+      validate-at-stop = {
+        enable = true;
+        name = "validate-at-stop";
+        hookType = "Stop";
+        command = lib.getExe validateAtStop;
+      };
+
+      # Second Stop gate: the PR loop. The rule this enforces lived in
+      # always-loaded steering and was ignored twice in one session after a
+      # mid-session correction, which is the signal that it needed a mechanism
+      # rather than more prose.
+      pr-watch-at-stop = {
+        enable = true;
+        name = "pr-watch-at-stop";
+        hookType = "Stop";
+        command = lib.getExe prWatchAtStop;
+      };
     };
 
     permissions.rules = {
@@ -665,6 +684,21 @@ in {
       # Each target runs in a git worktree, cherry-picks to branch on
       # success, rolls back on failure. See scripts/update-*.sh.
       # Targeted updates: ninja -j4 -f .update.ninja update-agnix
+      # Reporting-only. Deliberately NOT a git-hooks validator: that table in
+      # config/repo-validation.nix requires every validator to carry a CI
+      # backend and participate in Stop, which would make this merge-blocking
+      # on prose. A false positive there is friction on every documentation
+      # edit forever, so it earns promotion by being quiet first.
+      "lint:gradeability" = {
+        description = "Report steering directives an agent cannot grade itself against (advisory)";
+        exec = ''
+          set -euETo pipefail
+          shopt -s inherit_errexit 2>/dev/null || :
+          cd "$DEVENV_ROOT"
+          ${pkgs.python3}/bin/python3 checks/gradeability.py .
+        '';
+      };
+
       "update:all" = {
         description = "Run full update pipeline (ninja DAG)";
         exec = ''

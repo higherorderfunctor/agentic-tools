@@ -39,15 +39,26 @@ before root-causing.
 - Any script that reads secrets (`cat <file>`, credential helpers)
 - Wrappers spawned by external tools (Claude Code, Copilot, IDE)
 
-**Contexts where it's defensive but still required:**
+**Bound by the MUST rule — a bare command here is a defect:**
 
-- HM activation scripts (`home.activation.*`) — run with PATH from the
-  activation environment, but should still be explicit
-- `writeShellApplication` — gets `runtimeInputs` which provides PATH, but the
-  scripts it generates should still prefer explicit paths for commands not in
-  `runtimeInputs`
-- `installPhase` / `buildPhase` — run inside `stdenv` with full PATH from build
-  inputs; absolute paths optional but acceptable
+- `home.activation.<name>` bodies
+- bodies emitted by `writeShellScript` / `writeShellScriptBin`
+- `writeShellApplication` text, for commands NOT listed in that application's
+  own `runtimeInputs`
+
+**Exempt — bare commands are correct, do not rewrite them:**
+
+- `installPhase` / `buildPhase` / `installCheckPhase` / `runCommand` bodies.
+  stdenv supplies PATH from the derivation's own `nativeBuildInputs`.
+
+The heading above these two lists used to read "defensive but still required"
+over a bullet saying "optional but acceptable", so the file could be cited for
+opposite verdicts on the same bare `cp`. `checks/bare-commands.nix` is the
+authority and has always exempted the phases; this list now matches it. When an
+exempt body lives in a file the whole-line scan reads (`lib/`,
+`packages/*/lib/`, `overlays/lib.nix`), silence it with a `# bare-commands: ok`
+marker on the line, as `mkClaudeExtract` does — never by adding a store path the
+phase does not need.
 
 **Enforcement:** `checks/bare-commands.nix` (part of `nix flake check`) runs two
 scans.
