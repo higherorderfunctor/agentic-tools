@@ -259,7 +259,16 @@ set +e
   # message.
   # shellcheck disable=SC2086
   if ! nix run --inputs-from . nix-update -- --flake "$name" --system "$system" $extra_flags 2>&1 | tee "$version_file"; then
-    log_failure "nix-update failed"
+    # PIPESTATUS survives into this block — measured, including the real
+    # exit code and which side failed:
+    #   $ if ! bash -c 'exit 42' | tee /dev/null; then echo "${PIPESTATUS[*]}"; fi
+    #   42 0
+    # so the `if !` form costs nothing in diagnosis. Report both: under
+    # `pipefail` a `tee` failure (full disk, bad path) fails the pipeline
+    # just as loudly as the real command, and attributing it to the wrong
+    # one sends the next reader looking in the wrong place.
+    pipe=("${PIPESTATUS[@]}")
+    log_failure "nix-update failed (nix-update=${pipe[0]} tee=${pipe[1]})"
     exit 1
   fi
 
