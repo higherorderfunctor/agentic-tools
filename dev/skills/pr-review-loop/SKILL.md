@@ -65,6 +65,31 @@ an OLD review that reads exactly like a fresh clean one.
 **"generated no new comments" describes bucket 1 only.** It has appeared in the
 same body as a suppressed finding.
 
+## Watching CI without racing it
+
+`gh pr checks <n> --watch` returns IMMEDIATELY with `no checks reported` if it
+beats GitHub to creating them, which is the normal case right after a push. The
+watcher then exits successfully having watched nothing, and the turn ends on a
+green-looking result — the same silent-clean shape as everything else here.
+
+Wait for the checks to EXIST before watching, and gate on the count rather than
+on their state:
+
+```bash
+for _ in $(seq 1 40); do
+  n=$(gh pr checks <n> --repo OWNER/REPO --json name | jq 'length')
+  [ "$n" -gt 0 ] && break
+  sleep 15
+done
+gh pr checks <n> --repo OWNER/REPO --watch --interval 30
+```
+
+Gating on "is anything PENDING" instead has the same bug with an extra step: an
+empty list has nothing pending, so it falls through just as fast.
+
+`UNSTABLE` on the PR is not a failure — it means "not all green yet" and covers
+pending. `DIRTY` is the one that means stop waiting and rebase.
+
 ## Deciding whether a review is yours to read
 
 Three states look alike and only one means "reviewed, nothing found".
