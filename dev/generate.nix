@@ -269,15 +269,34 @@
     ${agentsContent}
   '';
 
-  # CLAUDE.md is a one-liner that @-imports AGENTS.md. All
-  # orientation content lives in AGENTS.md. Keeping CLAUDE.md
-  # body content alongside the @AGENTS.md import would
-  # double-load the content at every session start (the import
-  # expansion plus the inline body).
+  # CLAUDE.md carries the orientation directly rather than
+  # @-importing AGENTS.md, and the difference is the ROUTING
+  # INDEX. That index exists because Codex has no glob-scoped
+  # instruction primitive: it is Codex's only route from a path
+  # to the fragments governing it. Claude has real scoping in
+  # `.claude/rules/*.md` (`paths:` frontmatter), so under the
+  # import Claude paid for an index it can never act on —
+  # measured at 9,875 bytes on every session.
+  #
+  # Emitting the body ONCE here is what keeps this from being
+  # the double-load the import was designed to avoid: CLAUDE.md
+  # no longer imports AGENTS.md, so only one copy is ever read.
+  # Do not "simplify" this back to `@AGENTS.md`; that silently
+  # restores the index to Claude's payload.
   claudeMd = ''
     # CLAUDE.md
 
-    @AGENTS.md
+    Project instructions for AI coding assistants working in this repository.
+
+    Deep-dive architecture documentation (fanout semantics, wrapper chains,
+    fragment pipeline, overlay cache-hit parity, HM module conventions, etc.)
+    comes from source fragments under `dev/fragments/`, `packages/*/docs/` and
+    `devshell/*/docs/`. They reach you as path-scoped rules in
+    `.claude/rules/*.md`, loaded automatically when you edit a matching path —
+    you do not look them up. Do not edit those projections, or the
+    `.github/instructions/` and `.kiro/steering/` ones; they are generated.
+
+    ${agentsContent}
   '';
   # ── README.md generation ─────────────────────────────────────────────
 

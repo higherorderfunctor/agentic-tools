@@ -64,7 +64,15 @@ _: {
     ai-config-scope = {
       scopes = [
         "devenv.nix"
-        "packages/*/lib/mk*.nix"
+        # The five AI CLI factories, listed explicitly. `packages/*/lib/mk*.nix`
+        # used to stand here and matched 24 files — every MCP server factory,
+        # glab, beads and semble included — so editing an unrelated `mk*.nix`
+        # pulled this whole category for nothing.
+        "packages/chatgpt-codex/lib/mkCodex.nix"
+        "packages/claude-code/lib/mkClaude.nix"
+        "packages/copilot-cli/lib/mkCopilot.nix"
+        "packages/kimchi/lib/mkKimchi.nix"
+        "packages/kiro-cli/lib/mkKiro.nix"
         "packages/*/lib/wrapPackage.nix"
         "packages/*/modules/devenv/**"
       ];
@@ -103,11 +111,23 @@ _: {
         # Final B7 static-file registry and generic backend lowering.
         "lib/ai/runtime-files.nix"
         "lib/ai/sharedOptions.nix"
-        "packages/*/lib/mk*.nix"
+        # The five AI CLI factories, listed explicitly. `packages/*/lib/mk*.nix`
+        # used to stand here and matched 24 files — every MCP server factory,
+        # glab, beads and semble included — so editing an unrelated `mk*.nix`
+        # pulled this whole category for nothing.
+        "packages/chatgpt-codex/lib/mkCodex.nix"
+        "packages/claude-code/lib/mkClaude.nix"
+        "packages/copilot-cli/lib/mkCopilot.nix"
+        "packages/kimchi/lib/mkKimchi.nix"
+        "packages/kiro-cli/lib/mkKiro.nix"
         "packages/chatgpt-codex/modules/**"
         "packages/claude-code/modules/**"
         "packages/copilot-cli/modules/**"
         "packages/kiro-cli/modules/**"
+        # `ai-module-fanout.md` discusses this file as the repo's only
+        # `mkProgram` consumer; the retired glob caught `lib/mkSemble.nix`
+        # instead, which is a 37-line MCP defaults record.
+        "packages/semble/modules/common.nix"
       ];
       sources = [
         "ai-module-fanout"

@@ -31,7 +31,10 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`dev/fragments/ai-clis/packaging-guide.md`](dev/fragments/ai-clis/packaging-guide.md)
 
 - **`ai-config-scope`**
-  - Match: `devenv.nix`, `packages/*/lib/mk*.nix`,
+  - Match: `devenv.nix`, `packages/chatgpt-codex/lib/mkCodex.nix`,
+    `packages/claude-code/lib/mkClaude.nix`,
+    `packages/copilot-cli/lib/mkCopilot.nix`,
+    `packages/kimchi/lib/mkKimchi.nix`, `packages/kiro-cli/lib/mkKiro.nix`,
     `packages/*/lib/wrapPackage.nix`, `packages/*/modules/devenv/**`
   - Read:
     [`dev/fragments/ai-config-scope/host-config-merge.md`](dev/fragments/ai-config-scope/host-config-merge.md)
@@ -41,9 +44,13 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     `lib/ai/app/**`, `lib/ai/default.nix`, `lib/ai/hooks.nix`,
     `lib/ai/materialize.nix`, `lib/ai/mkSkillPackageModule.nix`,
     `lib/ai/program.nix`, `lib/ai/runtimes.nix`, `lib/ai/runtime-files.nix`,
-    `lib/ai/sharedOptions.nix`, `packages/*/lib/mk*.nix`,
+    `lib/ai/sharedOptions.nix`, `packages/chatgpt-codex/lib/mkCodex.nix`,
+    `packages/claude-code/lib/mkClaude.nix`,
+    `packages/copilot-cli/lib/mkCopilot.nix`,
+    `packages/kimchi/lib/mkKimchi.nix`, `packages/kiro-cli/lib/mkKiro.nix`,
     `packages/chatgpt-codex/modules/**`, `packages/claude-code/modules/**`,
-    `packages/copilot-cli/modules/**`, `packages/kiro-cli/modules/**`
+    `packages/copilot-cli/modules/**`, `packages/kiro-cli/modules/**`,
+    `packages/semble/modules/common.nix`
   - Read:
     [`dev/fragments/ai-module/ai-module-fanout.md`](dev/fragments/ai-module/ai-module-fanout.md),
     [`dev/fragments/ai-module/collision-semantics.md`](dev/fragments/ai-module/collision-semantics.md),
