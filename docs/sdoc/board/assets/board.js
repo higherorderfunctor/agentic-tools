@@ -250,10 +250,7 @@ function renderEdges() {
     const edge = route.edge;
     const semanticEdges = route.edges ?? [edge];
     const role = edge.role || edge.type;
-    const roleStyle = roleStyles.get(role) ?? {
-      color: "#64ffda",
-      markerId: "arrow",
-    };
+    const roleStyle = roleStyles.get(role);
     const sources = [...new Set(semanticEdges.map(({ source }) => source))];
     const targets = [...new Set(semanticEdges.map(({ target }) => target))];
     const wrapper = svgNode("g", {
@@ -366,6 +363,9 @@ function renderLegend() {
     roleItems.append(item);
   }
   const outlineItems = htmlNode("div", "legend-items legend-outline-items");
+  const focalType = layout.nodes.find(
+    (node) => node.id === state.focusId,
+  )?.type;
   for (const [kind, label] of [
     ["focus", "Focused work"],
     ["inspected", "Inspected"],
@@ -373,10 +373,11 @@ function renderLegend() {
     ["target", "Inspected → target"],
   ]) {
     const item = htmlNode("span", "legend-item legend-outline-item");
-    item.append(
-      htmlNode("span", `legend-outline-swatch outline-${kind}`),
-      htmlNode("span", null, label),
-    );
+    const swatch = htmlNode("span", `legend-outline-swatch outline-${kind}`);
+    if (kind === "focus") {
+      swatch.style.setProperty("--outline-color", colorOf(focalType));
+    }
+    item.append(swatch, htmlNode("span", null, label));
     outlineItems.append(item);
   }
   const group = (title, items, className = "") => {
