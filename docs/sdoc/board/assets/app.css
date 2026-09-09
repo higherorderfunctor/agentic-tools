@@ -905,10 +905,6 @@ html[data-status="error"] .status-dot {
   box-shadow: 0 0 9px color-mix(in srgb, var(--outline-color), transparent 28%);
 }
 
-.outline-focus {
-  --outline-color: var(--accent-success);
-}
-
 .outline-inspected {
   --outline-color: var(--text-primary);
 }
