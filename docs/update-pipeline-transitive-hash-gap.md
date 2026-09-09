@@ -393,8 +393,9 @@ What the build actually catches, and what now happens:
 - **Mode D** — the build hits `ERR_PNPM_NO_OFFLINE_TARBALL` because the FOD
   output does not match. This one IS a hash we could not produce, so it still
   holds back — provided a fixer exists for that hash kind. **It currently does
-  not for pnpmDeps or cargoDeps**; see the KNOWN GAP comment on
-  `fix_sidecar_hashes` in `dev/scripts/update-common.sh`.
+  not for pnpmDeps or cargoDeps** — there is no `fixPnpmDepsHash` and no
+  `fixCargoHash`. See the KNOWN GAP comment on `fix_sidecar_hashes` in
+  `dev/scripts/update-common.sh`, and GitHub issue #1570.
 - **Any future class of build-time failure** specific to the targeted package
   (test failures, missing native deps, etc.) — still caught for free, and still
   reported, but as a red PR rather than a withheld one.

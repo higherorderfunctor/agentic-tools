@@ -419,28 +419,39 @@ verify_all_packages() {
 fix_sidecar_hashes() {
   local expr paths p rc=0
 
-  # ── KNOWN GAP: this roster covers TWO of the four hash kinds ──────────
+  # ── KNOWN GAP: this roster is narrower than the fixers that exist ─────
   #
   # IF A NIXPKGS BUMP BREAKS A HASH AND THE PR OPENED RED INSTEAD OF
   # BEING HELD BACK, THIS IS WHY. Read this before re-deriving it.
+  # Tracked as GitHub issue #1570. Grep `fixPnpmDepsHash` or
+  # `fixSrcHash` to find every place the gap is written down.
   #
-  # `fixVendorHash` (Go) and `fixNpmDepsHash` (npm) are the only fixers
-  # any overlay exposes. There is no `fixPnpmDepsHash` and no
-  # `fixCargoHash`, so a nixpkgs bump that invalidates a pnpmDeps or
-  # cargoDeps hash has nothing to re-derive it. The build then fails with
-  # every hash-derivation step reporting success, and update-input.sh
-  # classifies that as "well-formed but does not build" and opens a red
-  # PR — when the true cause is a hash we could not produce, which the
-  # hold-back rule says should have withheld the PR.
+  # Two separate shortfalls, and only the first is about missing fixers:
   #
-  # This is a MISCLASSIFICATION, not a regression: before the hold-back
-  # split there was no hold-back on the input path at all, so these
-  # already surfaced as red PRs. Deferred deliberately rather than
+  #   1. NO FIXER EXISTS for pnpmDeps or cargoDeps. A nixpkgs bump that
+  #      invalidates either has nothing to re-derive it. The build then
+  #      fails with every hash-derivation step reporting success, so
+  #      update-input.sh classifies it as "well-formed but does not
+  #      build" and opens a red PR — when the true cause is a hash we
+  #      could not produce, which the rule says should hold back.
+  #
+  #   2. A FIXER EXISTS BUT IS NOT DISCOVERED. The expression below
+  #      collects `fixVendorHash` and `fixNpmDepsHash` only, so glab's
+  #      `passthru.fixSrcHash` has no caller at all — see the note on
+  #      `mkGoUpdateExtract` in overlays/lib.nix, which also explains why
+  #      that case presents as a CONFUSING `fixVendorHash` failure
+  #      ("goModules build failed without a '-go-modules' hash
+  #      mismatch") rather than as a src problem.
+  #
+  # Shortfall 1 is a MISCLASSIFICATION, not a regression: before the
+  # hold-back split there was no hold-back on the input path at all, so
+  # these already surfaced as red PRs. Deferred deliberately rather than
   # designed upfront — adding a fixer means per-package `extraExtract`
   # plumbing, and we would rather see a real failure shape it.
   #
-  # Tracked as a GitHub issue; grep `fixPnpmDepsHash` to find every
-  # place this gap is written down.
+  # Shortfall 2 is a one-line addition to the list below and is only
+  # unfixed because nobody has verified glab's fixer against a live
+  # fetcher change.
   #
   # `builtins.getAttr` keeps the expression free of brace-substitution
   # sequences, so bash never tries to expand any part of it.

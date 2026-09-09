@@ -205,9 +205,12 @@ jobs:
       #
       # `always()` so a sweep that ran out of wall clock still SHIPS what it
       # finished. Every target commits into its own worktree branch only
-      # after its build verification passes, so a killed ninja leaves each
-      # branch either at the base commit (skipped by the base-SHA guard) or
-      # carrying a complete, verified commit. Discarding those was pure
+      # after the change is fully WRITTEN — lock, hashes, formatting — so a
+      # killed ninja leaves each branch either at the base commit (skipped
+      # by the base-SHA guard) or carrying a complete commit. It is NOT
+      # necessarily a verified one: since the hold-back split, a target
+      # whose build fails deliberately still commits and opens a red PR,
+      # and branch CI is what reports it. Discarding those was pure
       # waste: measured on run 30713330569, ninja was `cancelled` at the
       # 60-minute timeout with 47 of 52 edges DONE, this step was `skipped`,
       # and every finished dependency — glab's regenerated sidecar included —

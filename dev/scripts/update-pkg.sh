@@ -332,7 +332,7 @@ if ! (
     log_info "Build failed — opening the PR; branch CI is the gate"
     echo "::warning::${name}: build verification failed, PR opens red"
   fi
-  # Belt and braces: keep the subshell'"'"'s exit status independent of the
+  # Belt and braces: keep the subshell's exit status independent of the
   # build above even if a later edit adds a statement here.
   true
 ); then

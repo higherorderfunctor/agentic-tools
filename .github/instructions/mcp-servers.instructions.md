@@ -253,15 +253,24 @@ WRONG shape for it:
   `.patch` file. `--replace-fail` is positional-anchor-free and turns drift into
   a loud build failure; a `.patch` can apply with FUZZ and silently land in the
   wrong place.
-- So keep the `config.update.targets` row. A held-back sweep here is the SIGNAL,
-  not a channel-occupying nuisance: it means upstream touched the exact lines
-  being patched, which is precisely when a human must look.
+- So keep the `config.update.targets` row. A sweep that goes red here is the
+  SIGNAL, not a channel-occupying nuisance: it means upstream touched the exact
+  lines being patched, which is precisely when a human must look.
 
-For a SECURITY patch that inverts an upstream default, failing the sweep is the
-DESIRED behavior — auto-sweeping past it would silently restore the unsafe
-default. Prefer edits that also make the compiler your backstop: if the patched
-signature is threaded through callers, a partial application fails to typecheck
-rather than compiling into a half-patched binary.
+For a SECURITY patch that inverts an upstream default, a failing build is the
+DESIRED outcome — auto-sweeping past it would silently restore the unsafe
+default.
+
+**Since the hold-back split (2026-09-09) that failure surfaces as a RED PR, not
+as a held-back target.** The protection is unchanged and does not depend on
+hold-back: `build (<system>)` is a required status check, so a dead
+`--replace-fail` anchor reddens it and the bot's auto-merge cannot land the PR.
+What moved is only WHERE you see it — a red check on an open PR rather than a
+`HELD BACK` line in a sweep log, which is the more visible of the two. Do not
+"restore" hold-back here on safety grounds; the required check is the gate.
+Prefer edits that also make the compiler your backstop: if the patched signature
+is threaded through callers, a partial application fails to typecheck rather
+than compiling into a half-patched binary.
 
 `openmemory-mcp` WAS the worked example, and its whole arc is the lesson — the
 package was retired on 2026-09-01, but keep the example: this repo carries no

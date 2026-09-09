@@ -628,8 +628,8 @@ feature maturities, and config-key extraction fail closed.
   thing that spells itself that way.** `applyPatches` dying in `patchPhase`
   means `nix-build` never emits a hash mismatch, so nix-update reports
   `failed to retrieve hash when trying to update <pkg>.src` and the sweep
-  records `HELD BACK: <pkg> (nix-update or build failed)`. Neither names a
-  patch. The real `Hunk #N FAILED` lines are in the
+  records `HELD BACK: <pkg> (nix-update, formatter or commit failed)`. Neither
+  names a patch. The real `Hunk #N FAILED` lines are in the
   `--- nix stderr (last 20 lines) ---` tail in the update job log.
 
   **Read that tail before concluding anything**, because the `--no-src` failure

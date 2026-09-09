@@ -38,11 +38,39 @@ if ! (
     exit 1
   fi
 
-  # Regenerate devenv.yaml from updated flake.lock
-  nix eval --raw --impure --expr 'import ./config/generate-devenv-yaml.nix {}' >devenv.yaml
+  # Regenerate devenv.yaml from updated flake.lock.
+  #
+  # Write to a temp and move, NEVER `>devenv.yaml` directly: the shell
+  # truncates the redirect target BEFORE running the command, so an eval
+  # failure left a zero-byte devenv.yaml — which then got staged, committed
+  # and opened as a PR. Nothing downstream catches that: devenv.yaml has no
+  # drift check under `nix flake check`, and prettier accepts an empty YAML
+  # file, so the six required checks stay green and the bot's auto-merge
+  # lands it. Explicit `exit` for the errexit reason above.
+  if ! nix eval --raw --impure --expr 'import ./config/generate-devenv-yaml.nix {}' \
+    >devenv.yaml.tmp; then
+    rm -f devenv.yaml.tmp
+    log_failure "devenv.yaml regeneration failed"
+    exit 1
+  fi
+  # The `mv` needs the same guard as the eval above. Bare, a failed rename
+  # left devenv.yaml at its OLD content, which then got staged and committed
+  # beside a bumped flake.lock — a stale-but-well-formed file that no
+  # required check compares against the lock, so it would auto-merge exactly
+  # like the zero-byte case this temp-and-move exists to prevent.
+  if ! mv devenv.yaml.tmp devenv.yaml; then
+    rm -f devenv.yaml.tmp
+    log_failure "could not install regenerated devenv.yaml"
+    exit 1
+  fi
 
-  # Sync devenv.lock
-  devenv update
+  # Sync devenv.lock. Producing content the PR carries, so a failure is a
+  # hold-back: shipping a stale devenv.lock beside a bumped flake.lock is a
+  # PR we could not write correctly, and no required check compares them.
+  if ! devenv update; then
+    log_failure "devenv update failed"
+    exit 1
+  fi
 
   # Semble comes from the llm-agents flake input rather than a package update
   # target, so mkUpdateScript's extraExtract hook can never run for it. Refresh
@@ -51,12 +79,23 @@ if ! (
   # or adapts each local derivative after upstream content changes.
   if [ "$name" = "llm-agents" ]; then
     log_info "Regenerating pinned Semble agent templates..."
+    # Each step produces content the PR carries, so each failure is a
+    # hold-back. Without the guards a failed `nix build` left
+    # `semble_templates_path` empty, `cp ""` failed, and the PR shipped
+    # with an unrefreshed snapshot — all silently, per the errexit note
+    # above.
     update_system=$(nix eval --raw --impure --expr builtins.currentSystem)
-    semble_templates_path=$(nix build --no-link --print-out-paths \
-      ".#checks.$update_system.semble-templates-extracted.passthru.extracted")
-    cp "$semble_templates_path" packages/semble/upstream-templates.json
-    chmod 644 packages/semble/upstream-templates.json
-    nix fmt -- packages/semble/upstream-templates.json
+    if ! semble_templates_path=$(nix build --no-link --print-out-paths \
+      ".#checks.$update_system.semble-templates-extracted.passthru.extracted"); then
+      log_failure "semble template extraction failed"
+      exit 1
+    fi
+    if ! cp "$semble_templates_path" packages/semble/upstream-templates.json ||
+      ! chmod 644 packages/semble/upstream-templates.json ||
+      ! nix fmt -- packages/semble/upstream-templates.json; then
+      log_failure "could not refresh packages/semble/upstream-templates.json"
+      exit 1
+    fi
   fi
 
   # Check if anything changed. `git diff --staged --quiet` signals through its
@@ -67,7 +106,15 @@ if ! (
   # nothing actually moved, the target ran the FULL nix-fast-build
   # verification of every package before failing on an empty commit, and
   # reported the cause as "update or build failed".
-  git add flake.lock devenv.yaml devenv.lock packages/semble/upstream-templates.json
+  # `git add` is atomic: a bad pathspec aborts it and stages NOTHING. Left
+  # bare, that failure fell through to the clean-index check below, which
+  # exited the subshell 0 — so the sweep printed `NO UPDATES` and the real
+  # lock change was discarded with the worktree. Neither hold back nor
+  # ship; the update simply vanished.
+  if ! git add flake.lock devenv.yaml devenv.lock packages/semble/upstream-templates.json; then
+    log_failure "git add failed"
+    exit 1
+  fi
   if git_diff_quiet diff --staged; then
     exit 0
   fi
@@ -96,17 +143,33 @@ if ! (
     # bare failing command does NOT abort, it falls through to the
     # `git commit` below, whose success then becomes the subshell's
     # status. That is how a verified-broken bump shipped as UPDATED.
-    if ! fix_sidecar_hashes; then
-      log_failure "could not derive sidecar hashes"
-      exit 1
-    fi
-    # Informational from here. The lock is written and every hash we can
-    # derive has been derived, so the tree is complete and committable.
-    # A build that still fails means the update is well-formed but does
-    # not build — that is a red PR for branch CI to report, not a reason
-    # to withhold the PR.
+    # A non-zero return here does NOT by itself mean "a hash cannot be
+    # derived", and treating it that way re-parks the input behind one
+    # broken peer — the exact failure this rule exists to remove. Two
+    # paths return non-zero for other reasons: the roster expression
+    # forces every attr in `packages.<system>`, so ONE package throwing
+    # at eval fails the whole resolve; and a fixer whose FOD build breaks
+    # with no hash mismatch to scrape exits 1 too (overlays/lib.nix,
+    # `fix_fod_hash`) — that is "the recorded hash was already right and
+    # something else broke".
+    #
+    # So capture it and let the retry adjudicate.
+    fixer_rc=0
+    fix_sidecar_hashes || fixer_rc=$?
+
     if ! verify_all_packages; then
-      log_info "Build still failing after sidecar repair — opening the PR; branch CI is the gate"
+      if [ "$fixer_rc" -ne 0 ]; then
+        # The repair could not run to completion AND the tree still does
+        # not build, so we cannot show the hashes are right: the PR may
+        # need a value we never produced. That is the hold-back case.
+        log_failure "sidecar hash repair failed and the build still fails"
+        exit 1
+      fi
+      # The repair ran clean and the build still fails, so every hash we
+      # can derive HAS been derived and the tree is complete and
+      # committable. Well-formed but does not build is a red PR for
+      # branch CI to report, not a reason to withhold it.
+      log_info "Build still failing after a clean sidecar repair — opening the PR; branch CI is the gate"
       echo "::warning::${name}: build verification failed, PR opens red"
     fi
   fi
