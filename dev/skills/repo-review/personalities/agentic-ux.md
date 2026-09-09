@@ -45,10 +45,12 @@ tools might fail to use these skills and fix the root causes.
 
 ### Instruction File Size
 
-- Flag unusually large instruction files and check if content duplicates
-  reference docs (reference docs load on demand; instruction files load every
-  session). Use your judgment — there is no hard byte threshold, but bigger
-  files increase the risk that routing rules get buried.
+- Flag any single fragment over the 150-line target `AGENTS.md` states, and
+  check whether its content duplicates a reference doc (reference docs load on
+  demand; instruction files load every session). "Unusually large" stood here
+  and could not be graded — 150 lines is the repo's own stated bar, so use it
+  and say by how much a file exceeds it. Bigger files increase the risk that
+  routing rules get buried.
 - Flag competing or overlapping routing/tool-selection tables
 - Apply the test: "Would removing this line cause Claude to make mistakes? If
   not, cut it."

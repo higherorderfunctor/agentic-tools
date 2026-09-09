@@ -684,6 +684,21 @@ in {
       # Each target runs in a git worktree, cherry-picks to branch on
       # success, rolls back on failure. See scripts/update-*.sh.
       # Targeted updates: ninja -j4 -f .update.ninja update-agnix
+      # Reporting-only. Deliberately NOT a git-hooks validator: that table in
+      # config/repo-validation.nix requires every validator to carry a CI
+      # backend and participate in Stop, which would make this merge-blocking
+      # on prose. A false positive there is friction on every documentation
+      # edit forever, so it earns promotion by being quiet first.
+      "lint:gradeability" = {
+        description = "Report steering directives an agent cannot grade itself against (advisory)";
+        exec = ''
+          set -euETo pipefail
+          shopt -s inherit_errexit 2>/dev/null || :
+          cd "$DEVENV_ROOT"
+          ${pkgs.python3}/bin/python3 checks/gradeability.py .
+        '';
+      };
+
       "update:all" = {
         description = "Run full update pipeline (ninja DAG)";
         exec = ''

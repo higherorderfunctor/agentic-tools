@@ -842,7 +842,9 @@ round that did not happen, are in the `pr-review-loop` skill.
 ### When Copilot does not review, a SEPARATE agent does
 
 Triggers, any of them: the review errored, the account is out of quota, the PR
-never left draft, or a significant change landed after the last review.
+never left draft, or `git diff --stat <last-reviewed-sha>...HEAD` shows a change
+that would earn a re-request under the test above — a new file or mechanism, or
+an approach rewritten rather than corrected.
 
 **You cannot review your own diff.** Reading it back produces agreement, because
 the reasoning that wrote the code is the reasoning evaluating it. Dispatch a
