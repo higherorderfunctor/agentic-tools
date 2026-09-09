@@ -1,8 +1,9 @@
 ## Update Pipeline Architecture
 
 > **Last verified:** 2026-09-09 — a target is HELD BACK only when the PR cannot
-> be WRITTEN. A failing build is no longer a hold-back reason; it ships as a red
-> PR and branch CI reports it.
+> be WRITTEN; a failing build ships as a red PR instead. Target bodies are
+> standalone subshells so `errexit` is genuinely armed, gated by
+> `checks/target-subshell-shape.nix`.
 >
 > **Settled — do not relitigate.** Gating the PR on a passing build was tried
 > and rejected. It parks every later bump of that input behind one broken
@@ -217,12 +218,38 @@ committable change; that it does not build is a fact about the code, and the six
 required checks on the PR are what report it. Withholding the PR there converts
 a visible red check into an invisible line in a sweep log.
 
-**Every one of these needs an explicit `exit`.** Each target's body is the
-CONDITION of an `if ! ( … )`, and bash disables `errexit` for a condition — so a
-bare failing command does not abort the subshell, it falls through to the
-trailing `git commit`, whose success becomes the subshell's status. That is not
-theory: it is how a nixpkgs bump with a verified-failing build shipped as
-`UPDATED` on every sweep from at least 2026-04-13 to 2026-09-09.
+**Errexit must stay ARMED inside a target body, and that is a property of the
+SHAPE.** Bash disables `errexit` for any command whose status it tests — an `if`
+or `while` condition, a `!` negation, or the left operand of `||`/`&&` — and
+that suppression reaches inside a subshell and overrides a `set -e` written
+there. `( … ) || rc=$?` is not a fix either; the `||` puts the subshell back in
+a tested context. Only a standalone subshell works:
+
+```bash
+target_rc=0
+set +e
+(
+  set -euETo pipefail
+  shopt -s inherit_errexit 2>/dev/null || :
+  …
+)
+target_rc=$?
+set -e
+```
+
+Under the old `if ! ( … ); then` shape every bare command in a target body fell
+through to the trailing `git commit`, whose success became the target's status.
+A nixpkgs bump whose build verification FAILED therefore shipped as `UPDATED` —
+sweep 34351134945 logged exactly that, with zero `HELD BACK:` lines in 12,274
+lines of log, and it had been doing so since at least 69c00ef2 (2026-04-13).
+
+`checks/target-subshell-shape.nix` fails the build if the shape regresses, and
+carries a positive control so it cannot pass vacuously when a body is renamed or
+removed. **That gate is the rule; this paragraph only explains it.** The rule
+lived as prose first and was broken twice within two days of being written, each
+time caught by a reviewer rather than by a tool — shellcheck has no diagnostic
+for it. The explicit `exit` calls still in those bodies are now belt-and-braces,
+not the mechanism.
 
 ### Key files
 

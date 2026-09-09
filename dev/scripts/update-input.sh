@@ -18,7 +18,17 @@ version_file="$wt/.update-version"
 
 # Phase 1: Update the input in the worktree
 log_info "Updating flake input..."
-if ! (
+# STANDALONE subshell, NOT an `if !` condition — bash disables errexit for
+# anything whose status it tests, and that reaches inside the subshell and
+# overrides its own `set -e`. See "Target subshell shape" in
+# update-common.sh; checks/target-subshell-shape.nix fails the build if this
+# regresses.
+target_rc=0
+set +e
+(
+  set -euETo pipefail
+  shopt -s inherit_errexit 2>/dev/null || :
+
   cd "$wt"
 
   # Capture pre-update formatter store path. Used by Phase 2.5 to
@@ -31,10 +41,22 @@ if ! (
   # "different from after" and the existing unconditional behavior.
   fmt_before=$(nix eval --raw .#formatter.x86_64-linux.outPath 2>/dev/null || echo "")
 
-  # Capture nix flake update output for version reporting
-  nix flake update "$name" 2>&1 | tee "$version_file"
-  if [ "${PIPESTATUS[0]}" -ne 0 ]; then
-    log_failure "nix flake update failed"
+  # Capture nix flake update output for version reporting. `if !` rather
+  # than a bare pipeline plus a PIPESTATUS test: under `pipefail` the
+  # pipeline's own status already IS nix's, and with errexit now armed a
+  # bare pipeline would abort before reaching any status check, losing this
+  # message. The `if` reads the same status and keeps the diagnosis.
+  if ! nix flake update "$name" 2>&1 | tee "$version_file"; then
+    # PIPESTATUS survives into this block — measured, including the real
+    # exit code and which side failed:
+    #   $ if ! bash -c 'exit 42' | tee /dev/null; then echo "${PIPESTATUS[*]}"; fi
+    #   42 0
+    # so the `if !` form costs nothing in diagnosis. Report both: under
+    # `pipefail` a `tee` failure (full disk, bad path) fails the pipeline
+    # just as loudly as the real command, and attributing it to the wrong
+    # one sends the next reader looking in the wrong place.
+    pipe=("${PIPESTATUS[@]}")
+    log_failure "nix flake update failed (nix=${pipe[0]} tee=${pipe[1]})"
     exit 1
   fi
 
@@ -216,7 +238,11 @@ if ! (
     log_failure "git commit failed"
     exit 1
   fi
-); then
+)
+target_rc=$?
+set -e
+
+if [ "$target_rc" -ne 0 ]; then
   version_detail=$(parse_input_version "$version_file" "$name")
   report_held_back "$name" "update or hash derivation failed" "$version_detail"
   exit 0
