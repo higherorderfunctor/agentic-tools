@@ -15,8 +15,6 @@
   };
   inherit (ourPkgs) fetchFromGitHub;
   vu = import ../lib.nix;
-  # httpx-auth has test failures in nixpkgs (jwt InsecureKeyLengthWarning)
-  httpx-auth = ourPkgs.python3Packages.httpx-auth.overridePythonAttrs {doCheck = false;};
 
   rev = "153a96a61fde2bf5a23961c64a3dd96b5e385108";
   src = fetchFromGitHub {
@@ -35,10 +33,26 @@ in
       inherit rev;
     };
     inherit src;
-    # v0.11.0 added httpx-auth dependency (not in nixpkgs' v0.10.0)
+    # Upstream added httpx-auth in v0.11.0. Append nixpkgs' OWN
+    # `python3Packages.httpx-auth`, never a variant of it.
+    #
+    # This used to append a private `overridePythonAttrs {doCheck = false;}`
+    # copy, for a jwt InsecureKeyLengthWarning test failure. That was safe
+    # only while nixpkgs sat on v0.10.0 and listed no httpx-auth of its own.
+    # nixpkgs d6524aa moved to 0.12.0 with `dependencies = [httpx-auth mcp
+    # uvicorn]`, so the private copy became a SECOND store path for the same
+    # `httpx_auth 0.23.1` and `pythonCatchConflictsPhase` failed:
+    #
+    #   Found duplicated packages in closure for dependency 'httpx_auth'
+    #
+    # Appending the identical derivation instead makes the entry a no-op
+    # duplicate on a nixpkgs that already carries it (one store path, so no
+    # conflict), while still supplying it on one that does not. Measured on
+    # sweep 34388647306 — the first sweep after the versionCheckHook fix,
+    # which is what let the build reach this phase at all.
     dependencies =
       (old.dependencies or [])
-      ++ [httpx-auth];
+      ++ [ourPkgs.python3Packages.httpx-auth];
     nativeCheckInputs = with ourPkgs.python3Packages; [pytest pytest-asyncio];
     doInstallCheck = true;
     installCheckPhase = vu.mkMcpSmokeTest {bin = "mcp-proxy";};
