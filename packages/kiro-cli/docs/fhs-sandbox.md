@@ -1,27 +1,12 @@
 # The nixpkgs FHS sandbox: what kiro can and cannot see
 
-> **Last verified:** 2026-08-16 (commit pending —
-> `ai.kiro.useFhsSandbox = false` now selects the same pinned unwrapped payload
-> explicitly, while true remains the default. `trustedMcpTools` is composed
-> inside the FHS payload so launcher dispatch reaches it in both supported
-> nixpkgs topologies; the structural check realizes that production shape).
-> Prior: 2026-08-16 (commit pending — nixpkgs 9ddfd8a consolidated the three
-> per-command FHS environments into one shared environment behind thin command
-> wrappers. The underlying launcher still bind-mounts `/nix` and preserves PATH;
-> the structural check now follows the new wrapper layer and pins the dispatcher
-> too). Prior: 2026-08-15 (commit pending — clarifies that a null Kiro-specific
-> PATH tombstone suppresses the normalized root PATH before the `extraPackages`
-> prefix is built). Prior: 2026-08-14 (commit pending — adds the consumer-facing
-> `ai.kiro.extraPackages` path for making store-backed tools visible without
-> rebuilding the FHS root, records its wrapper/PATH precedence, and clarifies
-> that the FHS copy of `kiro-cli-chat` shadows the outer chat wrapper during
-> launcher dispatch. Adds a structural CI guard for the upstream `/nix`, init,
-> and inherited-PATH contracts). Prior: 2026-08-11 (commit pending — first
-> revision, measured against the 2.16.2 `fhsenv-rootfs` derivation by reading
-> the generated bwrap script and probing from inside the sandbox. Supersedes the
-> "has NOT been measured" caveat in [`launcher-argv.md`](launcher-argv.md)). If
-> you bump kiro-cli or touch `overlays/kiro-cli.nix`, re-measure rather than
-> assuming.
+> **Last verified:** 2026-08-16 — `ai.kiro.useFhsSandbox = false` selects the
+> pinned unwrapped payload explicitly, and `true` stays the default.
+> `trustedMcpTools` composes inside the FHS payload so launcher dispatch reaches
+> it under both supported nixpkgs topologies, and the structural check pins that
+> shape.
+>
+> Full lineage: `git show 0057d8ed:packages/kiro-cli/docs/fhs-sandbox.md`.
 
 **This is not Kiro's sandbox.** It is an upstream nixpkgs wrapper: since the
 package split, `pkgs.ai.kiro-cli` on Linux routes all three commands through one

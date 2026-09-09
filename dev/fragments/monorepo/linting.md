@@ -1,11 +1,8 @@
 ## Linting
 
-> **Last verified:** 2026-08-31 (commit pending — full-corpus treefmt and hook
-> diagnostics are detached from shell activation; serialized treefmt hooks now
-> use their cache, while Stop keeps its two convergence passes uncached). Prior:
-> 2026-08-29 (repository hooks now declare their local, Stop, and CI lifecycles
-> once in `config/repo-validation.nix`; every code validator has a
-> merge-blocking whole-corpus gate).
+> **Last verified:** 2026-08-31 — full-corpus treefmt and hook diagnostics run
+> only as explicit devenv tasks, detached from shell activation. Full lineage:
+> `git show f7189d05:dev/fragments/monorepo/linting.md`.
 
 `nix flake check` is the authoritative CI gate. Local hooks provide earlier
 feedback, but neither a successful changeset scan nor a `--no-verify` commit is

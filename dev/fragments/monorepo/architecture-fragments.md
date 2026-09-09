@@ -1,15 +1,9 @@
 ## Architecture Fragments
 
-> **Last verified:** 2026-08-02 (commit pending — AGENTS.md now carries a
-> compact registry-generated routing index so Codex and other flat consumers can
-> find applicable source fragments without flattening every fragment body).
-> Prior: 2026-07-27 (the worked registration example is now explicitly
-> fictional, so it can no longer drift out of sync with a real category's
-> `scopes`; it previously named `ai-clis` and `claude-code` and had gone stale
-> against both. Prior 2026-07-27, that example stopped teaching
-> `packages/ai-clis/**`, a directory that does not exist; prior 2026-07-24, the
-> `packagePaths` + `devFragmentNames` registries dissolved into
-> `config.fragments.categories`).
+> **Last verified:** 2026-09-08 — the `Last verified` marker is now capped at
+> ONE entry; the rule and its cost are in "The marker is one entry, not a
+> changelog" below. Full lineage:
+> `git show a25e8832:dev/fragments/monorepo/architecture-fragments.md`.
 
 This repo ships path-scoped architecture fragments as dev-only context for
 agents working on it. They are SEPARATE from the published consumer-facing
@@ -65,6 +59,36 @@ commit, not a follow-up.
 This is not an etiquette rule. Research on LLM context shows out-of-date
 instructions degrade task success more than missing instructions. A lie is worse
 than silence.
+
+### The marker is ONE entry, not a changelog
+
+Update the `Last verified` marker in place. **Do not append the old entry as a
+`Prior:`.** These fragments are LLM context: one source fans out to Claude,
+Codex, Copilot and Kiro, so every byte is paid four times, on every turn that
+matches the scope.
+
+The habit of chaining `Prior:` entries grew to **82 KB across 31 fragments — 15%
+of all fragment text** — and it broke a consumer outright: github.com's Copilot
+PR reviewer began failing with `Prompt too big after adding system message`
+before it read a line of any diff.
+
+**The body is the record.** A correction that was applied to the body needs no
+changelog entry — the body already says the true thing, and the entry only
+restates it at four times the cost. That is what nearly all of those 82 KB were.
+
+Keep exactly two things beyond the current entry, and only when they earn it:
+
+- A **`Settled — do not relitigate`** bullet, for an approach that was TRIED and
+  REJECTED, or a measurement that would otherwise be re-derived wrongly. Name
+  the rejected thing and why it failed, keep the evidence (dates, PR numbers,
+  counts), and stop. This is the one thing git does not give you cheaply,
+  because reading a diff tells you WHAT changed and not what was ruled out.
+- A **git ref** to the last fuller version, when the reasoning is worth being
+  able to re-read: `` `git show <hash>:<path>` ``. One ref, not a chain.
+
+Everything else — re-verification with no change, restatements of what a commit
+did, dates with no claim attached — is dropped. Deleting it loses nothing: it is
+in the file's history, which is what history is for.
 
 ### When to add a new fragment
 

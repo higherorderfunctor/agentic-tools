@@ -1,63 +1,16 @@
 ## Fragment Pipeline Architecture
 
-> **Last verified:** 2026-08-19 (commit pending — removes a retired
-> package-sourced category and its generated consumer documentation). Prior:
-> 2026-08-16 (commit pending — generated README guidance now documents the
-> per-runtime literal-file seam and removes the superseded Kiro steering-copy
-> uninstall sequence). Prior: 2026-08-16 (commit pending — the `kiro-wrapper`
-> category now scopes `checks/kiro-fhs-contract.nix`, so an editor changing the
-> upstream sandbox tripwire receives the FHS and launcher architecture sources
-> it enforces). Prior: 2026-08-16 (commit pending — the Stacked Workflows guide
-> moved from `dev/fragments/` to its package `docs/` directory through the
-> existing location discriminator). Prior: 2026-08-16 (commit pending —
-> generated README guidance now uses `ai.programs.stacked-workflows.enable`,
-> documents B4 runtime negation, and keeps the HM-only
-> `stacked-workflows.gitPreset` companion visibly separate). Prior: 2026-08-15
-> (commit pending — Semble's co-located architecture document is now a
-> registered package-sourced category scoped to `packages/semble/**`). Prior:
-> 2026-08-15 (commit pending — the `mcp-secrets` category now follows
-> managed-proxy ownership through its shared option aggregator,
-> declaration-scope lowering transform, proxy helper, and module/factory
-> behavioral checks). Prior: 2026-08-15 (commit pending — the ai-module routing
-> comment now names `mergePool` after the retired collision helper; category
-> scopes and sources are unchanged). Prior: 2026-08-15 (commit pending —
-> generated README guidance now uses typed context and keyed rules, including
-> Semble's single exported `rule` helper; retired instruction helpers no longer
-> appear). Prior: 2026-08-15 (commit pending — generated README guidance now
-> distinguishes the closed normalized `ai.<runtime>.settings` surface from
-> runtime-shaped `nativeSettings`, including Codex security and Claude
-> environment examples). Prior: 2026-08-05 (commit pending — adds the
-> `mcp-services` category so the managed-service bind-address contract follows
-> its schema, server metadata, Home Manager implementation, and behavioral
-> checks). Prior: 2026-08-03 (commit pending — generated README guidance now
-> describes the temporary `pkgs.ai.generic` bucket and classifies `gh`/`glab` as
-> dev tools). Prior: 2026-08-03 (commit pending — the kiro auto-memory category
-> now scopes its moved implementation sources under `overlays/`, keeping the
-> fragment routed to both sides of that abstraction). Prior: 2026-08-03 (commit
-> pending — the generated README now keeps `nix-agentic-tools` on its own
-> nixpkgs pin so consumer store paths match the published binary cache). Prior:
-> 2026-08-02 (commit pending — generated Semble guidance now exposes its
-> runtime-specific direct instruction records: unnamed for the Claude/Codex
-> single-file composers and named for Kiro's `semble.md` steering file). Prior:
-> 2026-08-02 (commit pending — the generated README now documents shared typed
-> Codex profile ownership and devenv's native user-layer materialization).
-> Prior: 2026-08-02 (commit pending — Kiro's transformer now accepts an explicit
-> typed `always | auto | fileMatch | manual` inclusion mode while preserving the
-> legacy paths-derived default, and the shared renderer resolves typed
-> path-valued instruction bodies before node normalization). Prior 2026-08-02:
-> AGENTS.md now derives a compact source-fragment routing index from the
-> category registry for flat consumers, without flattening scoped fragment
-> bodies. Prior: 2026-08-01 (generated instruction and repo-document derivations
-> remain flake packages but are excluded from the authenticated all-packages
-> build, preventing revision-by-revision Cachix churn while `nix flake check`
-> retains drift coverage). Prior: 2026-07-24 (the `packagePaths` +
-> `devFragmentNames` registries dissolved into `config.fragments.categories`).
-> If you touch `lib/fragments.nix`, `config/fragment-categories.nix`,
-> `lib/fragments-registry.nix`, `dev/generate.nix`, `lib/ai/transformers/`, or
-> any content-package `passthru.fragments` surface and this fragment isn't
-> updated in the same commit, stop and fix it. This is a cross-cutting pipeline
-> — changes that look small in one file frequently ripple into generator outputs
-> for four ecosystems.
+> **Last verified:** 2026-08-19 — no dead package-sourced categories remain: a
+> retired one, and the consumer documentation it generated, were removed
+> together.
+>
+> **Settled — do not relitigate.** Full lineage:
+> `git show 25ec0738:dev/fragments/pipeline/fragment-pipeline.md`.
+>
+> - The old dual-registry split (`packagePaths` + `devFragmentNames`) is gone,
+>   dissolved into the single `config.fragments.categories` registry
+>   (2026-07-24). Don't resurrect the split — one registry drives both fragment
+>   composition and category scoping.
 
 ### The four layers
 

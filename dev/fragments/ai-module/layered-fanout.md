@@ -1,31 +1,12 @@
 ## ai.\* Layered Fanout Pattern
 
-> **Last verified:** 2026-08-16 (commit pending — the former L4 emission step is
-> split into routing/rendering, the public per-runtime literal-file registry,
-> and one generic backend sink; primary context/rule outputs cannot bypass the
-> registry, and shared AGENTS.md targets arbitrate public runtime entries inside
-> their one owner before L5; the location map distinguishes generic L2b, shared
-> L4, public B7, and generic L5 ownership). Prior: 2026-08-15 (commit pending —
-> records the managed-proxy sidecar exception: MCP client values still traverse
-> L2↔L3 normally, while explicit declaration ownership centrally emits unique
-> active systemd units). Prior: 2026-08-15 (commit pending — L2↔L3 keyed pools
-> now use atomic per-runtime replacement with null tombstones, while package
-> ownership collisions are checked by definition provenance within each scope).
-> Prior: 2026-08-15 (commit pending — typed context is the composition
-> exception: root and runtime content concatenate root-first into one
-> runtime-named artifact. Keyed rules retain collision semantics and lower their
-> normalized matcher at L4; repository-local AGENTS.md consumers share a keyed,
-> byte-deduplicating writer). Prior: 2026-08-15 (commit pending — L2 root pools
-> now cross into L3 only for runtimes whose app record lists that pool in
-> `supportedPools`; unsupported root fanout degrades and the L2b/L3 options are
-> absent. The closed normalized `settings` schema is deliberately listed by all
-> five runtimes even when a particular field lowers only for a subset). Prior:
-> 2026-08-01 (commit pending — records the portable hooks exception: per-event
-> matcher-group lists append instead of key-colliding, and agents may carry a
-> typed semantic record). Prior: 2026-04-21 (commit pending — refactor of
-> ai-factory-collision plan §4). If you add a new Dir option or change how
-> per-file Dir expansion fans through the layers, update this fragment in the
-> same commit.
+> **Last verified:** 2026-08-16 — L4 splits into routing/rendering, a public
+> per-runtime file registry, and one generic L5 sink. Context and rule outputs
+> cannot bypass the registry, and shared AGENTS.md arbitrates public runtime
+> entries in one owner before L5; the layer location map below reflects the
+> current L2b/L4/B7/L5 ownership split.
+>
+> Full lineage: `git show ce31eaaa:dev/fragments/ai-module/layered-fanout.md`.
 
 ### Canonical layered shape
 

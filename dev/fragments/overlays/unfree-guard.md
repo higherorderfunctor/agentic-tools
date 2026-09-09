@@ -1,10 +1,8 @@
 ## Unfree Package Guard (`ensureUnfreeCheck`)
 
-> **Last verified:** 2026-08-03 (commit pending — nests every guarded binary
-> group under `pkgs.ai` while preserving one universal output-boundary guard).
-> Prior: 2026-04-13 (commit pending). If you touch `overlays/default.nix`, add a
-> new unfree package to any overlay, or change how `guard` is applied to output
-> attrsets and this fragment isn't updated in the same commit, stop and fix it.
+> **Last verified:** 2026-08-03 — every guarded binary group nests under
+> `pkgs.ai` behind one universal output-boundary guard. Full lineage:
+> `git show 47d0367b:dev/fragments/overlays/unfree-guard.md`.
 
 ### The problem
 

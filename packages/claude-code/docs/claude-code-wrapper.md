@@ -1,17 +1,12 @@
 ## claude-code Wrapper Chain
 
-> **Last verified:** 2026-08-25 (commit pending — adds the `nativeSettings`
-> option surface, which is now GENERATED from the binary's own settings schema
-> rather than hand-declared key by key, and records that `passthru.extracted`
-> moved from `runCommandLocal` to `runCommand`. The packaged version is 2.1.245,
-> not 2.1.220 as this fragment claimed.) Prior: 2026-07-27 (commit pending —
-> `ai.claude.plugins` became attrset-only, and re-reading upstream at
-> home-manager rev `cbb77679` showed this fragment had gone stale on the
-> delivery mechanism: there is no wrapper at all at the version we package.
-> Prior 2026-04-15, buddy removal — anthropics/claude-code#45517.) If you touch
-> `overlays/claude-code.nix`, the HM plugin integration, or the `nativeSettings`
-> option surface and this fragment isn't updated in the same commit, stop and
-> fix it.
+> **Last verified:** 2026-08-25 — the `nativeSettings` option surface is now
+> GENERATED from the binary's own settings schema rather than hand-declared key
+> by key; `passthru.extracted` moved from `runCommandLocal` to `runCommand`; the
+> packaged version is 2.1.245.
+>
+> Full lineage:
+> `git show 6d2fbeef:packages/claude-code/docs/claude-code-wrapper.md`.
 
 Claude Code ships as a **pre-built compiled binary** (a Bun single-exec). The
 base package (`overlays/claude-code.nix`) installs it directly as

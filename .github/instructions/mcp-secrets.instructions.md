@@ -7,48 +7,25 @@ applyTo: "checks/factory-eval.nix,checks/module-eval.nix,lib/ai/app/mkBackendTra
 
 ## SOPS-Injectable Remote HTTP MCP Servers
 
-> **Last verified:** 2026-08-15 (commit pending — replaces accidental
-> cross-runtime systemd-definition deduplication with explicit proxy ownership:
-> a used top-level declaration owns one shared managed proxy and fans out only
-> its lowered client entry; runtime-scoped declarations own proxies directly;
-> reused server/ownership keys fail with an actionable diagnostic; and an unused
-> top-level proxy is not materialized. The ownership scan dynamically discovers
-> every MCP-capable `mkAiApp` runtime from the option tree, so public/custom
-> runtimes cannot receive a dead loopback entry or evade the reused-key guard).
-> Prior: 2026-08-13 (commit pending — the proxy was writing every injected
-> credential to the systemd journal in CLEARTEXT, because Caddy's reverse_proxy
-> error logs embed the whole request header map and its built-in
-> `log_credentials` covers only Authorization/Cookie, never the custom auth
-> headers this proxy exists to inject. Measured on live units: 35 journal lines
-> carrying a gateway API key. Fixed by dropping the WHOLE header map rather than
-> naming secret fields — a per-field list is a denylist that fails open, and
-> abandoning it also deleted the canonical-casing trap it required. Attribution
-> moves to an explicit per-unit `SyslogIdentifier`. SPLITS the header surface:
-> `<server>.headers` are the CLIENT's and asserted credential-free,
-> `proxy.headers` are what the daemon injects, with `null` meaning delete;
-> absorption is gone. Records that client-identity masking was tried on
-> 2026-08-12 and REMOVED — the headers are undici defaults, not harness
-> markers). Prior: 2026-08-06 (commit pending — adds the LOCAL
-> CREDENTIAL-INJECTING PROXY (`proxy.enable`, `lib/ai/mcpProxy.nix`), which
-> retires the per-binary scope mismatch below for any server that opts in: the
-> credential moves into a systemd user daemon and the client gets an
-> unauthenticated loopback url, so no client holds a credential to get wrong.
-> Records the measured argv-vs-environ fact that decides the whole design, and
-> the Nix `$${` escaping trap that silently produces an unexpanded Caddy token.
-> HM + Linux only; devenv and Darwin are deferred, NOT WONTFIX). Prior:
-> 2026-08-04 (commit pending — records the PER-BINARY vs USER-GLOBAL scope
-> mismatch that lets a devshell kiro connect to gateway MCP servers with no
-> credentials, and the `export VAR="$(cat …)"` masking that makes an unreadable
-> secret silent; the url writer now fails loudly, the launcher wrapper
-> deliberately does not). Prior: 2026-08-04 (commit pending — rebased onto the
-> extracted launcher wrapper: `wrapKiroPackage` no longer lives in `mkKiro.nix`
-> and no longer uses `makeWrapper`, so the secret export moved into
-> `packages/kiro-cli/lib/wrapPackage.nix` as a shell `export` line beside
-> `envExports`). Prior: 2026-07-23 (Option B: SOPS url + `mcpWriteMode`). If you
-> change the `secretValue` shape, the Kiro placeholder/preprocessor, the
-> `renderServer` guard, the wrapper export, the mcp.json writer, proxy lowering,
-> or managed-proxy ownership/registration and this fragment isn't updated in the
-> same commit, stop and fix it.
+> **Last verified:** 2026-08-15 — proxy ownership is now explicit and keyed by
+> server name, replacing an earlier version that could accidentally deduplicate
+> proxy definitions across runtimes instead of giving each owner its own daemon.
+>
+> **Settled — do not relitigate.** Each of these records an approach that was
+> TRIED and rejected, so the reasoning is not re-derived from scratch. Full
+> lineage: `git show bfb6b663:dev/fragments/mcp-secrets/mcp-secrets.md`.
+>
+> - **Redact the WHOLE header map in the proxy's error-log filter, never a
+>   per-field denylist.** The per-field version was live and still wrong: it
+>   needs Go's canonical header casing to match, fails silently on a mismatched
+>   case, and fails OPEN on any new or computed header name. Measured
+>   2026-08-12: 35 journal lines leaked a gateway API key before the whole-map
+>   fix landed.
+> - **Do not normalize or mask client headers (`User-Agent`, `Accept-Language`,
+>   `Sec-Fetch-Mode`) in the proxy.** Tried 2026-08-12, reverted the next day:
+>   the headers are plain undici defaults that identify no harness, the
+>   `Mcp-Protocol-Version` header can't be stripped anyway, and normalizing made
+>   the traffic MORE distinctive, not less.
 
 A `type = "http"` MCP server (`ai.mcpServers` / `ai.kiro.mcpServers`) can take
 SOPS/agenix-injected `headers` and `url` so secrets never land in the

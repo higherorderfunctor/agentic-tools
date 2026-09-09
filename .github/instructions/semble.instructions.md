@@ -7,15 +7,13 @@ applyTo: "packages/semble/**"
 
 # Semble integrations
 
-> **Last verified:** 2026-08-16 (commit pending — Semble's inherited MCP
-> integration now has canonical multi-category defaults, while global CLI
-> guidance and the typed CLI/MCP subagent are independent opt-ins; Kiro can keep
-> an agent-scoped server out of the root pool, and drift review follows the live
-> JSON-RPC tool surface plus package-version provenance). Prior: 2026-08-15
-> (commit pending — Semble is the first `ai.programs.*` factory consumer: one
-> option specification generates portable root defaults and capability-gated
-> Claude, Codex, and Kiro overrides; the four runtime-list selectors are
-> retired).
+> **Last verified:** 2026-08-16 — Semble's inherited MCP integration has
+> canonical multi-category defaults; global CLI guidance and the typed CLI/MCP
+> subagent are independent opt-ins; Kiro can keep an agent-scoped server out of
+> the root pool; drift review follows the live JSON-RPC tool surface plus
+> package-version provenance.
+>
+> Full lineage: `git show 3dc3057b:packages/semble/docs/semble.md`.
 
 Semble provides local semantic and lexical code search through a CLI and an MCP
 server. This repository re-exports Numtide's pinned derivation unchanged and

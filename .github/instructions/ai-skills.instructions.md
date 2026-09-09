@@ -7,22 +7,11 @@ applyTo: "lib/ai/hm-helpers.nix,lib/ai/mkSkillPackageModule.nix,packages/chatgpt
 
 ## ai.skills Fanout Delegation Pattern
 
-> **Last verified:** 2026-08-19 (commit pending — the retired generated-skill
-> exception is removed; Stacked Workflows remains the sole skill-package program
-> consumer). Prior: 2026-08-17 (commit pending — Codex now receives symlinked
-> skill directories because 0.147.0 ignores the otherwise-uniform real directory
-> containing symlinked leaves; migration validates ownership and moves the
-> legacy directory intact to a state backup). Prior: 2026-08-16 (commit pending
-> — stacked-workflows now uses `ai.programs.<name>.enable` plus nullable
-> per-runtime B4 overrides to gate its per-runtime skill contributions; the
-> backend inventory now reflects Claude's upstream delegation plus the direct
-> Copilot and Kimchi helpers). Prior: 2026-08-01 (commit pending — Codex joins
-> skills fanout at the native user-global and repository-local `.agents/skills`
-> locations). Prior: 2026-04-08 (commit 97ac174 — refactor(devenv): ai.skills
-> branches delegate through ecosystem options). If you touch any of the five CLI
-> skills fanouts, `lib/ai/hm-helpers.nix:mkSkillEntries`, the skill-package
-> factory, or upstream `programs.<cli>.skills` references, and this fragment
-> isn't updated in the same commit, stop and fix it.
+> **Last verified:** 2026-08-19 — the retired generated-skill exception is
+> removed; Stacked Workflows remains the sole skill-package program consumer.
+>
+> Full lineage:
+> `git show 25ec0738:dev/fragments/ai-skills/skills-fanout-pattern.md`.
 
 When an ecosystem has a native `programs.<cli>.skills` option, `ai.skills`
 fanout MUST delegate through it. Otherwise its factory uses a shared helper

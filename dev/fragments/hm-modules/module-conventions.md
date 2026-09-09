@@ -1,68 +1,12 @@
 ## HM Module Conventions
 
-> **Last verified:** 2026-08-19 (commit pending — the retired generated skill
-> and its two module facets are removed; Stacked Workflows remains the
-> skill-package program example, and generated store-path strings remain a
-> supported helper input without a current first-party producer). Prior:
-> 2026-08-16 (commit pending — Semble's shared declaration now models canonical
-> multi-category MCP defaults, explicit CLI/agent opt-ins, and testable
-> cross-runtime isolation assertions identically in HM and devenv). Prior:
-> 2026-08-16 (commit pending — stacked-workflows uses a shared `ai.programs.*`
-> enable declaration across HM and devenv through `mkSkillPackageModule`; its
-> machine-wide `gitPreset` remains an explicitly HM-only top-level companion;
-> runtime submodule and enable-gate examples cover all five ecosystems). Prior:
-> 2026-08-15 (commit pending — Semble's program-factory relocation preserves one
-> HM/devenv declaration and lowering path; identical runtime package variants
-> share one wrapper/cache while divergent variants use a collision-free
-> aggregate and isolated caches). Prior: 2026-08-15 (commit pending — normalized
-> guidance is now a typed context record plus keyed rules; the list-shaped
-> instructions option and shared instruction type are gone). Prior: 2026-08-15
-> (commit pending — runtime-shaped config moved from `ai.<runtime>.settings` to
-> `nativeSettings`, the new closed `settings` submodule is normalized across all
-> runtimes, and Codex integration roots use a hidden internal contribution
-> channel). Prior: 2026-08-14 (commit pending — Semble's shared module now
-> lowers grammar and path mappings identically through both facets, with one
-> package-identity cache guard and cache-location wrapper per backend; HM's XDG
-> cache remains authoritative on Darwin too). Prior: 2026-08-05 (commit pending
-> — the Codex named-profile delivery-path example is retained but
-> `ai.codex.profiles` is now LOCKED OUT and fails evaluation; the asymmetry it
-> teaches is still correct, the option is not usable). Prior: 2026-08-05 (commit
-> pending — glab's Linux Home Manager facet can queue one OS-keyring
-> synchronization per activation through a graphical-session path unit; the
-> shared option is an explicit devenv exclusion, and the ordinary wrapper stops
-> exporting the synchronized token). Prior: 2026-08-05 (commit pending — enabled
-> glab facets contribute their effective config directory to Codex's legacy
-> workspace-write sandbox; this follows backend defaults and explicit overrides
-> without coupling the standalone glab module to the AI module). Prior:
-> 2026-08-05 (commit pending — re-verifies these conventions while the managed
-> MCP module's bridge-host comment is generalized so adding Context7 to the
-> bridge set cannot stale a hardcoded server count). Prior: 2026-08-03 (commit
-> pending — glab's shared package default now follows its
-> `pkgs.ai.devTools.glab` namespace in both HM and devenv). Prior: 2026-08-02
-> (commit pending — Semble's shared activation condition delegates its Codex
-> cache grant to backend-native sinks; Home Manager appends the user XDG cache
-> path without enabling Codex or choosing its sandbox mode). Prior: 2026-08-02
-> (commit pending — Semble adds one shared HM and devenv option declaration plus
-> shared runtime-fanout logic; only the package installation sink differs).
-> Prior: 2026-08-02 (commit pending — Codex named profiles now use one typed
-> declaration across HM and devenv while each backend delivers the artifact at
-> its native scope: HM links user files and devenv materializes repo
-> declarations into the user-only profile lookup location with explicit
-> ownership). Prior: 2026-08-02 (commit pending — generated option references
-> now enforce exact flattened `ai.*` name/type parity across HM and devenv;
-> backend-only behavior stays discoverable and fails explicitly, as with Home
-> Manager rejecting project-only `ai.copilot.projectDir` overrides). Prior:
-> 2026-08-02 (commit 589fa37c — distinguishes ordinary JSON merge activation
-> from Codex's leaf-owned TOML reconciliation, whose manifest supplies removal
-> semantics while preserving native project-trust state). Prior: 2026-07-28
-> (commit pending — records the ONE-SHARED-DECLARATION form of the config-parity
-> rule, landed by `packages/glab` and asserted by
-> `module-glab-hm-devenv-option-parity`; prior 2026-07-21 was the repo-wide
-> activation reordering `entryAfter ["writeBoundary"]` → `["linkGeneration"]`;
-> earlier revisions added the activation script `exit` warning + Nix path type
-> strictness section). If you touch any `modules/<subdir>/default.nix` file, add
-> a new option, or change an assertion/activation pattern and this fragment
-> isn't updated in the same commit, stop and fix it.
+> **Last verified:** 2026-08-19 — the retired generated skill and its two module
+> facets are gone. Stacked Workflows is the sole remaining skill-package program
+> example, and generated store-path strings stay a supported helper input with
+> no first-party producer today.
+>
+> Full lineage:
+> `git show 25ec0738:dev/fragments/hm-modules/module-conventions.md`.
 
 These conventions are enforced by code review and the `checks/module-eval.nix`
 evaluation tests, not by the module system itself. Follow them when adding or

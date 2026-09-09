@@ -7,34 +7,18 @@ applyTo: "checks/copilot-wrapper-argv.nix,overlays/chatgpt-codex.nix,overlays/cl
 
 ## Copilot config delivery — two consumers, one product name
 
-> **Last verified:** 2026-08-16 (commit pending — the unscoped-frontmatter
-> measurement is retained here as the durable source after retiring the
-> normalized-interface plan; no behavior was re-measured). Prior: 2026-08-15
-> (commit pending — normalized context and rules intentionally emit only on
-> devenv's project-local `.github` surface. Their Home Manager options remain
-> for schema parity but are a documented no-op; the retired instructions surface
-> and its intermediate HM writer are gone). Prior: 2026-08-14 (commit pending —
-> `configDir` is TWO different things and the sentence below that called it
-> "neither" was only true of devenv's. Home Manager defaults it to `.copilot`,
-> which IS the CLI's home; devenv defaults it to `.config/github-copilot`, which
-> nothing reads. Named instructions and rules moved onto the HM `configDir`
-> after landing in `$HOME/.github/instructions/` — a directory with no
-> user-global meaning at all — and a gated assertion now pins `configDir` when
-> there is content that would go dead. Records the measured
-> instruction-discovery list for 1.0.80, and a MUCH cheaper way to read this
-> SEA's app code than the npm tarball: it self-extracts). Prior: 2026-08-05
-> (commit pending — the wrapper both backends use now lives in ONE place,
-> `packages/copilot-cli/lib/wrapPackage.nix`, and is exercised behaviorally by
-> `checks/copilot-wrapper-argv.nix`. It had been inlined once per backend, and
-> that duplication is why the identical pair of defects — builder-expanded
-> `$HOME`, missing `@` prefix — shipped twice, as #767 and then #769. Nothing
-> about the DISCOVERY behavior below changed). Prior: 2026-08-05 (first version.
-> Records the syscall-traced config discovery of copilot-cli 1.0.78, why the
-> devenv MCP fix is a wrapper flag rather than `COPILOT_HOME`, and why
-> `lsp-config.json` / `settings.json` stay written-but-undelivered instead of
-> asserting). If you change how `packages/copilot-cli/` delivers config in
-> either backend, or bump copilot-cli across a release that moves config
-> discovery, re-run the probe below and update this in the same commit.
+> **Last verified:** 2026-08-16 — the unscoped-frontmatter measurement (1.0.79)
+> is retained as the durable record after the normalized-interface plan was
+> retired; it was not re-measured at 1.0.80.
+>
+> **Settled — do not relitigate.** Full lineage:
+> `git show 89dce4c4:dev/fragments/ai-clis/copilot-config-delivery.md`.
+>
+> - **The wrapper lives in one place, not duplicated per backend.** Both
+>   backends now share `packages/copilot-cli/lib/wrapPackage.nix`, exercised by
+>   `checks/copilot-wrapper-argv.nix`. Inlining it once per backend is what let
+>   the identical pair of defects — builder-expanded `$HOME`, missing `@` prefix
+>   — ship twice, as #767 and then #769.
 
 ### The trap: "Copilot" is two different consumers here
 

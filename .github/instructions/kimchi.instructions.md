@@ -7,23 +7,10 @@ applyTo: "packages/kimchi/**"
 
 # Kimchi factory (mkKimchi)
 
-> **Last verified:** 2026-08-16 (commit pending — normalized context now renders
-> into `ai.kimchi.files` before the generic backend sink, making the final
-> `harness/AGENTS.md` replaceable or suppressible as one whole entry). Prior:
-> 2026-08-15 (commit pending — Kimchi's normalized environment-variable pool now
-> accepts null tombstones, so a runtime entry can suppress a same-key portable
-> root default). Prior: 2026-08-15 (commit pending — Kimchi's typed context now
-> composes root-first with runtime context into the existing
-> `harness/AGENTS.md`; the retired instructions pool is no longer part of the
-> capability census, and rules continue to degrade because Kimchi has no rules
-> pool). Prior: 2026-08-15 (commit pending — records Kimchi's normalized pool
-> capability census and deliberate absence of rules; native JSON passthrough
-> moved to `ai.kimchi.nativeSettings`, while the uniform closed
-> `ai.kimchi.settings` surface does not change the two-file native lifecycle).
-> Prior: 2026-06-23 (commit pending). If you touch
-> `packages/kimchi/lib/mkKimchi.nix`, `packages/kimchi/modules/**`, or the
-> Kimchi credential / wrapper handling and this fragment isn't updated in the
-> same commit, stop and fix it.
+> **Last verified:** 2026-08-16 — normalized context renders into
+> `ai.kimchi.files` before the generic backend sink, so the final
+> `harness/AGENTS.md` is replaceable or suppressible as one whole entry. Full
+> lineage: `git show 54efc1e8:packages/kimchi/docs/kimchi-factory.md`.
 
 `packages/kimchi/lib/mkKimchi.nix` is an `lib.ai.app.mkAiApp` participant,
 closest in shape to `mkKiro` (dual config trees + activation-merge for the

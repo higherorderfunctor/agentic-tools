@@ -1,11 +1,14 @@
 # Beads devenv lifecycle
 
-> **Last verified:** 2026-08-24 (commit pending — the Beads overlay now owns and
-> updates the exact nested Dolt derivation exposed as `passthru.dolt`, removing
-> the lifecycle's accidental dependence on when nixpkgs updates Dolt). Prior:
-> 2026-08-18 (commit pending — records successful validation of the generated
-> lifecycle against Dolt 2.3.0; no lifecycle shape changed). Prior: 2026-08-16
-> (commit pending — initial `services.beads` lifecycle implementation for #992).
+> **Last verified:** 2026-08-24 — the Beads overlay owns and updates the nested
+> Dolt derivation exposed as `passthru.dolt`, so the lifecycle no longer depends
+> on whatever Dolt version nixpkgs happens to ship.
+>
+> **Settled — do not relitigate.** Full lineage:
+> `git show db6df0dd:packages/beads/docs/beads-lifecycle.md`.
+>
+> - Do not let the lifecycle read Dolt through nixpkgs' own resolution — that
+>   was the prior, accidental coupling this pinning replaced.
 
 `services.beads` is intentionally devenv-only. It owns repository-local
 operational state and does not create an `ai.programs.beads` distribution tree;
