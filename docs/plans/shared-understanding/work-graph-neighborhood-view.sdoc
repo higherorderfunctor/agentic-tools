@@ -52,6 +52,20 @@ were subsequently scoped under colored source-node-type groups; Shift-click
 sets every same-named role to the clicked checkbox's resulting state. The
 reference lives on feat/work-graph-neighborhood-reference for a separate porting
 session to evaluate.
+
+Ported 2026-09-08 onto feat/strictdoc-trial as commits adf8e8d1..5ee1cc63 over
+base 3548b09d: the bounded neighborhood view, the loosened graph key spacing,
+the overlapping-route coalescer, and the simplified visual semantics. The
+reference had been built against a board with no Grammars tab, no lifecycle
+widget and no sdoc-semantics/2 payload, so its edits to the settled board nodes
+arrived describing a smaller app; that canon was reconciled with the merged
+tree in the same session -- schema strings corrected, the shared card renderer
+restored to MECH-SDOC-BOARD-CANVAS, the static route list and switcher count
+brought up to date, and every smoke measurement taken on the reference branch
+labelled with where it was taken. The statement's "vendored ELK.js worker" has
+moved on once more: the engine now reaches the server through
+SDOC_BOARD_ELKJS_DIR under WORK-BOARD-ELKJS-VIA-NIX, with the served bytes
+unchanged.
 <<<
 RELATIONS:
 - TYPE: Parent

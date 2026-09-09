@@ -37,6 +37,14 @@ Updated 2026-09-03 for commits 8823edf1 and 46cd3cf1: the static allowlist
 grew grammar-groups.json and fsm.js, and source.py gained the semantics
 payload. The three JSON routes are unchanged -- semantics rides inside
 /api/graph rather than on a fourth route.
+
+Updated 2026-09-08 for commit 8b936c3c: the allowlist grew two more entries,
+/assets/vendor/elkjs/elk-api.js and /assets/vendor/elkjs/elk-worker.min.js,
+and they are the only ones not backed by a file in this directory -- server.py
+resolves them against the Nix store path in SDOC_BOARD_ELKJS_DIR and refuses
+to start when that variable is unset or does not hold both files. So the
+process now asks one thing of its environment beyond a python3;
+MECH-SDOC-BOARD-LAYOUT owns the delivery. Still three JSON routes.
 <<<
 RELATIONS:
 - TYPE: Parent

@@ -36,7 +36,7 @@ Reporting that an ID names nothing is element-check.py's job, not the board's;
 a null kind here means "unknown", never "wrong".
 
 The snapshot carries a third top-level key, semantics, and the adapter does
-not compute it: the caller passes the sdoc-semantics/1 payload in. When none
+not compute it: the caller passes the sdoc-semantics/2 payload in. When none
 arrives the adapter writes an explicit refusal record naming the reason rather
 than omitting the key, because a missing key gives a reader no null to branch
 on and reads as a settled empty answer.
@@ -51,6 +51,12 @@ NOTES: >>>
 Updated 2026-09-03 for commits 6fbaa76b, 7d6886d1 and 46cd3cf1: File
 relations became element-grained in both payloads, the KIND word is joined
 from the extractor, and the snapshot gained the semantics key.
+
+Corrected 2026-09-08: the payload the caller passes in is sdoc-semantics/2,
+not /1. The engine's SCHEMA and adapter.py's SEMANTICS_SCHEMA both read
+sdoc-semantics/2; the statement had been carrying the older string. The two
+schema strings the adapter itself owns, sdoc-board/2 and sdoc-perspective/2,
+are unchanged.
 <<<
 RELATIONS:
 - TYPE: Parent
