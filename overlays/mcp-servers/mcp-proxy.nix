@@ -26,10 +26,12 @@
     hash = "sha256-LeQc1AWq+/iGEePN8ouYjowEt63K23AoKiKktX2EziQ=";
   };
 in
-  ourPkgs.mcp-proxy.overridePythonAttrs (old: {
+  ourPkgs.mcp-proxy.overridePythonAttrs (old: let
+    # upstream: readPyprojectVersion @ pyproject.toml
+    upstreamVersion = "0.12.0";
+  in {
     version = vu.mkVersion {
-      # upstream: readPyprojectVersion @ pyproject.toml
-      upstream = "0.12.0";
+      upstream = upstreamVersion;
       inherit rev;
     };
     inherit src;
@@ -40,4 +42,20 @@ in
     nativeCheckInputs = with ourPkgs.python3Packages; [pytest pytest-asyncio];
     doInstallCheck = true;
     installCheckPhase = vu.mkMcpSmokeTest {bin = "mcp-proxy";};
+    # Patch versionCheckHook's $version to drop our +<shortRev> suffix.
+    # nixpkgs gave mcp-proxy a versionCheckHook in d6524aa (c043004 had
+    # none), and the hook installs no phase of its own — it appends to
+    # `preInstallCheckHooks`, so the `runHook preInstallCheck` that OPENS
+    # mkMcpSmokeTest is what dispatches it. It matches the derivation's
+    # `version` against `mcp-proxy --version`; ours carries the +<shortRev>
+    # suffix the binary knows nothing about, so the hook `exit 2`s before
+    # the smoke test body ever runs. `preVersionCheck` fires inside the hook
+    # ahead of that comparison, so reassigning `version` there keeps the
+    # check RUNNING, just against the string the binary actually prints.
+    # Preferred over stripping the hook from `nativeInstallCheckInputs`
+    # (oxlint's shape) or `dontVersionCheck`, both of which delete the
+    # assertion instead of repairing it.
+    preVersionCheck = ''
+      version="${upstreamVersion}"
+    '';
   })
