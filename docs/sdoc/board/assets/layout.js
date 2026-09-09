@@ -588,17 +588,12 @@ function coalesceOrthogonalRoutes(routes, laneTolerance) {
                 { x: fixed, y: lo },
                 { x: fixed, y: hi },
               ];
-        const firstRoute = routes[routeIndexes[0]];
         coalesced.push({
           d: terminalPath(points, terminalAtLow, terminalAtHigh),
           edge: semanticEdges[0],
           edges: semanticEdges,
-          kind: firstRoute.kind,
           label: null,
           points,
-          ranks: routeIndexes.flatMap((routeIndex) =>
-            routes[routeIndex].ranks ? routes[routeIndex].ranks : [],
-          ),
           terminal: terminalAtLow || terminalAtHigh,
         });
       }
@@ -624,7 +619,7 @@ function fallbackLabel(points, baseline) {
   };
 }
 
-function displayRoutes(output, pieces, labelBaselines, positions, ranks) {
+function displayRoutes(output, pieces, labelBaselines) {
   const routes = [];
   for (const elkEdge of output.edges ?? []) {
     const piece = pieces.get(elkEdge.id);
@@ -633,8 +628,6 @@ function displayRoutes(output, pieces, labelBaselines, positions, ranks) {
     if (points.length < 2) continue;
     const semanticEdges = piece.records.map(({ edge }) => edge);
     const edge = semanticEdges[0];
-    const source = positions[edge.source];
-    const target = positions[edge.target];
     const elkLabel = elkEdge.labels?.[0];
     const baseline = elkLabel
       ? labelBaselines.get(elkLabel.id) || elkLabel.height * 0.78
@@ -650,22 +643,10 @@ function displayRoutes(output, pieces, labelBaselines, positions, ranks) {
       d: pathOf(points),
       edge,
       edges: semanticEdges,
-      kind:
-        edge.source === edge.target
-          ? "self"
-          : source.x === target.x
-            ? "same-rank"
-            : source.x < target.x
-              ? "forward"
-              : "backward",
       label:
         label ||
         (elkEdge.labels?.length ? fallbackLabel(points, baseline) : null),
       points,
-      ranks: semanticEdges.map((semantic) => ({
-        source: ranks.get(semantic.source) ?? 0,
-        target: ranks.get(semantic.target) ?? 0,
-      })),
       terminal: piece.terminal,
     });
   }
@@ -710,7 +691,6 @@ export async function layoutNeighborhood(snapshot, centerId, options = {}) {
       .map((node) => [
         node.id,
         {
-          component: 0,
           rank: selection.ranks.get(node.id) ?? 0,
           x: node.x,
           y: node.y,
@@ -730,7 +710,7 @@ export async function layoutNeighborhood(snapshot, centerId, options = {}) {
     nodes: selection.nodes,
     positions,
     routes: coalesceOrthogonalRoutes(
-      displayRoutes(output, pieces, labelBaselines, positions, selection.ranks),
+      displayRoutes(output, pieces, labelBaselines),
       config.card.width / CARD.width,
     ),
     totalNodes: selection.totalNodes,

@@ -257,7 +257,7 @@ function renderEdges() {
     const sources = [...new Set(semanticEdges.map(({ source }) => source))];
     const targets = [...new Set(semanticEdges.map(({ target }) => target))];
     const wrapper = svgNode("g", {
-      class: `edge edge-${route.kind}`,
+      class: "edge",
       "data-role": role,
       "data-source": edge.source,
       "data-sources": JSON.stringify(sources),
