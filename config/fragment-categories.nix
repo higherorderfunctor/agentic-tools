@@ -453,15 +453,6 @@ _: {
         "git-workflow"
         "linting"
         "peer-communication"
-        # The house response-style guide. Lives in its own fragment directory
-        # (hence the `dir` override) so it can move to a standalone category
-        # if the generator ever grows multi-category always-loaded support, and
-        # so the sibling work item WORK-PEER-COMMS-FRAGMENT-TO-SDOC has one
-        # file to convert into an sdoc node.
-        {
-          name = "peer-communication";
-          dir = "peer-communication";
-        }
         "project-overview"
       ];
     };

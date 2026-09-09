@@ -262,9 +262,21 @@ curl -sI "https://nix-agentic-tools.cachix.org/${HASH}.narinfo" | head -1
 
 ### Exceptions
 
-**Pinned external derivations preserve the upstream identity.** Semble is
-selected directly from `inputs.llm-agents.packages.${system}.semble`, with no
-nixpkgs follow, `overlays.shared-nixpkgs`, local `ourPkgs` rebuild, or
+**Pinned external derivations preserve the upstream identity.** There are two:
+Semble and strictdoc. For both, parity holds for a STRUCTURAL reason rather than
+a maintained one — the derivation closes over the upstream flake's own locked
+nixpkgs and reads `final` for nothing but `system`, so neither side of the
+two-pin comparison can move.
+
+That makes the generic check weak for them, and the coverage is uneven. Measured
+2026-08-27: `checks/cache-hit-parity.nix` carries an explicit `sembleUpstreamOk`
+assertion pinning `self.packages.<system>.semble` to the upstream `drvPath` and
+`outPath`, wired into the pass condition with its own failure message. It names
+strictdoc nowhere at all. Giving that row real teeth means mirroring the Semble
+assertion, which is a check change and not a documentation one.
+
+Semble is selected directly from `inputs.llm-agents.packages.${system}.semble`,
+with no nixpkgs follow, `overlays.shared-nixpkgs`, local `ourPkgs` rebuild, or
 `overrideAttrs`. Its cache identity belongs to the upstream flake rather than to
 this repository's nixpkgs pin. Both the standalone output and a deliberately
 divergent consumer must match that upstream `drvPath` and `outPath` exactly.
@@ -443,8 +455,14 @@ for majors of one package; this is the general form.
 
 ### Direct external-flake derivations
 
-Semble is the external pinned-package exception to the local-build patterns
-below. `overlays/semble.nix` returns
+Two packages take this shape, and it is a class rather than an exception: Semble
+and, since 2026-08-27, strictdoc — `overlays/dev-tools/strictdoc.nix` re-exports
+`inputs.strictdoc.packages.${system}.default` on the identical contract. What
+follows describes Semble; strictdoc differs only in the input it names and in
+tracking upstream's main rather than a release.
+
+Semble is the original external pinned-package case, against the local-build
+patterns below. `overlays/semble.nix` returns
 `inputs.llm-agents.packages.${system}.semble` directly. It does not apply the
 input's `overlays.shared-nixpkgs`, rebuild with this repository's `ourPkgs`, or
 call `overrideAttrs`; any of those would replace the upstream cache identity
