@@ -117,7 +117,6 @@ These are NOT real findings:
 
 - Pre-existing issues not introduced in recent work
 - Something that looks wrong but is intentional (check git blame)
-- Pedantic nitpicks a senior engineer wouldn't flag
 - Issues a linter, typechecker, or formatter would catch (treefmt, deadnix,
   statix, cspell handle these)
 - General quality concerns not in CLAUDE.md or coding standards
@@ -127,7 +126,10 @@ These are NOT real findings:
 
 Score each finding independently. Run scoring agents in parallel.
 
-**Filter**: Drop findings with confidence < 80.
+**Filter**: Keep findings scoring 75 or 100; drop 0, 25 and 50. Scoring agents
+must emit one of the five rubric values above — no interpolation. The cutoff
+used to sit at 80, which is the one value the scale never anchors, so a scorer
+had no textual basis for landing either side of it.
 
 ## Phase 3: Aggregate [CRITICAL]
 
@@ -153,8 +155,10 @@ survived the confidence filter. This agent:
    - Merge reinforcement/decay observations across reviewers
    - Apply confidence adjustments per the formulas in review-policy.md
 
-5. **Validates findings**: For each recommended change, verify the evidence is
-   concrete and actionable. Demote to observation if evidence is vague.
+5. **Validates findings**: demote a recommended change to observation unless its
+   `evidence` field contains at least one of — a URL, a verbatim quote of the
+   offending text, or a `file:line` reference. Prose asserting a problem with
+   none of those three is vague regardless of its severity label.
 
 ## Phase 4: Debate (Only If Needed) [CRITICAL]
 

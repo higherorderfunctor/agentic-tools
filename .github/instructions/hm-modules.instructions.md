@@ -394,8 +394,12 @@ commit message. If the mismatch is accidental, it's a bug.
 ### Validation
 
 `checks/module-eval.nix` runs module evaluation tests via `evalModule` with the
-full `homeManagerModules.default` set. Add test cases there whenever you add new
-module behavior — especially for:
+full `homeManagerModules.default` set. Add a case in the SAME commit whenever it
+(a) adds or removes an option under `modules/**` or `lib/ai/**`, (b) changes
+what an existing option's `mkIf` writes into `config`, or (c) adds, removes or
+changes the condition of an assertion. A commit that touches `modules/**` but
+does none of those — a rename, a comment, formatting, a refactor with identical
+evaluated `config` — needs no new case. The three map onto:
 
 - Option discoverability (set an option, verify it evaluates)
 - Fanout correctness (set an option, verify it propagates)
@@ -408,9 +412,16 @@ protection via the eval harness.
 
 **Eval-only checks DON'T catch everything.** Some bugs only manifest during real
 HM activation against real consumer state (e.g., the Nix path type strictness
-bug below). When touching anything that affects activation scripts or on-disk
-layout, verify end-to-end against a consumer (`home-manager switch` on a real
-system), not just `nix flake check`.
+bug below). A diff that changes the body of a `home.activation.<name>` block,
+adds or removes a `home.file` entry, or changes literal-file lowering in
+`lib/ai/runtime-files.nix` is therefore NOT fully covered by a green
+`nix flake check`.
+
+**Do not run `home-manager switch` yourself — it mutates the operator's live
+system.** Instead add a line to the PR description naming the activation entries
+or file paths the change touches, and ask the operator to run
+`home-manager switch -b backup` before merge. For every other diff under
+`modules/**`, a green `nix flake check` is the complete bar.
 
 ### Nix path types — strict `lib.isPath` checks
 

@@ -79,8 +79,13 @@ Corollaries, each learned the hard way:
   unavailable because nixpkgs has not picked it up. Take upstream's latest
   release (or main HEAD where that is the tracking choice) as the version you
   are designing against.
-- **Build it, do not note it.** A seriously-used package with no overlay is a
-  slice to write, not a version gap to report.
+- **Build it, do not note it.** Write the overlay in the same change when the
+  package is already CONSUMED here — it appears in `devenv.nix` `packages`, in a
+  module's or wrapper's package / `runtimeInputs` list, as an `ai.*` option
+  default, or in `config/update-targets.nix` — or when the operator named it.
+  Being a transitive dependency alone does not qualify. If it fails all of
+  those, say which one it fails and stop. A version or store-path comparison
+  against nixpkgs is never a ground to decline, defer or drop an overlay.
 
 `pnpm_10` / `pnpm_11` are the worked example: one sat at exact nixpkgs parity at
 landing and was absorbed anyway, precisely so the pair is carried the same way
@@ -689,8 +694,12 @@ Two registries have to agree with that:
 `config.checks.cacheHitParity.<name>.platforms` (or the check aborts on darwin
 looking up a package that is not there) and, if a future case needs it, anything
 else that enumerates packages per system. This is the exception, not a licence
-to platform-gate anything inconvenient — a sidecar merely missing a platform is
-still the bug rule 6 describes.
+to platform-gate anything inconvenient. Before wrapping an entry in
+`lib.optionalAttrs`, prove the package genuinely cannot build on the excluded
+system, as `gluetun` was proved by cross-compiling `GOOS=darwin GOARCH=arm64`. A
+sidecar whose per-system keys omit a system the upstream release actually ships
+for is a STALE SIDECAR: add the missing `{url, hash}` entry and the matching
+`config.checks.cacheHitParity.<name>.platforms` row, do not gate the attribute.
 
 **The CI IFD warm step DOES cover that kind of IFD — since it started forcing
 `drvPath`.** `.github/actions/warm-ifd` pre-realizes sources by evaluating

@@ -157,10 +157,13 @@ Do NOT hardcode label names. Read the actual label names and descriptions, then
 use judgment to classify them. Every repo is different — `git-branchless` has
 "has workaround" and "answered", another repo might have "solved" or "recipe".
 
-**Cache the assessment** in the `value-labels` frontmatter field. Each entry
-records the label name and a short reason why it's valuable. On subsequent runs,
-if `label-head` hasn't changed, reuse the cached assessment. If labels changed,
-re-assess and update the cache.
+**Cache the assessment** in the `value-labels` frontmatter field, recording ONLY
+labels classified High value. Each entry records the label name and a short
+reason why it's valuable. Step 5b fetches every issue carrying each cached
+label, so caching a Medium-value label such as `enhancement` turns a targeted
+fetch into a near-full enumeration; Medium and Noise are not recorded and drive
+no fetch. On subsequent runs, if `label-head` hasn't changed, reuse the cached
+assessment. If labels changed, re-assess and update the cache.
 
 ## Steps
 

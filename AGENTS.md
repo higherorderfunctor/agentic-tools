@@ -854,13 +854,27 @@ This is not a fallback for one outage. It is the standing substitute whenever
 the automatic review did not happen, and github.com Copilot fails on this repo
 often enough that it is the common case, not the rare one.
 
-### Complex changes to main: prosecute, defend, judge
+### Escalating past one reviewer: prosecute, defend, judge
 
-For a complex change headed to `main`, one independent reviewer is not enough.
-Run the three-role protocol: an agent that prosecutes, a separate agent that
-defends, and a third that judges on evidence. If the judge cannot converge, loop
-— at most three rounds, each narrowed to what stayed unresolved. Surface a
-genuine split to the operator rather than adjudicating it yourself.
+Escalate from one independent reviewer to the three-role protocol when EITHER
+holds. Do not grade the change's "complexity" — that word routed this decision
+before and two agents reading it reached opposite answers.
+
+**(a) You intend to DISMISS a reviewer finding rather than fix it.** Dismissing
+your own reviewer's finding is the second discard filter this whole structure
+exists to remove, so the intent to dismiss is itself the trigger. One round,
+scoped to the disputed findings only.
+
+**(b) The diff touches a shared abstraction.**
+`git diff --name-only origin/main...HEAD` matches `lib/**`, `packages/*/lib/**`
+or `overlays/*.nix`; or a hunk under `modules/**` or `lib/ai/**` adds, removes
+or retypes a `mkOption`.
+
+Everything else uses the single-reviewer default. Run the three-role protocol:
+an agent that prosecutes, a separate agent that defends, and a third that judges
+on evidence. If the judge cannot converge, loop — at most three rounds, each
+narrowed to what stayed unresolved. Surface a genuine split to the operator
+rather than adjudicating it yourself.
 
 **Scope, deliberately narrow:**
 
