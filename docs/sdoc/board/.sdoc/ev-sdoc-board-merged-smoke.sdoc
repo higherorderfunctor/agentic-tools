@@ -26,6 +26,15 @@ target facets. Switching tables via restore({table}) was refused with "Unknown
 column SOURCE_TYPE in field columns"; loading the Table object directly worked
 and logs upstream's deprecation of that path.
 <<<
+NOTES: >>>
+Re-measured 2026-09-08 against this tree after the Graph port and the elkjs
+move. The hermetic suite is 16 tests rather than the nine contracts above; it
+grew cases for the static allowlist and the two Nix-backed
+/assets/vendor/elkjs/ routes. The live daemon now holds 518 nodes with 1,156
+resolved snapshot edges, 0 diagnostics and 1,245 relation rows at generation 3,
+and /api/graph and /api/rows serve 1,711,091 and 1,996,403 bytes. Every finding
+in the statement still holds; only the counts moved.
+<<<
 RELATIONS:
 - TYPE: File
   VALUE: docs/sdoc/board/test_board.py

@@ -46,21 +46,24 @@ links here: clicking it switches the view and selects that element's card.
 The switcher order is Grammars, Plan, Graph, Perspective.
 
 Two further sections close the right-hand pane, and neither reads the
-grammar. They read the snapshot's semantics key, the sdoc-semantics/1 payload
-the engine computes: Rules, the sentences that engine states about this
-type's state fields, then Lifecycle, one machine per state field drawn as an
-inline SVG by assets/fsm.js. The grammar says a type has a STATUS field with
-four words in it; the semantics engine says which of those words a node may
-move to next and under what rule. Rules come first because an operator
-shaping the model reads the sentence before the diagram. fsm.js knows no
-field name -- DEPTH, STATUS and AUTHORED_BY arrive as data, so a field rename
-does not reach it -- and it lays its machines out transposed, rank running
-down and branches spreading across, because the pane is 350px wide and a
-six-rung ladder never fit it sideways. Its geometry is measured in CSS pixels
-with no viewBox, so no label is scaled below the app's 10px floor. Each
-section degrades to a named absence: no engine, no machine for this type, or
-a machine with no rules yet all still render a section that says so, because
-a missing section reads as settled and nothing here is.
+grammar. They read the snapshot's semantics key, the sdoc-semantics/2
+payload the engine computes: Rules, the sentences that engine states about
+this type's state fields, then Lifecycle, one machine per lifecycle that
+payload names for this type -- machines are keyed by lifecycle name and
+indexed by type under by_type, so two type-specific lifecycles over one
+field stay distinct -- each drawn as an inline SVG by assets/fsm.js. The
+grammar says a type has a STATUS field with four words in it; the semantics
+engine says which of those words a node may move to next and under what
+rule. Rules come first because an operator shaping the model reads the
+sentence before the diagram. fsm.js knows no field name -- DEPTH, STATUS and
+AUTHORED_BY arrive as data, so a field rename does not reach it -- and it
+lays its machines out transposed, rank running down and branches spreading
+across, because the pane is 350px wide and a six-rung ladder never fit it
+sideways. Its geometry is measured in CSS pixels with no viewBox, so no
+label is scaled below the app's 10px floor. Each section degrades to a named
+absence: no engine, no machine for this type, or a machine with no rules yet
+all still render a section that says so, because a missing section reads as
+settled and nothing here is.
 <<<
 NOTES: >>>
 Updated 2026-09-02 for commits 8823edf1 and 35f2a499 (grammar-groups.json,
@@ -68,7 +71,13 @@ coverage check, pill order).
 
 Updated 2026-09-03 for commits b6c01bd4 and 46cd3cf1: the layout now carries
 the canon's glosses verbatim, and the inspector gained the Rules and
-Lifecycle sections over the sdoc-semantics/1 payload.
+Lifecycle sections over the semantics payload.
+
+Corrected 2026-09-08: the payload is sdoc-semantics/2, and its machines are
+keyed by lifecycle name and indexed by type under by_type rather than being
+one per state field. Today the two readings coincide -- the engine emits
+STATUS, DEPTH and AUTHORED_BY, and machinesFor() maps a tag through by_type --
+but the tab reads the index, not the field list.
 <<<
 RELATIONS:
 - TYPE: Parent
