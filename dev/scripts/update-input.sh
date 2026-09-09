@@ -87,11 +87,28 @@ if ! (
   # the fixers each drive their own `nix build`.
   if ! verify_all_packages; then
     log_info "Build failed — re-deriving sidecar hashes and retrying once..."
-    # Non-fatal: the retry below is the authority on whether the tree is
-    # good, and it reports the real failure if the hashes were not the
-    # problem.
-    fix_sidecar_hashes || :
-    verify_all_packages
+    # A hash we cannot DERIVE is the one failure here that stops the PR
+    # from being writable, so it is the only one that holds the input
+    # back. Everything downstream of it ships.
+    #
+    # `exit`, not a bare call. This whole body is the CONDITION of the
+    # `if ! (` above, and bash disables errexit for a condition — so a
+    # bare failing command does NOT abort, it falls through to the
+    # `git commit` below, whose success then becomes the subshell's
+    # status. That is how a verified-broken bump shipped as UPDATED.
+    if ! fix_sidecar_hashes; then
+      log_failure "could not derive sidecar hashes"
+      exit 1
+    fi
+    # Informational from here. The lock is written and every hash we can
+    # derive has been derived, so the tree is complete and committable.
+    # A build that still fails means the update is well-formed but does
+    # not build — that is a red PR for branch CI to report, not a reason
+    # to withhold the PR.
+    if ! verify_all_packages; then
+      log_info "Build still failing after sidecar repair — opening the PR; branch CI is the gate"
+      echo "::warning::${name}: build verification failed, PR opens red"
+    fi
   fi
 
   # Phase 2.5: Formatter pass — only when this input bump actually
@@ -110,21 +127,35 @@ if ! (
   # can see the isolated update branch, so this per-input pass is authoritative.
   # `nix fmt` exits 0 on successful in-place formatting regardless
   # of whether files changed (no --fail-on-change). A non-zero exit
-  # here means the formatter itself errored, which correctly aborts
-  # the subshell and reports HELD BACK. `git add -A` runs
-  # unconditionally: when fmt was skipped it's a no-op over the lock
-  # files already staged; when fmt ran it captures reformatting.
+  # here means the formatter itself errored, leaving the tree
+  # non-canonical — a PR that cannot be written correctly, so it holds
+  # the input back. `git add -A` runs unconditionally: when fmt was
+  # skipped it's a no-op over the lock files already staged; when fmt
+  # ran it captures reformatting.
+  #
+  # Both need an explicit `exit` for the errexit reason spelled out at
+  # the sidecar-hash repair above.
   fmt_after=$(nix eval --raw .#formatter.x86_64-linux.outPath 2>/dev/null || echo "")
   if [ "$fmt_before" != "$fmt_after" ]; then
-    run_build nix fmt
+    if ! run_build nix fmt; then
+      log_failure "formatter errored"
+      exit 1
+    fi
   fi
-  git add -A
+  if ! git add -A; then
+    log_failure "git add failed"
+    exit 1
+  fi
 
-  # Phase 3: Commit only after build passes
-  git commit -m "chore: update input $name"
+  # Phase 3: Commit. NOT gated on a passing build — see the sidecar-hash
+  # repair above for why a failing build ships as a red PR instead.
+  if ! git commit -m "chore: update input $name"; then
+    log_failure "git commit failed"
+    exit 1
+  fi
 ); then
   version_detail=$(parse_input_version "$version_file" "$name")
-  report_held_back "$name" "update or build failed" "$version_detail"
+  report_held_back "$name" "update or hash derivation failed" "$version_detail"
   exit 0
 fi
 

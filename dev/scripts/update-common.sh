@@ -419,6 +419,29 @@ verify_all_packages() {
 fix_sidecar_hashes() {
   local expr paths p rc=0
 
+  # ── KNOWN GAP: this roster covers TWO of the four hash kinds ──────────
+  #
+  # IF A NIXPKGS BUMP BREAKS A HASH AND THE PR OPENED RED INSTEAD OF
+  # BEING HELD BACK, THIS IS WHY. Read this before re-deriving it.
+  #
+  # `fixVendorHash` (Go) and `fixNpmDepsHash` (npm) are the only fixers
+  # any overlay exposes. There is no `fixPnpmDepsHash` and no
+  # `fixCargoHash`, so a nixpkgs bump that invalidates a pnpmDeps or
+  # cargoDeps hash has nothing to re-derive it. The build then fails with
+  # every hash-derivation step reporting success, and update-input.sh
+  # classifies that as "well-formed but does not build" and opens a red
+  # PR — when the true cause is a hash we could not produce, which the
+  # hold-back rule says should have withheld the PR.
+  #
+  # This is a MISCLASSIFICATION, not a regression: before the hold-back
+  # split there was no hold-back on the input path at all, so these
+  # already surfaced as red PRs. Deferred deliberately rather than
+  # designed upfront — adding a fixer means per-package `extraExtract`
+  # plumbing, and we would rather see a real failure shape it.
+  #
+  # Tracked as a GitHub issue; grep `fixPnpmDepsHash` to find every
+  # place this gap is written down.
+  #
   # `builtins.getAttr` keeps the expression free of brace-substitution
   # sequences, so bash never tries to expand any part of it.
   expr='let
