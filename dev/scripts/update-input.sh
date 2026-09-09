@@ -53,7 +53,16 @@ if ! (
     log_failure "devenv.yaml regeneration failed"
     exit 1
   fi
-  mv devenv.yaml.tmp devenv.yaml
+  # The `mv` needs the same guard as the eval above. Bare, a failed rename
+  # left devenv.yaml at its OLD content, which then got staged and committed
+  # beside a bumped flake.lock — a stale-but-well-formed file that no
+  # required check compares against the lock, so it would auto-merge exactly
+  # like the zero-byte case this temp-and-move exists to prevent.
+  if ! mv devenv.yaml.tmp devenv.yaml; then
+    rm -f devenv.yaml.tmp
+    log_failure "could not install regenerated devenv.yaml"
+    exit 1
+  fi
 
   # Sync devenv.lock. Producing content the PR carries, so a failure is a
   # hold-back: shipping a stale devenv.lock beside a bumped flake.lock is a
