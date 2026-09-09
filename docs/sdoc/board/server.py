@@ -13,8 +13,8 @@ and holds no graph. No daemon answering is HTTP 503 with the client's own
 remedy in the body -- the browser shows it and offers a retry, rather than
 this server quietly loading the corpus itself.
 
-The Content-Security-Policy admits same-origin workers for the board's vendored
-ELK layout engine. It also admits cdn.jsdelivr.net, blob: scripts and workers,
+The Content-Security-Policy admits same-origin workers for the board's ELK
+layout engine. It also admits cdn.jsdelivr.net, blob: scripts and workers,
 and wasm-unsafe-eval: Perspective's pinned CDN build loads its wasm and worker
 that way (EV-SDOC-PERSPECTIVE-FIRST-EXPLORER measured exactly which directives
 it needs).
@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import mimetypes
+import os
 import sys
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -39,7 +40,44 @@ from scribe_paths import RootError, resolve_root  # noqa: E402
 
 from source import ClientError, DaemonSource, NoDaemon  # noqa: E402
 
-ELK_VENDOR = HERE / "assets" / "vendor" / "elkjs"
+ELK_DIR_ENV = "SDOC_BOARD_ELKJS_DIR"
+ELK_ASSETS = ("elk-api.js", "elk-worker.min.js")
+
+
+def _elk_dir() -> Path:
+    """The Nix store directory holding elkjs, or a refusal naming the fix.
+
+    DEC-DEPS-VIA-NIX: the layout engine is not in the tree. devenv.nix builds
+    it from upstream's pinned tarball and hands the store path over
+    SDOC_BOARD_ELKJS_DIR, which reaches the dev shell and the `board` process
+    alike. An unset variable means this server was started outside that
+    environment.
+
+    Refuse at startup rather than at request time. The alternative is two 404s
+    on routes index.html asks for, which the browser reports as a broken layout
+    engine -- a symptom several steps from "you are not in the devenv shell".
+    """
+    raw = os.environ.get(ELK_DIR_ENV)
+    if not raw:
+        raise SystemExit(
+            f"{ELK_DIR_ENV} is unset. The board's ELK layout engine comes from "
+            "Nix, not from the repository; devenv.nix sets this variable. Start "
+            "the board with `devenv up board`, or run this server from inside "
+            "`devenv shell`."
+        )
+    directory = Path(raw)
+    missing = [name for name in ELK_ASSETS if not (directory / name).is_file()]
+    if missing:
+        raise SystemExit(
+            f"{ELK_DIR_ENV}={raw} does not hold {', '.join(missing)}. The "
+            "variable should name the elkjs derivation's lib/ directory; a "
+            "stale value survives a `devenv.nix` change until the shell or the "
+            "`board` process is restarted."
+        )
+    return directory
+
+
+ELK_DIR = _elk_dir()
 STATIC_ROUTES = {
     "/": HERE / "index.html",
     "/index.html": HERE / "index.html",
@@ -54,8 +92,11 @@ STATIC_ROUTES = {
     "/assets/layout.js": HERE / "assets" / "layout.js",
     "/assets/perspective.js": HERE / "assets" / "perspective.js",
     "/assets/theme.css": HERE / "assets" / "theme.css",
-    "/assets/vendor/elkjs/elk-api.js": ELK_VENDOR / "elk-api.js",
-    "/assets/vendor/elkjs/elk-worker.min.js": ELK_VENDOR / "elk-worker.min.js",
+    # The route paths outlive the delivery: assets/layout.js resolves them
+    # relative to its own URL, so they stayed put when the files moved from the
+    # tree into the store.
+    "/assets/vendor/elkjs/elk-api.js": ELK_DIR / "elk-api.js",
+    "/assets/vendor/elkjs/elk-worker.min.js": ELK_DIR / "elk-worker.min.js",
 }
 CONTENT_SECURITY_POLICY = (
     "default-src 'self'; "

@@ -1,8 +1,0 @@
-elkjs 0.12.0
-Source: https://registry.npmjs.org/elkjs/-/elkjs-0.12.0.tgz
-Upstream: https://github.com/kieler/elkjs
-License: EPL-2.0 OR GPL-3.0-or-later (see LICENSE)
-
-Vendored files:
-  elk-api.js          sha256 ccca46175c05bbd280b5de6c9853103711e52c666a101f145b717e345363e24d
-  elk-worker.min.js   sha256 e4f5c51c6f2fd564bb64e52e81c4a85a316ef2f24f8b90e1db5eb886c765b030

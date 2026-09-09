@@ -19,7 +19,7 @@ async function elkEngine() {
   if (!elkPromise) {
     elkPromise = import(ELK_API_URL).then(() => {
       if (typeof globalThis.ELK !== "function") {
-        throw new Error("the vendored ELK API did not register itself");
+        throw new Error("the ELK API did not register itself");
       }
       return new globalThis.ELK({ workerUrl: ELK_WORKER_URL });
     });

@@ -13,8 +13,8 @@ STATEMENT: >>>
 layout.js first traverses only the selected node's filtered incoming and
 outgoing adjacency to the requested hop depth, ranks candidates for
 deterministic clipping, and retains at most 48 nodes. Only that bounded induced
-subgraph is sent to the vendored ELK.js 0.12 worker; the whole canon is never
-serialized to the layout engine.
+subgraph is sent to the ELK.js 0.12 worker; the whole canon is never serialized
+to the layout engine.
 
 ELK Layered places the measured card boxes from left to right and returns
 orthogonal edge sections. The board supplies measured relation-label boxes and
@@ -40,11 +40,18 @@ and counts continue to describe canon relations.
 Layout is asynchronous. A monotonically increasing request token makes the
 latest depth, filter, hash, or refresh selection win and discards stale worker
 results. Initial layout failures keep the app from reporting ready; later
-failures reach the shared error banner. The API and worker are pinned,
-same-origin assets served through the static allowlist.
+failures reach the shared error banner.
+
+The API and worker are pinned, same-origin assets served through the static
+allowlist, and they come from Nix rather than from the tree. devenv.nix builds
+elkjs 0.12.0 from upstream's published tarball and puts the derivation's lib
+directory in SDOC_BOARD_ELKJS_DIR, for the dev shell and the board process
+alike; server.py reads that variable to back the two /assets/vendor/elkjs/
+routes and refuses to start without it. The route paths are unchanged, because
+layout.js resolves them relative to its own URL.
 <<<
 NOTES: >>>
-The ELK.js layout replaced the reference implementation's custom SCC, barycentric, and orthogonal router on 2026-09-02. elkjs 0.12.0 is vendored under its EPL-2.0 OR GPL-3.0-or-later license.
+The ELK.js layout replaced the reference implementation's custom SCC, barycentric, and orthogonal router on 2026-09-02. elkjs 0.12.0 is EPL-2.0 OR GPL-3.0-or-later. It was vendored in the tree until 2026-09-08, when WORK-BOARD-ELKJS-VIA-NIX moved it behind SDOC_BOARD_ELKJS_DIR; the served bytes did not change.
 <<<
 RELATIONS:
 - TYPE: Parent
@@ -58,14 +65,6 @@ RELATIONS:
   VALUE: docs/sdoc/board/assets/board.js
 - TYPE: File
   VALUE: docs/sdoc/board/server.py
-- TYPE: File
-  VALUE: docs/sdoc/board/assets/vendor/elkjs/elk-api.js
-- TYPE: File
-  VALUE: docs/sdoc/board/assets/vendor/elkjs/elk-worker.min.js
-- TYPE: File
-  VALUE: docs/sdoc/board/assets/vendor/elkjs/LICENSE
-- TYPE: File
-  VALUE: docs/sdoc/board/assets/vendor/elkjs/NOTICE.txt
 - TYPE: Parent
   VALUE: EV-SDOC-BOARD-ELK-NEIGHBORHOOD-SMOKE
   ROLE: Proven_By
