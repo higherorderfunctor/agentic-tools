@@ -229,7 +229,17 @@ fi
 
 # Phase 1: Update dep hashes via nix-update (needs clean committed state)
 log_info "Running nix-update..."
-if ! (
+# STANDALONE subshell, NOT an `if !` condition — bash disables errexit for
+# anything whose status it tests, and that reaches inside the subshell and
+# overrides its own `set -e`. See "Target subshell shape" in
+# update-common.sh; checks/target-subshell-shape.nix fails the build if this
+# regresses.
+target_rc=0
+set +e
+(
+  set -euETo pipefail
+  shopt -s inherit_errexit 2>/dev/null || :
+
   cd "$wt"
 
   # Prime the src derivation file in the store. `nix flake prefetch`
@@ -243,12 +253,13 @@ if ! (
   # building the output, which is enough to unblock nix-update.
   nix eval --raw ".#$name.src.drvPath" >/dev/null 2>&1 || true
 
+  # `if !` rather than a bare pipeline plus a PIPESTATUS test: `pipefail`
+  # already makes the pipeline's status nix-update's, and with errexit armed
+  # a bare pipeline would abort before any status check ran, losing this
+  # message.
   # shellcheck disable=SC2086
-  nix run --inputs-from . nix-update -- --flake "$name" --system "$system" $extra_flags 2>&1 | tee "$version_file"
-  # pipefail propagates nix-update failures through tee
-  nix_update_status=${PIPESTATUS[0]}
-  if [ "$nix_update_status" -ne 0 ]; then
-    log_failure "nix-update exited $nix_update_status"
+  if ! nix run --inputs-from . nix-update -- --flake "$name" --system "$system" $extra_flags 2>&1 | tee "$version_file"; then
+    log_failure "nix-update failed"
     exit 1
   fi
 
@@ -335,7 +346,11 @@ if ! (
   # Belt and braces: keep the subshell's exit status independent of the
   # build above even if a later edit adds a statement here.
   true
-); then
+)
+target_rc=$?
+set -e
+
+if [ "$target_rc" -ne 0 ]; then
   version_detail=$(parse_pkg_version "$version_file")
   # Roll back the Phase 0 rev+src commit so a held-back package does
   # NOT leave a branch ahead of base. The PR-creation step in

@@ -115,6 +115,46 @@ git_diff_quiet() {
   esac
 }
 
+# ── Target subshell shape ────────────────────────────────────────────────────
+#
+# Each target script runs its body in a STANDALONE subshell whose status is
+# read from `$?` on the next line, never as the condition of an `if !`.
+#
+# Bash disables errexit for any command whose status it TESTS — an `if` or
+# `while` condition, a `!` negation, or the left operand of `||`/`&&` — and
+# that suppression reaches INSIDE a subshell, overriding a `set -e` written in
+# the subshell itself. Measured:
+#
+#   $ if ! ( set -euETo pipefail; false; echo REACHED ); then …; fi
+#   REACHED                              # errexit suppressed
+#   $ set +e; ( set -euETo pipefail; false; echo REACHED ); echo $?
+#   1                                    # errexit ARMED, body aborted
+#
+# Note the second form: `( … ) || rc=$?` is NOT a fix — the `||` puts the
+# subshell right back in a status-tested context. Only a standalone subshell
+# works, with `set +e` around the call so the parent survives the failure:
+#
+#   target_rc=0
+#   set +e
+#   (
+#     set -euETo pipefail
+#     shopt -s inherit_errexit 2>/dev/null || :
+#     …
+#   )
+#   target_rc=$?
+#   set -e
+#
+# Why it matters: under the old `if ! ( … ); then` shape every bare command in
+# a target body fell through to the trailing `git commit`, whose success became
+# the target's exit status. A nixpkgs bump whose build verification FAILED
+# therefore shipped as `UPDATED` — measured on sweep 34351134945, which logged
+# `UPDATED: nixpkgs` with zero `HELD BACK:` lines in 12,274 lines of log, and
+# had been doing so since at least 69c00ef2 (2026-04-13).
+#
+# The rule was documented before it was enforced and then broken twice within
+# two days, so it is now a build-failing gate rather than a comment:
+# checks/target-subshell-shape.nix. shellcheck has no diagnostic for it.
+
 # ── Worktree management ──────────────────────────────────────────────────────
 
 # Create or reset a worktree on a named branch (update/<name>).
