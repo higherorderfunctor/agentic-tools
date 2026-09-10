@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # cspell:ignore sdoc sgra unrelate argparse
 """The `scribe` command: turn a command line into one typed operation
-(WORK-SCRIBE-CLIENT, docs/plans/scribe-daemon/).
+(DEC-SCRIBE-DAEMON-NO-FALLBACK, docs/plans/scribe-daemon/).
 
 Stdlib only. No strictdoc import, no corpus load, no graph.
 

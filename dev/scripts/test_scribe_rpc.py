@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # cspell:ignore sdoc sockaddr unrelate
 """Contracts for the scribe socket, its client, and the export
-(WORK-SCRIBE-RPC-AND-SERVICE, WORK-SCRIBE-CLIENT, WORK-SCRIBE-EXPORT-PAYLOAD).
+(MECH-SCRIBE-RPC, MECH-SCRIBE-SOCKET-IDENTITY, MECH-SCRIBE-EXPORT-PAYLOAD).
 
 Every contract runs against a real server on a real socket in a temporary
 runtime directory, never the live one, so a running daemon is neither
