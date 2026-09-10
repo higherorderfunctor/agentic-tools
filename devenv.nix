@@ -309,8 +309,6 @@ in {
       # execution is needed here.
       nativeSettings = {
         approval_policy = "never";
-        model = "gpt-5.6-sol";
-        model_reasoning_effort = "high";
         sandbox_mode = "danger-full-access";
       };
     };
