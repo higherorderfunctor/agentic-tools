@@ -282,8 +282,8 @@ in {
     # in the payload and listed on the start screen, which is where a
     # reader is meant to see them. A bad root (exit 2) does.
     #
-    # PYTHONPATH and STRICTDOC_CACHE_DIR are unset for the same reason the
-    # sdoc skill's recipes unset them: a shell-level PYTHONPATH shadows the
+    # PYTHONPATH and STRICTDOC_CACHE_DIR are unset before the wrappers rebuild
+    # their declared environment: a shell-level PYTHONPATH shadows the
     # interpreter under test, and the cache dir would redirect the export.
     "view:render" = {
       description = "Render the canon (or one root): export, view-check, wireline, render";
@@ -340,12 +340,12 @@ in {
           log "Checking the tree under $r"
           rc=0
           # To stderr: devenv shows a task's stderr in its summary and hides stdout.
-          env -u PYTHONPATH ${python} "$view/view-check.py" "$index" . --root "$r" >&2 || rc=$?
+          env -u PYTHONPATH strictdoc-grammar-extract "$view/view-check.py" "$index" . --root "$r" >&2 || rc=$?
           if [ "$rc" -gt 1 ]; then exit "$rc"; fi
         done
         payload="$out/$stem.json"
         log "Writing the payload"
-        env -u PYTHONPATH ${python} "$view/wireline.py" "$index" . "''${scope[@]}" --out "$payload"
+        env -u PYTHONPATH strictdoc-grammar-extract "$view/wireline.py" "$index" . "''${scope[@]}" --out "$payload"
         render() {
           env -u PYTHONPATH ${python} "$view/render.py" "$payload" "$view/template.html" --wrap "$1" --out "$2" >/dev/null
           log "wrote $2"

@@ -90,11 +90,12 @@ list -- is not repeated here.
 
 This module also holds the STATEMENT parser (the row conventions from
 DEC-ROW-REFERENCE-LINES and MECH-ROW-SOURCE-LINE, the widget row shapes
-from the whiteboard-view design) and the .sgra reader, because the check
-and the wireline must read a statement the same way and this is the one
-place both import from. The worktree is walked to map each UID to its file:
-a narrative's directory class (spec, plan:<name>, package) is what the
-over-in-plan-or-spec rule compares.
+from the whiteboard-view design). The check and wireline share the grammar
+returned by the resident daemon's workspace.grammar method. The worktree is
+still walked to map each UID to its file, because this pipeline's input is a
+hand-run ``strictdoc export`` and only an export that goes through the daemon
+carries ``_DOCUMENT_PATH``: a narrative's directory class (spec, plan:<name>,
+package) is what the over-in-plan-or-spec rule compares.
 """
 
 from __future__ import annotations
@@ -106,7 +107,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "dev" / "scripts"))
-from scribe_grammar import _SGRA_LINE, _TYPE_RE, parse_sgra  # noqa: E402,F401
+from scribe_client import ClientError, call_for_root  # noqa: E402
+from scribe_contract import WorkspaceGrammarResult  # noqa: E402
 from sdoc_fp import build_uid_index, iter_nodes, load_index, parse_parent_fp  # noqa: E402
 
 SCHEMA = "whiteboard-view/2"
@@ -154,11 +156,19 @@ SKIP_DIRS = {".git", ".devenv", "output"}
 
 
 # --------------------------------------------------------------------------
-# grammar.sgra
+# grammar
 # --------------------------------------------------------------------------
 
 
-
+def daemon_grammar(worktree: Path) -> dict:
+    """Return the validated grammar held by this worktree's daemon."""
+    reply = call_for_root(worktree.resolve(), "workspace.grammar")
+    try:
+        return WorkspaceGrammarResult.model_validate(reply).model_dump(
+            by_alias=True
+        )["types"]
+    except ValueError as error:
+        raise ClientError(f"invalid workspace.grammar result: {error}") from error
 
 
 def ladders(grammar: dict) -> dict:
@@ -925,17 +935,23 @@ def main() -> int:
     parser.add_argument("worktree", type=Path)
     parser.add_argument("--root", help="UID of one root narrative (default: every root)")
     parser.add_argument("--all-roots", action="store_true", help="every root (the default)")
-    parser.add_argument("--grammar", type=Path, help="grammar file (default: <worktree>/docs/sdoc/grammar.sgra)")
     args = parser.parse_args()
     if not args.worktree.is_dir():
         parser.error(f"worktree {args.worktree} is not a directory")
     if args.root and args.all_roots:
         parser.error("--root and --all-roots exclude each other")
-    grammar_path = args.grammar or args.worktree / "docs" / "sdoc" / "grammar.sgra"
-    if not grammar_path.is_file():
-        parser.error(f"grammar {grammar_path} does not exist")
+    try:
+        grammar = daemon_grammar(args.worktree)
+    except ClientError as error:
+        print(f"view-check: {error}", file=sys.stderr)
+        return 1
 
-    canon = build_canon(load_index(args.export_json), args.worktree, parse_sgra(grammar_path), [args.root] if args.root else None)
+    canon = build_canon(
+        load_index(args.export_json),
+        args.worktree,
+        grammar,
+        [args.root] if args.root else None,
+    )
 
     total = 0
     for root in canon.roots:

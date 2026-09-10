@@ -36,8 +36,8 @@ computed sits under a key that says so:
               grid row that places it in a cell or the outside strip; one
               entry per (narrative, row), whichever via was seen first
   grammar     every element's prefix, fields (kind, options, required) and
-              relation roles, from the grammar file: the export types every
-              field as String
+              relation roles, from the daemon's workspace.grammar reply: the
+              export types every field as String
   ladders     every SingleChoice field's option list, from the grammar
   checks      view-check's findings, per root and canon-wide, the same list
               its own output prints
@@ -72,6 +72,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve()
 sys.path.insert(0, str(HERE.parents[3] / "dev" / "scripts"))
+from scribe_client import ClientError  # noqa: E402
 from sdoc_fp import PLACEHOLDER, contract_hash, parse_parent_fp  # noqa: E402
 
 
@@ -336,7 +337,6 @@ def main() -> int:
     parser.add_argument("worktree", type=Path)
     parser.add_argument("--root", help="UID of one root narrative (default: every root)")
     parser.add_argument("--all-roots", action="store_true", help="every root (the default)")
-    parser.add_argument("--grammar", type=Path, help="grammar file (default: <worktree>/docs/sdoc/grammar.sgra)")
     parser.add_argument("--out", type=Path, help="write the payload here instead of stdout")
     args = parser.parse_args()
 
@@ -345,11 +345,18 @@ def main() -> int:
         parser.error(f"worktree {worktree} is not a directory")
     if args.root and args.all_roots:
         parser.error("--root and --all-roots exclude each other")
-    grammar_path = args.grammar or worktree / "docs" / "sdoc" / "grammar.sgra"
-    if not grammar_path.is_file():
-        parser.error(f"grammar {grammar_path} does not exist")
+    try:
+        grammar = vc.daemon_grammar(worktree)
+    except ClientError as error:
+        print(f"wireline: {error}", file=sys.stderr)
+        return 1
 
-    canon = vc.build_canon(vc.load_index(args.export_json), worktree, vc.parse_sgra(grammar_path), [args.root] if args.root else None)
+    canon = vc.build_canon(
+        vc.load_index(args.export_json),
+        worktree,
+        grammar,
+        [args.root] if args.root else None,
+    )
     wire = Wireline(canon)
     text = json.dumps(wire.payload(worktree, args.export_json), indent=2, ensure_ascii=False) + "\n"
     if args.out:

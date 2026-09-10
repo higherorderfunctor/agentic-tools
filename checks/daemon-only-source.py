@@ -10,10 +10,12 @@ own graph. ``dev/scripts/sdoc_semantics`` is allowlisted as the requirement's
 recorded violation; it must disappear when the operator-defined semantics
 representation exists.
 
-Two view programs are transitional stack entries: R13 converts them to daemon
-RPC and removes their temporary entries from ``TRANSITIONAL_R13`` in the same
-commit. Keeping the exception named here lets this earlier R11 commit execute
-without hiding any other consumer.
+One narrow exception remains, named by FINDING rather than by file:
+``view-check.py`` walks the worktree for ``.sdoc`` files. The view pipeline's
+input is a hand-run ``strictdoc export``, and only an export that goes through
+``sdoc_model`` carries ``_DOCUMENT_PATH``, so the walk cannot be replaced until
+that pipeline reads the daemon's export. Scoping the exception to the one
+finding keeps a grammar read added to the same file refused.
 """
 
 from __future__ import annotations
@@ -40,16 +42,20 @@ ALLOWED_PREFIXES = (
     # the operator defines a daemon representation for the semantics model.
     Path("dev/scripts/sdoc_semantics"),
 )
-TRANSITIONAL_R13 = {
-    Path("docs/sdoc/view/view-check.py"),
-    Path("docs/sdoc/view/wireline.py"),
+# Keyed by path, valued by the EXACT findings tolerated there. Adding a path
+# here is deliberately more work than adding one to ALLOWED_PATHS: an entry
+# has to name the finding it forgives.
+NARROW_EXCEPTIONS = {
+    Path("docs/sdoc/view/view-check.py"): {
+        "walks the filesystem for .sdoc files",
+    },
 }
 
 
 def is_allowed(path: Path) -> bool:
     if path.name.startswith("test_"):
         return True
-    if path in ALLOWED_PATHS or path in TRANSITIONAL_R13:
+    if path in ALLOWED_PATHS:
         return True
     return any(path.is_relative_to(prefix) for prefix in ALLOWED_PREFIXES)
 
@@ -122,6 +128,8 @@ def scan(root: Path) -> list[str]:
             for finding in findings(
                 relative, absolute.read_text(encoding="utf8", errors="strict")
             ):
+                if finding in NARROW_EXCEPTIONS.get(relative, set()):
+                    continue
                 failures.append(f"{relative}: {finding}")
     return failures
 
