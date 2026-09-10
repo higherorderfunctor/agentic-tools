@@ -27,7 +27,10 @@ field rather than a key that is quietly dropped. Which parameters a given
 OPERATION requires, and which it forbids, is a second layer: one model per
 operation, beside the operations themselves. Refusals keep their codes --
 -32001 for a workspace that could not answer, -32002 for an operation that was
-understood and declined.
+understood and declined. A WorkspaceError reached through scribe.apply is the
+latter: validation failures and rejected saves are operations the held
+workspace understood. An unexpected exception inside a registered method is
+-32603 Internal error and retains str(exc) as diagnostic data.
 
 A request over the cap is drained before its refusal is written, so the client
 receives the refusal instead of a broken pipe. Batches are accepted up to eight
