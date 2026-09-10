@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-GRAMMAR-EXTRACT-SOURCE-BOUNDARY
 TITLE: The overlay that put the extractor's sources on the wrong side is gone
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 dev/fragments/overlays/overlay-pattern.md states an invariant: an overlay must

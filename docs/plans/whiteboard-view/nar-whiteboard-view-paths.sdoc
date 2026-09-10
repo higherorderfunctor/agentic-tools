@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-WHITEBOARD-VIEW-PATHS
 TITLE: The paths that must work
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen

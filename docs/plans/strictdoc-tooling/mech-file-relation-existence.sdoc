@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-FILE-RELATION-EXISTENCE
 TITLE: File relations to nonexistent paths export clean
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Check every File relation against the repository tree in
@@ -50,11 +49,10 @@ of the grain check and runs as strictdoc-element-check in nix flake check.
 Two exclusions, both deliberate and both cheap to reverse. Targets outside
 the repository are not supported; no File relation names one today. Forward
 references are not supported either -- a node may not name a path its own
-unbuilt work will create. The corpus carries 64 File relations on 37 nodes,
-4 of them element-grained and none using LINE_RANGE, and they sit on nodes at
-implemented or better, so the strict rule still costs nothing and relaxing it
-later by gating existence on DEPTH is a one-line change, where tightening it
-later would not be.
+unbuilt work will create. The corpus carries 64 File relations on 37 nodes, 4 of
+them element-grained and none using LINE_RANGE. Every target exists, so the
+strict rule still costs nothing and relaxing it later is a one-line change,
+where tightening it later would not be.
 <<<
 RATIONALE: >>>
 This node's own earlier premise -- that the parser will not do it -- is

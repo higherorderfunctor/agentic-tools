@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SCRIBE-WORKSPACE
 TITLE: Build the resident workspace and its reconciliation
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Build the workspace and its reconciliation as a library, with no transport.

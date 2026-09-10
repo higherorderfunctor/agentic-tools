@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: INV-REGISTER-NOT-AUTHORITATIVE
 TITLE: The register is not the source of truth it claims to be
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Seven open-card identifiers appear in section bodies with no register row at

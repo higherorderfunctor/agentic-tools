@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DSL-CANDIDATE-JIRA-TRANSITIONS
 TITLE: Candidate shape: lifecycles with Jira-style transitions (who may, what must hold, what it says)
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 PROPOSED SHAPE, one of three, from the 2026-08-29 prior-art spike
@@ -27,8 +26,8 @@ THE SHAPE.
         from = "open";  to = "accepted";
         who = [ "human" ];                                  # Jira "condition": actor gate
         when = c.every "Governed_By"                        # Jira "validator": data gate
-          (c.inList (c.var "target.DEPTH") [ "interface-settled" "implemented" "verified" ]);
-        message = "every governing node must be at least interface-settled";
+          (c.eq (c.var "target.AUTHORED_BY") "human");
+        message = "every governing node must be human-authored";
       };
     };
     canon.relations.Governed_By.ripple = {

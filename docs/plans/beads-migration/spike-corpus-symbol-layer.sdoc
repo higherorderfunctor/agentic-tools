@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: SPIKE-CORPUS-SYMBOL-LAYER
 TITLE: The symbol reference layer is healthy
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 60 of 61 symbol references resolve. The layer that rotted is the coarse

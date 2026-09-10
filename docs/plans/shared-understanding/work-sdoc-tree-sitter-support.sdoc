@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SDOC-TREE-SITTER-SUPPORT
 TITLE: Extended tree-sitter support for sdoc
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The umbrella for extended tree-sitter/sdoc support, carrying three build items

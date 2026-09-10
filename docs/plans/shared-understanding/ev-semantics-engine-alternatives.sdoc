@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SEMANTICS-ENGINE-ALTERNATIVES
 TITLE: Semantics engine survey: eight candidates probed on a seventeen-row rubric
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: Claude workflow wf_29569539-fe2 on 2026-09-03 (five finder lenses, a shortlist, eight deep assessments each with a runnable probe, eight independent verifications, a synthesis); every number from gh api or nix eval; probes, verifier transcripts and synthesis.md archived untracked under private/semantics-engine/ in the worktree
 STATEMENT: >>>
@@ -34,8 +33,8 @@ in-process callability, and maintenance. Each row got one verdict: native (the
 library expresses it as data or a first-class API), glue (caller code, lines
 counted), or no (not expressible without reimplementing the concept). Every
 candidate was probed against a toy graph shaped like this corpus: a DECISION
-with and without a Superseded_By edge, two MECHANISMs at different DEPTHs, a
-WORK that Crosses one, and per-edge PARENT_FP entries. Each probe carried
+with and without a Superseded_By edge, two MECHANISMs with different field
+values, a WORK that Crosses one, and per-edge PARENT_FP entries. Each probe carried
 negative controls, so a gate that never fires could not pass as working. A
 second agent that had not written the probe re-ran it and re-pulled every
 maintenance number; the corrections it made are applied below.
@@ -60,7 +59,7 @@ probe showed is never imported when rendering mermaid.
 python-statemachine 3.2.1. The healthiest library of the same shape: 126
 commits in 12 months, seven releases, zero runtime dependencies, in nixpkgs.
 Loads a machine from JSON, YAML or SCXML against a published schema, and ran
-DEPTH crossed with AUTHORED_BY as one parallel-state document. Guard bodies are
+STATUS crossed with AUTHORED_BY as one parallel-state document. Guard bodies are
 method names, so every graph-reaching gate is still Python. Two silent traps:
 the loader disables three of four diagnostics, and a refused send raises
 nothing unless a flag is set. Checkpoints and relation contracts have no
@@ -131,8 +130,8 @@ supplies a transaction primitive. Whether a rule library in a second language
 satisfies DEC-LAYER-STACK is a reading of that decision, not a measurement.
 <<<
 NOTES: >>>
-DEPTH implemented, not verified: a completed observation run by its own
-author, not independently re-taken, this corpus's convention. Each probe WAS
+This is a completed observation run by its own author, not independently
+re-taken. Each probe WAS
 re-run by a second agent inside the run; that is verification of the
 measurements, not of this node.
 

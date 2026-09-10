@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-PROSE-UID-REFS-CAN-BREAK-SILENTLY
 TITLE: A UID wrapped across a line break stops resolving and nothing notices
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 strictdoc format rewraps prose, and a UID mentioned in prose can be wrapped

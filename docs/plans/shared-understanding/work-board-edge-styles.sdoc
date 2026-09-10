@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-EDGE-STYLES
 TITLE: Edges convey the relation role: per-grammar colour and dash, legend, bold labels
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Operator directive, 2026-09-01, recorded for review before any

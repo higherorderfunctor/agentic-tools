@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-VIEW-SELF-HOSTED
 TITLE: Render the view system's own design through its own pipeline
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Give the view system's own root its tabs -- a legend, the data model, the programs, the rules inventory, the paths and the edges -- and render it through the same task as the whiteboard, so the plan reads in the page shape it defines. Done 2026-08-30.

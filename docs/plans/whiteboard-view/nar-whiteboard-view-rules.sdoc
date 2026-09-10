@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-WHITEBOARD-VIEW-RULES
 TITLE: The rules, and who enforces each
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen

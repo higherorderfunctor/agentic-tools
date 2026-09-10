@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SDOC-TREE-SITTER-GRAMMAR
 TITLE: A tree-sitter grammar for the sdoc format, derived from the sdoc grammar
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 A dedicated tree-sitter grammar for the sdoc file format itself, derived from

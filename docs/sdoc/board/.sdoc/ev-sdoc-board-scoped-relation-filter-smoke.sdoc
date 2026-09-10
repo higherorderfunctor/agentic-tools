@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SDOC-BOARD-SCOPED-RELATION-FILTER-SMOKE
 TITLE: Scoped relation filters preserve selection and control exact edges
-DEPTH: verified
 AUTHORED_BY: llm
 SOURCE: Chromium 152 headless via DevTools Protocol at 1440x900 against the live scribe daemon; 2026-09-02
 STATEMENT: >>>

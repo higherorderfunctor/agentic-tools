@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-PLAN-VIEW
 TITLE: A plan view: the work hierarchy as its own lens
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Plan views over the canon. The first cut is SHIPPED, to the shape the

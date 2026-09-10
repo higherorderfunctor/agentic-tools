@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SCRIBE-EXPORT-PAYLOAD
 TITLE: Serve the render's export from the held graph
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Generate the export payload from the held graph and point the render task at

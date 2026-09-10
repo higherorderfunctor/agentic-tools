@@ -51,9 +51,9 @@
 # INSERTING one mid-list, while no node carries it, ALSO exports clean --
 # strictdoc validates the order of the fields a node ACTUALLY HAS, so an
 # absent optional field only advances the grammar pointer. The positive
-# control that makes those two greens mean anything: swapping DEPTH and
-# AUTHORED_BY on one real node fails with "Semantic error: Wrong field
-# order". COMPONENT was therefore appended on the .sgra-diff ground alone,
+# control that makes those two greens mean anything: swapping two fields on
+# one real node fails with "Semantic error: Wrong field order". COMPONENT was
+# therefore appended on the .sgra-diff ground alone,
 # and its position is still free until a migration writes values.
 #
 # Rendered with:
@@ -71,29 +71,15 @@
   inherit (dsl) el field rel;
   inherit (field) one required str tag;
 
-  # The vocabularies the node types share. Written once because they ARE one
-  # vocabulary each — a DEPTH that meant different things on two types would be
-  # a different field, not a repeated one.
-  depths = [
-    "sketch"
-    "needs-design"
-    "needs-spike"
-    "interface-settled"
-    "implemented"
-    "verified"
-  ];
   # DEC-AUTHORSHIP-LADDER: one monotonic ladder that only rises. The middle two
   # rungs are a human's acts (seen and let stand; adopted as their own); the
   # writer stamps the bottom rung and has no flag for the others.
   authors = ["llm" "llm-accepted" "llm-adopted" "human"];
 
-  # The field run every claim-bearing type carries, in this order. DECISION has
-  # no DEPTH and no PARENT_FP, so it is spelled out on its own below rather than
-  # assembled by subtraction — subtraction reads as "the same thing, minus" when
-  # the truth is that a decision is not a thing that has a depth.
+  # Shared fields, in grammar order. DECISION has no PARENT_FP, so it is
+  # spelled out on its own below rather than assembled by subtraction.
   uid = required (str "UID");
   title = required (str "TITLE");
-  depth = required (one "DEPTH" depths);
   authoredBy = required (one "AUTHORED_BY" authors);
   statement = required (str "STATEMENT");
   rationale = str "RATIONALE";
@@ -111,7 +97,7 @@
 
   # Roles. Every Parent role is a dependency: the node that carries it depends
   # on the target's wording, may fingerprint it in PARENT_FP, and is walked by
-  # readiness and the cycle check. A Child role is the opposite: the node that
+  # the cycle check. A Child role is the opposite: the node that
   # carries it points DOWN at something it owns or produced, with no dependency
   # and no fingerprint, so a collectable node can point at a durable one and
   # collection never strands a reference.
@@ -176,7 +162,6 @@ in [
     fields = [
       uid
       title
-      depth
       authoredBy
       statement
       rationale
@@ -191,7 +176,6 @@ in [
     fields = [
       uid
       title
-      depth
       authoredBy
       statement
       rationale
@@ -209,7 +193,6 @@ in [
     fields = [
       uid
       title
-      depth
       authoredBy
       (str "SOURCE")
       statement
@@ -229,7 +212,6 @@ in [
     fields = [
       uid
       title
-      depth
       authoredBy
       statement
       rationale
@@ -267,7 +249,6 @@ in [
     fields = [
       uid
       title
-      depth
       authoredBy
       (one "WIDGET" [
         "prose"
@@ -306,13 +287,11 @@ in [
   # ----------------------------------------------------------------------- Work
   # Work declares what it crosses (the lane), what it assumes, and what it
   # Produces — the evidence it leaves behind, pointed at downward so the
-  # evidence outlives the work. DEPTH on WORK conflates design maturity with
-  # delivery; DEC-WORK-STATE-FIELD holds that open until beads runs.
+  # evidence outlives the work. WORK deliberately carries no state field.
   (el "WORK" {prefix = "WORK-";} {
     fields = [
       uid
       title
-      depth
       authoredBy
       statement
       rationale

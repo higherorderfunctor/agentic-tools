@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: INV-VOCABULARIES-UNBOUNDED
 TITLE: Two declared-bounded vocabularies are unbounded in practice
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 The grain rule labels: 127 rules across 90 distinct labels, one placeholder

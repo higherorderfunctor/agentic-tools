@@ -188,7 +188,7 @@ def main(argv: list[str] | None = None) -> int:
         "selector",
         nargs="?",
         metavar="FIELD|TYPE",
-        help="one state field (DEPTH) or one node type (DECISION); default all",
+        help="one state field (STATUS) or one node type (DECISION); default all",
     )
     parser.add_argument("--root", help="repository root (default: derived)")
     output = parser.add_mutually_exclusive_group()

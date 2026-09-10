@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-BEHAVIOUR-MODEL
 TITLE: Define the behaviour model in Nix and render it for review
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Define, as a typed Nix option tree layered over the generated grammar surface, what a
@@ -93,12 +92,10 @@ State is a TUPLE over the element's declared state fields, with initial, termina
 the rule that a transition may not write a field it does not constrain in from. The
 alternative was one lifecycle region per single-choice field, where a transition moves
 one region and a second region moves only on a completion trigger. Both are proven at
-instance scale, 13 of 13 negatives in 0.04 s and 7 of 7 in 0.038 s. The tuple wins on
-the defects: the region shape turns a spike's single atomic write into a completion
-chain whose intermediate snapshot its own invariant forbids, has no transaction
-primitive at all, and is violated today by a live unrun-and-sketch node in this corpus.
-The tuple's two measured defects -- no reachability, and a sketch-to-verified leap
-accepted -- are two of the three eval checks named above.
+instance scale, 13 of 13 negatives in 0.04 s and 7 of 7 in 0.038 s. The tuple wins
+because the region shape turns one atomic multi-field write into a completion chain
+whose intermediate snapshot its own invariant forbids, and has no transaction
+primitive at all. Its missing reachability check is one of the eval checks named above.
 
 The ripple is DERIVED from what a transition writes intersected with what a gate reads,
 at the granularity the field catalogue already carries: a per-field contract flag. The
@@ -178,7 +175,6 @@ forcing apply, and the module seam that makes the types unavoidable.
 <<<
 PARENT_FP: >>>
 DEC-EXECUTABLE-RULES-ROADMAP:0000000
-DEC-LOCAL-IMPLEMENTABILITY:0000000
 <<<
 NOTES: >>>
 Vocabulary adopted from the outside research: a command is a request and may be refused;
@@ -191,23 +187,17 @@ five's.
 
 MEASURED WHILE GROOMING, 2026-08-27. The cross-check input already exists and needs
 nothing built. One nix eval over the committed packages/strictdoc-grammar/values.nix
-yields the five element tags, every single-choice field's option set (DECISION carries
-AUTHORED_BY and STATUS; MECHANISM, SLICE and INVARIANT carry DEPTH and AUTHORED_BY;
-SPIKE carries DEPTH, AUTHORED_BY and STATUS) and every parent relation role. Positive
-and negative control on the same walk: MECHANISM.DEPTH set to verified is accepted, and
-set to done it throws naming all six declared values. The grammar package's check step
-returns the TOTAL merged value with every optional key present and explicitly null, so
-the behaviour surface never has to handle an absent key.
+yields the element tags, every single-choice field's option set and every parent
+relation role. The grammar package's check step returns the TOTAL merged value with
+every optional key present and explicitly null, so the behaviour surface never has to
+handle an absent key.
 
-THREE CROSSED MECHANISMS ARE VALIDATORS, AND THE EDGES LOOK MISPLACED. MECH-READY-QUERY,
-MECH-READINESS-PREDICATE-RECONCILE and MECH-RELATION-TARGET-TYPE-LINT are things that
-RUN, which the roadmap puts in milestone four -- three is the surface, four is the
-implementation -- and SLICE-CHECKPOINT-WIRING already crosses the comparable validators.
-Milestone three owns their DECLARATIONS: the closure-ready gate and what it must see,
-and the role-to-target-type table as model data. Measured consequence of leaving them
-here: status.py reports this slice BLOCKED on MECH-RELATION-TARGET-TYPE-LINT and
-MECH-READINESS-PREDICATE-RECONCILE at sketch, so the surface cannot be handed off until
-two validators it does not build are designed. Reviewing those two edges is owed.
+ONE CROSSED MECHANISM IS A VALIDATOR, AND THE EDGE LOOKS MISPLACED.
+MECH-RELATION-TARGET-TYPE-LINT is something that RUNS, which the roadmap puts in
+milestone four -- three is the surface, four is the implementation -- and
+SLICE-CHECKPOINT-WIRING already crosses the comparable validators. Milestone
+three owns its DECLARATION: the role-to-target-type table as model data.
+Reviewing that edge is owed.
 
 EDGES OWED IN. MECH-CONTRACT-FIELDS-EDGE-TO-SEMANTIC-LAYER says the Governed_By edge to
 DEC-FP-FIELDS-CONFIGURABLE and its PARENT_FP entry belong to the milestone that delivers
@@ -246,8 +236,6 @@ where they get written.
 
 - Which fields are contract-bearing. The ripple mechanism is settled (writes intersected with reads, at field granularity); the field SET is DEC-FP-FIELDS-CONFIGURABLE and stays empty here.
 
-- Whether DEPTH may regress, and who may move it. The type admits a transition in either direction; no direction is declared.
-
 - Who may sign, what independent means, and whether signing authority keys on grade. DEC-FP-ACCEPT-AUTHORITY is open and the gate is declared with no check.
 
 - Whether the per-edge signing machine is a lifecycle on the relation or a milestone on one end. The subject union admits both; neither is chosen.
@@ -264,15 +252,6 @@ RELATIONS:
 - TYPE: Parent
   VALUE: DEC-EXECUTABLE-RULES-ROADMAP
   ROLE: Governed_By
-- TYPE: Parent
-  VALUE: DEC-LOCAL-IMPLEMENTABILITY
-  ROLE: Governed_By
-- TYPE: Parent
-  VALUE: MECH-READY-QUERY
-  ROLE: Crosses
-- TYPE: Parent
-  VALUE: MECH-READINESS-PREDICATE-RECONCILE
-  ROLE: Crosses
 - TYPE: Parent
   VALUE: MECH-RELATION-TARGET-TYPE-LINT
   ROLE: Crosses

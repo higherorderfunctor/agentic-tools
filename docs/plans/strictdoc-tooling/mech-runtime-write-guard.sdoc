@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-RUNTIME-WRITE-GUARD
 TITLE: Enforce field ownership at the runtime rather than in a document
-DEPTH: implemented
 AUTHORED_BY: human
 STATEMENT: >>>
 Two fields are the operator's and the tool never writes them: PARENT_FP and AUTHORED_BY. What enforces that is the absence of a code path, not a check placed in front of one. The sdoc CLI derives its field flags from the grammar it loads, minus a named guarded set, so create and set carry no flag for either field; naming one anyway exits non-zero saying who owns it. There is no override flag, because a flag the model can pass is a document rule wearing a different hat.

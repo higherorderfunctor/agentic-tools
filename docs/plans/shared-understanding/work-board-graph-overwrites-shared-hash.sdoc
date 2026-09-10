@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-GRAPH-OVERWRITES-SHARED-HASH
 TITLE: Opening the Graph tab overwrites another view selection in the hash
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Graph-tab audit row, 2026-09-08:

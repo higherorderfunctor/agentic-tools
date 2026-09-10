@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SDOC-BOARD-GRAPH-KEY-AND-ROLE-STYLE-SMOKE
 TITLE: The graph key explains role hues and card outline states
-DEPTH: verified
 AUTHORED_BY: llm
 SOURCE: Independent Chromium 152 headless DevTools probes at 1440x900 and 390x844 against the live scribe daemon; 2026-09-04
 STATEMENT: >>>

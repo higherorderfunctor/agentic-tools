@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SCRIBE-NEW-IN-ONE-LOAD
 TITLE: Creating a node in memory costs 5 ms, and every meta field matches a rebuild
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: strictdoc-trial worktree, 382-node canon copied to a temp dir, warm cache; strictdoc 0.28.3; 2026-09-01
 STATEMENT: >>>

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-FP-GIT-FLOW-HAZARDS
 TITLE: Git operations that change node content before it reaches main
-DEPTH: interface-settled
 AUTHORED_BY: human
 STATEMENT: >>>
 Squash-merge is the only method the repository allows, and it is safe for the hash: it preserves the final tree, so a contract hash is byte-identical before and after and matches the branch tip. What it destroys is the ability to reconstruct an intermediate accepted state, and the per-commit attribution of which signature was turned alongside which content change. Under squash-only, and on a branch that restack and absorb routinely rewrite, the durable unit of signature is the pull request, not the commit. MECH-FP-MAIN-LINEAGE and MECH-FP-PREMERGE-GC own that.

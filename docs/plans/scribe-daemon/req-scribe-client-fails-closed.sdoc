@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: REQ-SCRIBE-CLIENT-FAILS-CLOSED
 TITLE: A client without a daemon fails loudly and does nothing else
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 A scribe client shall treat an unreachable daemon as an error. It shall not

@@ -63,7 +63,6 @@ FIXTURE_INDEX = {
                     "UID": "MECH-FIX-TWO",
                     "TITLE": "A mechanism",
                     "AUTHORED_BY": "llm",
-                    "DEPTH": "sketch",
                     "STATEMENT": "How it behaves.",
                     "RELATIONS": [
                         {"TYPE": "Parent", "VALUE": "DEC-FIX-ONE", "ROLE": "Governed_By"},
@@ -244,7 +243,7 @@ class AdapterContractTest(unittest.TestCase):
         decision = by_id["DEC-FIX-ONE"]
         mechanism = by_id["MECH-FIX-TWO"]
         self.assertEqual(decision["state"], {"field": "STATUS", "value": "accepted"})
-        self.assertEqual(mechanism["state"], {"field": "DEPTH", "value": "sketch"})
+        self.assertIsNone(mechanism["state"])
         self.assertEqual(
             mechanism["source"]["path"], "docs/plans/fixture/mech-fix-two.sdoc"
         )

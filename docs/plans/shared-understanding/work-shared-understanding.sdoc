@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SHARED-UNDERSTANDING
 TITLE: Shift the system toward shared human-and-LLM reasoning
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The grooming thread for the operator's 2026-09-01 direction. Their goal

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-PLAN-BEADS-SNAPSHOT
 TITLE: Ingest to beads freezes the plan
-DEPTH: sketch
 AUTHORED_BY: human
 STATEMENT: >>>
 SUPERSEDED by MECH-PLAN-CHANGE-KINDS: too strong. At ingest the plan is snapshotted immutably and execution state moves to beads.

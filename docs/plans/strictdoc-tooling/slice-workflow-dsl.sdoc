@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-WORKFLOW-DSL
 TITLE: Design the workflow DSL: pick a shape, settle the condition language, then build
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Design the DSL above the hook layer: rule DEC-DSL-SHAPE and

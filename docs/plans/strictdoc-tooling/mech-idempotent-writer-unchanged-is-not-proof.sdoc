@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-IDEMPOTENT-WRITER-UNCHANGED-IS-NOT-PROOF
 TITLE: An idempotent writer reporting unchanged proves nothing about whether it can write
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 generate:sgra skips a file whose bytes already match and logs `unchanged`. So

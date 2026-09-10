@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-STRICTDOC-VERSION-SMOKE
 TITLE: Nothing asserts the strictdoc binary's version any more
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The retired first-party build asserted its own acceptance condition in an

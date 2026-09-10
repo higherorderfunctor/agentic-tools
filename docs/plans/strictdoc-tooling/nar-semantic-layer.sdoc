@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER
 TITLE: Semantic layer
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: callout
 TAGS: explored, not settled

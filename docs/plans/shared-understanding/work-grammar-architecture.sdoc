@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAMMAR-ARCHITECTURE
 TITLE: Several grammar files, each a bounded goal
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Concept group: the grammar becomes several .sgra files, each a bounded goal.

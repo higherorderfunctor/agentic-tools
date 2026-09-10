@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-GRAPH-CONTROLS-AND-KEY
 TITLE: Graph controls stay visible while a grouped key explains encodings
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Neighborhood distance, filters, and viewport actions occupy a dedicated control

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-FP-DETECTOR
 TITLE: Suspect-link detection and acceptance over the design graph
-DEPTH: implemented
 AUTHORED_BY: human
 STATEMENT: >>>
 Ship fp-check and fp-accept over the JSON export, plus a flake check that gates
@@ -20,7 +19,7 @@ placeholder; drifted, where a real recorded hash no longer matches; and
 unbacked, where a fingerprint names a parent the node has no relation to.
 
 fp-accept rewrites the named nodes' entries to current hashes and is the only
-thing that writes them. It refuses a parent that is still moving.
+thing that writes them.
 <<<
 RATIONALE: >>>
 The contract field selection is a prototype choice, deliberately not settled --
@@ -28,14 +27,13 @@ see MECH-FP-FIELD-TUNING. Git-flow handling is deliberately absent: nothing
 bites before a branch reaches main, and that merge is the forcing function.
 <<<
 PARENT_FP: >>>
-MECH-FP-ACCEPT-READINESS:0000000
 MECH-FP-CHECK:0000000
 MECH-FP-RELATION-LINT:0000000
 <<<
 NOTES: >>>
 Implemented: dev/scripts/fp-check.py and fp-accept.py, sharing dev/scripts/
-sdoc_fp.py (contract-field hashing, PARENT_FP parsing, the readiness
-predicate) and sdoc_edit.py (structural PARENT_FP field editor -- finds a
+sdoc_fp.py (contract-field hashing and PARENT_FP parsing) and sdoc_edit.py
+(structural PARENT_FP field editor -- finds a
 node's line-range by UID and field-range by name rather than splitting on
 blank lines, because a multiline field's own prose can contain blank
 paragraph breaks). CI gate: checks/strictdoc-fp-check.nix, exporting the
@@ -53,23 +51,17 @@ green rather than red on day one.
 
 Verified past the happy path: a synthetic export exercises all four
 fp-check cases (signed-and-current, never-signed, drifted, unbacked) plus a
-deleted-parent case in one run, and a synthetic readiness fixture confirms
-fp-accept actually refuses a DECISION parent with STATUS open and a
-MECHANISM parent below interface-settled rather than silently skipping the
-check. fp-accept was then run for real on SLICE-FP-DETECTOR itself (this
-node) and on MECH-FP-CHECK and MECH-FP-ACCEPT-READINESS, producing the
-PARENT_FP entries above and below -- the multi-entry block form is this
-node's own three-parent write, exercised for real rather than only in the
-synthetic fixture.
+deleted-parent case in one run. fp-accept was run for real on
+SLICE-FP-DETECTOR itself (this node) and on
+MECH-FP-CHECK, producing the PARENT_FP entries above and below -- the
+multi-entry block form is this node's own write, exercised for real rather
+than only in the synthetic fixture.
 
 Retyped from SLICE to WORK on 2026-08-30 under DEC-SLICE-DECOMPOSES-TO-WORK and DEC-NODE-FAMILIES. The UID keeps its retired prefix: DEC-UID-OUTLIVES-TYPE.
 <<<
 RELATIONS:
 - TYPE: Parent
   VALUE: MECH-FP-CHECK
-  ROLE: Crosses
-- TYPE: Parent
-  VALUE: MECH-FP-ACCEPT-READINESS
   ROLE: Crosses
 - TYPE: Parent
   VALUE: MECH-FP-RELATION-LINT

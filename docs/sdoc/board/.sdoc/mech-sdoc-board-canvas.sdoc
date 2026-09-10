@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-CANVAS
 TITLE: The Board canvas renders a focal work item's bounded neighborhood
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 board.js presents three panes over the snapshot. The left pane lists only

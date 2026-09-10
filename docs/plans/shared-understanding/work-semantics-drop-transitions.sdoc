@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SEMANTICS-DROP-TRANSITIONS
 TITLE: Remove transitions from both Nix delivery sites
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Remove ps.transitions from grammarPython in devenv.nix and

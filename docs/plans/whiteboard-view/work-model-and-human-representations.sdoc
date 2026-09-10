@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-MODEL-AND-HUMAN-REPRESENTATIONS
 TITLE: Representations for a model's entry points and for generated human documents
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 More representations over the canon, beyond the page a person reads: entry

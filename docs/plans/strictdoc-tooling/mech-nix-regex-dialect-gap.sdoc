@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-NIX-REGEX-DIALECT-GAP
 TITLE: Nix's regex engine cannot express the dialect StrictDoc's grammar is written in
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Measured on 0.28.3 while writing the faithful extractor. builtins.match is

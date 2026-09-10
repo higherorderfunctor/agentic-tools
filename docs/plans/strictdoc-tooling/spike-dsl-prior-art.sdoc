@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: SPIKE-DSL-PRIOR-ART
 TITLE: Prior art for a Nix workflow DSL over the canon
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Assess prior art for the DSL that sits above the hook layer: a Nix option
@@ -35,7 +34,7 @@ that forces it:
   forced by: "A transition is explicit and its checks must pass."
   from: Jira's transition with its three slots (condition = who may, validator = is the data right, post function = what runs after) and XState's event-fired transition.
 - **Condition** — A yes/no rule written as data over one node's fields, its one-hop neighbours through a named relation role, and the acting identity, with an error message beside it.
-  forced by: "Field STATUS equals accepted AND every relation of role X points at a node whose DEPTH is at least Y."
+  forced by: "Field STATUS equals accepted AND every relation of role X points at a human-authored node."
   from: JsonLogic (a rule is one JSON object {operator: [operands]}) and Terraform's precondition, which carries error_message next to every condition.
 - **Site** — The joint and phase a condition is checked at (the slice document's word for that pair), and whether failing there refuses the operation, warns, or is only recorded.
   forced by: "Dirty must not block being in that state; it may block committing and probably blocks merging."
@@ -61,7 +60,7 @@ SCOPE OUT -- what lives outside the DSL, and why:
 - The dirty marks themselves: runtime state written by scribe into a node field (an sdoc relation carries only TYPE, VALUE, ROLE, so an edge cannot carry a mark). Nix has no state; it declares which roles carry staleness.
 - Clearing a mark ('I read the neighbour, it is fine'): the TUI for a human, a skill for an LLM. Judgement has no rule form; the DSL says only which actor class may re-stamp.
 - CI wiring: the forge ruleset or workflow YAML. git-hooks stages end at pre-push and no Nix DSL reaches a merge decision; the DSL emits `scribe check --gate merge` and nothing more.
-- Multi-hop and whole-canon questions ('everything under me is verified', 'at most one accepted DECISION governs X'): plain Python over the loaded graph (a ten-line worklist). The condition language sees one node plus one hop.
+- Multi-hop and whole-canon questions ('every parent satisfies a property', 'at most one accepted DECISION governs X'): plain Python over the loaded graph (a ten-line worklist). The condition language sees one node plus one hop.
 - Firing automatic transitions ('when conditions are met, transition'): nothing runs between invocations, so `scribe check` reports them as due; no per-edit graph-wide re-evaluation.
 - Building the snapshot a condition reads (before, after, actor class, relations with their target's fields, edge marks): Python at each joint. The DSL names what a rule reads; Python supplies it.
 - Flows and use cases: USE CASE nodes in the canon and package test fixtures, not DSL entities. A flow's expected refusal is a test, not a rule.
@@ -96,7 +95,7 @@ FLOWS THAT CANNOT BE MODELLED WELL:
 LAYER COUNT, the research's argument (recorded here; the ruling is
 DEC-DSL-LAYER-COUNT's):
 
-forcing: The only reasoning-level split the research found is Rego's termination rule: a condition is a total function of one snapshot (always terminates, no effects), a hook has effects. That justifies exactly one piece of DATA between the DSL and the hooks, the rule JSON, and that data rides in the hook's own settings slot; it is not machinery and not a layer. The ecosystem constant agrees: NixOS systemd sugar (script -> serviceConfig), arion (service -> out.service) and git-hooks.nix (options -> raw) each have ONE intermediate, a freeform layer in the runtime's vocabulary that typed sugar writes into under mkIf so a consumer can still mkForce the low layer. No three-tier precedent exists. What WOULD earn a second layer is recursion in conditions (multi-hop, repeat-until-stable) or automatic graph-wide transitions, because termination and ordering then become concerns of their own that Nix cannot check; both are recommended out of scope, so the second layer stays unearned. The split between package TYPES (what a lifecycle can be, for any grammar) and this repo's VALUES (DEPTH, signing) is real but lives inside the DSL as options versus config, exactly like any NixOS module, not between L2 and the DSL.
+forcing: The only reasoning-level split the research found is Rego's termination rule: a condition is a total function of one snapshot (always terminates, no effects), a hook has effects. That justifies exactly one piece of DATA between the DSL and the hooks, the rule JSON, and that data rides in the hook's own settings slot; it is not machinery and not a layer. The ecosystem constant agrees: NixOS systemd sugar (script -> serviceConfig), arion (service -> out.service) and git-hooks.nix (options -> raw) each have ONE intermediate, a freeform layer in the runtime's vocabulary that typed sugar writes into under mkIf so a consumer can still mkForce the low layer. No three-tier precedent exists. What WOULD earn a second layer is recursion in conditions (multi-hop, repeat-until-stable) or automatic graph-wide transitions, because termination and ordering then become concerns of their own that Nix cannot check; both are recommended out of scope, so the second layer stays unearned. The split between package TYPES (what a lifecycle can be, for any grammar) and this repo's VALUES (STATUS, AUTHORED_BY and signing) is real but lives inside the DSL as options versus config, exactly like any NixOS module, not between L2 and the DSL.
 holds: The DSL holds lifecycles, transitions, conditions, sites, ripple rules, actor classes and gates, typed and keyed by name, validated by eval-time assertions (state values in the grammar enum, roles in L1, guard names declared, reachability). It compiles straight into L2 entries: hooks.<name> = { on; phase; python = "scribe.rules:evaluate"; settings = { rule = <JSON>; from; to; message; }; }. That hook JSON is the one intermediate and it is already L2's vocabulary. L2 gains one generic handler (the evaluator) and one extractor kind (who is acting), nothing else. L1 is untouched: state fields, choice values and relation roles are read from it, never written, and separate evalModules pools keep a DSL module from mkForce-ing a grammar field.
 
 READING LIST, at most six:

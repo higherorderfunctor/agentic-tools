@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-UC-INNER-SDOCS-IN-CODE-COMMENTS
 TITLE: Use case: match inner sdocs in code comments
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 An unsettled use case: recognizing an sdoc node written inline inside a

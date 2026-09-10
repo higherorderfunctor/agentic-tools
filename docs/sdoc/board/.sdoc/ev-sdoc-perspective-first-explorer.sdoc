@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SDOC-PERSPECTIVE-FIRST-EXPLORER
 TITLE: The export-backed Perspective explorer renders and restores a query
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: StrictDoc 0.28.3 JSON export; Perspective 5.3.0 CDN build; headless Chromium; codex spike contracts; 2026-08-31
 STATEMENT: >>>

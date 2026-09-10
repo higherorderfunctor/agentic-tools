@@ -19,13 +19,13 @@ WHAT THE DAEMON GETS
 --------------------
 An operation, never an argument list:
 
-    scribe set MECH-X --depth sketch
-      -> {"op": "set", "uid": "MECH-X", "fields": {"DEPTH": "sketch"}}
+    scribe set MECH-X --title "A mechanism"
+      -> {"op": "set", "uid": "MECH-X", "fields": {"TITLE": "A mechanism"}}
 
 `@file` and `-` are resolved HERE, against the caller's working directory and
 the caller's stdin, which the daemon has neither of.
 
-Some refusals therefore move: whether a node's type declares `--depth` is
+Some refusals therefore move: whether a node's type declares a field is
 answered by the daemon, because the type comes from the index and a UID
 prefix is a birth-name, not a type. The refusal is the same, the message is
 better, and it arrives from a different place.
@@ -170,7 +170,6 @@ def build_parser(grammar: dict, command: str | None, tag: str | None):
 
     list_parser = subparsers.add_parser("list", help="list nodes, filtered")
     list_parser.add_argument("--type", dest="node_type")
-    list_parser.add_argument("--depth")
     list_parser.add_argument("--status")
 
     # READ-ONLY, AND IT NEVER REACHES THE DAEMON. What a state field's values
@@ -184,7 +183,7 @@ def build_parser(grammar: dict, command: str | None, tag: str | None):
     )
     semantics_parser.add_argument(
         "selector", nargs="?", metavar="FIELD|TYPE",
-        help="one state field (DEPTH) or one node type (DECISION); default all",
+        help="one state field (STATUS) or one node type (DECISION); default all",
     )
     output = semantics_parser.add_mutually_exclusive_group()
     output.add_argument("--json", action="store_true", help="the sdoc-semantics/2 payload")
@@ -282,7 +281,6 @@ def operation(args, grammar: dict) -> dict:
         payload = {
             "op": "list",
             "type": args.node_type,
-            "depth": args.depth,
             "status": args.status,
         }
     elif command == "check":

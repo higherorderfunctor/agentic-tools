@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-ANNOTATIONS-ARE-WORK
 TITLE: Annotations are work: combine the two families
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The operator's direction that annotations -- gaps, review comments, open

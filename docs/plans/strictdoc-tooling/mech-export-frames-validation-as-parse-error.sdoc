@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-EXPORT-FRAMES-VALIDATION-AS-PARSE-ERROR
 TITLE: strictdoc export reports a semantic rejection as "could not parse file"
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Measured on 0.28.3 while wiring checks/strictdoc-grammar-negative-fixtures.nix.

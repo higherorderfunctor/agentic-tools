@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-EMIT-LAYER-BOUNDARY
 TITLE: Emit is the renderer composed with the type mapping, and they split cleanly
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Settled with the operator 2026-08-26. Two jobs, one composition:

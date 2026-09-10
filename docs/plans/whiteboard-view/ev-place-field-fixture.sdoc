@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-PLACE-FIELD-FIXTURE
 TITLE: PLACE, Over and sixteen widget words parse, export and round-trip under strictdoc 0.28.3
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: fixture and derivation script under the session scratchpad wf4/organization-in-grammar/ (fx-place, screens.py, out/screens.txt)
 STATEMENT: >>>

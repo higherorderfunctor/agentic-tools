@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-SERVER
 TITLE: One stdlib HTTP server serves the app over the resident daemon
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 server.py is one stdlib threaded HTTP server: GET and HEAD only, an

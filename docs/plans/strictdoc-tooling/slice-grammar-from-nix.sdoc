@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-GRAMMAR-FROM-NIX
 TITLE: Generate the grammar from a typed Nix option surface, and gate it
-DEPTH: verified
 AUTHORED_BY: llm
 STATEMENT: >>>
 Generate a typed Nix option surface from strictdoc's own grammar definition,
@@ -166,7 +165,7 @@ extractor now renames reserved module-system attribute names, and a collision
 with no rename is fatal rather than silent.
 
 WHAT CLOSED THIS SLICE. The operator ruled on 2026-08-26 that three items stood
-between implemented and accepted. All three landed 2026-08-27, and each carries
+between the prototype and acceptance. All three landed 2026-08-27, and each carries
 its own record of what was built rather than restating it here:
 
   MECH-STRICTDOC-DEVENV-MODULE -- DONE. ai.strictdoc, with enable, package and
@@ -230,8 +229,7 @@ STATEMENT, which specified a build that no longer existed. The third is closed:
 that statement was rewritten in place on 2026-08-27, supersession not being
 expressible for a slice (MECH-SLICE-CANNOT-BE-SUPERSEDED).
 
-DEPTH WAS HELD at implemented until an independent read happened.
-verified means an INDEPENDENT session checked the code against this node, and
+The work remained under review until an independent read happened. Independent verification means a separate session checked the code against this node, and
 for a while none had: every paragraph above was written by a session in the same
 run as the work it describes, and the run that assembled this section built nothing and ran
 no check. This slice's five flake gates are strictdoc-grammar-model-equal (which
@@ -242,8 +240,8 @@ beside them but belongs to SLICE-SDOC-IN-SEMBLE and the patched tree-sitter
 grammar, not here. All are real mechanical evidence, but a green check proves
 the code does what the code does, not that it does what this node says.
 
-VERIFIED 2026-08-27 by an independent session that wrote none of this code, and
-DEPTH is raised on the strength of it. Re-measured rather than transcribed: the
+VERIFIED 2026-08-27 by an independent session that wrote none of this code.
+Re-measured rather than transcribed: the
 grammar renders byte-identically at 4085 bytes, with a positive control -- one
 PREFIX mutated in a scratch copy produces a diff, so the comparison is live. The
 denial split holds in all four arms with a passing control title. The

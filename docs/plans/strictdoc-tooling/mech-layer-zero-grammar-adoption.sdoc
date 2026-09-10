@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-LAYER-ZERO-GRAMMAR-ADOPTION
 TITLE: Rule the layer-zero grammar pair's held semantics during the migration
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 A two-grammar sketch sits in packages/strictdoc-grammar/values/plan.nix and

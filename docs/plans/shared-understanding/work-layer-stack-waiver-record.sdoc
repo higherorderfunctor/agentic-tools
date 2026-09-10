@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LAYER-STACK-WAIVER-RECORD
 TITLE: Record how the canon holds the layer-stack waiver, and what retires it
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Decide how the canon records the layer-stack waiver, and what retires it.

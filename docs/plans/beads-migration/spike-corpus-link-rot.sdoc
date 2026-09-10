@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: SPIKE-CORPUS-LINK-ROT
 TITLE: Link rot in the source corpus
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 212 of 865 internal links dangle, 25 percent. 49 of 90 distinct targets resolve

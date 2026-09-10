@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DEVENV-TASK-SCRIPTS-FIXED-AT-EVAL
 TITLE: A devenv task cannot consume what another task in the same run regenerates
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Repo-wide, not attached to any milestone. devenv renders every task's `exec`

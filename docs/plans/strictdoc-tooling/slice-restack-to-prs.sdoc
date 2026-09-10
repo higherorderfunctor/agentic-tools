@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-RESTACK-TO-PRS
 TITLE: Restack the long-lived branch into reviewable pull requests
-DEPTH: sketch
 AUTHORED_BY: human
 STATEMENT: >>>
 Cut the accumulated branch into a series of pull requests ordered so each is

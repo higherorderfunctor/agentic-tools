@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-AGENTS-INFER-OVERLAY-CONVENTION-FROM-EXAMPLES
 TITLE: Agents keep putting wrapping in overlays because the examples do
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 A behavioural defect rather than a code one. The convention is that an overlay

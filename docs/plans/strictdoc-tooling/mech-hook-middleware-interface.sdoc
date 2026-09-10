@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-HOOK-MIDDLEWARE-INTERFACE
 TITLE: The hook layer as middleware: every joint is the pre or post of one operation
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 PROPOSED, NOT ACCEPTED. A snapshot of the hook layer as it stood on

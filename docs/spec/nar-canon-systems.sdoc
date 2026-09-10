@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-CANON-SYSTEMS
 TITLE: The systems a reader can switch on and off
-DEPTH: interface-settled
 AUTHORED_BY: llm
 WIDGET: table
 PLACE: card

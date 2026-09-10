@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-AI-STRICTDOC-HOME-PARITY
 TITLE: Satisfy options parity with a home-level install, and defer the rest
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 checks/options-doc.nix demands exact home-manager parity for an `ai.*` facet, so

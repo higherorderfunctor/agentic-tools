@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-ALLOWED-EDGES
 TITLE: Which relations are allowed
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen
@@ -25,9 +24,9 @@ Each role, what it may point at, how many are live, and what nothing checks.
 - Crosses (35 live edges, work to mechanism) is the lane a piece of work declares. But no node records which layer it belongs to, so 'crosses more than one layer' — what used to make a piece of work a 'slice' — has nothing to read.
 [LINK: DEC-DEFER-LAYER] [LINK: NAR-SEMANTIC-LAYER-TYPE-WORK] [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM] [LINK: NAR-SEMANTIC-LAYER-GAP-SEMANTICS-LIVE-IN-TOOLS-WITH-NO-OWNER]
 > Crosses: SLICE -> MECHANISM (35) = the lane; no node carries LAYER, so "crosses more than one layer" has no input [OPEN: DEC-DEFER-LAYER]
-- Assumes (17 live edges, none fingerprinted) is undecided: does it carry a contract like the other roles, and does an unsettled target block readiness the way Crosses does?
+- Assumes (17 live edges, none fingerprinted) is undecided: does it carry a contract like the other roles?
 [LINK: DEC-ASSUMES-CONTRACT-BEARING] [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM] [LINK: NAR-SEMANTIC-LAYER-TYPE-WORK] [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION]
-> Assumes: MECHANISM -> DECISION|MECHANISM, SLICE -> DECISION|SLICE (17 live, 0 fingerprinted); contract-bearing? blocks like Crosses? [OPEN: DEC-ASSUMES-CONTRACT-BEARING]
+> Assumes: MECHANISM -> DECISION|MECHANISM, SLICE -> DECISION|SLICE (17 live, 0 fingerprinted); contract-bearing? [OPEN: DEC-ASSUMES-CONTRACT-BEARING]
 - Guarantees (2 live edges) points from a mechanism at the rule it upholds — read as a requirement.
 [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM] [LINK: NAR-SEMANTIC-LAYER-TYPE-REQUIREMENT]
 > Guarantees: MECHANISM -> INVARIANT (2), read as -> REQUIREMENT [WORKS]
@@ -40,9 +39,9 @@ Each role, what it may point at, how many are live, and what nothing checks.
 - Two mechanisms have been superseded in prose only, so the count that is supposed to trigger the extension reads zero.
 [LINK: MECH-GROOMED-NODES-STAY-IN-THE-BACKLOG-FILE] [LINK: MECH-PLAN-BEADS-SNAPSHOT] [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM]
 > prose-supersession ledger reads 0; MECH-GROOMED-NODES-STAY-IN-THE-BACKLOG-FILE and MECH-PLAN-BEADS-SNAPSHOT are prose-superseded [GAP]
-- Backlogged_In (90 live edges) is meant to pair with DEPTH: sketch. The pairing is already broken — 8 sketch nodes lack the edge, none of the 41 decisions carry it, and a decision has no DEPTH to check against anyway.
+- Backlogged_In links an ungroomed item to its plan's register. Grooming drops the edge.
 [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION] [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM]
-> Backlogged_In: any -> register (90); "sketch <=> edge" already broken: 8 sketch nodes lack it, 0 of 41 DECISIONs carry it, DECISION has no DEPTH to query [GAP]
+> Backlogged_In: any -> register; grooming drops the edge [WORKS]
 - Nothing outside a plan may depend on a node inside it, and another plan counts as outside. The rule is keyed on file location. Two live edges violate it, and the check is unbuilt.
 [LINK: NAR-SEMANTIC-LAYER-TYPE-REQUIREMENT] [LINK: NAR-SEMANTIC-LAYER-GAP-MERGE-BOUNDARY-IS-NOT-A-JOINT]
 > direction: no Parent or PARENT_FP into docs/plans/<P>/ from outside (plan-to-plan counts); keyed on file; 2 live violations; check unbuilt [WORKS]

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LANG-JAVASCRIPT
 TITLE: Language items for JavaScript
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Grammar to load: `tree-sitter-grammars.tree-sitter-javascript` (nixpkgs, 0.25.0, `python313Packages`/`python314Packages` binding present).

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: MECH-ONE-NODE-PER-FILE
 TITLE: One node per file, because an agent reads files and traverses edges
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 A file holds exactly one node. One requirement, one plan step, one plan, one
@@ -63,9 +62,8 @@ After: 161 nodes in 161 files, 447,724 bytes, 2,780 bytes on average. The
 largest file is one node, slice-behaviour-model.sdoc at 17.9 KB, which is the
 node's own size and not a packing problem.
 
-DEPTH is implemented rather than verified: the carve was checked by the session
-that ran it and by a contest over its findings, but no independent session has
-read this node against the tree.
+The carve was checked by the session that ran it and by a contest over its
+findings, but no independent session has read this node against the tree.
 
 Adjacent but different, and now dissolved:
 MECH-GROOMED-NODES-STAY-IN-THE-BACKLOG-FILE was about groomed nodes not moving

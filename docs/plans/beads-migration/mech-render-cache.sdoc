@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-RENDER-CACHE
 TITLE: Human-readable renders are cached on the fingerprint of their inputs
-DEPTH: sketch
 AUTHORED_BY: human
 STATEMENT: >>>
 A rendered chunk is produced by a model, not deterministically: it expands one

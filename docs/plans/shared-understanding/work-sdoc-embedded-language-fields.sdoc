@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SDOC-EMBEDDED-LANGUAGE-FIELDS
 TITLE: Fields may embed another language, named by a companion field
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Let an sdoc field's content be written in another language, with a companion

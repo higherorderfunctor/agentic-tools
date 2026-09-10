@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SPIKE-IS-A-PIPELINE-TO-A-DECISION
 TITLE: A spike is work, then evidence, then a decision, which is why it fits no single cell
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 A SPIKE is not one thing, which is why it fits no cell of DEC-NODE-TYPE-GRID. It
@@ -21,7 +20,7 @@ So a spike EXISTS TO MAKE A DECISION. That is its purpose and its terminus, and
 a spike with no decision downstream of it was a prototype, not a probe.
 
 THE STRUCTURAL TELL, and nobody had a reason for it before now. SPIKE is the
-only node type carrying TWO state fields, a DEPTH and a STATUS whose word list
+only node type carrying its own STATUS, whose word list
 differs from every other STATUS in the grammar. Every other type carries one. It
 carries two because it IS two -- the doing and the finding -- and the second
 field is the evidence half wearing the same node.

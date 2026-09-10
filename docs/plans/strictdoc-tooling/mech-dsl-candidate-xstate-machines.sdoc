@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DSL-CANDIDATE-XSTATE-MACHINES
 TITLE: Candidate shape: XState-style machines with guards bound by name
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 PROPOSED SHAPE, one of three, from the 2026-08-29 prior-art spike
@@ -23,16 +22,16 @@ THE SHAPE.
   { c, lib, ... }: {
     canon.machines.DECISION = {
       stateField = "STATUS";  initial = "open";
-      states.open.on.accept = { target = "accepted"; guard = "governorsSettled"; };
+      states.open.on.accept = { target = "accepted"; guard = "governorsHumanAuthored"; };
       states.accepted.type = "final";                       # no transition may leave it
     };
-    canon.guards.governorsSettled = c.and [                 # bodies bound by NAME
+    canon.guards.governorsHumanAuthored = c.and [           # bodies bound by NAME
       (c.eq (c.var "actor.class") "human")
       (c.every "Governed_By"
-        (c.inList (c.var "target.DEPTH") [ "interface-settled" "implemented" "verified" ]))
+        (c.eq (c.var "target.AUTHORED_BY") "human"))
     ];
     # a higher layer swaps one body, machine untouched (XState machine.provide):
-    # canon.guards.governorsSettled = lib.mkForce (c.eq (c.var "actor.class") "human");
+    # canon.guards.governorsHumanAuthored = lib.mkForce (c.eq (c.var "actor.class") "human");
     canon.relations.Governed_By.ripple = { onFields = [ "STATEMENT" ]; clearedBy = [ "human" ]; };
     canon.actors = {
       extractor = "ssh-signing-key";

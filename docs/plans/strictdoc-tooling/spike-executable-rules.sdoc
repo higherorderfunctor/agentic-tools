@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: SPIKE-EXECUTABLE-RULES
 TITLE: How much of the design system's rules can run rather than be read
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 INV-GUARDS-MUST-EXECUTE records a measured split: every constraint that lived
@@ -68,12 +67,12 @@ through the documents, so the gate exports the corpus and needs no first-party
 package.
 
 Of four levels -- node, edge, document, branch -- only the parser and the fp
-and cycle checks execute, and only in CI. The parser accepts DEPTH TBD, a
+and cycle checks execute, and only in CI. The parser accepts an invalid choice value, a
 Governed_By pointing at a MECHANISM, and an edit to an accepted decision's
 statement. All four hashes reverted in 387cdaec equal today's, so a restored
 signature reads as signed and current. Two live violations each of
-INV-NO-EXTERNAL-PLAN-REFS and of the role-target table; five definitions of
-ready that no two agree on. Ten incidentals logged to 99-backlog.
+INV-NO-EXTERNAL-PLAN-REFS and of the role-target table. Ten incidentals logged
+to 99-backlog.
 
 The package does not need owning for anything questions one or three need.
 Seed facts held except: the version delta needs a reqif override plus a

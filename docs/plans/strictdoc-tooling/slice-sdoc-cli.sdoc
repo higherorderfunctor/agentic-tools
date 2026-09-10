@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-SDOC-CLI
 TITLE: A command-line tool that is the only writer of sdoc files
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Build the command-line tool that produces and edits sdoc documents. Its option
@@ -31,9 +30,8 @@ NO SEMANTIC RULES APPLY AT THIS MILESTONE, and that is the scope boundary. The
 tool enforces exactly what the GRAMMAR says -- the node types, which fields are
 required, each choice field's word list, and which relation roles a type may
 declare. It enforces nothing about how this instance USES them. Who may sign,
-whether DEPTH may regress, when deleting is legitimate, and where direct edits
-are denied are all instance semantics, and milestone five is where they are
-written.
+when deleting is legitimate, and where direct edits are denied are all instance
+semantics, and milestone five is where they are written.
 
 delete exists in the tool and is deliberately NOT taught by the sdoc skill. The
 verb is available to someone who wants it; nothing points an agent at it.
@@ -50,11 +48,10 @@ graph 0.3 s, and strictdoc's node model writes any field in grammar order --
 nothing here waits on the behaviour model.
 
 Deriving the option surface from the grammar rather than hand-writing it is what
-makes the milestone small. The five node types are genuinely asymmetric -- a
-DECISION carries no DEPTH and no File relation, a SPIKE is the only type
-carrying both a DEPTH and a STATUS with a different word list under the same
-name, an INVARIANT cannot point at a file -- and that asymmetry is exactly what
-gets hand-written wrong.
+makes the milestone small. The node types are genuinely asymmetric -- a
+DECISION carries STATUS and no File relation, while the other families carry
+no state field and have different relation surfaces -- and that asymmetry is
+exactly what gets hand-written wrong.
 <<<
 PARENT_FP: DEC-EXECUTABLE-RULES-ROADMAP:0000000
 NOTES: >>>
@@ -63,18 +60,17 @@ grammar defines the CLI options for everything but delete, the tool runs format
 and validation, and that is the milestone -- "simple cli to produce docs from
 options. no semantic rules apply yet."
 
-Three questions raised against the draft verb list were ruled INSTANCE SEMANTICS
-and are not this milestone's: whether deleting is legitimate, whether raising
-DEPTH is an ordinary edit or a lifecycle move, and whether to ship the harness
-denial given it is absent in eleven of twenty-three worktrees. All three sit
-with milestone five.
+Two questions raised against the draft verb list were ruled INSTANCE SEMANTICS
+and are not this milestone's: whether deleting is legitimate, and whether to
+ship the harness denial given it is absent in eleven of twenty-three worktrees.
+Both sit with milestone five.
 
 Build on strictdoc's own machinery rather than re-implementing writes: manage
 new for scaffolding, set_field_value for fields, the writer for formatting. Two
 measured constraints on that. set_field_value performs NO value validation --
-DEPTH='totally-not-a-depth' and a None on a required STATEMENT both serialise
-cleanly and reach disk -- so the validation has to be the tool's, not the
-model's. And single-line versus block form is chosen from the grammar rather
+AUTHORED_BY='robot' and a None on a required STATEMENT both serialise cleanly
+and reach disk -- so the validation has to be the tool's, not the model's. And
+single-line versus block form is chosen from the grammar rather
 than from what was parsed, so a PARENT_FP written through the model is always a
 block while the corpus carries inline single-entry values; that is hash-neutral
 because PARENT_FP is in EXCLUDED_FIELDS, but it is a visible diff.
@@ -90,10 +86,9 @@ IMPLEMENTED 2026-08-27 as dev/scripts/sdoc_cli.py, reachable as `scribe` in
 the dev shell through packages/strictdoc-grammar/lib/mkScribe.nix.
 
 The option surface is derived, and the asymmetry this slice's RATIONALE
-predicted is what comes out: `scribe new DECISION --help` offers no --depth,
-no File role and STATUS as open|accepted|rejected|superseded, while `sdoc
-new SPIKE --help` offers both a --depth and a --status of
-unrun|run|blocked. Relation roles are per type too -- --role Crosses is
+predicted is what comes out: `scribe new DECISION --help` offers STATUS as
+open|accepted|rejected|superseded and no File role, while `scribe new WORK
+--help` offers no state option. Relation roles are per type too -- --role Crosses is
 rejected on a MECHANISM, which does not declare it.
 
 All nine verbs are exercised. Prefix-to-type agreement now closes: `new
@@ -101,8 +96,7 @@ MECHANISM --uid SLICE-WRONG` exits 1, where strictdoc exports it clean.
 
 Deliberately NOT shipped, and each has a home: the harness denial before the
 edit tool runs (milestone four owns checkpoints), and whether deleting is
-legitimate, whether raising DEPTH is a lifecycle move and who may sign
-(milestone five owns instance semantics). `delete` exists and the sdoc skill
+legitimate and who may sign (milestone five owns instance semantics). `delete` exists and the sdoc skill
 does not teach it.
 
 Two judgement calls made under the operator's "you pick, I will tune later",

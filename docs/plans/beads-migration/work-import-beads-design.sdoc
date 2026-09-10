@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-IMPORT-BEADS-DESIGN
 TITLE: Import the beads design from outside the canon once canon and whiteboard have shipped
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Import the beads design into the canon once the canon and the whiteboard are

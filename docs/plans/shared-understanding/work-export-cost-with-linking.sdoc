@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-EXPORT-COST-WITH-LINKING
 TITLE: Source linking costs an export half a second warm and seven seconds cold
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Source linking costs about +0.6 s on a warm export and about +7 s cold (9.3 s

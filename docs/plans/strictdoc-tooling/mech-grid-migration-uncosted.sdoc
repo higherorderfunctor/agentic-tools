@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-GRID-MIGRATION-UNCOSTED
 TITLE: Applying the node-type grid is a corpus migration, not yet costed or applied
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 DEC-NODE-TYPE-GRID names six node types and the grammar declares five, and only

@@ -5,10 +5,9 @@ docs/plans/strictdoc-tooling/slice-sdoc-cli.sdoc).
 
 THE OPTION SURFACE IS DERIVED FROM THE GRAMMAR, not typed by a person. One
 flag per field a node type declares, one per relation role it may make, and
-every choice flag's word list read off that field. The types are
-genuinely asymmetric -- a DECISION carries no DEPTH and no File relation, a
-DECISION is the only type with a STATUS; the rest carry DEPTH, so the surface differs
-under the same name, an INVARIANT cannot point at a file -- and that
+every choice flag's word list read off that field. The types are genuinely
+asymmetric -- a DECISION carries STATUS and no File relation, while an
+INVARIANT cannot point at a file -- and that
 asymmetry is exactly what gets hand-written wrong. Run
 `sdoc new NARRATIVE --help` and `sdoc new DECISION --help` to see two different
 surfaces come out of one grammar.
@@ -26,9 +25,8 @@ NO SEMANTIC RULES APPLY AT THIS MILESTONE, and that is the scope boundary.
 This tool enforces exactly what the GRAMMAR says: the node types, which
 fields are required, each choice field's word list, and which relation roles
 a type may declare. It enforces nothing about how this instance USES them.
-Who may sign, whether DEPTH may regress, and when deleting is legitimate are
-instance semantics, and SLICE-INSTANCE-SEMANTICS-MIGRATION is where they get
-written.
+Who may sign and when deleting is legitimate are instance semantics, and
+SLICE-INSTANCE-SEMANTICS-MIGRATION is where they get written.
 
 Two rules here are NOT instance semantics and are enforced:
 
@@ -138,9 +136,9 @@ def split_root(argv: list[str]) -> tuple[str | None, list[str]]:
 
     Both the verb peek and main need it, and they must agree: a peek that
     does not know --root consumes a value treats that VALUE as the verb, so
-    `sdoc --root . set MECH-X --depth ...` resolved no node type and built a
+    `sdoc --root . set MECH-X --title ...` resolved no node type and built a
     `set` parser with no field flags. The failure surfaced as argparse's
-    "unrecognized arguments: --depth", which points at the wrong thing
+    "unrecognized arguments: --title", which points at the wrong thing
     entirely.
     """
     rest: list[str] = []
@@ -328,7 +326,7 @@ def build_parser(graph, verb: str | None, tag: str | None) -> argparse.ArgumentP
     # fall back to the union across types, so the command still parses and the
     # error the caller sees is "no node with UID ..." or "MECHANISM declares no
     # field ...", either of which names the actual problem. argparse's
-    # "unrecognized arguments: --depth" does not.
+    # "unrecognized arguments: --title" does not.
     for element in [graph.element(tag)] if tag else [graph.element(t) for t in graph.tags()]:
         add_field_flags(set_parser, element, required=False, allow_existing=tag is None)
     unsettable = sorted(
@@ -408,7 +406,6 @@ def build_parser(graph, verb: str | None, tag: str | None) -> argparse.ArgumentP
 
     list_parser = subparsers.add_parser("list", help="List nodes, filtered")
     list_parser.add_argument("--type", dest="node_type", choices=graph.tags())
-    list_parser.add_argument("--depth")
     list_parser.add_argument("--status")
 
     subparsers.add_parser("check", help="Validate every node, relation and File path")
@@ -593,16 +590,14 @@ def do_list(graph, args, root: Path) -> int:
     for node in graph.iter_nodes():
         if args.node_type and node.node_type != args.node_type:
             continue
-        fields = {name: field_value(node, name) for name in ("DEPTH", "STATUS")}
-        if args.depth and fields.get("DEPTH") != args.depth:
-            continue
-        if args.status and fields.get("STATUS") != args.status:
+        status = field_value(node, "STATUS")
+        if args.status and status != args.status:
             continue
         rows.append(
             (
                 node.reserved_uid,
                 node.node_type,
-                fields.get("DEPTH") or fields.get("STATUS") or "",
+                status or "",
                 graph.path_of(node).relative_to(root),
             )
         )

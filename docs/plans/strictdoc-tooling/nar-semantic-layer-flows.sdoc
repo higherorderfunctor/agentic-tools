@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-FLOWS
 TITLE: The joints and the language over them
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen
@@ -31,9 +30,9 @@ The operations logic can attach to, what a handler sees, and the open decisions 
 > condition language: JsonLogic trees typed by a Nix tagged union, evaluated in Python at the joint over node + one-hop + acting identity [WORKS]
 - Creating a node touches disk even under dry-run, so a 'before the write' joint already sees a file.
 > flow create: scribe new touches disk under --dry-run; a "before the write" joint already sees a file [GAP]
-- Signing is a standalone script today, the only thing that writes fingerprints, with no scribe verb. Dissolved into a scribe operation on the fingerprint field plus a semantic-layer gate on readiness and class.
+- Signing is a standalone script today, the only thing that writes fingerprints, with no scribe verb. Dissolved into a scribe operation on the fingerprint field plus a semantic-layer class gate.
 [LINK: NAR-SEMANTIC-LAYER-GAP-SEMANTICS-LIVE-IN-TOOLS-WITH-NO-OWNER] [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
-> flow sign: fp-accept.py, sole PARENT_FP writer, no scribe verb [FALLS OUT: a scribe move on PARENT_FP + L3 gate (readiness + class)]
+> flow sign: fp-accept.py, sole PARENT_FP writer, no scribe verb [FALLS OUT: a scribe move on PARENT_FP + L3 class gate]
 - CI runs one command, a named gate. Automatic transitions are reported as due, never fired.
 > flow check --gate <name>: CI's one command; automatic transitions reported as due, never fired [WORKS]
 - Handover to beads and a board over it: the board sits over the execution engine, not the plan. Whether the board shows plans or work, and whether the viewer is a terminal or the web, are undecided — the direction presumes a terminal.

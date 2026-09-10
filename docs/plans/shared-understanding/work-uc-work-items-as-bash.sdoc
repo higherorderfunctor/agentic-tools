@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-UC-WORK-ITEMS-AS-BASH
 TITLE: Use case: work items that are literal bash scripts
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 An unsettled use case: a WORK item whose content is a literal, executable

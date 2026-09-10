@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-MOVE-RESEARCH-INTO-THE-CANON-AS-EVIDENCE
 TITLE: Move research such as the Kiro workflow findings into the canon as evidence
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Move research into the canon as evidence. The research that lives as

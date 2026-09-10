@@ -2,10 +2,8 @@
 """Render the design graph as readable markdown.
 
     strictdoc export . --formats=json --output-dir /tmp/sdoc-out
-    python3 docs/sdoc/render.py /tmp/sdoc-out/json/index.json            # grooming queue
-    python3 docs/sdoc/render.py <json> --all                             # everything
+    python3 docs/sdoc/render.py /tmp/sdoc-out/json/index.json            # everything
     python3 docs/sdoc/render.py <json> --uid DEC-SYSTEM-PURPOSE          # one node + neighbours
-    python3 docs/sdoc/render.py <json> --depth sketch --depth needs-design
 
 Every relation and fingerprint is printed with the TARGET'S TITLE, not just its
 UID. Chasing a bare identifier to find out what it means is the specific thing
@@ -21,7 +19,7 @@ import textwrap
 
 NOT_NODES = {"DOCUMENT", "SECTION", "TEXT"}
 BODY = ("STATEMENT", "RATIONALE", "RETIRES_ON", "NOTES")
-BADGE = ("DEPTH", "STATUS", "AUTHORED_BY")
+BADGE = ("STATUS", "AUTHORED_BY")
 
 
 def nodes(obj, path=None):
@@ -87,7 +85,6 @@ def main() -> int:
     ap.add_argument("json")
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--uid", action="append", default=[])
-    ap.add_argument("--depth", action="append", default=[])
     args = ap.parse_args()
 
     found = list(nodes(json.load(open(args.json))))
@@ -115,12 +112,8 @@ def main() -> int:
                     seen.add(u)
                     picked.append((by_uid[u], None))
         title = "Node and neighbours"
-    elif args.all:
-        picked, title = found, "The whole graph"
     else:
-        wanted = args.depth or ["sketch"]
-        picked = [(n, p) for n, p in found if n.get("DEPTH") in wanted]
-        title = "Grooming queue — " + ", ".join(wanted)
+        picked, title = found, "The whole graph"
 
     print(f"# {title}\n\n{len(picked)} nodes")
     for node, _ in picked:

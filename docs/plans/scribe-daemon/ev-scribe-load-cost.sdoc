@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SCRIBE-LOAD-COST
 TITLE: Every scribe call and every render pays a full graph load
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: strictdoc-trial worktree, 348-node canon, warm cache; strictdoc 0.28.3; 2026-08-31
 STATEMENT: >>>

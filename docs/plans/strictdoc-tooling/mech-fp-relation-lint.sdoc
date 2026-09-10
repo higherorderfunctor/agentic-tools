@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: MECH-FP-RELATION-LINT
 TITLE: Every PARENT_FP entry should have a matching relation
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 A node recording a fingerprint for a parent asserts a dependency on that

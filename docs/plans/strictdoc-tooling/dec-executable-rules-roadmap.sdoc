@@ -10,8 +10,8 @@ TITLE: The rules become executable in five milestones, plumbing before migration
 AUTHORED_BY: llm
 STATUS: accepted
 RETIRES_ON: >>>
-The fifth milestone is verified, or a milestone's review changes the order or
-the number of milestones.
+The fifth milestone is complete and independently reviewed, or a milestone's
+review changes the order or the number of milestones.
 <<<
 STATEMENT: >>>
 The rules of the design system become executable in five milestones, in this
@@ -25,7 +25,7 @@ order:
    Nix and rendered so it can be looked at.
 4. That behaviour wired into the tool and into checkpoints at command, commit
    and merge time, with strictdoc's own hooks as the backstop.
-5. This system's own semantics -- fingerprints, signing, the ripple, DEPTH --
+5. This system's own semantics -- fingerprints, signing, the ripple, STATUS and AUTHORED_BY --
    migrated onto that plumbing.
 
 Every milestone is consumer-facing, so its option surface or verb list is
@@ -46,7 +46,7 @@ the first two problems without waiting on any lifecycle decision; milestone
 three is where the lifecycle becomes something that can be looked at; only
 after four does a rule run rather than get read, which is what
 INV-GUARDS-MUST-EXECUTE asks for. Ordering migration last keeps the instance's
-open decisions -- who signs, whether DEPTH may regress, agent identity -- from
+open decisions -- who signs and agent identity -- from
 blocking the plumbing.
 <<<
 NOTES: >>>

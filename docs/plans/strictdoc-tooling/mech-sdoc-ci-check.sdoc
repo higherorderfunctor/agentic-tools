@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-CI-CHECK
 TITLE: Gate the design graph in nix flake check
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Add a flake check that exports the graph to JSON and fails on non-zero exit, so

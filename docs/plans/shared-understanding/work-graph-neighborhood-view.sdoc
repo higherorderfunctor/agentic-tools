@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAPH-NEIGHBORHOOD-VIEW
 TITLE: Graph tab: pick a node from a list, draw only its neighborhood
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Graph tab has a left pane listing every WORK node, searchable and filtered

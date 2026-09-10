@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SEMANTIC-CONFLICT-TRACKING
 TITLE: Track semantic rules before a DSL exists
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Track semantics before a DSL exists. The operator cannot track semantics

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-GRAMMAR-CHECKS-ARE-IN-FLAKE-CHECK
 TITLE: The five grammar gates are flake checks, so they are in the CI gate too
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 checks/strictdoc-grammar-{surface-current,surface-live,model-equal,

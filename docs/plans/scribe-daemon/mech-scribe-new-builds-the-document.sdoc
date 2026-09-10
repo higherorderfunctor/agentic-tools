@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SCRIBE-NEW-BUILDS-THE-DOCUMENT
 TITLE: A create builds its document in memory, so it batches like every other write
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 A create builds its document in memory and then behaves like every other

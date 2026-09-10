@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-UNPLACED
 TITLE: Not placed anywhere yet
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen
@@ -19,7 +18,7 @@ Four nodes the sheet could not file under a topic.
 > MECH-CHECK-SYSTEM-BOUNDARY: flake checks vs devenv tasks; 5 grammar arms written twice; neither is a joint [UNADDRESSED]
 - Two known problems — vocabularies copied three times over in Python, and milestone two's rules sitting in the tool (a judgement still pending) — have no owner and no work node.
 [LINK: MECH-MILESTONE-TWO-SEMANTICS-MISPLACED] [LINK: MECH-SDOC-VOCABULARY-SINGLE-SOURCE] [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM] [LINK: NAR-SEMANTIC-LAYER-GAP-SEMANTICS-LIVE-IN-TOOLS-WITH-NO-OWNER]
-> MECH-SDOC-VOCABULARY-SINGLE-SOURCE (DEPTH ladder, placeholder, PARENT_FP parse each 3x in Python) and MECH-MILESTONE-TWO-SEMANTICS-MISPLACED (judgement PENDING): no owner, no WORK node [GAP]
+> MECH-SDOC-VOCABULARY-SINGLE-SOURCE (node discovery, placeholder and PARENT_FP parsing duplicated in Python) and MECH-MILESTONE-TWO-SEMANTICS-MISPLACED (judgement PENDING): no owner, no WORK node [GAP]
 - The mechanism that was to draw the boundary between defining semantics and this system's own semantics is dissolved — the layer stack draws it. The edge from code to its layer is still unplaced.
 [LINK: DEC-LAYER-STACK] [LINK: MECH-SEMANTICS-DEFINITION-BOUNDARY] [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM] [LINK: NAR-SEMANTIC-LAYER-GAP-SEMANTICS-LIVE-IN-TOOLS-WITH-NO-OWNER]
 > MECH-SEMANTICS-DEFINITION-BOUNDARY [FALLS OUT: DEC-LAYER-STACK draws it; code -> layer edge unplaced]

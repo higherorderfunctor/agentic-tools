@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-CORPUS-CHECK-COUNTS-ERROR-NODES-NOT-SPAN
 TITLE: The corpus check's no-regression arm counts ERROR nodes, which recovery reshapes
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 checks/strictdoc-grammar-corpus.nix gates a grammar change on the number of

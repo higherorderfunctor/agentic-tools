@@ -30,7 +30,7 @@ interchangeable and neither replaces the other.
       handler is handed. SEMANTIC-FREE AND UNOPINIONATED: it says where a rule
       could run, never what any rule is.
 
-  L3  THE SEMANTIC LAYER.  Lifecycles, gates, ripple, signing, readiness. It is
+  L3  THE SEMANTIC LAYER.  Lifecycles, gates, ripple and signing. It is
       expressed as a DSL that DECOMPOSES into an L1 grammar plus L2 hooks, and
       it introduces no machinery of its own.
 

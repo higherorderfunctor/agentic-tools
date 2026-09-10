@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DSL-CHECKS-NOTHING-BY-ITSELF
 TITLE: DSL values are unchecked until something feeds them to the option surface
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The DSL is sugar only, which means it asserts nothing: every constructor is a

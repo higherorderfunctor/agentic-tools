@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-AGENT-IDENTITY-KEYS
 TITLE: Give agents their own signing identity
-DEPTH: interface-settled
 AUTHORED_BY: human
 STATEMENT: >>>
 An acting identity is a commit-message trailer written by a hook from the environment. It is not a key, not the git author or committer, and not a field on any node.

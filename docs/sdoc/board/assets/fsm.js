@@ -2,13 +2,11 @@
 //
 // Data is the snapshot's `semantics` key (schema sdoc-semantics/2), which the
 // engine computes from the SAME parsed grammar the Grammars tab already
-// renders. Nothing here knows a field name: DEPTH, STATUS, STANDING and
-// AUTHORED_BY are data, and a machine the engine stops emitting stops being
-// drawn (WORK-DEPTH-RENAME is live -- hard-coding a field name here would
-// hard-code a rename).
+// renders. Nothing here knows a field name: STATUS, STANDING and AUTHORED_BY
+// are data, and a machine the engine stops emitting stops being drawn.
 //
 // THE LAYOUT IS TRANSPOSED, on purpose. A lifecycle reads left to
-// right; this pane is 350px wide and a six-rung ladder never fit that, so
+// right; this pane is 350px wide and a horizontal ladder may not fit, so
 // rank runs DOWN and branches spread ACROSS: one row per BFS depth from the
 // initial state, siblings sharing the row's width. An ordered ladder becomes
 // a straight vertical run, and a branching machine (STATUS: open -> accepted
@@ -20,7 +18,7 @@
 // knows its own width -- which is why `machineFigure()` returns an EMPTY svg
 // and `layoutMachines(root)` fills it after the caller has mounted it.
 // Labels are then measured with getComputedTextLength() and ellipsized to
-// their box, so a long state word ("interface-settled") never bleeds past its
+// their box, so a long state word never bleeds past its
 // border; the untruncated word stays in the box's <title>.
 import { htmlNode } from "/assets/card.js";
 
@@ -190,8 +188,8 @@ function edgePath(from, to, geometry) {
     };
   }
   // Backward or self: route out into the reserved right lane rather than
-  // over the boxes, so a regression edge (should the operator decide DEPTH
-  // may regress) is legible instead of hidden under a state.
+  // over the boxes, so a backward edge is legible instead of hidden under a
+  // state.
   const lane = geometry.width - 2;
   const x1 = from.box.x + from.box.width;
   const y1 = from.box.y + from.box.height / 2;

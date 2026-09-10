@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SEMBLE-PATH-MAPPINGS
 TITLE: Path mappings assign non-standard filenames to a language and index
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 An ordered list of path patterns maps files to a language and to one of the

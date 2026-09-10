@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DSL-SHAPE-DIVERGES-FROM-SURFACE
 TITLE: The DSL and emitter value shape does not typecheck against the generated surface
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Two incompatible field shapes are live at once in packages/strictdoc-grammar.

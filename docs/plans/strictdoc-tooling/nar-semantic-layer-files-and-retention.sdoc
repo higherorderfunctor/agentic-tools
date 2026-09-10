@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-FILES-AND-RETENTION
 TITLE: Files, plans and how long a node lives
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen
@@ -31,15 +30,15 @@ One node per file; retention keyed on directory; plans, backlogs, beads and owne
 - Settled architecture lives in a directory beside the code it describes, each node linked to a file. That placement retires when a tool can extract the same content from source comments.
 [LINK: DEC-ARCH-COLOCATION] [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM]
 > settled architecture beside code, each node File-linked; retires when a source-comment extractor exists [OPEN: DEC-ARCH-COLOCATION]
-- A plan's backlog is one register node; ungroomed items point at it. Grooming raises DEPTH in place and drops that edge; the UID never changes. Who may groom is unstated.
+- A plan's backlog is one register node; ungroomed items point at it. Grooming drops that edge; the UID never changes. Who may groom is unstated.
 [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM] [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
-> backlog = register node per plan; items carry Backlogged_In; grooming raises DEPTH in place, drops the edge, UID unchanged; which class may groom: unstated [WORKS]
+> backlog = register node per plan; items carry Backlogged_In; grooming drops the edge, UID unchanged; which class may groom: unstated [WORKS]
 - Beads is the agent's private working store, one per identity. Canon and beads differ in authority, not shape. From the moment a plan is handed over, execution state — done, who holds it, what blocks it — lives in beads.
 [LINK: NAR-SEMANTIC-LAYER-TYPE-WORK]
 > beads = LLM's private working graph, one store per identity; canon vs beads = authority, not shape; execution state (done? holder? blocker?) lives in beads from ingest (handover) [WORKS]
-- One human owns a plan (though it is recorded nowhere); work can involve many identities; handover freezes the scope handed over, not the whole plan; and an agent may file sketch nodes without asking.
+- One human owns a plan (though it is recorded nowhere); work can involve many identities; handover freezes the scope handed over, not the whole plan; and an agent may file backlog nodes without asking.
 [LINK: NAR-SEMANTIC-LAYER-TYPE-WORK]
-> one identity:human owns a plan (recorded nowhere); WORK is multi-identity; ingest freezes the handed-over scope, not the plan; identity:llm may file sketch nodes unasked [WORKS]
+> one identity:human owns a plan (recorded nowhere); WORK is multi-identity; ingest freezes the handed-over scope, not the plan; identity:llm may file backlog nodes unasked [WORKS]
 - An agent's key is a second writer on every plan, but the difference between an owner and a delegate is unwritten. The retirement condition 'two people edit one plan' can be read more than one way, and nothing says which.
 [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
 > split: an identity:llm key is a second writer on every plan; owner vs delegate unwritten; RETIRES_ON "two people edit one plan" ambiguous [GAP]

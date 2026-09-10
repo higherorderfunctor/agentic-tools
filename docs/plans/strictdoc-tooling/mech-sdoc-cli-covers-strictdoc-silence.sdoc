@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: MECH-SDOC-CLI-COVERS-STRICTDOC-SILENCE
 TITLE: The tool must supply the two failure behaviours strictdoc's CLI does not have
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Two silent failures in strictdoc's own command line have to be closed by the wrapper, because neither can be closed upstream through configuration. First, asking for an output no registered format claims succeeds and writes nothing: with formats pinned, html, rst, markdown, excel and the bare default all exit 0 with zero non-cache files, and `--formats=html` additionally spends 0.53 s compiling Jinja templates first, because `ExportAction` gates template construction on the REQUESTED handle while dispatching on the REGISTERED one. The `--formats` allowlist is the hardcoded `EXPORT_FORMATS` list at `commands/export.py:17` and a project config can only append to it (`:88`), never remove, so no configuration makes an unregistered handle an argparse error. Second, strictdoc prints its parse and semantic errors to STDOUT beside the progress log, so the natural wrapper shape `strictdoc format . > /dev/null` exits 1 with no output at all. The tool `SLICE-SDOC-CLI` builds must refuse any handle the loaded config does not register, before invoking strictdoc, and must redirect strictdoc's stdout to stderr rather than discarding it.

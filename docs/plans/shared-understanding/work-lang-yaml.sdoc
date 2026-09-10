@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LANG-YAML
 TITLE: Language items for YAML
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Grammar to load: `tree-sitter-grammars.tree-sitter-yaml` (nixpkgs, 0.7.2, `python313Packages`/`python314Packages` binding present).

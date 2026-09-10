@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: MECH-DEFAULT-EXPORT-IS-RED-ON-RST
 TITLE: The default export format fails on this corpus, so only --formats=json is ever green
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 `strictdoc export . --output-dir <dir>` with no `--formats` exits 1 on this

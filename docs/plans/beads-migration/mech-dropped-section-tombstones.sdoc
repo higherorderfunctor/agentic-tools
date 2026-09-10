@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DROPPED-SECTION-TOMBSTONES
 TITLE: Tombstone the nine dropped sections before converting past the first slice
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Create nine DECISION nodes with STATUS superseded, one per dropped section, each

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-ENFORCED-DENIAL-IS-A-PREFIX
 TITLE: An enforced denial rejects every word starting with it, and only the exact word was measured
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 patternType's addCheck branch rejects a value whose PREFIX is a denied word --

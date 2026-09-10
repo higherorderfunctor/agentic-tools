@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-EXTRACT-WRAPPER-NO-FORMATTER
 TITLE: The extraction wrapper carries no Nix formatter, so generation is only idempotent by accident
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 overlays/dev-tools/strictdoc-grammar-extract.nix puts strictdoc's dependency

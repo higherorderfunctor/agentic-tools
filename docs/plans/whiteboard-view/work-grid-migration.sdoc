@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRID-MIGRATION
 TITLE: Apply the node-type families to the corpus: retype by grammar type, then by the mechanism mood test
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Retype every node of the retired grammar types by rule (SLICE to WORK,

@@ -3978,7 +3978,6 @@ in {
       [MECHANISM]
       UID: MECH-SAMPLE
       TITLE: Sample mechanism
-      DEPTH: sketch
       AUTHORED_BY: llm
       STATEMENT: >>>
       A minimal MECHANISM node, parsed to prove the strictdoc grammar loads

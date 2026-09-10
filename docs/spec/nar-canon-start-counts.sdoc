@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-CANON-START-COUNTS
 TITLE: What the canon holds
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: index
 PLACE: section

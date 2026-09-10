@@ -204,7 +204,6 @@ def scribe_apply(
     element: str | None = None,
     id: str | None = None,
     line_range: str | None = None,
-    depth: str | None = None,
     status: str | None = None,
     dry_run: bool | None = None,
 ) -> dict:
@@ -238,7 +237,6 @@ def scribe_apply(
         "element": element,
         "id": id,
         "line_range": line_range,
-        "depth": depth,
         "status": status,
         "dry_run": dry_run,
     }

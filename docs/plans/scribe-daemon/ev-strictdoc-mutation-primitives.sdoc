@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-STRICTDOC-MUTATION-PRIMITIVES
 TITLE: StrictDoc mutates a loaded index in place, unguarded and without rollback
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: audit plus refute-and-defend contest over strictdoc 0.28.3 driven against a corpus copy; 2026-08-31
 STATEMENT: >>>

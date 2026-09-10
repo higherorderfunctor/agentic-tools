@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DSL-CANDIDATE-ADMISSION-RULES
 TITLE: Candidate shape: a flat rule list with a per-site action, Kubernetes-admission style
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 PROPOSED SHAPE, one of three, from the 2026-08-29 prior-art spike
@@ -27,10 +26,10 @@ THE SHAPE.
         (c.eq (c.var "before.STATUS") "open")                # the "from" state is just a clause
         (c.eq (c.var "actor.class") "human")
         (c.every "Governed_By"
-          (c.inList (c.var "target.DEPTH") [ "interface-settled" "implemented" "verified" ]))
+          (c.eq (c.var "target.AUTHORED_BY") "human"))
       ];
       actions."scribe.change" = "deny";                      # deny | warn | audit, per joint
-      message = "every governing node must be at least interface-settled";
+      message = "every governing node must be human-authored";
     };
     canon.rules.no-stale-edges = {
       match = { relation = "Governed_By"; };

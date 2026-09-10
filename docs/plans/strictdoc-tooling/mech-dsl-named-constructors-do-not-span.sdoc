@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DSL-NAMED-CONSTRUCTORS-DO-NOT-SPAN
 TITLE: The DSL's named constructors cover the common case, not the relation space
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The settled DSL shape gives rel.parent and rel.child two positional roles, and

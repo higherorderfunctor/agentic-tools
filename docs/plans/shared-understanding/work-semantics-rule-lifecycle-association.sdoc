@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SEMANTICS-RULE-LIFECYCLE-ASSOCIATION
 TITLE: Represent rule-to-lifecycle association without semantic IDs
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Eliminate the compatibility renderer inference that a top-level rule belongs to a lifecycle when its ID begins with the normalized lifecycle name. The fixed model shape gives rules no lifecycle reference while the sdoc-semantics/1 compatibility rows nest rules under machines. Decide and represent that association without making opaque IDs semantic, while preserving the readable output.

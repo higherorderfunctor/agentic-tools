@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-CORPUS-EDGE-MAP
 TITLE: Which dependencies become which relation roles
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Six roles, derived from real dependencies rather than a taxonomy.

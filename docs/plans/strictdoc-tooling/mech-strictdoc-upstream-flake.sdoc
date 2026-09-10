@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-STRICTDOC-UPSTREAM-FLAKE
 TITLE: Take strictdoc from upstream's own flake instead of our overlay
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 strictdoc ships a flake. Cut over to it and retire the overlay written as step

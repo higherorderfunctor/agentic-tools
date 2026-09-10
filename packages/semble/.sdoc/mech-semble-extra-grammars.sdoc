@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SEMBLE-EXTRA-GRAMMARS
 TITLE: Semble loads extra tree-sitter grammars from the Nix store
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The semble package is patched so that a grammar lookup failing against its

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-PLAN-ITEMS-REVISE-IN-PLACE
 TITLE: Plan items revise in place; no reject, supersede by edge only
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Plan items are revised in place as shape is added. They are not frozen or

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SCRIBE-APPLY-PARAMS-DECLARED-TWICE
 TITLE: scribe.apply names its parameters in two places
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 `scribe.apply` declares every operation's parameters flat in its RPC signature

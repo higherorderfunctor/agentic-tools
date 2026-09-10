@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-SCOPED-RELATION-FILTERS
 TITLE: Relation filters are scoped by source node type
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Graph view derives each relation filter from an edge's source node type and

@@ -65,7 +65,7 @@ grid.
 | tag           | prefix  | family                        | use for                                                                      |
 | ------------- | ------- | ----------------------------- | ---------------------------------------------------------------------------- |
 | `REQUIREMENT` | `REQ-`  | definition, normative x all   | what must always hold; can be violated                                       |
-| `DECISION`    | `DEC-`  | definition, normative x one   | a choice, open or closed; in force once accepted; no `DEPTH`, no `PARENT_FP` |
+| `DECISION`    | `DEC-`  | definition, normative x one   | a choice, open or closed; in force once accepted; no `PARENT_FP`             |
 | `MECHANISM`   | `MECH-` | definition, descriptive x all | how the system always behaves; can only be wrong                             |
 | `EVIDENCE`    | `EV-`   | definition, descriptive x one | one observation: a probe's finding, a measurement, a log, an external source |
 | `USE_CASE`    | `UC-`   | coverage                      | a path the specification must enable; covered or uncovered                   |
@@ -90,7 +90,8 @@ targets, which is what lets the parser refuse a dangling one.
 bracket: 494 rows still use it.
 
 `STATUS` lives on DECISION only (`open` / `accepted` / `rejected` /
-`superseded`). Every other type carries `DEPTH`.
+`superseded`). `COMMENTARY` separately carries `STANDING`; the other claim types
+carry no state field.
 
 Relation roles, and the direction they are written: a **Parent** role is written
 on the node that DEPENDS -- `Governed_By` (→ a DECISION), `Guarantees` (→ a
@@ -116,14 +117,8 @@ nodes lives in that plan's directory — `Cites` is a Parent relation and
 `INV-NO-EXTERNAL-PLAN-REFS` forbids one into another plan, so cite other plans'
 nodes with `[LINK:]` only.
 
-## The four governance fields
+## The three governance fields
 
-- **`DEPTH`** — `sketch` / `needs-design` / `needs-spike` / `interface-settled`
-  / `implemented` / `verified`. Declares intent. The `needs-*` values are the
-  design worklist. `implemented` means code landed and is **unreviewed**;
-  `verified` means an independent session checked the code against the node.
-  **The gap between them is the review queue** — `DEPTH == implemented` is the
-  query.
 - **`AUTHORED_BY`** — `llm` / `llm-accepted` / `llm-adopted` / `human`, a ladder
   that only rises (`DEC-AUTHORSHIP-LADDER`). Who wrote the statement, and how
   far a human has taken it on. The writer stamps `llm`; the other rungs are a
@@ -136,11 +131,6 @@ nodes with `[LINK:]` only.
 - **`RETIRES_ON`** — required on `DECISION`. The forcing function. A deferred
   decision with no retirement condition is avoidance, not deferral.
 
-Readiness is **not** a field. It is a query: a slice is implementable when every
-mechanism in its closure is `interface-settled` or better, every decision in it
-is `accepted`, and no edge is suspect. The `open` decisions in that closure are
-the slice's degrees of freedom.
-
 ## Write with `scribe`, not with the edit tool
 
 `scribe` is this repository's writer for the graph (SLICE-SDOC-CLI). **Its
@@ -151,14 +141,14 @@ be got wrong from memory.
 
 ```bash
 scribe new MECHANISM --help          # the flags MECHANISM actually declares
-scribe new MECHANISM --uid MECH-THING --title "..." --depth sketch \
+scribe new MECHANISM --uid MECH-THING --title "..." \
      --statement @statement.md --path docs/plans/<plan>/
-scribe set MECH-THING --depth implemented --notes @notes.md
+scribe set MECH-THING --notes @notes.md
 scribe relate MECH-THING --role Governed_By --target DEC-SOMETHING
 scribe relate EV-THING --role File --target devenv.nix \
      --element function --id 'tasks."strictdoc:bench"'
 scribe show MECH-THING               # the node, with relations resolved to titles
-scribe list --type WORK --depth sketch
+scribe list --type WORK
 scribe check                         # every node, relation and File path
 scribe semantics DECISION            # the lifecycle a state field claims
 ```
@@ -262,8 +252,8 @@ takes no `--output-dir`, writes `./output/` unconditionally, and rewrites
 7. **Commit as you go, unprompted.** One commit per unit of work, not one at the
    end and not only when asked — the branch is long-lived and gets restacked
    into pull requests, so commit boundaries are what make that restack legible.
-   Update the node in the same commit: raise its `DEPTH`, record measured
-   numbers in `NOTES`, file what a probe found as `EVIDENCE`.
+   Update the node in the same commit: record measured numbers in `NOTES` and
+   file what a probe found as `EVIDENCE`.
 
 ## Gotchas that fail closed
 
@@ -352,26 +342,24 @@ should.
 - **That edge does not use up the item's parents.** Give it `Governed_By`,
   `Crosses`, `Assumes` to whatever it actually relates to as well. Containment
   by edge composes; containment by file did not. A web is the point.
-- An ungroomed item is an ordinary node at `DEPTH: sketch` — a `MECHANISM` to
-  build, a `DECISION` to make, a `WORK` item to do. **There is no `BACKLOG` node
-  type**, deliberately: the existing types already say what kind of work it is.
-- **Grooming no longer moves a file.** It raises the node's `DEPTH` in place and
-  drops the `Backlogged_In` edge. A plan's ungroomed set is the register's
-  inbound `Backlogs`; `DEPTH == sketch` scoped to the directory is worth keeping
-  as a **cross-check**, since the two disagreeing means somebody filed without
-  attaching or groomed without detaching (`MECH-SDOC-LAYOUT-CHECK`).
+- An ungroomed item is an ordinary node — a `MECHANISM` to build, a `DECISION`
+  to make, a `WORK` item to do — carrying `Backlogged_In` to its register.
+  **There is no `BACKLOG` node type**, deliberately: the existing types already
+  say what kind of work it is.
+- **Grooming no longer moves a file.** It drops the `Backlogged_In` edge. A
+  plan's ungroomed set is the register's inbound `Backlogs`.
 
 The operator's judgment budget is the scarce resource. A logged finding is not
 lost; mentioning it costs attention, logging it costs nothing.
 
 ## What exists, and what still does not
 
-Suspect-link detection, the readiness query and a derived view shipped on this
-branch, and `scribe` shipped with milestone two (SLICE-SDOC-CLI). The gates all
-of it is wired into are listed by name in `docs/sdoc/README.md`. `scribe`
-applies **no instance semantics** — whether `DEPTH` may regress, when deleting
-is legitimate and who may sign are milestone five's, and `delete` exists in the
-tool precisely because this skill is what does not teach it.
+Suspect-link detection and a derived view shipped on this branch, and `scribe`
+shipped with milestone two (SLICE-SDOC-CLI). The gates all of it is wired into
+are listed by name in `docs/sdoc/README.md`. `scribe` applies **no instance
+semantics** — when deleting is legitimate and who may sign are milestone five's,
+and `delete` exists in the tool precisely because this skill is what does not
+teach it.
 
 What is still true: **nothing has ever been signed.** Every fingerprint entry is
 a placeholder, so no contract change has been accepted by anyone. The parser

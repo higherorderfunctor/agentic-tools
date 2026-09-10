@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-VIEW-PIPELINE
 TITLE: Build the view pipeline: wireline, check, renderer, task
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Build the four programs of the view -- the wireline, the check, the renderer with its template, and the devenv task that runs them in order -- register each program as a File relation on its mechanism, and raise each mechanism to implemented. Done 2026-08-30; what the first render measured is the evidence this work produces.

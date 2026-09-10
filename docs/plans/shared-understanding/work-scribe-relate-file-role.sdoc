@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SCRIBE-RELATE-FILE-ROLE
 TITLE: scribe relate cannot write a File relation
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 scribe relate --role File is refused because _relation_type_for_role in

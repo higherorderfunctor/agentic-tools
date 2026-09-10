@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SCRIBE-RECONCILE
 TITLE: A write parses its own file now and defers the whole-graph rebuild
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 A write is checked before any byte moves. The mutation applies in memory, the

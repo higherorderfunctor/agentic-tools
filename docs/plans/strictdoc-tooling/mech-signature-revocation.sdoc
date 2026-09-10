@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SIGNATURE-REVOCATION
 TITLE: Make a revoked fingerprint distinguishable from one never signed
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 A PARENT_FP entry's value slot carries three states rather than two: the placeholder 0000000, meaning nobody has accepted this edge; a seven-character contract hash, meaning the edge was accepted at that hash; and revoked:<hash>, meaning an acceptance at that hash was withdrawn. The tag cannot be mistaken for a hash, since hashes are hexadecimal and the tag is not, and the existing parser already returns the value slot whole. Carrying it therefore needs no grammar change -- PARENT_FP is an unconstrained String -- and no parser change.
@@ -36,7 +35,7 @@ The four distinct hashes 387cdaec reverted -- b2c00b4, ff63967, 5360cbe, 704b6d9
 
 Third fixture, DEC-FINGERPRINT-IN-NODE:revoked:b2c00b4 against today's checker: classified drifted, exit 1. The marker is therefore not inert -- shipping the representation without the classification turns all five reverted entries into false suspects. With the classification, the honest state of this graph is 26 never signed and 5 revoked out of 31.
 
-parse_parent_fp partitions on the first colon, so the value slot already survives whole: the fixture parses to ('DEC-FINGERPRINT-IN-NODE', 'revoked:b2c00b4'). Longest possible rendered entry across this graph is 50 characters, MECH-READINESS-PREDICATE-RECONCILE:revoked:0000000, or 61 with the single-entry field prefix, so no line-width question arises.
+parse_parent_fp partitions on the first colon, so the value slot already survives whole: the fixture parses to ('DEC-FINGERPRINT-IN-NODE', 'revoked:b2c00b4'). The rendered entry remains short enough that no line-width question arises.
 
 The flake source store path contains docs/plans and no .git, which is what rules the history check out of the existing gate.
 

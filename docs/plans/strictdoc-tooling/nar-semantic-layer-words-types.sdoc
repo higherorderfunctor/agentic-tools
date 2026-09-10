@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-WORDS-TYPES
 TITLE: The seven kinds, one line each
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: list
 PLACE: section

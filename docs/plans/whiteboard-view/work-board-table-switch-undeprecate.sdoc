@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-TABLE-SWITCH-UNDEPRECATE
 TITLE: Exit the deprecated load(table) path in the table switch
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The explorer's table switch rides viewer.load(table), which upstream

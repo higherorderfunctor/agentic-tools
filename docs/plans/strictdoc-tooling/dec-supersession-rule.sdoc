@@ -42,12 +42,7 @@ pattern, and two is also enough to see whether liveness means the same thing for
 each type.
 
 When it is extended, liveness is a QUERY and not a field: a node is live when
-nothing points at it with Supersedes. No new enum value and no new field. DEPTH
-is a design-maturity axis and a superseded node may have been fully implemented,
-so folding superseded into DEPTH would destroy that distinction. The readiness
-query must then skip superseded nodes, or a retired slice keeps blocking its
-successor. That is the one place the extension is not free, and the reason the
-trigger above waits for evidence.
+nothing points at it with Supersedes. No new enum value and no new field.
 <<<
 RATIONALE: >>>
 Written after the machinery was hit twice in three days and read wrong once.

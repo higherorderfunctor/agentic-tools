@@ -7,14 +7,13 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-MECHANISM-MOOD-REVIEW-STAYED
 TITLE: Stayed mechanisms
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen
 STATEMENT: >>>
 The test's reason for leaving each one a mechanism.
 
-- [LINK: MECH-AGENT-IDENTITY-KEYS] -- It is the interface-settled design of an Acted-By trailer written by a commit-msg hook (what it names, what it is not, who reads it, what is out of scope); a hook that tomorrow failed to append the trailer… [MECHANISM: high]
+- [LINK: MECH-AGENT-IDENTITY-KEYS] -- It is the design of an Acted-By trailer written by a commit-msg hook (what it names, what it is not, who reads it, what is out of scope); a hook that tomorrow failed to append the trailer… [MECHANISM: high]
 - [LINK: MECH-AGENTS-INFER-OVERLAY-CONVENTION-FROM-EXAMPLES] -- If agents stopped copying the nearest example tomorrow this node would be wrong, not violated, and its claim -- 'a written instruction loses to a working example every time', recorded by the RATIONALE as 'a… [MECHANISM: medium]
 - [LINK: MECH-ASTGREP-OVER-SDOC] -- If the semble-packaged grammar turned out not to load as an ast-grep dynamic language the node would be wrong (it already says 'Unproven'), never violated; it sketches how two existing capabilities could… [MECHANISM: high]
 - [LINK: MECH-AUTHORED-BY-GUARD] -- The node is the design of a check -- UID-keyed map, merge-base baseline, CI job with full history, FLIP versus NEW-HUMAN classes -- and it disclaims the rule's force itself ('this check reports a claim and… [MECHANISM: medium]
@@ -55,7 +54,7 @@ The test's reason for leaving each one a mechanism.
 - [LINK: MECH-FP-FIELD-TUNING] -- Nothing in the world can violate it and nothing can prove it wrong -- 'Revisit which fields a fingerprint covers ... after the prototype has been in use' is a deferred piece of WORK (something to do, dying… [MECHANISM: medium]
 - [LINK: MECH-FP-GIT-FLOW-HAZARDS] -- If squash-merge turned out not to preserve the hash, or a new hazard appeared, the response is to fix the node's enumeration, not the world, so it is descriptive; and the STATEMENT reasons structurally about… [MECHANISM: medium]
 - [LINK: MECH-FP-MAIN-LINEAGE] -- The node's centre is the design of a merge-result gate that does not yet exist as a checkpoint (NOTES: SLICE-CHECKPOINT-WIRING 'enumerates no merge-result checkpoint. This gate needs one'), so if the gate were… [MECHANISM: medium]
-- [LINK: MECH-FP-PREMERGE-GC] -- As a sketch the node's NOTES admit ('Not settled that a garbage collection is the right shape'), nothing today can be violated by it or proven wrong by it, so it sorts as a design proposal; but its single… [MECHANISM: low]
+- [LINK: MECH-FP-PREMERGE-GC] -- The node's NOTES admit ('Not settled that a garbage collection is the right shape'), nothing today can be violated by it or proven wrong by it, so it sorts as a design proposal; but its single… [MECHANISM: low]
 - [LINK: MECH-GRAMMAR-ARBITRARY-GENERATOR] -- If someone hand-wrote a generator tomorrow nothing would be violated -- the node is a deferred design recommendation for property testing ('the shape worth building', 'Point it at the ROUND TRIP'), i.e. the… [MECHANISM: high]
 - [LINK: MECH-GRAMMAR-CHECKS-ARE-IN-FLAKE-CHECK] -- If the five checks were moved out of the flake's `checks` output tomorrow the node would be wrong (stale), not violated, so descriptive; its load-bearing claim 'there is no third state: nix flake check builds… [MECHANISM: medium]
 - [LINK: MECH-GRAMMAR-EXTRACT-SOURCE-BOUNDARY] -- The heuristic's 'must' is a QUOTED invariant from dev/fragments/overlays/overlay-pattern.md, not this node's own force, and the operator's ruling in NOTES is owned by MECH-OVERLAY-WRAPPING-BELONGS-IN-MODULES;… [MECHANISM: medium]
@@ -78,11 +77,7 @@ The test's reason for leaving each one a mechanism.
 - [LINK: MECH-PLAN-REFS-CHECK] -- It is the design of the checker that Guarantees INV-NO-EXTERNAL-PLAN-REFS -- what counts as outside, which relations are scanned, the CLI and flake-check shape -- and if the script stopped doing any of it this… [MECHANISM: high]
 - [LINK: MECH-PRETOOLUSE-BLIND-TO-BASH] -- The claim is that a PreToolUse envelope carries only tool_name and tool_input, so a tool-call hook binds a tool and never a path -- if Claude Code gave hooks path visibility tomorrow the node would be wrong,… [MECHANISM: medium]
 - [LINK: MECH-PROSE-UID-REFS-CAN-BREAK-SILENTLY] -- If strictdoc format stopped wrapping UIDs across lines, or a check started catching split tokens, the node would be wrong (fix the node), not violated, and its claim covers every prose UID reference, not just… [MECHANISM: high]
-- [LINK: MECH-READINESS-PREDICATE-RECONCILE] -- The body is the design of a shared module to build (four exports, named consumers, behaviour held constant, a done-when); if status.py kept its own predicate tomorrow the design would be unbuilt rather than… [MECHANISM: medium]
-- [LINK: MECH-READINESS-REPORT-FRONTIER] -- If status.py stopped seeding the closure walk with the root and stopped listing the whole closure, the node would be wrong (MECH-READY-QUERY already records it as subsumed), not violated; the claim is about… [MECHANISM: medium]
 - [LINK: MECH-README-ROWS-FOLLOW-DESCRIPTIONS-NOT-PACKAGES] -- If mkDescriptionRows mapped over the overlay package set tomorrow the node would be wrong (the bug fixed), not violated; it describes what the generator does for every package lacking a description, and… [MECHANISM: medium]
-- [LINK: MECH-READY-QUERY] -- A design of a function, a verdict record and a CLI front end to be built (interface-settled); a differently shaped ready.py tomorrow means the design was not followed, not that the world broke, and 'Ready… [MECHANISM: high]
-- [LINK: MECH-READY-QUERY-GRAPH-REUSE] -- A refactor proposal about the code's shape (factor cycle-check's adjacency walk into sdoc_fp.py for MECH-READY-QUERY); reimplementing the walk tomorrow would leave the proposal unbuilt, not the world in… [MECHANISM: high]
 - [LINK: MECH-RELATION-TARGET-TYPE-LINT] -- If relation-target-check.py stopped running, the node's account of the checker (three eval-time checks, one corpus check, non-zero exit, CI gate, no allowlist) would be wrong rather than violated, and the node… [MECHANISM: low]
 - [LINK: MECH-RENDER-CACHE] -- If a built cache regenerated a chunk whose inputs had not moved, the cache would be buggy against this design and the design would still stand -- the node describes how the render cache always behaves (records… [MECHANISM: high]
 - [LINK: MECH-REQIF-PIN-HAS-NO-SWEEP] -- Describes how an inline pin behaves under mkUpdateScript for any such pin (never swept; a release outgrowing it fails the build, the dependency moving on does not); when the pin was removed (MOOT 2026-08-27)… [MECHANISM: medium]
@@ -182,11 +177,7 @@ MECH-PLAN-BEADS-SNAPSHOT:0000000
 MECH-PLAN-REFS-CHECK:0000000
 MECH-PRETOOLUSE-BLIND-TO-BASH:0000000
 MECH-PROSE-UID-REFS-CAN-BREAK-SILENTLY:0000000
-MECH-READINESS-PREDICATE-RECONCILE:0000000
-MECH-READINESS-REPORT-FRONTIER:0000000
 MECH-README-ROWS-FOLLOW-DESCRIPTIONS-NOT-PACKAGES:0000000
-MECH-READY-QUERY-GRAPH-REUSE:0000000
-MECH-READY-QUERY:0000000
 MECH-RELATION-TARGET-TYPE-LINT:0000000
 MECH-RENDER-CACHE:0000000
 MECH-REQIF-PIN-HAS-NO-SWEEP:0000000
@@ -408,19 +399,7 @@ RELATIONS:
   VALUE: MECH-PROSE-UID-REFS-CAN-BREAK-SILENTLY
   ROLE: Cites
 - TYPE: Parent
-  VALUE: MECH-READINESS-PREDICATE-RECONCILE
-  ROLE: Cites
-- TYPE: Parent
-  VALUE: MECH-READINESS-REPORT-FRONTIER
-  ROLE: Cites
-- TYPE: Parent
   VALUE: MECH-README-ROWS-FOLLOW-DESCRIPTIONS-NOT-PACKAGES
-  ROLE: Cites
-- TYPE: Parent
-  VALUE: MECH-READY-QUERY
-  ROLE: Cites
-- TYPE: Parent
-  VALUE: MECH-READY-QUERY-GRAPH-REUSE
   ROLE: Cites
 - TYPE: Parent
   VALUE: MECH-RELATION-TARGET-TYPE-LINT

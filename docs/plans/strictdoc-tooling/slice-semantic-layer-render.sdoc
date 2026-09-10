@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-SEMANTIC-LAYER-RENDER
 TITLE: Render the semantic layer as an HTML artifact to judge from, not as text
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Render the semantic layer as an HTML artifact the operator can read on a phone

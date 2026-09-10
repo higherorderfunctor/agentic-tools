@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-SHIFT
 TITLE: The board app carries more meaning
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Concept group: the board app carries more meaning for a human reader. Holds

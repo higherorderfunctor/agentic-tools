@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-CHECKPOINT-WIRING
 TITLE: Wire the behaviour model into the tool and the checkpoints
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Add the lifecycle verbs to the tool built in milestone two: a move is one command that names a transition, evaluates that transition's gates, and either refuses with a diagnostic naming the gate or performs the write through the same validated path a create or a set already takes. The verbs, the transitions and the gates come from the behaviour model. This milestone supplies no lifecycle content of its own.
@@ -67,7 +66,6 @@ where they get written.
 
 - Who may make each move. The model carries a slot for it; this milestone fills none of it.
 
-- Whether DEPTH may move backwards, and whether implemented and verified belong in DEPTH at all -- SLICE-INSTANCE-SEMANTICS-MIGRATION's decisions, taken at its own review.
 
 - The authorization half of the authorship guard: how a legitimate operator flip is discharged past a guard that cannot recognise them. Left blank deliberately -- it is an authorization rule, and every mechanism available today (a trailer, a label, a flag) is equally available to an agent, so choosing one now would encode a policy the plumbing cannot back.
 

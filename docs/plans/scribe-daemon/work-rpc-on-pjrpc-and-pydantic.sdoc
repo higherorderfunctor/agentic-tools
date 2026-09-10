@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-RPC-ON-PJRPC-AND-PYDANTIC
 TITLE: The scribe RPC runs on pjrpc with a typed pydantic contract per method
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The scribe RPC stops hand-rolling JSON-RPC. pjrpc supplies the sync,

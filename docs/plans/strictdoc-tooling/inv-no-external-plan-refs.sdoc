@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: INV-NO-EXTERNAL-PLAN-REFS
 TITLE: Nothing outside a plan may depend on a plan node
-DEPTH: interface-settled
 AUTHORED_BY: human
 STATEMENT: >>>
 Settled architecture, source annotations, and other plans must not hold

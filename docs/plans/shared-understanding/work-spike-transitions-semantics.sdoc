@@ -7,12 +7,11 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SPIKE-TRANSITIONS-SEMANTICS
 TITLE: Spike: pytransitions/transitions as the semantics engine
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 A spike on the transitions Python library (https://github.com/pytransitions/transitions)
-as the engine behind instance semantics -- the lifecycle ladders (DEPTH,
-STATUS, STANDING) modeled as state machines with events and guards. The
+as the engine behind instance semantics -- the STATUS, AUTHORED_BY and STANDING
+ladders modeled as state machines with events and guards. The
 library reads as simple enough that it could either influence a Nix
 rendering of the same state machine, or a thin config wrapper built around
 the library itself; which of the two is still open, and is the point of the
@@ -32,8 +31,8 @@ simple, possibly to influence a nix version or config wrapper.
 Landed 2026-09-03 (46cd3cf and the commit before it) as
 dev/scripts/sdoc_semantics/: a `transitions`-backed engine (engine.py, the
 only module that imports the library) with declarations in direct Python
-under machines/ -- one file per field (depth.py, status.py,
-authored_by.py), listed in registry.py in presentation order. This is an
+under machines/ -- one file per field, listed in registry.py in presentation
+order. This is an
 explicit WAIVER of DEC-LAYER-STACK for the spike ("for the spike the
 semantics can be written in direct python" -- operator, stated in
 engine.py's own docstring); machines/ is a transcription surface meant to be
@@ -47,16 +46,9 @@ order. `scribe semantics <TYPE>` and the board's Grammars tab both read the
 same registry, so a change to a machine file shows up in both without
 further wiring.
 
-Three questions deliberately left open, transcribed as rules on the
-declarations themselves rather than settled here: whether DEPTH may ever
-fall (a design invalidated by a spike arguably returns to needs-design, but
-a falling DEPTH erases the record it once stood higher -- nobody has
-ruled); whether `implemented` and `verified` belong on the DEPTH ladder at
-all, since they describe the artifact rather than the thinking; and whether
-one machine per FIELD (what ships) or one machine per (type, field) is the
-right grain -- the former is cheaper and is what six node types sharing one
-DEPTH ladder assumes, the latter would let a REQUIREMENT and a WORK disagree
-about what a rung means, at the cost of keeping six tables aligned.
+One question is deliberately left open, transcribed as a rule on the
+declarations themselves rather than settled here: whether one machine per
+FIELD (what ships) or one machine per (type, field) is the right grain.
 
 Revisited 2026-09-03: the engine choice was re-opened before shaping
 (WORK-REVISIT-SEMANTICS-ENGINE). The assessment

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SCRIBE-DRY-RUN
 TITLE: scribe previews every writing verb
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 scribe grows --dry-run on every writing verb: new (every type leaf), set,

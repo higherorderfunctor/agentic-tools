@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: MECH-DIRTY-EDGE-ON-OPTION-CHANGE
 TITLE: A node whose inputs changed should go dirty rather than quietly stale
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The operator's, and it belongs with the behaviour model rather than the grammar

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: REQ-DAEMON-IS-THE-ONLY-SOURCE
 TITLE: No program outside the daemon reads corpus content from disk
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 No program outside the scribe daemon reads corpus content from disk. Corpus

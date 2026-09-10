@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SCRIBE-COMMANDS-LOAD-IN-PROCESS
 TITLE: No scribe command loads a graph of its own any more
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Every scribe command is a typed operation against the graph the daemon already

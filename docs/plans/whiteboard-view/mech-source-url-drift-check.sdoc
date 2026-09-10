@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SOURCE-URL-DRIFT-CHECK
 TITLE: An evidence node whose SOURCE is a URL goes dirty when the page behind it changes
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 An EVIDENCE node may name an external source -- a vendor's documentation

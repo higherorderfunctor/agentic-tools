@@ -106,10 +106,10 @@ type's `NAR-SEMANTIC-LAYER-TYPE-*` narrative. Both are interim.
 
 ```bash
 scribe show WORK-SHARED-UNDERSTANDING     # one node, relations resolved to titles
-scribe list --type WORK --depth sketch    # filtered listing
+scribe list --type WORK                   # filtered listing
 scribe check                              # every node, relation and File path
 scribe new MECHANISM --help               # the flags this type actually declares
-scribe set MECH-THING --depth implemented --notes @notes.md
+scribe set MECH-THING --notes @notes.md
 scribe relate MECH-THING --role Governed_By --target DEC-SOMETHING
 scribe semantics DECISION                 # the lifecycle its state field claims
 ```
@@ -142,7 +142,7 @@ extractor table strictdoc resolves it with, so a wrong id is refused rather than
 silently dropped.
 
 `scribe semantics` works with the daemon down. With no argument it prints every
-machine; give it a state field (`DEPTH`) or a node type (`DECISION`) to narrow
+machine; give it a state field (`STATUS`) or a node type (`DECISION`) to narrow
 it. `--json` prints the `sdoc-semantics/2` payload the board consumes;
 `--mermaid` prints one `stateDiagram-v2` per machine.
 
@@ -351,19 +351,17 @@ placeholder fingerprints, which nobody has.
 
 ## Where this stands — 2026-08-29 (session 7: the render exists)
 
-**The semantic layer is rendered.** `SLICE-SEMANTIC-LAYER-RENDER` is at
-`implemented`; its NOTES carry the artifact link, the page's shape, the
-measurements and the review that ran before hand-over. Nothing was settled — the
-page says so on every screen — and no decision was brought. The next step is the
-operator's: read the render, then ask for decisions as cards, one per turn. Do
-not re-run the render prompt below; it is done. The generator lives outside the
-repository (`MECH-RENDER-GENERATOR-OUTSIDE-REPO`, backlog).
+**The semantic layer is rendered.** `SLICE-SEMANTIC-LAYER-RENDER`'s NOTES carry
+the artifact link, the page's shape, the measurements and the review that ran
+before hand-over. No decision was brought. The next step is the operator's: read
+the render, then ask for decisions as cards, one per turn. Do not re-run the
+render prompt below; it is done. The generator lives outside the repository
+(`MECH-RENDER-GENERATOR-OUTSIDE-REPO`, backlog).
 
 ## Where this stands — 2026-08-29 (end of session 6)
 
-**Explored, nothing settled.** The session worked the hook layer and then
-climbed to the semantic layer, and everything above the glossary is a sketch or
-an open decision. 204 nodes, check clean.
+**Explored, with decisions still open.** The session worked the hook layer and
+then climbed to the semantic layer. 204 nodes, check clean.
 
 What is durable from it:
 
@@ -421,9 +419,8 @@ alternative. Authorship is one monotonic four-value field governing reversal
 rather than credit (`DEC-AUTHORSHIP-LADDER`). An open decision _is_ a question
 (`DEC-OPEN-IS-THE-QUESTION`), flagged for re-evaluation because where contention
 lives is still unproven. And `MECH-MILESTONE-TWO-SEMANTICS-MISPLACED` records
-that milestone two's fingerprinting and readiness logic sits in the tool rather
-than in L3 — **classification only, judgement on the logic deliberately
-pending.**
+that milestone two's fingerprinting logic sits in the tool rather than in L3 —
+**classification only, judgement on the logic deliberately pending.**
 
 That last node carries the worked example: of the four refusals milestone two
 advertised, two are read off the grammar and are the layering working, and two
@@ -461,35 +458,19 @@ and no citation broke — proved rather than asserted: a per-node dump of the JS
 export is identical across the carve, and 0 of 161 contract hashes moved.
 Reading one backlog item used to cost 279 KB; it now costs the node.
 
-**Milestones two and three are READY. Nothing in either closure waits on the
-operator.** Hand either to an implementation session by slice UID.
-
-    SLICE-SDOC-CLI          milestone 2  READY
-    SLICE-BEHAVIOUR-MODEL   milestone 3  READY
-    SLICE-CHECKPOINT-WIRING milestone 4  blocked: DEC-PLAN-LIFECYCLE-OPEN, and m2
-    SLICE-INSTANCE-SEMANTICS-MIGRATION  m5  blocked: the above + DEC-FP-ACCEPT-AUTHORITY
-
-**Milestone one is `verified`**, raised after an independent session read the
-node against the tree. Nine divergences were found, all nine survived a
-refute/defend contest, and none were code defects — the implementation was sound
-and the node's accounting was not. Its one unmet promise is tracked, not
-forgotten: the governing decision says milestone one delivers a validation gate
-at commit time AND in CI, and only CI exists.
-
 **Milestone two's scope collapsed once the layers were separated.** The tool's
 option surface derives from the grammar; it runs format and validation; that is
-the milestone. Three questions raised against its draft verb list were ruled
-INSTANCE SEMANTICS and moved to milestone five — whether deleting is legitimate,
-whether raising `DEPTH` is a lifecycle move, and whether to ship the harness
-denial given it is absent in eleven of twenty-three worktrees. `delete` exists
-in the tool and the skill deliberately does not teach it. Denying direct edits
-in the harness moved to milestone four, which owns checkpoints.
+the milestone. Two questions raised against its draft verb list were ruled
+INSTANCE SEMANTICS and moved to milestone five — whether deleting is legitimate
+and whether to ship the harness denial given it is absent in eleven of
+twenty-three worktrees. `delete` exists in the tool and the skill deliberately
+does not teach it. Denying direct edits in the harness moved to milestone four,
+which owns checkpoints.
 
-Graph at close: 166 nodes, 0 suspect fingerprints, 0 cycles, 38
-interface-settled, 81 sketch. Five are new this session —
-`DEC-NODE-FILE-NAMING`, `MECH-SDOC-LAYOUT-CHECK`,
-`DEC-BACKLOG-IS-A-REGISTER-NODE` and the two backlog registers — and the count
-read 160 before, which was already wrong by one against the same export.
+Five nodes were new in that session — `DEC-NODE-FILE-NAMING`,
+`MECH-SDOC-LAYOUT-CHECK`, `DEC-BACKLOG-IS-A-REGISTER-NODE` and the two backlog
+registers — and the count read 160 before, which was already wrong by one
+against the same export.
 
 ### What is open for the operator
 
@@ -559,8 +540,8 @@ It writes nodes and edges. It does not write code, and it does not sign.
 > update the nodes in the same commit. Log incidental findings to the plan
 > backlog rather than telling me.
 
-Give it a WORK UID, not a description. The work's closure is the brief, and the
-graph already says whether it is ready.
+Give it a WORK UID, not a description. The work node and its `Crosses` relations
+are the brief.
 
 ### The render session — DONE 2026-08-29 (kept for the record)
 
@@ -620,7 +601,7 @@ contents, and the `sdoc` skill body. The memory index carries a pointer, not the
 content — which is what both prompts above are closing.
 
 There is no automatic context-following by relation. Naming a plan or a slice is
-the manual stand-in; `MECH-READY-QUERY` is the node that replaces it.
+the manual stand-in.
 
 ## Reading the graph
 
@@ -628,10 +609,9 @@ the manual stand-in; `MECH-READY-QUERY` is the node that replaces it.
 strictdoc export . --formats=json --output-dir /tmp/sdoc-out
 J=/tmp/sdoc-out/json/index.json
 
-python3 docs/sdoc/render.py $J                    # the grooming queue
-python3 docs/sdoc/render.py $J --all              # everything
+python3 docs/sdoc/render.py $J                    # everything
+python3 docs/sdoc/render.py $J --all              # explicit equivalent
 python3 docs/sdoc/render.py $J --uid <UID>        # one node plus its neighbours
-python3 docs/sdoc/render.py $J --depth needs-design --depth needs-spike
 ```
 
 Markdown on stdout — pipe it to a pager or open it in an editor. Every relation

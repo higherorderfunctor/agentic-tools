@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DUPLICATE-ELEMENT-TAG-SILENT
 TITLE: Duplicate element TAG is a third silent grammar collision
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Measured on 0.28.3. Two grammar elements sharing a TAG parse clean and export

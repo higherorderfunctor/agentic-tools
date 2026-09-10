@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-UC-INNER-SDOC-EXTRACTION
 TITLE: Use case: extract inner sdocs from code comments
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 An unsettled use case, narrower than WORK-UC-INNER-SDOCS-IN-CODE-COMMENTS:

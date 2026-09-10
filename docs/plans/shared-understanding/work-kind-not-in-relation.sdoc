@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-KIND-NOT-IN-RELATION
 TITLE: The item kind is recomputed by the board, not stored on the relation
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The extractor reports a KIND for each source item, and the adapter emits it,

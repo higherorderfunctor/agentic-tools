@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-ELKJS-VIA-NIX
 TITLE: Deliver the board's elkjs layout engine through Nix
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Graph neighborhood view ported on 2026-09-08 vendors the elkjs layout

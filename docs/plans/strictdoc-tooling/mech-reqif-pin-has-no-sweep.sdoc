@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-REQIF-PIN-HAS-NO-SWEEP
 TITLE: Decide what keeps the inline reqif pin current
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 overlays/dev-tools/strictdoc.nix pins reqif inline at 0.1.0, because

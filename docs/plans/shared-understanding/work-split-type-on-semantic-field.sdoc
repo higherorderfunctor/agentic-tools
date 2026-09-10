@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SPLIT-TYPE-ON-SEMANTIC-FIELD
 TITLE: Split a node type when one field changes its semantics
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 A grammar design rule the operator stated: when a single field's value
@@ -21,7 +20,7 @@ not because a kind field says so. "Gap, red, bad, do not pass go."
 
 Applies first to the annotation kinds (WORK-ANNOTATION-NODES): it is the
 reason the operator leans node-type over kind-field there. It also bears on
-DEPTH/STATUS-style ladders, where one field's value already selects which
+STATUS-style state fields, where one field's value already selects which
 rules apply; whether any of those should split is not decided here.
 <<<
 NOTES: >>>

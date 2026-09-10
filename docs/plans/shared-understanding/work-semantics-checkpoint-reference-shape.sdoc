@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SEMANTICS-CHECKPOINT-REFERENCE-SHAPE
 TITLE: Give checkpoint references a declared model shape
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Resolve the contradiction between the fixed model shape and the interpreter duty to reject unresolved checkpoint references. The fixed checkpoint shape is name plus sees, and the fixed flow shape is name plus transition/outcome steps; neither exposes a checkpoint reference. Decide which declared data may name a checkpoint, then add validation and positive and negative controls without restoring the rejected out-of-shape flow checkpoint field by assumption.

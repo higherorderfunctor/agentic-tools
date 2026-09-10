@@ -1423,7 +1423,7 @@
   }
   // a narrative's state chips come from its node card, which names the fields;
   // without a card the schema keys stand in
-  const narChips=n=>stateChips(NODES[n.uid]&&NODES[n.uid].state?NODES[n.uid].state:{depth:n.depth,authored:n.authored});
+  const narChips=n=>stateChips(NODES[n.uid]&&NODES[n.uid].state?NODES[n.uid].state:{authored:n.authored});
   const sysChips=uid=>systemsOf(uid).map(x=>h("span",{class:"flag"},x));
   function tagRow(n){
     const tags=(n.tags||[]);
@@ -2120,7 +2120,7 @@
     const nar=NAR[uid];
     if(!nd&&!nar) return [h("p",{},"That node is not in the canon."),h("a",{href:"#/nodes"},"nodes")];
     if(!nodeOn(uid)) return [h("div",{class:"nodehead stack"},h("code",{},uid),h("h1",{},titleOf(uid)),h("p",{},offNote(uid)))];
-    const type=nd?nd.type:"", title=nd?nd.title:nar.title, state=nd?nd.state:{depth:nar.depth,authored:nar.authored}, path=nd?nd.path:nar.path;
+    const type=nd?nd.type:"", title=nd?nd.title:nar.title, state=nd?nd.state:{authored:nar.authored}, path=nd?nd.path:nar.path;
     const back=BACK[uid]||[];
     const fields=nd?Object.entries(nd.fields||{}):[];
     const outP=nd?nd.out.filter(r=>r.type!=="Child"):[], outC=nd?nd.out.filter(r=>r.type==="Child"):[];

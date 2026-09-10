@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: MECH-PLAN-CHANGE-KINDS
 TITLE: Two kinds of change to a plan, only one of which ingest freezes
-DEPTH: interface-settled
 AUTHORED_BY: human
 STATEMENT: >>>
 Execution state -- is this done, who holds it, what blocks it -- belongs to the

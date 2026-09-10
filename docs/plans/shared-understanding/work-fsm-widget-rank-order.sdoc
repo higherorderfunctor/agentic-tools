@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-FSM-WIDGET-RANK-ORDER
 TITLE: The lifecycle widget ranks states by longest path
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Grammars tab's lifecycle widget orders states by longest path from the

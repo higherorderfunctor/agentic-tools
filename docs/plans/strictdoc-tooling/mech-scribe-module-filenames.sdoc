@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SCRIBE-MODULE-FILENAMES
 TITLE: The writer's module files still carry the retired name
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The writer's command is scribe; its module files are still sdoc_cli.py and

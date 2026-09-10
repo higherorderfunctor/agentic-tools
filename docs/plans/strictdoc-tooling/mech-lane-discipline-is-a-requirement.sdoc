@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: MECH-LANE-DISCIPLINE-IS-A-REQUIREMENT
 TITLE: Stay in your lane is two requirements, and the Crosses edge is the lane
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The motivation behind SLICE is SCOPE DISCIPLINE, and it is two rules rather than

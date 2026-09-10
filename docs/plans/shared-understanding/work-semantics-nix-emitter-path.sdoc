@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SEMANTICS-NIX-EMITTER-PATH
 TITLE: The path from the hand-written model document to the Nix behaviour surface
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The logged path from model.json to Nix, so it exists as sdoc before anyone

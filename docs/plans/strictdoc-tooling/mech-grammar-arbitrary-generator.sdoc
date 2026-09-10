@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-GRAMMAR-ARBITRARY-GENERATOR
 TITLE: Derive a value generator from the grammar surface rather than writing one
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Property testing for the grammar surface, deliberately deferred past milestone

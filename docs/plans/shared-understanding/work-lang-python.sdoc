@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LANG-PYTHON
 TITLE: Language items for Python
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Grammar to load: `tree-sitter-grammars.tree-sitter-python` (nixpkgs, 0.25.0, `python313Packages`/`python314Packages` binding present). This is also the grammar strictdoc's own built-in `reader_python.py` uses natively (source traceability, gated off in this repo today), so a repo-side extractor and strictdoc's own reader would target the same grammar.

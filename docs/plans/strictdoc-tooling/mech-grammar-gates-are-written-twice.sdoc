@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-GRAMMAR-GATES-ARE-WRITTEN-TWICE
 TITLE: dev/tasks/check.nix restates the flake checks instead of running them
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 `check:sdoc-grammar` and checks/strictdoc-grammar-*.nix implement the same

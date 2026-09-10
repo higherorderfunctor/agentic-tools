@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SCRIBE-WORKSPACE-CONTRACTS
 TITLE: The workspace holds, defers, batches and recovers, under contract
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: dev/scripts/test_scribe_workspace.py against an isolated 374-node corpus copy; strictdoc 0.28.3; 2026-08-31
 STATEMENT: >>>

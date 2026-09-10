@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SCRIBE-DEVENV-PROCESS
 TITLE: The daemon is a devenv process, one per worktree
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The daemon is a devenv process, started with `devenv up` and stopped with

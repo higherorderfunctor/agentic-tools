@@ -7,15 +7,14 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-GROOMED-NODES-STAY-IN-THE-BACKLOG-FILE
 TITLE: Grooming no longer moves a node between files
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Abandoned. MECH-ONE-NODE-PER-FILE replaced the work this node scheduled.
 
 The problem was that the backlog protocol defined grooming as moving a node into
-a numbered document in the same plan, and the 2026-08-27 grooming pass raised
-DEPTH on eighteen nodes and moved none of them, leaving a backlog document full
-of interface-settled nodes whose name no longer described it. The work was
+a numbered document in the same plan, and the 2026-08-27 grooming pass changed
+eighteen nodes and moved none of them, leaving a backlog document full of
+groomed nodes whose name no longer described it. The work was
 deciding which numbered document each of the eighteen belonged to, and moving
 them.
 
@@ -48,7 +47,7 @@ Logged against MECH-SLICE-CANNOT-BE-SUPERSEDED as an instance of a non-DECISION
 node being superseded in prose. That makes two events for that node to weigh,
 not one.
 
-The rough split by subject recorded at the time of logging -- readiness and
+The rough split by subject recorded at the time of logging -- query and
 predicate nodes with the tooling document, plan-refs and lifecycle nodes with
 the lifecycle document, CLI, guard and signing nodes with the executable-rules
 document -- has no destinations left to name. It is kept only as evidence that

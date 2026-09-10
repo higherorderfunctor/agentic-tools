@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAMMAR-AS-BOUNDARY
 TITLE: Say what a grammar-file boundary means
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Say what a grammar file IS: a collection of node types and semantics that

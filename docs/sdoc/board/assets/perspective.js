@@ -14,16 +14,7 @@ const DEFAULT_CONFIGS = {
   nodes: {
     plugin: "Datagrid",
     settings: true,
-    columns: [
-      "UID",
-      "TITLE",
-      "TYPE",
-      "DEPTH",
-      "STATUS",
-      "DIR",
-      "OUT_COUNT",
-      "IN_COUNT",
-    ],
+    columns: ["UID", "TITLE", "TYPE", "STATUS", "DIR", "OUT_COUNT", "IN_COUNT"],
   },
   relations: {
     plugin: "Datagrid",

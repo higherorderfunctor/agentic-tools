@@ -68,7 +68,7 @@ pkgs.runCommand "strictdoc-semantics" {
 
   debt = graph["nodes"]["WORK-SEMANTICS-RULE-LIFECYCLE-ASSOCIATION"]
   assert isinstance(debt["fields"], dict)
-  assert isinstance(debt["fields"]["DEPTH"], str)
+  assert isinstance(debt["fields"]["AUTHORED_BY"], str)
   assert isinstance(graph["edges"], list)
   for edge in graph["edges"]:
       assert isinstance(edge, dict)

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SEMANTICS-DEFINITION-BOUNDARY
 TITLE: Draw the boundary between defining semantics and this system's semantics
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Two layers, framed by the operator on 2026-08-25. The definition layer is how
@@ -17,7 +16,7 @@ flows that hit them; where validators wire in and which hook point each one
 belongs to; which validations run on CRUD-like operations versus commit and
 merge operations; and how a grammar maps to structured CLI arguments. The
 instance layer is this design system's particular semantics: fingerprints,
-contracts, the ripple, DEPTH, signing authority.
+contracts, the ripple, STATUS, AUTHORED_BY and signing authority.
 
 CRUD and git operations blur the line. They are assumed to be part of the
 semantic vocabulary and need a placement in the definition layer.

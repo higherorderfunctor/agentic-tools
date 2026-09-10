@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-VENDOR-PERSPECTIVE
 TITLE: Vendor the pinned Perspective build out of the CDN
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Vendor or nix-package the pinned Perspective 5.3.0 assets (modules, wasm,

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-GRAMMAR-TEXT-ELEMENT-INJECTION
 TITLE: Our grammar declares no TEXT element, so strictdoc silently adds one
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 When an imported grammar declares no TEXT element, strictdoc inserts a default

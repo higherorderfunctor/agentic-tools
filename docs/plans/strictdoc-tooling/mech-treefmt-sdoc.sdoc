@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-TREEFMT-SDOC
 TITLE: Register strictdoc format as the treefmt formatter for sdoc and sgra
-DEPTH: interface-settled
 AUTHORED_BY: human
 STATEMENT: >>>
 treefmt formats no file with an sdoc extension today: none of its five formatters -- alejandra, biome, prettier, shfmt, taplo -- claims one, and an unmatched path is logged at info while the run still exits zero. Register strictdoc format as treefmt's formatter for *.sdoc, and set document_line_width in strictdoc_config.py so that the command has something to enforce. The width comes from a new option, ai.strictdoc.settings.format.lineLength, defaulting to 80 -- prettier's printWidth here, which treefmt.nix records as a deliberate choice, so prose inside a .sdoc block wraps at the same column as prose in a .md file. Without the width the command normalises nothing a reader can see: measured, every deviation short of a parse error round-trips unchanged, so a formatter registered without it is a validator wearing a formatter's name.

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-EDGES-RULES
 TITLE: Which relations are allowed
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: facts
 PLACE: section

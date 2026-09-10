@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GLOSSARY-NODES
 TITLE: One definition per node
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Glossary/definition: one definition per node. The operator's gut: it fits

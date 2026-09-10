@@ -51,9 +51,6 @@ ELEMENTS:
   - TITLE: TITLE
     TYPE: String
     REQUIRED: True
-  - TITLE: DEPTH
-    TYPE: SingleChoice(sketch, needs-design, needs-spike, interface-settled, implemented, verified)
-    REQUIRED: True
   - TITLE: AUTHORED_BY
     TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
     REQUIRED: True
@@ -102,9 +99,6 @@ ELEMENTS:
   - TITLE: TITLE
     TYPE: String
     REQUIRED: True
-  - TITLE: DEPTH
-    TYPE: SingleChoice(sketch, needs-design, needs-spike, interface-settled, implemented, verified)
-    REQUIRED: True
   - TITLE: AUTHORED_BY
     TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
     REQUIRED: True
@@ -152,9 +146,6 @@ ELEMENTS:
     REQUIRED: True
   - TITLE: TITLE
     TYPE: String
-    REQUIRED: True
-  - TITLE: DEPTH
-    TYPE: SingleChoice(sketch, needs-design, needs-spike, interface-settled, implemented, verified)
     REQUIRED: True
   - TITLE: AUTHORED_BY
     TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
@@ -207,9 +198,6 @@ ELEMENTS:
   - TITLE: TITLE
     TYPE: String
     REQUIRED: True
-  - TITLE: DEPTH
-    TYPE: SingleChoice(sketch, needs-design, needs-spike, interface-settled, implemented, verified)
-    REQUIRED: True
   - TITLE: AUTHORED_BY
     TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
     REQUIRED: True
@@ -250,9 +238,6 @@ ELEMENTS:
     REQUIRED: True
   - TITLE: TITLE
     TYPE: String
-    REQUIRED: True
-  - TITLE: DEPTH
-    TYPE: SingleChoice(sketch, needs-design, needs-spike, interface-settled, implemented, verified)
     REQUIRED: True
   - TITLE: AUTHORED_BY
     TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
@@ -303,9 +288,6 @@ ELEMENTS:
     REQUIRED: True
   - TITLE: TITLE
     TYPE: String
-    REQUIRED: True
-  - TITLE: DEPTH
-    TYPE: SingleChoice(sketch, needs-design, needs-spike, interface-settled, implemented, verified)
     REQUIRED: True
   - TITLE: AUTHORED_BY
     TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)

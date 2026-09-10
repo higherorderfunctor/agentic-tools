@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-HTML-RENDER-MUST-PASS
 TITLE: Rendering to HTML should be a requirement, with a check that is not a full render
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Make it a requirement that this corpus renders to HTML, and gate it. The
