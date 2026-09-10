@@ -95,6 +95,14 @@ store path. Four tabs, each also a URL:
 | Graph       | `?view=board`       | the whole canon as cards on a pan-and-zoom canvas. The default view                  |
 | Perspective | `?view=perspective` | two queryable tables over one export: one row per node, one row per relation         |
 
+The app asks the resident daemon for `workspace.describe`, `workspace.export`,
+and `workspace.grammar`; it does not parse the grammar file or load a second
+StrictDoc graph. Each node's declaring path arrives in that export as
+`_DOCUMENT_PATH`, so the board neither walks the worktree for `.sdoc` files nor
+imports the view checker to recover it. The semantics payload still reads the
+operator-owned model from disk, explicitly recorded under
+`REQ-DAEMON-IS-THE-ONLY-SOURCE` until that representation is defined.
+
 The Grammars tab's grouping is hand-authored in
 `docs/sdoc/board/grammar-groups.json` — the one part of the board not derived
 from the grammar. It is guarded twice: `strictdoc-board-grammar-groups` in
@@ -115,6 +123,11 @@ scribe set MECH-THING --notes @notes.md
 scribe relate MECH-THING --role Governed_By --target DEC-SOMETHING
 scribe semantics DECISION                 # the lifecycle its state field claims
 ```
+
+The daemon supplies the grammar that builds this command surface, so help also
+needs the daemon. With no daemon, `scribe --help` fails closed and prints the
+socket plus the command that starts one; there is no client-side grammar parser
+or no-daemon validator.
 
 `set` **replaces** a field rather than appending to it: read the current value
 with `show`, then write old plus new. Every field flag takes `@FILE` to read the
@@ -146,7 +159,8 @@ silently dropped.
 `scribe semantics` works with the daemon down. With no argument it prints every
 machine; give it a state field (`STATUS`) or a node type (`DECISION`) to narrow
 it. `--json` prints the `sdoc-semantics/2` payload the board consumes;
-`--mermaid` prints one `stateDiagram-v2` per machine.
+`--mermaid` prints one `stateDiagram-v2` per machine. This direct model read is
+the recorded semantics violation, not a fallback for any corpus command.
 
 ### Listing what a source file offers
 
@@ -184,6 +198,7 @@ relation to the task binding by id, and the binding carries a marker back.
 
 | check                                             | gates                                                                                |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `daemon-only-source`                              | no consumer outside the daemon reads the corpus or grammar from disk                 |
 | `module-semble-strictdoc-grammar-load`            | semble loads the patched sdoc tree-sitter grammar                                    |
 | `module-strictdoc-enable-installs-cli-and-runner` | `ai.strictdoc.enable` puts the CLI and the runner in the shell                       |
 | `module-strictdoc-grammars-render-committed-file` | the module renders the grammar file that is committed                                |
@@ -252,8 +267,11 @@ a marker that resolved.
 ## Daemon internals
 
 `scribe` and every writing command talk to a resident daemon holding one loaded
-graph per worktree. Without one they fail closed, naming the socket and the
-command that starts it; there is deliberately no fallback.
+graph per worktree. The client obtains `workspace.grammar` before it builds
+argv, then sends the selected operation through `scribe.apply`; it does not read
+the grammar or corpus from disk. Without a daemon every command, including help,
+fails closed with the socket and start command. There is deliberately no
+fallback.
 
 | what               | command              |
 | ------------------ | -------------------- |

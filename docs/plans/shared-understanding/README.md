@@ -18,7 +18,16 @@ the branch: **promote a shared understanding between human and LLM.**
 ## Load context
 
 1. Invoke the `sdoc` skill; read `docs/sdoc/README.md` if you have not.
-2. Read the root node and walk down:
+2. Start the resident processes from a shell in the worktree:
+
+   ```bash
+   devenv up -d scribe board
+   ```
+
+   Every scribe command, including help, obtains its grammar from the daemon and
+   fails closed with the socket and start command when none answers.
+
+3. Read the root node and walk down:
 
    ```bash
    scribe show WORK-SHARED-UNDERSTANDING
@@ -33,8 +42,7 @@ the branch: **promote a shared understanding between human and LLM.**
    operator ruling. `REQ-BOARD-GRAMMAR-DRIVEN` is the one requirement the
    operator offered; everything else is WORK.
 
-3. The board app renders this plan: `devenv up -d scribe board` from a shell in
-   the worktree, then the Plan tab (tree, right-pane card) —
+4. The board app renders this plan in the Plan tab (tree, right-pane card) —
    http://127.0.0.1:8765/?view=plan. `docs/sdoc/README.md` has the rest: start
    and stop, the other tabs, the scribe verbs, the checks by name. The process
    runs the devenv-packaged `sdoc-board` wrapper, not a repository launcher or
@@ -147,7 +155,9 @@ Bootstrap, in order:
 1. Read the project_strictdoc_trial memory (latest session block first).
 2. Invoke the sdoc skill (authoritative copy: <worktree>/dev/skills/sdoc/SKILL.md).
 3. Read <worktree>/docs/plans/shared-understanding/README.md — the plan's own
-   bootstrap — then `scribe show WORK-SHARED-UNDERSTANDING`.
+   bootstrap.
+4. Start the resident daemon, then run
+   `scribe show WORK-SHARED-UNDERSTANDING`.
 
 The board app: `devenv up -d scribe board` from a shell in the worktree if not
 already up; http://127.0.0.1:8765/?view=plan renders this plan.

@@ -133,11 +133,13 @@ nodes with `[LINK:]` only.
 
 ## Write with `scribe`, not with the edit tool
 
-`scribe` is this repository's writer for the graph (SLICE-SDOC-CLI). **Its
-option surface is DERIVED from the grammar** — one flag per field a node type
-declares, one per relation role it may make — so `scribe new DECISION --help`
-and `scribe new NARRATIVE --help` print two different surfaces, and neither can
-be got wrong from memory.
+`scribe` is this repository's writer for the graph (SLICE-SDOC-CLI). It obtains
+the grammar from the resident daemon and **derives its option surface from that
+reply** — one flag per field a node type declares, one per relation role it may
+make — so `scribe new DECISION --help` and `scribe new NARRATIVE --help` print
+two different surfaces, and neither can be got wrong from memory. Help is a
+daemon-backed operation too: with no daemon, even `scribe --help` fails closed
+and prints the socket plus the command that starts one.
 
 ```bash
 scribe new MECHANISM --help          # the flags MECHANISM actually declares
@@ -179,7 +181,9 @@ non-zero saying who owns it. There is no override.
 the start, stop and restart recipe, the board, the checks by name and the export
 benchmark. `scribe semantics` is the one verb that runs with the daemon down: it
 prints the lifecycle each state field CLAIMS — states, transitions, and rules
-marked settled or open — and enforces nothing.
+marked settled or open — and enforces nothing. Its direct semantics-model read
+is the recorded violation of `REQ-DAEMON-IS-THE-ONLY-SOURCE`, not a general
+fallback for corpus commands.
 
 ## Source linking is on
 
