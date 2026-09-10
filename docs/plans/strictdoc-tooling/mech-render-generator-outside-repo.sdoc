@@ -37,6 +37,8 @@ Python's glob skips dotted directories, so a walker over the corpus misses
 packages/*/.sdoc/ unless it uses os.walk -- caught while mapping UIDs to files.
 
 Retyped from MECHANISM to EVIDENCE on 2026-08-30 by the mechanism mood test under DEC-NODE-FAMILIES, with medium confidence after a second opinion: it records what was observed once, not how something always behaves. Noted for a later split: The four-step pipeline paragraph is an architecture that becomes a MECHANISM the day the generator is committed under docs/sdoc/; 'Options, unweighed' is an open decision, not a claim. The UID keeps its prefix: DEC-UID-OUTLIVES-TYPE.
+
+Delivery review retained when the completed render WORK row was retired on 2026-09-10. Five independent readers raised 37 findings: 23 were confirmed and fixed, 6 were split and resolved by falling back to the source sheet wording, 4 were refuted, and 4 nits were fixed. Phone and desktop screenshot passes found three layout defects before review, and all five tag colours passed the colour-vision validator in both themes.
 <<<
 RELATIONS:
 - TYPE: Parent
