@@ -36,3 +36,6 @@ RELATIONS:
   VALUE: packages/strictdoc-grammar/values.nix
   ELEMENT: function
   ID: governedBy
+- TYPE: Parent
+  VALUE: EV-PLACE-FIELD-FIXTURE
+  ROLE: Proven_By
