@@ -12,7 +12,7 @@ WIDGET: facts
 PLACE: screen
 STATEMENT: >>>
 - input: [LINK: MECH-SEMANTIC-LAYER-WHITEBOARD]
-- brief: [LINK: SLICE-SEMANTIC-LAYER-RENDER]
+- brief: [LINK: MECH-RENDER-GENERATOR-OUTSIDE-REPO]
 - canon: the commit and export this page was built from are printed in the page footer, which reads them off the payload; a hand-written copy here went stale within the day
 - wording: every line has a plain-language headline written for the page and the sheet's own wording one tap below; where they disagree, the sheet is the source
 - verdicts: a verdict is the sheet's opinion on its day, not a node's state; read a node's state on the node
@@ -23,14 +23,11 @@ DEC-NODE-FAMILIES:0000000
 DEC-UID-OUTLIVES-TYPE:0000000
 MECH-SEMANTIC-LAYER-WHITEBOARD:0000000
 NAR-TERM-CANON:0000000
-SLICE-SEMANTIC-LAYER-RENDER:0000000
+MECH-RENDER-GENERATOR-OUTSIDE-REPO:0000000
 <<<
 RELATIONS:
 - TYPE: Parent
   VALUE: MECH-SEMANTIC-LAYER-WHITEBOARD
-  ROLE: Cites
-- TYPE: Parent
-  VALUE: SLICE-SEMANTIC-LAYER-RENDER
   ROLE: Cites
 - TYPE: Parent
   VALUE: DEC-NODE-FAMILIES
@@ -40,4 +37,7 @@ RELATIONS:
   ROLE: Cites
 - TYPE: Parent
   VALUE: NAR-TERM-CANON
+  ROLE: Cites
+- TYPE: Parent
+  VALUE: MECH-RENDER-GENERATOR-OUTSIDE-REPO
   ROLE: Cites

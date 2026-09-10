@@ -18,7 +18,7 @@ DEC-NODE-FAMILIES:0000000
 DEC-UID-OUTLIVES-TYPE:0000000
 MECH-SEMANTIC-LAYER-WHITEBOARD:0000000
 NAR-TERM-CANON:0000000
-SLICE-SEMANTIC-LAYER-RENDER:0000000
+MECH-RENDER-GENERATOR-OUTSIDE-REPO:0000000
 <<<
 NOTES: >>>
 Built on 2026-08-30 by migrate_whiteboard.py from the sheet's lines and the reviewed headlines of the 2026-08-29 render, through the scribe. Every PARENT_FP entry is a 0000000 declaration; nothing here is signed.
@@ -26,9 +26,6 @@ Built on 2026-08-30 by migrate_whiteboard.py from the sheet's lines and the revi
 RELATIONS:
 - TYPE: Parent
   VALUE: MECH-SEMANTIC-LAYER-WHITEBOARD
-  ROLE: Cites
-- TYPE: Parent
-  VALUE: SLICE-SEMANTIC-LAYER-RENDER
   ROLE: Cites
 - TYPE: Parent
   VALUE: DEC-NODE-FAMILIES
@@ -75,3 +72,6 @@ RELATIONS:
 - TYPE: Child
   VALUE: MECH-SEMANTIC-LAYER-WHITEBOARD
   ROLE: Contains
+- TYPE: Parent
+  VALUE: MECH-RENDER-GENERATOR-OUTSIDE-REPO
+  ROLE: Cites
