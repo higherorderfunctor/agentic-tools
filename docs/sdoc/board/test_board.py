@@ -11,6 +11,7 @@ such run.
 from __future__ import annotations
 
 import json
+import tempfile
 import threading
 import types
 import unittest
@@ -32,6 +33,8 @@ from adapter import (
 )
 from server import build_server
 from source import NoDaemon, Payloads, semantics_payload
+import source as board_source
+from source import ClientError, DaemonSource, grammar_types
 
 FIXTURE_INDEX = {
     "_COMMENT": "fixture",
@@ -92,6 +95,10 @@ FIXTURE_PATHS = {
 FIXTURE_GRAMMAR = {
     "DECISION": {"prefix": "DEC-", "fields": [], "roles": []},
     "MECHANISM": {"prefix": "MECH-", "fields": [], "roles": []},
+}
+FIXTURE_GRAMMAR_REPLY = {
+    "schema": "scribe-grammar/1",
+    "types": FIXTURE_GRAMMAR,
 }
 FIXTURE_PROJECT = {"name": "fixture", "root": "/fixture", "generation": 7}
 
@@ -469,6 +476,51 @@ class SemanticsCarriageTest(unittest.TestCase):
         self.assertEqual(semantics["machines"], {})
         self.assertIn("two transitions on advance", semantics["unavailable"])
         self.assertIn("RuntimeError", semantics["unavailable"])
+
+
+class SourceContractTest(unittest.TestCase):
+    def test_workspace_grammar_drives_the_snapshot(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            exported = root / "index.json"
+            exported.write_text(json.dumps(FIXTURE_INDEX), encoding="utf8")
+
+            class CannedSource(DaemonSource):
+                def __init__(self):
+                    super().__init__(root)
+                    self.calls = []
+
+                def _call(self, method, params=None):
+                    self.calls.append((method, params))
+                    if method == "workspace.describe":
+                        return {"generation": 7, "dirty": False}
+                    if method == "workspace.export":
+                        return {"index": str(exported), "generation": 7}
+                    if method == "workspace.grammar":
+                        return FIXTURE_GRAMMAR_REPLY
+                    raise AssertionError(method)
+
+            source = CannedSource()
+            with (
+                mock.patch.object(board_source, "uid_paths", return_value=FIXTURE_PATHS),
+                mock.patch.object(
+                    board_source, "semantics_payload", return_value=FIXTURE_SEMANTICS
+                ),
+            ):
+                snapshot = json.loads(source.payloads().snapshot)
+            self.assertEqual(snapshot["grammar"], FIXTURE_GRAMMAR)
+            self.assertEqual(
+                [method for method, _params in source.calls],
+                ["workspace.describe", "workspace.export", "workspace.grammar"],
+            )
+
+    def test_plain_validator_has_positive_and_negative_controls(self) -> None:
+        with mock.patch.object(board_source, "WorkspaceGrammarResult", None):
+            self.assertEqual(grammar_types(FIXTURE_GRAMMAR_REPLY), FIXTURE_GRAMMAR)
+            malformed = json.loads(json.dumps(FIXTURE_GRAMMAR_REPLY))
+            del malformed["types"]["MECHANISM"]["roles"]
+            with self.assertRaisesRegex(ClientError, "malformed MECHANISM"):
+                grammar_types(malformed)
 
 
 class FakeSource:

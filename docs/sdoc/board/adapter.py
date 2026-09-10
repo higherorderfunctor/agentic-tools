@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Adapt one scribe-daemon JSON export into the board's browser payloads.
 
-Pure functions over data already on disk: the daemon's `workspace.export`
-JSON, the worktree walk that maps each UID to its declaring file, and the
-`.sgra` grammar file. Nothing here talks to the daemon or imports strictdoc,
-which is what keeps the whole app runnable under any python3.
+Pure functions over data already obtained by the caller: the daemon's
+`workspace.export` JSON, the worktree walk that maps each UID to its declaring
+file, and the daemon's `workspace.grammar` result. Nothing here talks to the
+daemon or imports strictdoc, which keeps adaptation separate from transport.
 
 Two payloads out of one pass:
 
@@ -58,7 +58,6 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT / "dev" / "scripts"))
 
 from sdoc_fp import iter_nodes, load_index  # noqa: E402,F401
-from scribe_grammar import parse_sgra  # noqa: E402,F401
 
 
 def _view_check():

@@ -10,36 +10,9 @@ TITLE: One export becomes the snapshot and two queryable tables
 DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
-adapter.py's adapt() turns one workspace.export index.json into both browser
-payloads in a single pass, joining two sources the export does not carry: the
-UID-to-file walk (view-check's uid_paths, imported rather than duplicated) for
-provenance paths, and parse_sgra for field kinds and option lists, since the
-export types every field as String. The snapshot (sdoc-board/2) is one record
-per node plus one edge per RESOLVED Parent or Child declaration, with
-unresolved targets kept as diagnostics rather than dropped. The rows payload
-(sdoc-perspective/2) is two tables: nodes, one row per node with PATH, DIR and
-degree facets; and relations, one row per declared relation, denormalized with
-both endpoints' type, title, state and path. Every row of a table carries the
-union key set with nulls for absent fields, because Perspective infers its
-column schema from the rows.
+adapter.py turns one workspace.export index into the sdoc-board/2 snapshot and the sdoc-perspective/2 tables in one pass. The caller supplies the type declarations returned by workspace.grammar, so the adapter neither parses grammar.sgra nor imports StrictDoc. The current branch still supplies a UID-to-file map from the worktree because the daemon export path field lands separately in R2; once that stack is combined, the exported document path replaces this temporary join.
 
-A File relation may name part of a file rather than the whole of it, and both
-payloads carry that grain: ELEMENT and ID for a named item, or a LINE_RANGE,
-travel onto the relation row and onto the node's own fileRelations list. One
-thing beside them is not in the export at all -- the extractor's KIND word for
-the named item, such as option, module or binding -- and the adapter joins it
-by asking dev/scripts/sdoc_extractors for the items of that file. That lookup
-is optional by construction. The board is served and tested by a plain
-python3, so an extractor that cannot be imported, or a file no configured glob
-covers, leaves kind null and the card falls back to the ELEMENT word.
-Reporting that an ID names nothing is element-check.py's job, not the board's;
-a null kind here means "unknown", never "wrong".
-
-The snapshot carries a third top-level key, semantics, and the adapter does
-not compute it: the caller passes the sdoc-semantics/2 payload in. When none
-arrives the adapter writes an explicit refusal record naming the reason rather
-than omitting the key, because a missing key gives a reader no null to branch
-on and reads as a settled empty answer.
+The snapshot keeps one record per node, resolved Parent and Child edges, unresolved-target diagnostics, element-grained File relations, and the caller-supplied sdoc-semantics/2 payload. The Perspective tables retain union-shaped rows so column inference is stable. Extractor lookup for optional File relation KIND values remains an enrichment and may yield null without changing the declared target.
 <<<
 RATIONALE: >>>
 The spike squashed relations into comma-joined facet strings on the node row;

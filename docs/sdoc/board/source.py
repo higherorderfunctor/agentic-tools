@@ -6,9 +6,10 @@ content hash notices an edit, a checkout, a rebase -- so "fresh" here means
 "whatever the daemon serves right now", with no exporter subprocess and no
 second in-process StrictDoc load. `workspace.export` writes StrictDoc's own
 JSON export from the held graph (~0.3 s against ~2.3 s for the one-shot
-command, byte-identical), and the export lands under `output/`, which both
-the daemon's freshness sweep and the UID walk skip, so exporting never dirties
-the thing being exported.
+command, byte-identical), and the export lands under `output/`, which both the
+daemon's freshness sweep and the UID walk skip, so exporting never dirties the
+thing being exported. The grammar is the daemon's parsed scribe-grammar/1
+result, not a second reading of grammar.sgra.
 
 FAIL CLOSED, LOUDLY. When no daemon answers, requests surface the client's
 own refusal -- the socket and the command that starts one -- instead of
@@ -33,10 +34,14 @@ sys.path.insert(0, str(REPO_ROOT / "dev" / "scripts"))
 
 from scribe_client import ClientError, NoDaemon, call_for_root  # noqa: E402,F401
 
+try:  # R7 pins the board to the interpreter that makes this unconditional.
+    from scribe_contract import WorkspaceGrammarResult  # noqa: E402
+except ImportError:  # pragma: no cover - exercised by an explicit patched contract
+    WorkspaceGrammarResult = None
+
 from adapter import (  # noqa: E402
     adapt,
     load_index,
-    parse_sgra,
     semantics_unavailable,
     uid_paths,
 )
@@ -57,7 +62,6 @@ class DaemonSource:
     def __init__(self, root: Path, *, socket_override=None) -> None:
         self.root = Path(root).resolve()
         self.export_dir = self.root / "output" / "board" / "export"
-        self.grammar_path = self.root / "docs" / "sdoc" / "grammar.sgra"
         self._socket_override = socket_override
         self._lock = threading.Lock()
         self._cached: Payloads | None = None
@@ -85,7 +89,7 @@ class DaemonSource:
                 "root": str(self.root),
                 "generation": exported["generation"],
             }
-            grammar = parse_sgra(self.grammar_path)
+            grammar = grammar_types(self._call("workspace.grammar"))
             adapted = adapt(
                 index,
                 uid_paths(self.root),
@@ -122,12 +126,45 @@ def semantics_payload(grammar: dict) -> dict:
     fallback that computes a lesser answer (DEC-SCRIBE-DAEMON-NO-FALLBACK
     forbids those); it is the absence of an answer, named.
     """
+    # RECORDED VIOLATION of REQ-DAEMON-IS-THE-ONLY-SOURCE: build_payload
+    # reads sdoc_semantics/model.json from disk. The operator owns that layer;
+    # this board must not invent a daemon representation before it is set.
     try:
         from sdoc_semantics import build_payload
 
         return build_payload(grammar)
     except Exception as error:  # noqa: BLE001 - a widget is never worth a 500
         return semantics_unavailable(f"{type(error).__name__}: {error}")
+
+
+def grammar_types(reply: dict) -> dict:
+    """Validate workspace.grammar, using the shared model when importable.
+
+    R7 pins the board to scribe's pydantic-bearing interpreter. Until that
+    commit is in this branch, the narrow isinstance validator keeps the source
+    fail-closed under the older board launcher rather than trusting wire data.
+    """
+    if WorkspaceGrammarResult is not None:
+        try:
+            validated = WorkspaceGrammarResult.model_validate(reply)
+        except ValueError as error:
+            raise ClientError(f"invalid workspace.grammar result: {error}") from error
+        return validated.model_dump(by_alias=True)["types"]
+
+    if not isinstance(reply, dict) or set(reply) != {"schema", "types"}:
+        raise ClientError("invalid workspace.grammar result: expected schema and types")
+    if reply["schema"] != "scribe-grammar/1" or not isinstance(reply["types"], dict):
+        raise ClientError("invalid workspace.grammar result: wrong schema or types shape")
+    for tag, element in reply["types"].items():
+        if not isinstance(tag, str) or not isinstance(element, dict):
+            raise ClientError("invalid workspace.grammar result: type entries must be objects")
+        if set(element) != {"prefix", "fields", "roles"}:
+            raise ClientError(f"invalid workspace.grammar result: malformed {tag} element")
+        if not isinstance(element["prefix"], str):
+            raise ClientError(f"invalid workspace.grammar result: {tag}.prefix is not a string")
+        if not isinstance(element["fields"], list) or not isinstance(element["roles"], list):
+            raise ClientError(f"invalid workspace.grammar result: {tag} lists are malformed")
+    return reply["types"]
 
 
 def _encode(payload: dict) -> bytes:

@@ -1,0 +1,24 @@
+[DOCUMENT]
+TITLE: Remove the board grammar validator compatibility branch
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[WORK]
+UID: WORK-BOARD-GRAMMAR-VALIDATION-PIN
+TITLE: Remove the board grammar validator compatibility branch
+DEPTH: sketch
+AUTHORED_BY: llm
+STATEMENT: >>>
+When R7 pins the board to the Pydantic-bearing interpreter, make WorkspaceGrammarResult mandatory in source.py and delete the plain shape-validator branch.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: MECH-DEBT-SHARED-UNDERSTANDING
+  ROLE: Assumes
+- TYPE: Parent
+  VALUE: WORK-BOARD-READS-GRAMMAR-FROM-DAEMON
+  ROLE: Assumes
+- TYPE: Parent
+  VALUE: MECH-BACKLOG-SHARED-UNDERSTANDING
+  ROLE: Backlogged_In
