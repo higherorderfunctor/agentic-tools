@@ -12,7 +12,7 @@ SOURCE: Chromium 152 headless via DevTools Protocol at 1440x900 against the live
 STATEMENT: >>>
 The final headless Chromium render exposed 7 source-type groups and 25 distinct
 source-type and role checkboxes from the live 449-node corpus. With
-WORK-GRAPH-NEIGHBORHOOD-VIEW focused, disabling only WORK / Assumes changed its
+the Graph view focused, disabling only WORK / Assumes changed its
 one-hop neighborhood from 4 nodes and 5 links to 3 nodes and 4 links while the
 other three Assumes variants stayed enabled. Shift-click drove all four variants
 on, all four off, then all four on from the clicked checkbox's resulting state.

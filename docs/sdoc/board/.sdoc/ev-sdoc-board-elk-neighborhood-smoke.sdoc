@@ -41,7 +41,7 @@ adf8e8d1..5ee1cc63 and were not retaken. Two things about them are of that
 branch rather than this tree: the canon was smaller than the 518 nodes the
 daemon holds here at generation 3 on 2026-09-08, so the 48-node cap clips
 earlier now; and the elkjs delivery moved to Nix on 2026-09-08
-(WORK-BOARD-ELKJS-VIA-NIX). Neither weakens the numbers -- the layout code they
+(MECH-SDOC-BOARD-LAYOUT). Neither weakens the numbers -- the layout code they
 describe is unchanged, and the store's elk-api.js and elk-worker.min.js are
 sha256-identical to the vendored copies these probes ran against.
 <<<

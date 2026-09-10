@@ -17,7 +17,7 @@ hard limit, but a decision node is one decision, a mechanism is one mechanic,
 a use case is one path, and every other type follows the same line. Observed
 this session as the pattern to unpack at grooming: several nodes grew without
 bound by appending verbatim paragraphs to NOTES (WORK-ANNOTATION-NODES,
-WORK-CODE-LINKAGE-EXTRACTORS, WORK-GRAMMAR-TAB-GROUPS). Companion to
+WORK-CODE-LINKAGE-EXTRACTORS). Companion to
 MECH-ONE-NODE-PER-FILE, which fixes the file unit; this fixes the topic unit.
 <<<
 NOTES: >>>

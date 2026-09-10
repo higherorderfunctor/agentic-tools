@@ -37,8 +37,8 @@ Filed by the Graph-tab contract audit, 2026-09-08. A browser reload legitimately
 <<<
 RELATIONS:
 - TYPE: Parent
-  VALUE: WORK-GRAPH-NEIGHBORHOOD-VIEW
-  ROLE: Assumes
-- TYPE: Parent
   VALUE: MECH-BACKLOG-SHARED-UNDERSTANDING
   ROLE: Backlogged_In
+- TYPE: Parent
+  VALUE: MECH-SDOC-BOARD-SCOPED-RELATION-FILTERS
+  ROLE: Assumes

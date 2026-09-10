@@ -9,7 +9,7 @@ UID: WORK-SPLIT-MEGA-NODES
 TITLE: Three work items grew into several topics each
 AUTHORED_BY: llm
 STATEMENT: >>>
-WORK-ANNOTATION-NODES, WORK-CODE-LINKAGE-EXTRACTORS and WORK-GRAMMAR-TAB-GROUPS
+WORK-ANNOTATION-NODES, WORK-CODE-LINKAGE-EXTRACTORS
 each grew by appending verbatim paragraphs to NOTES across several sessions, so
 each now covers several topics at once. That is the anti-pattern
 WORK-ONE-NODE-ONE-TOPIC rules against: node count is supposed to carry

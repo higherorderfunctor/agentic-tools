@@ -77,6 +77,16 @@ keyed by lifecycle name and indexed by type under by_type rather than being
 one per state field. Today the two readings coincide -- the engine emits
 STATUS and AUTHORED_BY, and machinesFor() maps a tag through by_type --
 but the tab reads the index, not the field list.
+
+Delivery context retained when the completed grouping row was retired on
+2026-09-10: the operator requested the Spec / Definition 2x2 grid, Coverage,
+and an Unsorted rest group to surface future splits. The static check and
+runtime banner landed in 8823edf1, the pill order in 35f2a499, and an
+independent headless-browser run plus injected bad-layout controls verified
+both guards. The axis words were corrected to DEC-NODE-FAMILIES'
+universal/particular vocabulary. The still-open choice between rendering the
+grid from its narrative and keeping code plus a dirty edge remains in
+WORK-CODE-LINKAGE-EXTRACTORS and WORK-GRAMMAR-GLOSSES-INTERIM.
 <<<
 RELATIONS:
 - TYPE: Parent
