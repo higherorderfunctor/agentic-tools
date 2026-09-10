@@ -175,9 +175,15 @@ Run a test command or formatter across commits in the current stack.
 
 ## Notes
 
-- Test results are cached by command + tree ID. Use `git test clean` to clear.
-  Use `--no-cache` to bypass the cache for the current run without clearing
-  stored results (useful after environment changes).
+- Test results are cached by command + tree ID, under
+  `.git/branchless/test/<tree-oid>/`. Use `--no-cache` to bypass the cache for
+  one run without clearing stored results (useful after environment changes).
+- **`git test clean` takes a revset and defaults to `@`.** A bare
+  `git test clean` on `main` prints `Cleaned 0 cached test results.` and exits 0
+  with the cache untouched, which reads as "nothing to clean" rather than "wrong
+  revset". Cached entries are keyed by tree OID, so they outlive the commits
+  that produced them and no narrow revset reaches them. Clear everything with
+  `git test clean 'all()'`.
 - `strategy = worktree` (set by this repo's git preset; upstream defaults to
   `working-copy`) is what makes parallelism possible at all. It also means
   `--jobs 1` still runs in an isolated worktree, so a dirty working copy is

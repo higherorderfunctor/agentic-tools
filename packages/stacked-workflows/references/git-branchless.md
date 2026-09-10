@@ -406,8 +406,15 @@ directly, leaving descendants unchanged.
 ```bash
 git test show -x 'cmd'                         # pass/fail summary
 git test show -x 'cmd' -v                      # with output
-git test clean 'stack()'                       # clear cached results
+git test clean 'stack()'                       # clear cached results for the stack
+git test clean 'all()'                         # clear every cached result
 ```
+
+`git test clean` **defaults to `@`** when given no revset, and cached results
+are keyed by tree OID under `.git/branchless/test/<tree-oid>/`, so they outlive
+the commits that produced them. A bare `git test clean` on `main` therefore
+reports `Cleaned 0 cached test results.` while the cache is still full. Reach
+the orphaned entries with `all()`.
 
 ### Choosing the test revset
 
