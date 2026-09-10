@@ -18,6 +18,15 @@ old or the new state and never a half-built one.
 The workspace is the transport-neutral boundary. Neither the socket nor any
 future transport parses anything or owns state; both call this.
 <<<
+NOTES: >>>
+Dry-run delivery record retained when its completed WORK row was retired on
+2026-09-10. Workspace.write runs the ordinary mutation, precheck, render, and
+reparse pipeline, captures Graph.pending(), and discards the speculative
+generation instead of saving it. A separate last-published counter survives
+that discard so the next reload advances the board cache generation. Across
+three isolated runs, capture-and-discard averaged 6.3 ms and the next full read
+943.1 ms; the rejected deepcopy design took 4,444.9 ms in one run.
+<<<
 RELATIONS:
 - TYPE: Parent
   VALUE: REQ-SCRIBE-HOLDS-ONE-GRAPH

@@ -330,7 +330,7 @@ def apply(workspace: Workspace, op: str, params: dict) -> dict:
         # the grammar declares. This branch used to pass the client's spelling
         # straight through, so every File relation through the daemon was
         # refused as a role the type does not declare, while the same verb on
-        # the command line worked (WORK-SCRIBE-RELATE-FILE-ROLE). The mapping
+        # the command line worked (MECH-FILE-RELATION-EXISTENCE). The mapping
         # now lives once, in sdoc_model.relation_role.
         spec = _relation_spec(typed)
         return _written(

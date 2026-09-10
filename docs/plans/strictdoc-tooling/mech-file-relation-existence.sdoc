@@ -179,6 +179,8 @@ place rather than deleted:
 - "All three File relations in the corpus" is now 64 on 37 nodes, 4 of them
   element-grained. The upstream-accepted-forms probe below still holds; only
   the counts and the on/off state moved.
+
+The scribe File-role write defect was fixed in 6fbaa76b and its completed WORK row retired on 2026-09-10. relation_role in dev/scripts/sdoc_model.py centralizes the client spelling File to the grammar's empty role; _relation_spec in dev/scripts/scribe_ops.py now serves relate, unrelate, and new alike. test_file_relation_names_an_item exercises the typed-operation path. MECH-SDOC-BOARD-GRAMMARS-VIEW now carries File relations to both grammar-groups.json and its static checker.
 <<<
 RELATIONS:
 - TYPE: File

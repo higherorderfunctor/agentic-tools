@@ -249,7 +249,7 @@ def relation_role(role: str) -> str:
     choices, the daemon's `role` parameter, roles_of() above -- names it
     `File`. This is the one place that mapping lives; it used to be four,
     and the daemon's relate verb was the copy that did not get it
-    (WORK-SCRIBE-RELATE-FILE-ROLE).
+    (MECH-FILE-RELATION-EXISTENCE).
     """
     return "" if role == "File" else role
 

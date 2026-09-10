@@ -12,7 +12,7 @@ STATEMENT: >>>
 Since 07518382 both the dry and the real move path render and reparse the
 source document before the rename, so a document that does not round-trip is
 refused. The behaviour is documented in the sdoc skill, docs/sdoc/README.md
-and WORK-SCRIBE-DRY-RUN, and no test exercises it. Add a contract with a
+and MECH-SCRIBE-MOVE-BYPASSES-THE-MODEL, and no test exercises it. Add a contract with a
 positive control: a document made non-round-trippable is refused by both paths
 with the same message, and a clean one moves.
 <<<
@@ -24,5 +24,5 @@ RELATIONS:
   VALUE: MECH-BACKLOG-SHARED-UNDERSTANDING
   ROLE: Backlogged_In
 - TYPE: Parent
-  VALUE: WORK-SCRIBE-DRY-RUN
+  VALUE: MECH-SCRIBE-MOVE-BYPASSES-THE-MODEL
   ROLE: Assumes
