@@ -69,15 +69,17 @@ from pjrpc.server.validators.pydantic import PydanticValidatorFactory
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from scribe_contract import WorkspaceGrammarResult  # noqa: E402
 from scribe_ops import LineRange, ParamsError, RelationParams  # noqa: E402
 from scribe_ops import apply as apply_operation  # noqa: E402
 from scribe_workspace import Workspace, WorkspaceError  # noqa: E402
-from sdoc_model import SdocError  # noqa: E402
+from sdoc_model import SdocError, authoring_grammar  # noqa: E402
 
-# Bumped from `scribe-rpc/1` when the envelope moved onto pjrpc. Same framing,
-# same socket, same six methods; what changed is that a malformed request is
-# now refused by name rather than absorbed, so a client written against /1
-# that was relying on a silently-dropped key starts seeing -32602.
+# Bumped from `scribe-rpc/1` when the envelope moved onto pjrpc. Same framing
+# and socket; what changed is that a malformed request is now refused by name
+# rather than absorbed, so a client written against /1 that was relying on a
+# silently-dropped key starts seeing -32602. New methods carry their own result
+# schema and do not change this envelope version.
 SCHEMA = "scribe-rpc/2"
 
 MAX_REQUEST_BYTES = 16 * 1024 * 1024
@@ -198,6 +200,13 @@ def workspace_reload(workspace: Workspace) -> dict:
 @_faults
 def workspace_export(workspace: Workspace, outputDir: str) -> dict:  # noqa: N803
     return workspace.export_json(Path(outputDir))
+
+
+@REGISTRY.add("workspace.grammar", pass_context="workspace")
+@_faults
+def workspace_grammar(workspace: Workspace) -> dict:
+    result = WorkspaceGrammarResult(types=authoring_grammar(workspace.current().graph.grammar))
+    return result.model_dump(by_alias=True)
 
 
 @REGISTRY.add("scribe.apply", pass_context="workspace")

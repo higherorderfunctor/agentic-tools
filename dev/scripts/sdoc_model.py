@@ -100,6 +100,43 @@ GUARDED_OWNERS = {
 DOCUMENT_SKELETON = "[DOCUMENT]\nTITLE: {title}\n\n[GRAMMAR]\nIMPORT_FROM_FILE: @repo\n"
 
 
+def authoring_elements(grammar: DocumentGrammar) -> dict[str, GrammarElement]:
+    """Grammar elements a person may author.
+
+    StrictDoc injects TEXT into grammars that do not declare it. TEXT is its
+    free-prose container rather than one of this repository's node types, so
+    every author-facing grammar consumer goes through this one filter.
+    """
+    return {tag: element for tag, element in grammar.elements_by_type.items() if tag != "TEXT"}
+
+
+def authoring_grammar(grammar: DocumentGrammar) -> dict:
+    """Serialize StrictDoc's parsed grammar without flattening field kinds."""
+    return {
+        tag: {
+            "prefix": element.property_prefix or "",
+            "fields": [
+                {
+                    "name": field.title,
+                    "kind": field.gef_type,
+                    "required": field.required,
+                    "options": list(getattr(field, "options", None) or []),
+                }
+                for field in element.fields
+            ],
+            "roles": [
+                {
+                    "role": relation.relation_role,
+                    "type": relation.relation_type,
+                    "reverse": relation.reverse_relation_role,
+                }
+                for relation in element.relations
+            ],
+        }
+        for tag, element in authoring_elements(grammar).items()
+    }
+
+
 class SdocError(Exception):
     """Anything the caller should print and exit non-zero on."""
 
@@ -436,9 +473,9 @@ class Graph:
         raise SdocError("no document in the tree carries a grammar")
 
     def element(self, tag: str) -> GrammarElement:
-        elements = self.grammar.elements_by_type
+        elements = authoring_elements(self.grammar)
         if tag not in elements:
-            known = ", ".join(t for t in elements if t != "TEXT")
+            known = ", ".join(elements)
             raise SdocError(f"the grammar declares no {tag!r} element. Known: {known}")
         return elements[tag]
 
@@ -446,7 +483,7 @@ class Graph:
         """Every author-facing element tag. TEXT is strictdoc's own
         free-text element, back-filled by the index builder rather than
         declared by our grammar, and is not a node type anyone writes."""
-        return [t for t in self.grammar.elements_by_type if t != "TEXT"]
+        return list(authoring_elements(self.grammar))
 
     def node(self, uid: str) -> SDocNode:
         found = self.index.get_node_by_uid_weak(uid)
