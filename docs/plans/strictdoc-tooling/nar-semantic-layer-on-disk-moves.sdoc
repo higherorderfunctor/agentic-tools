@@ -30,7 +30,7 @@ Retention class changes by file move; what survives collection; where a backlog 
 - The reason given for putting architecture beside code — 'plans decay and are collected' — is the lean that was since dropped. The placement itself still stands.
 [LINK: DEC-ARCH-COLOCATION] [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION]
 > DEC-ARCH-COLOCATION's reason ("plans decay and are collected") is the dropped lean; placement stands [OPEN: DEC-ARCH-COLOCATION]
-- Scribe's move renames a file outside its load-change-save pipeline, so no joint fires. The library form has no move at all.
+- Scribe's move validates through the held graph but reaches disk outside save(), so a save-anchored joint misses it.
 > scribe move renames outside load|change|save, so no joint fires; the library form has no move [GAP]
 <<<
 PARENT_FP: >>>

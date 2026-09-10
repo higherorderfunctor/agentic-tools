@@ -13,8 +13,8 @@ PLACE: screen
 STATEMENT: >>>
 One row per ruling the view rests on: this plan's decisions and requirements first, then the spec rulings of 2026-08-30 the plan sits under. A row's word is the node's own state on the day of the render, read off the node, not a verdict of this page; the questions still open have a screen of their own.
 
-- A view is a tree of narratives -- rows inside a statement, Cites for what a narrative presents, Contains for its parts in relation order -- and each narrative says in PLACE how it sits on its container's screen; the renderer never derives placement from the depth of the tree.
-[LINK: DEC-NARRATIVE-DECLARES-ITS-PLACE] [ACCEPTED]
+- A view is a tree of narratives -- rows inside a statement, Cites for what a narrative presents, Contains for its parts in relation order -- and each narrative says in PLACE how it sits on its container's screen; the tab strip is a declared vocabulary a narrative joins by naming a tab key in TAGS, and the renderer never derives placement from the depth of the tree.
+[LINK: DEC-TABS-ARE-A-DECLARED-VOCABULARY] [ACCEPTED]
 - The words a row may carry, with their colours and meanings, are rows of the one legend narrative in a root's tree, drawn once where its PLACE puts it, never a grammar field and never something the renderer knows.
 [LINK: DEC-LEGEND-IS-DATA-WHERE-PLACED] [ACCEPTED]
 - A widget that counts or lists reads the narrative its Over relation names, else itself; Over carries no fingerprint and sits outside the contract hash.
@@ -39,8 +39,8 @@ One row per ruling the view rests on: this plan's decisions and requirements fir
 [LINK: REQ-VIEW-SERVES-LOCALLY-AND-AS-AN-ARTIFACT] [ACCEPTED]
 - No node outside the representation family carries a Parent relation or a fingerprint entry to a narrative.
 [LINK: REQ-NOTHING-DEPENDS-ON-A-NARRATIVE] [ACCEPTED]
-- A system is a named set of node types and relation roles declared in one table of the spec; membership is computed and a node may be in more than one.
-[LINK: DEC-SYSTEM-IS-A-TYPE-SET] [ACCEPTED]
+- A system is a named set of source directories declared in one table of the spec; membership is computed from a node's path and a node may be in more than one.
+[LINK: DEC-SYSTEM-IS-A-SOURCE-SET] [ACCEPTED]
 - Node types come in four families, and only the definition grid is a grid; a narrative is the representation family.
 [LINK: DEC-NODE-FAMILIES] [ACCEPTED]
 - A UID never changes: a retype changes the element tag, and the prefix names the type a node was born with.
@@ -54,10 +54,10 @@ PARENT_FP: >>>
 DEC-FILES-STAY-FLAT-FOR-VIEWS:0000000
 DEC-LEGEND-IS-DATA-WHERE-PLACED:0000000
 DEC-MIGRATE-BEFORE-BEADS:0000000
-DEC-NARRATIVE-DECLARES-ITS-PLACE:0000000
 DEC-NODE-FAMILIES:0000000
 DEC-ROW-REFERENCE-LINES:0000000
-DEC-SYSTEM-IS-A-TYPE-SET:0000000
+DEC-SYSTEM-IS-A-SOURCE-SET:0000000
+DEC-TABS-ARE-A-DECLARED-VOCABULARY:0000000
 DEC-TERMS-ARE-NARRATIVES:0000000
 DEC-UID-OUTLIVES-TYPE:0000000
 DEC-VIEWS-ARE-REGENERABLE:0000000
@@ -97,9 +97,6 @@ RELATIONS:
   VALUE: NAR-TERM-BEADS
   ROLE: Cites
 - TYPE: Parent
-  VALUE: DEC-NARRATIVE-DECLARES-ITS-PLACE
-  ROLE: Cites
-- TYPE: Parent
   VALUE: DEC-LEGEND-IS-DATA-WHERE-PLACED
   ROLE: Cites
 - TYPE: Parent
@@ -127,5 +124,8 @@ RELATIONS:
   VALUE: REQ-VIEW-SERVES-LOCALLY-AND-AS-AN-ARTIFACT
   ROLE: Cites
 - TYPE: Parent
-  VALUE: DEC-SYSTEM-IS-A-TYPE-SET
+  VALUE: DEC-TABS-ARE-A-DECLARED-VOCABULARY
+  ROLE: Cites
+- TYPE: Parent
+  VALUE: DEC-SYSTEM-IS-A-SOURCE-SET
   ROLE: Cites
