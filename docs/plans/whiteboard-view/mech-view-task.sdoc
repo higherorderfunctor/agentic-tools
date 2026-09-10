@@ -36,3 +36,9 @@ RELATIONS:
   ROLE: Governed_By
 - TYPE: File
   VALUE: dev/tasks/generate.nix
+- TYPE: Parent
+  VALUE: EV-VIEW-ORGANIZATION-FIRST-RENDER
+  ROLE: Proven_By
+- TYPE: Parent
+  VALUE: EV-VIEW-PIPELINE-FIRST-RENDER
+  ROLE: Proven_By

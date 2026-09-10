@@ -44,3 +44,7 @@ became WORK, 8 run SPIKE became EVIDENCE and 3 unrun became WORK, and
 MECH-SEMANTIC-LAYER-WHITEBOARD became the first NARRATIVE -- the one retype
 between two live prefixes so far. Each carries the retype in its NOTES.
 <<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: EV-GRID-MIGRATION-LEDGER
+  ROLE: Proven_By

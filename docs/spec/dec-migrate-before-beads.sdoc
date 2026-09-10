@@ -30,3 +30,7 @@ because the writer has no flag for it -- the relayed-ruling gap the whiteboard
 names. This decision lifts the gate; it does not supersede
 DEC-PLAN-LIFECYCLE-OPEN, which stays open on retention.
 <<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: EV-GRID-MIGRATION-LEDGER
+  ROLE: Proven_By

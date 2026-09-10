@@ -23,3 +23,6 @@ RELATIONS:
   ROLE: Governed_By
 - TYPE: File
   VALUE: dev/tasks/generate.nix
+- TYPE: Parent
+  VALUE: EV-VIEW-SELF-HOST-RENDER
+  ROLE: Proven_By
