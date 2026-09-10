@@ -140,6 +140,14 @@
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
             "help": "Additional directories that should be writable alongside the primary workspace",
             "names": ["--add-dir"],
             "valueName": "DIR"
@@ -1041,6 +1049,14 @@
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
             "help": "Additional directories that should be writable alongside the primary workspace",
             "names": ["--add-dir"],
             "valueName": "DIR"
@@ -1760,6 +1776,14 @@
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
             "help": "Additional directories that should be writable alongside the primary workspace",
             "names": ["--add-dir"],
             "valueName": "DIR"
@@ -2002,6 +2026,14 @@
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
             "help": "Additional directories that should be writable alongside the primary workspace",
             "names": ["--add-dir"],
             "valueName": "DIR"
@@ -2169,6 +2201,14 @@
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
             "help": "Source classification for newly created or forked threads",
             "names": ["--thread-source"],
             "valueName": "SOURCE"
@@ -2322,6 +2362,14 @@
             "default": null,
             "help": "Run enabled hooks without requiring persisted hook trust for this invocation. DANGEROUS. Intended only for automation that already vets hook sources",
             "names": ["--dangerously-bypass-hook-trust"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
             "valueName": null
           },
           {
@@ -2495,6 +2543,14 @@
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
             "help": "Source classification for newly created or forked threads",
             "names": ["--thread-source"],
             "valueName": "SOURCE"
@@ -2627,6 +2683,14 @@
             "valueName": "URL"
           },
           {
+            "acceptedValues": ["direct", "noise"],
+            "conflicts": [],
+            "default": "noise",
+            "help": "Transport used for the remote executor connection",
+            "names": ["--remote-transport"],
+            "valueName": "REMOTE_TRANSPORT"
+          },
+          {
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
@@ -2649,6 +2713,38 @@
             "help": "Use Agent Identity auth from CODEX_ACCESS_TOKEN for remote registration",
             "names": ["--use-agent-identity-auth"],
             "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
+            "help": "Sign Direct registration and WebSocket handshake requests with AWS SigV4",
+            "names": ["--aws-sigv4"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
+            "help": "AWS profile used for SigV4 authentication",
+            "names": ["--aws-profile"],
+            "valueName": "PROFILE"
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
+            "help": "AWS signing region. Uses the SDK region chain when omitted",
+            "names": ["--aws-region"],
+            "valueName": "REGION"
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": "execute-api",
+            "help": "AWS signing service",
+            "names": ["--aws-service"],
+            "valueName": "SERVICE"
           },
           {
             "acceptedValues": [],
@@ -2722,6 +2818,14 @@
             "valueName": "URL"
           },
           {
+            "acceptedValues": ["direct", "noise"],
+            "conflicts": [],
+            "default": "noise",
+            "help": "Transport used for the remote executor connection",
+            "names": ["--remote-transport"],
+            "valueName": "REMOTE_TRANSPORT"
+          },
+          {
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
@@ -2744,6 +2848,38 @@
             "help": "Use Agent Identity auth from CODEX_ACCESS_TOKEN for remote registration",
             "names": ["--use-agent-identity-auth"],
             "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
+            "help": "Sign Direct registration and WebSocket handshake requests with AWS SigV4",
+            "names": ["--aws-sigv4"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
+            "help": "AWS profile used for SigV4 authentication",
+            "names": ["--aws-profile"],
+            "valueName": "PROFILE"
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
+            "help": "AWS signing region. Uses the SDK region chain when omitted",
+            "names": ["--aws-region"],
+            "valueName": "REGION"
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": "execute-api",
+            "help": "AWS signing service",
+            "names": ["--aws-service"],
+            "valueName": "SERVICE"
           },
           {
             "acceptedValues": [],
@@ -3071,6 +3207,14 @@
             "help": "Tell the agent to use the specified directory as its working root",
             "names": ["--cd", "-C"],
             "valueName": "DIR"
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
           },
           {
             "acceptedValues": [],
@@ -3617,53 +3761,6 @@
         ],
         "help": "Usage: codex mcp remove [OPTIONS] <NAME>",
         "path": ["codex", "mcp", "remove"]
-      },
-      "codex mcp-server": {
-        "aliases": [],
-        "flags": [
-          {
-            "acceptedValues": [],
-            "conflicts": [],
-            "default": null,
-            "help": "Override a configuration value that would otherwise be loaded from `~/.codex/config.toml`. Use a dotted path (`foo.bar.baz`) to override nested values. The `value` portion is parsed as TOML. If it fails to parse as TOML, the raw string is used as a literal. Examples: - `-c model=\"o3\"` - `-c 'sandbox_permissions=[\"disk-full-read-access\"]'` - `-c shell_environment_policy.inherit=all`",
-            "names": ["--config", "-c"],
-            "valueName": "key=value"
-          },
-          {
-            "acceptedValues": [],
-            "conflicts": [],
-            "default": null,
-            "help": "Error out when config.toml contains fields that are not recognized by this version of Codex",
-            "names": ["--strict-config"],
-            "valueName": null
-          },
-          {
-            "acceptedValues": [],
-            "conflicts": [],
-            "default": null,
-            "help": "Enable a feature (repeatable). Equivalent to `-c features.<name>=true`",
-            "names": ["--enable"],
-            "valueName": "FEATURE"
-          },
-          {
-            "acceptedValues": [],
-            "conflicts": [],
-            "default": null,
-            "help": "Disable a feature (repeatable). Equivalent to `-c features.<name>=false`",
-            "names": ["--disable"],
-            "valueName": "FEATURE"
-          },
-          {
-            "acceptedValues": [],
-            "conflicts": [],
-            "default": null,
-            "help": "Print help (see a summary with '-h')",
-            "names": ["--help", "-h"],
-            "valueName": null
-          }
-        ],
-        "help": "Start Codex as an MCP server (stdio)",
-        "path": ["codex", "mcp-server"]
       },
       "codex migrate-rollouts": {
         "aliases": [],
@@ -4338,6 +4435,14 @@
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
             "help": "Additional directories that should be writable alongside the primary workspace",
             "names": ["--add-dir"],
             "valueName": "DIR"
@@ -4721,6 +4826,14 @@
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
             "help": "Additional directories that should be writable alongside the primary workspace",
             "names": ["--add-dir"],
             "valueName": "DIR"
@@ -5066,6 +5179,14 @@
             "acceptedValues": [],
             "conflicts": [],
             "default": null,
+            "help": "Run the session in a new managed Git worktree",
+            "names": ["--worktree"],
+            "valueName": null
+          },
+          {
+            "acceptedValues": [],
+            "conflicts": [],
+            "default": null,
             "help": "Additional directories that should be writable alongside the primary workspace",
             "names": ["--add-dir"],
             "valueName": "DIR"
@@ -5270,6 +5391,14 @@
         "help": "Tell the agent to use the specified directory as its working root",
         "names": ["--cd", "-C"],
         "valueName": "DIR"
+      },
+      {
+        "acceptedValues": [],
+        "conflicts": [],
+        "default": null,
+        "help": "Run the session in a new managed Git worktree",
+        "names": ["--worktree"],
+        "valueName": null
       },
       {
         "acceptedValues": [],
@@ -5572,6 +5701,11 @@
       "name": "guardianv2"
     },
     {
+      "default": false,
+      "maturity": "under development",
+      "name": "guardianv2.thread_context"
+    },
+    {
       "default": true,
       "maturity": "stable",
       "name": "hooks"
@@ -5728,8 +5862,13 @@
     },
     {
       "default": false,
-      "maturity": "under development",
+      "maturity": "removed",
       "name": "realtime_conversation"
+    },
+    {
+      "default": false,
+      "maturity": "under development",
+      "name": "reasoning_effort_override"
     },
     {
       "default": false,
@@ -5948,6 +6087,11 @@
     },
     {
       "default": true,
+      "maturity": "stable",
+      "name": "unified_exec_tty"
+    },
+    {
+      "default": true,
       "maturity": "removed",
       "name": "unified_exec_zsh_fork"
     },
@@ -5987,6 +6131,11 @@
       "name": "web_search_request"
     },
     {
+      "default": false,
+      "maturity": "under development",
+      "name": "windows_sandbox_service"
+    },
+    {
       "default": true,
       "maturity": "stable",
       "name": "workspace_dependencies"
@@ -5995,6 +6144,11 @@
       "default": false,
       "maturity": "removed",
       "name": "workspace_owner_usage_nudge"
+    },
+    {
+      "default": false,
+      "maturity": "experimental",
+      "name": "worktrees"
     },
     {
       "default": false,
@@ -6071,7 +6225,7 @@
     }
   ],
   "provenance": {
-    "codexVersion": "0.153.4",
+    "codexVersion": "0.154.0",
     "extractorSchema": 1
   }
 }
