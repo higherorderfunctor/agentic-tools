@@ -7,12 +7,11 @@ applyTo: ".github/actions/warm-ifd/**,.github/workflows/ci.yml,.github/workflows
 
 ## IFD Patterns and Gotchas
 
-> **Last verified:** 2026-09-08 — the oxlint awk's catalog assertion is a
-> VERSION-KEY check, not a content check, and `napi.patchPath` is derived from
-> the pin rather than restated. kiro's extract emits two settings fields from
-> one scan under opposite guards: `workspaceOverridableSettings` (used to
-> REJECT, so under-capture is the danger) and `settingKeys` (used as a flatten
-> BOUNDARY, so over-capture is).
+> **Last verified:** 2026-09-10 — a stale `pnpmDeps` hash substitutes from the
+> binary cache instead of failing, because `fetchPnpmDeps` leaves the version
+> out of its output name; `cargoDeps` carries the short rev and cannot be
+> masked. The `@napi-rs/cli` regeneration loop below was re-run end to end at
+> the 3.9.1 pin.
 >
 > **Settled — do not relitigate.** Full lineage:
 > `git show 52e86965:dev/fragments/overlays/ifd-patterns.md`.
@@ -476,8 +475,8 @@ feature maturities, and config-key extraction fail closed.
   - **`patchHash` is a plain `sha256sum` of the pnpm patch file's bytes.**
     Nothing derives it from the dependency; it moves only when that file does,
     which is why the awk can stamp it by key. Verify against the current pin
-    before trusting a regenerated one — at the 3.9.0 pin the stripped file
-    hashes to the committed `a732a649…`. Hash the INNER pnpm patch, not the
+    before trusting a regenerated one — at the 3.9.1 pin the stripped file
+    hashes to the committed `cd0ec720…`. Hash the INNER pnpm patch, not the
     outer git patch that adds it: those two differ, and only the inner one is
     what pnpm records.
   - **`patch-commit` emits content-free stanzas that must be stripped.** For
@@ -624,6 +623,24 @@ feature maturities, and config-key extraction fail closed.
   `src`, so it applies the moment a package moves from a plain fetcher to
   `applyPatches` — oxlint made that move on 2026-08-04 and did not bump once in
   the following ten days.
+- **A stale `pnpmDeps` hash SUBSTITUTES instead of failing, so a hand-driven
+  repin can ship the PREVIOUS rev's dependencies.** `fetchPnpmDeps` names its
+  output `${pname}-pnpm-deps` (`fetch-pnpm-deps/default.nix:77`) with no version
+  in it, so the FOD store path is a function of `pname` and the DECLARED hash
+  alone. Leave that hash untouched across a rev bump and any machine already
+  holding the old path — cachix included — hands it straight back: no build, no
+  mismatch, exit 0. Measured 2026-09-10 on the 3.9.1 repin, where
+  `nix build .#…oxlint.pnpmDeps` fetched `…-oxlint-pnpm-deps` from cachix while
+  the new source in fact hashes to
+  `sha256-bIbBs6+QYoJsRqCV2q7enpw5UIw1ugzRJff4OUOGQ+s=`. Force the real value by
+  writing a fake hash and reading `got:` — the same trick nix-update performs
+  with `outputHash = ""`, which is why the sweep gets this right and a manual
+  repin has to ask for it.
+
+  `cargoDeps` cannot be masked this way: `fetchCargoVendor` names its staging
+  output `${pname}-${version}-vendor-staging`, and `vu.mkVersion` puts the short
+  rev in `version`, so every bump moves that path and the build always happens.
+
 - **A patch conflict presents two layers from its cause — and it is not the only
   thing that spells itself that way.** `applyPatches` dying in `patchPhase`
   means `nix-build` never emits a hash mismatch, so nix-update reports
