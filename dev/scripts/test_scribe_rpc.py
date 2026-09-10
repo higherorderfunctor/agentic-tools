@@ -611,6 +611,55 @@ def test_extra_key_on_scribe_apply_refused(root: Path, runtime: Path) -> None:
         assert "text" in call(path, "scribe.apply", {"op": "check"})
 
 
+@contract("an understood workspace refusal from scribe.apply remains -32002")
+def test_apply_workspace_error_is_refused(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (_ws, path):
+        refusal = _refusal(
+            path,
+            {
+                "op": "relate",
+                "uid": "REQ-DAEMON-IS-THE-ONLY-SOURCE",
+                "role": "Crosses",
+                "target": "MECH-SCRIBE-RPC",
+                "line_range": "1-2",
+                "dry_run": True,
+            },
+        )
+        assert "-32002 Refused" in refusal, refusal
+        assert "may not make a 'Crosses' relation" in refusal, refusal
+
+
+@contract("an unexpected method exception is -32603 with diagnostic data")
+def test_method_exception_keeps_diagnostic(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (_ws, path):
+        try:
+            call(path, "workspace.export", {"outputDir": "/dev/null/x"})
+        except ClientError as exc:
+            refusal = str(exc)
+            assert "-32603 Internal error" in refusal, refusal
+            assert "Not a directory" in refusal, refusal
+            assert "/dev/null/x/json" in refusal, refusal
+        else:
+            raise AssertionError("an impossible export path was accepted")
+
+
+@contract("top-level lineRange remains an alias for line_range")
+def test_top_level_line_range_alias(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (_ws, path):
+        base = {
+            "op": "relate",
+            "uid": "REQ-DAEMON-IS-THE-ONLY-SOURCE",
+            "role": "Crosses",
+            "target": "MECH-SCRIBE-RPC",
+            "dry_run": True,
+        }
+        aliased = _refusal(path, {**base, "lineRange": "1-2"})
+        canonical = _refusal(path, {**base, "line_range": "1-2"})
+        assert "-32602" not in aliased, aliased
+        assert "-32002 Refused" in aliased, aliased
+        assert aliased == canonical, (aliased, canonical)
+
+
 @contract("rpc.discover reports schema 2 and the methods the registry holds")
 def test_discover_reports_the_registry(root: Path, runtime: Path) -> None:
     with served(root, runtime) as (_ws, path):
@@ -651,6 +700,9 @@ CONTRACTS = [
     test_relations_non_dict_entry_refused,
     test_oversized_request_refused_cleanly,
     test_extra_key_on_scribe_apply_refused,
+    test_apply_workspace_error_is_refused,
+    test_method_exception_keeps_diagnostic,
+    test_top_level_line_range_alias,
 ]
 
 

@@ -92,6 +92,10 @@ class ParamsError(Exception):
 # string that arrived EMPTY is a client bug rather than a shorthand. `_need`
 # used to refuse "" alongside None; min_length keeps that.
 Required = Annotated[str, pydantic.Field(min_length=1)]
+LineRange = Annotated[
+    str | None,
+    pydantic.Field(validation_alias=pydantic.AliasChoices("line_range", "lineRange")),
+]
 
 
 class _Params(pydantic.BaseModel):
@@ -126,10 +130,7 @@ class _FileItem(pydantic.BaseModel):
 
     element: str | None = None
     id: str | None = None
-    line_range: Annotated[
-        str | None,
-        pydantic.Field(validation_alias=pydantic.AliasChoices("line_range", "lineRange")),
-    ] = None
+    line_range: LineRange = None
 
 
 class RelationParams(_FileItem):

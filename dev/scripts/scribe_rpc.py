@@ -69,7 +69,7 @@ from pjrpc.server.validators.pydantic import PydanticValidatorFactory
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from scribe_ops import ParamsError, RelationParams  # noqa: E402
+from scribe_ops import LineRange, ParamsError, RelationParams  # noqa: E402
 from scribe_ops import apply as apply_operation  # noqa: E402
 from scribe_workspace import Workspace, WorkspaceError  # noqa: E402
 from sdoc_model import SdocError  # noqa: E402
@@ -117,25 +117,37 @@ class RefusedFault(rpc_exceptions.TypedError):
     MESSAGE = "Refused"
 
 
-def _faults(method):
+def _faults(method=None, *, workspace_fault=WorkspaceFault):
     """Turn this repository's refusals into the codes clients already know.
 
-    WorkspaceError is a subclass of SdocError, so it is caught FIRST; the
-    other order would answer every workspace failure as a refusal.
+    WorkspaceError is a subclass of SdocError, so it is caught FIRST. A
+    workspace.* method uses -32001 because its held workspace could not
+    answer. scribe.apply selects RefusedFault instead: once the operation has
+    reached the workspace, a validation failure or rejected save is an
+    understood operation that was declined, as it was under scribe-rpc/1.
     """
 
-    @functools.wraps(method)
-    def guarded(*args, **kwargs):
-        try:
-            return method(*args, **kwargs)
-        except ParamsError as exc:
-            raise rpc_exceptions.InvalidParamsError(data=str(exc)) from exc
-        except WorkspaceError as exc:
-            raise WorkspaceFault(data=str(exc)) from exc
-        except SdocError as exc:
-            raise RefusedFault(data=str(exc)) from exc
+    def decorate(target):
+        @functools.wraps(target)
+        def guarded(*args, **kwargs):
+            try:
+                return target(*args, **kwargs)
+            except ParamsError as exc:
+                raise rpc_exceptions.InvalidParamsError(data=str(exc)) from exc
+            except WorkspaceError as exc:
+                raise workspace_fault(data=str(exc)) from exc
+            except SdocError as exc:
+                raise RefusedFault(data=str(exc)) from exc
+            except Exception as exc:
+                # pjrpc catches method exceptions inside dispatch(), before
+                # handle_message's outer safety net can see them. Preserve the
+                # /1 contract: unexpected failures are -32603 and retain the
+                # diagnostic the operator needs to act on them.
+                raise rpc_exceptions.InternalError(data=str(exc)) from exc
 
-    return guarded
+        return guarded
+
+    return decorate if method is None else decorate(method)
 
 
 # `exclude` is not optional here, and its absence is silent. pjrpc derives one
@@ -189,7 +201,7 @@ def workspace_export(workspace: Workspace, outputDir: str) -> dict:  # noqa: N80
 
 
 @REGISTRY.add("scribe.apply", pass_context="workspace")
-@_faults
+@_faults(workspace_fault=RefusedFault)
 def scribe_apply(
     workspace: Workspace,
     op: str,
@@ -203,7 +215,7 @@ def scribe_apply(
     target: str | None = None,
     element: str | None = None,
     id: str | None = None,
-    line_range: str | None = None,
+    line_range: LineRange = None,
     status: str | None = None,
     dry_run: bool | None = None,
 ) -> dict:
