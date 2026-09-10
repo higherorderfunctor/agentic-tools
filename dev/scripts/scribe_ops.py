@@ -24,15 +24,34 @@ wrong for a value a client already resolved.
 Reads call sdoc_cli's do_show / do_list / do_check, which are pure rendering
 over a graph. Reimplementing them would be duplication; calling them with
 named values rather than a parsed argv is not.
-"""
 
-from __future__ import annotations
+EVERY OPERATION HAS A PYDANTIC MODEL, AND THAT IS THE SECOND OF TWO LAYERS
+--------------------------------------------------------------------------
+scribe_rpc.py types the WIRE: which parameter names exist at all across every
+operation, and what JSON type each one is. It cannot type an operation,
+because `uid` is required for `set` and meaningless for `check`, and one
+`scribe.apply` signature cannot say both.
+
+The models below are that second layer. Each names exactly the parameters ITS
+operation takes, `extra="forbid"` so `--role` on a `set` is refused by name
+rather than dropped, and `strict=True` so a JSON string never arrives where a
+bool was declared. `_need()` and a wall of `params.get()` used to stand here;
+five of the twelve gaps WORK-RPC-ON-PJRPC-AND-PYDANTIC closes were silent
+acceptances by those two.
+
+Requiredness lives in the model, not in the reading code, so a missing `uid`
+is refused BEFORE the graph is touched -- which matters because a refusal
+raised inside a write discards the held graph.
+"""
 
 import contextlib
 import io
 import sys
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Annotated, Any
+
+import pydantic
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -56,6 +75,157 @@ from sdoc_model import (  # noqa: E402
 # because a typed client is a second door onto the same pipeline and a guard
 # on only one door is not a guard.
 GUARDED = ("AUTHORED_BY", "PARENT_FP")
+
+
+class ParamsError(Exception):
+    """The parameters do not fit the operation asked for.
+
+    DELIBERATELY NOT AN SdocError. An SdocError is a refusal the corpus
+    earned -- the operation was understood and declined -- and scribe_rpc
+    answers it with -32002 Refused. This is the caller sending the wrong
+    shape, which is -32602 Invalid params, and collapsing the two would tell
+    a client to go re-read its canon when it should go re-read its keys.
+    """
+
+
+# `--path @repo/...`-style values reach here already resolved, so a required
+# string that arrived EMPTY is a client bug rather than a shorthand. `_need`
+# used to refuse "" alongside None; min_length keeps that.
+Required = Annotated[str, pydantic.Field(min_length=1)]
+
+
+class _Params(pydantic.BaseModel):
+    """Every operation's parameters, forbidding what it does not declare.
+
+    `strict` is what makes `"dry_run": "false"` an error instead of a write:
+    Python's truthiness says that string is true, and the non-strict pydantic
+    coercion rules say it is false. Neither is what the caller meant.
+    """
+
+    model_config = pydantic.ConfigDict(extra="forbid", strict=True)
+
+    # Clients echo the operation name inside the payload as well as sending
+    # it as the operation; both spellings exist in this repository's own
+    # tests. It is accepted and cross-checked in `_typed`, never authoritative.
+    op: str | None = None
+
+
+class _WriteParams(_Params):
+    dry_run: bool = False
+
+
+class _FileItem(pydantic.BaseModel):
+    """The element-grained slots only a `File` relation carries.
+
+    `lineRange` is accepted beside `line_range` because `_relation_spec` read
+    both before there was a model here, and a wire alias that silently stops
+    working is worse than one nobody uses.
+    """
+
+    model_config = pydantic.ConfigDict(extra="forbid", strict=True, populate_by_name=True)
+
+    element: str | None = None
+    id: str | None = None
+    line_range: Annotated[
+        str | None,
+        pydantic.Field(validation_alias=pydantic.AliasChoices("line_range", "lineRange")),
+    ] = None
+
+
+class RelationParams(_FileItem):
+    """One relation as `new --relate` sends it, inside the `relations` list."""
+
+    role: Required
+    target: Required
+
+
+class ShowParams(_Params):
+    uid: Required
+
+
+class ListParams(_Params):
+    type: str | None = None
+    depth: str | None = None
+    status: str | None = None
+
+
+class CheckParams(_Params):
+    pass
+
+
+class NewParams(_WriteParams):
+    type: Required
+    uid: Required
+    path: Required
+    fields: dict[str, str] = pydantic.Field(default_factory=dict)
+    relations: list[RelationParams] = pydantic.Field(default_factory=list)
+
+
+class SetParams(_WriteParams):
+    uid: Required
+    fields: dict[str, str] = pydantic.Field(default_factory=dict)
+    unset: list[str] = pydantic.Field(default_factory=list)
+
+
+class RelateParams(_WriteParams, _FileItem):
+    uid: Required
+    role: Required
+    target: Required
+
+
+class MoveParams(_WriteParams):
+    uid: Required
+    path: Required
+
+
+class DeleteParams(_WriteParams):
+    uid: Required
+
+
+# One model per operation name in scribe_protocol.OPERATIONS. The mapping is
+# asserted complete at import time below, so adding a verb to the protocol
+# without typing it fails on the daemon's first import rather than on the
+# first client that sends it.
+PARAMS: dict[str, type[_Params]] = {
+    "check": CheckParams,
+    "delete": DeleteParams,
+    "list": ListParams,
+    "move": MoveParams,
+    "new": NewParams,
+    "relate": RelateParams,
+    "set": SetParams,
+    "show": ShowParams,
+    "unrelate": RelateParams,
+}
+assert set(PARAMS) == set(OPERATIONS), (
+    f"every operation needs a params model; missing "
+    f"{sorted(set(OPERATIONS) - set(PARAMS))}, unknown {sorted(set(PARAMS) - set(OPERATIONS))}"
+)
+
+
+def describe_validation_error(error: pydantic.ValidationError) -> str:
+    """`dry_run: Input should be a valid boolean`, not a 40-line traceback.
+
+    The field is the whole point: a caller that is told only "invalid params"
+    has to bisect its own payload.
+    """
+    return "; ".join(
+        f"{'.'.join(str(part) for part in item['loc']) or 'params'}: {item['msg']}"
+        for item in error.errors()
+    )
+
+
+def _typed(op: str, params: Any) -> _Params:
+    """The wire payload as the model for `op`, or a ParamsError naming why not."""
+    if not isinstance(params, dict):
+        raise ParamsError(f"params: expected an object, got {type(params).__name__}")
+    try:
+        typed = PARAMS[op].model_validate(params)
+    except pydantic.ValidationError as exc:
+        raise ParamsError(describe_validation_error(exc)) from exc
+    if typed.op is not None and typed.op != op:
+        raise ParamsError(f"op: the payload says {typed.op!r} but the operation is {op!r}")
+    return typed
 
 
 def _guard(fields: dict) -> None:
@@ -98,44 +268,53 @@ def _render(handler, graph, root: Path, **named) -> str:
 
 
 def apply(workspace: Workspace, op: str, params: dict) -> dict:
-    """Run one operation. Raises SdocError or WorkspaceError to refuse."""
+    """Run one operation.
+
+    Raises ParamsError when the parameters do not fit `op`, and SdocError or
+    WorkspaceError to refuse an operation that was understood.
+    """
     if op not in OPERATIONS:
         raise SdocError(f"unknown operation {op!r}; expected one of {', '.join(OPERATIONS)}")
+
+    typed = _typed(op, params)
 
     if op in READS:
         graph = workspace.current().graph
         validate_guarded(graph)
         root = workspace.root
-        if op == "show":
-            return {"text": _render(sdoc_cli.do_show, graph, root, uid=_need(params, "uid"))}
-        if op == "list":
+        if isinstance(typed, ShowParams):
+            return {"text": _render(sdoc_cli.do_show, graph, root, uid=typed.uid)}
+        if isinstance(typed, ListParams):
             return {
                 "text": _render(
                     sdoc_cli.do_list, graph, root,
-                    node_type=params.get("type"),
-                    depth=params.get("depth"),
-                    status=params.get("status"),
+                    node_type=typed.type,
+                    depth=typed.depth,
+                    status=typed.status,
                 )
             }
         return {"text": _render(sdoc_cli.do_check, graph, root)}
 
     graph = workspace._held()
     validate_guarded(graph)
-    fields = dict(params.get("fields") or {})
+    # Named rather than fetched with getattr: `new` and `set` are the two
+    # operations that carry fields, and a soft lookup here is the shape this
+    # module just finished removing.
+    fields = dict(typed.fields) if isinstance(typed, (NewParams, SetParams)) else {}
     _guard(fields)
-    dry_run = bool(params.get("dry_run", False))
+    dry_run = typed.dry_run
 
-    if op == "new":
-        return _new(workspace, params, fields, dry_run=dry_run)
+    if isinstance(typed, NewParams):
+        return _new(workspace, typed, fields, dry_run=dry_run)
 
-    uid = _need(params, "uid")
+    uid = typed.uid
     if not graph.has_node(uid):
         raise SdocError(f"{uid} is not a node in the graph")
     tag = graph.node(uid).node_type
 
-    if op == "set":
+    if isinstance(typed, SetParams):
         _check_fields(graph, tag, fields)
-        unset = list(params.get("unset") or [])
+        unset = list(typed.unset)
         _guard({name: "" for name in unset})
         if not fields and not unset:
             raise SdocError("nothing to set -- pass at least one field or an unset")
@@ -148,14 +327,14 @@ def apply(workspace: Workspace, op: str, params: dict) -> dict:
 
         return _written(workspace, mutate, refuse_dangling_links, dry_run=dry_run)
 
-    if op in ("relate", "unrelate"):
+    if isinstance(typed, RelateParams):
         # `File` is the role a client NAMES and the empty string is the role
         # the grammar declares. This branch used to pass the client's spelling
         # straight through, so every File relation through the daemon was
         # refused as a role the type does not declare, while the same verb on
         # the command line worked (WORK-SCRIBE-RELATE-FILE-ROLE). The mapping
         # now lives once, in sdoc_model.relation_role.
-        spec = _relation_spec(params)
+        spec = _relation_spec(typed)
         return _written(
             workspace,
             lambda g: (g.add_relation if op == "relate" else g.remove_relation)(
@@ -170,7 +349,7 @@ def apply(workspace: Workspace, op: str, params: dict) -> dict:
             dry_run=dry_run,
         )
 
-    if op == "delete":
+    if isinstance(typed, DeleteParams):
         return _written(
             workspace,
             lambda g: g.remove_node(uid),
@@ -178,31 +357,24 @@ def apply(workspace: Workspace, op: str, params: dict) -> dict:
             dry_run=dry_run,
         )
 
-    if op == "move":
-        destination = sdoc_cli.target_path(_need(params, "path"), uid, workspace.root)
+    if isinstance(typed, MoveParams):
+        destination = sdoc_cli.target_path(typed.path, uid, workspace.root)
         return _move(workspace, uid, destination, dry_run=dry_run)
 
     raise SdocError(f"operation {op!r} is not implemented")
 
 
-def _relation_spec(params: dict) -> RelationSpec:
-    """One relation off the wire, with the File role mapped and the
-    element-grained slots carried. Shared by relate/unrelate and by `new`,
-    so the two doors onto the same pipeline cannot drift again."""
+def _relation_spec(spec: RelationParams | RelateParams) -> RelationSpec:
+    """One validated relation as the model layer wants it, with the File role
+    mapped and the element-grained slots carried. Shared by relate/unrelate
+    and by `new`, so the two doors onto the same pipeline cannot drift again."""
     return RelationSpec(
-        relation_role(_need(params, "role")),
-        _need(params, "target"),
-        params.get("element") or None,
-        params.get("id") or None,
-        params.get("line_range") or params.get("lineRange") or None,
+        relation_role(spec.role),
+        spec.target,
+        spec.element or None,
+        spec.id or None,
+        spec.line_range or None,
     )
-
-
-def _need(params: dict, name: str):
-    value = params.get(name)
-    if value in (None, ""):
-        raise SdocError(f"{name} is required")
-    return value
 
 
 def _written(workspace: Workspace, mutate, precheck, *, dry_run: bool) -> dict:
@@ -215,7 +387,7 @@ def _written(workspace: Workspace, mutate, precheck, *, dry_run: bool) -> dict:
     return response
 
 
-def _new(workspace: Workspace, params: dict, fields: dict, *, dry_run: bool) -> dict:
+def _new(workspace: Workspace, params: NewParams, fields: dict, *, dry_run: bool) -> dict:
     """Create a node in a file of its own -- an ordinary deferred write.
 
     The document is built in memory by Graph.new_document, so this goes
@@ -229,10 +401,10 @@ def _new(workspace: Workspace, params: dict, fields: dict, *, dry_run: bool) -> 
     graph, so the next read pays a reload for a create that never began.
     """
     graph = workspace._held()
-    tag = _need(params, "type")
+    tag = params.type
     if tag not in graph.tags():
         raise SdocError(f"unknown node type {tag!r}; expected one of {', '.join(graph.tags())}")
-    uid = _need(params, "uid")
+    uid = params.uid
     sdoc_cli.check_prefix(graph, tag, uid)
     if graph.has_node(uid):
         raise SdocError(f"{uid} already exists at {graph.path_of(graph.node(uid))}")
@@ -241,8 +413,8 @@ def _new(workspace: Workspace, params: dict, fields: dict, *, dry_run: bool) -> 
     values["UID"] = uid  # a field to the model, a parameter on the wire
     values["AUTHORED_BY"] = "llm"  # MECH-RUNTIME-WRITE-GUARD
 
-    relations = [_relation_spec(r) for r in (params.get("relations") or [])]
-    path = sdoc_cli.target_path(_need(params, "path"), uid, workspace.root)
+    relations = [_relation_spec(r) for r in params.relations]
+    path = sdoc_cli.target_path(params.path, uid, workspace.root)
     if path.exists():
         raise SdocError(f"{path} already exists")
 

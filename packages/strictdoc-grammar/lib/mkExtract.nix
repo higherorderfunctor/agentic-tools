@@ -94,11 +94,25 @@
 }: let
   inherit (pkgs) ast-grep makeWrapper python3 stdenvNoCC;
 
-  # Spliced onto the venv's PYTHONPATH. `ast_grep_py` is an EXTENSION module,
-  # so it is only importable while this repository's `pkgs.python3` and
-  # upstream's interpreter agree on the Python MINOR version — see the header.
+  # Spliced onto the venv's PYTHONPATH, because that venv carries neither.
+  #
+  # `ast_grep_py` is an EXTENSION module, so it is only importable while this
+  # repository's `pkgs.python3` and upstream's interpreter agree on the Python
+  # MINOR version — see the header.
+  #
+  # `pjrpc` is the JSON-RPC dispatcher `dev/scripts/scribe_rpc.py` serves the
+  # daemon's socket through (MECH-SCRIBE-RPC). Pure Python, so the coupling
+  # above reduces to a directory name, and it is declared in ./pjrpc.nix rather
+  # than in devenv.nix because flake.nix builds this same factory for the
+  # grammar checks — that file's header carries the whole argument. Its
+  # partner pydantic is deliberately NOT listed: upstream's venv already has
+  # it, and the install check below is what asserts the two resolve together.
   pythonPathPackages = [
     pkgs.python3Packages.ast-grep-py
+    (import ./pjrpc.nix {
+      inherit lib;
+      inherit (pkgs) python3Packages;
+    })
   ];
 
   # Only the interpreter participates in this build-time import check. Other
@@ -167,15 +181,26 @@ in
     # builder imports, and so does the matcher library. The repository
     # interpreter is also imported from its source path below, so a broken
     # delivery fails here rather than in a session.
+    #
+    # `pjrpc.server.validators.pydantic` is the ONE import that proves the
+    # spliced package and the venv's own pydantic resolve in the SAME
+    # interpreter: pjrpc comes off PYTHONPATH, pydantic out of upstream's venv,
+    # and that module imports pydantic at module scope. Either half missing is
+    # a build failure here rather than a daemon that starts and refuses every
+    # request (MECH-SCRIBE-RPC).
     doInstallCheck = true;
     installCheckPhase = ''
       runHook preInstallCheck
       PYTHONPATH="${semanticsSource}:''${PYTHONPATH-}" \
         "$out/bin/strictdoc-grammar-extract" -c '
       import ast_grep_py, arpeggio, textx, sdoc_semantics
+      import pjrpc, pydantic
+      from pjrpc.server import Dispatcher, MethodRegistry
+      from pjrpc.server.validators.pydantic import PydanticValidatorFactory
       from strictdoc.backend.sdoc.grammar.grammar_builder import SDocGrammarBuilder
       assert SDocGrammarBuilder.create_grammar_grammar()
       assert sdoc_semantics.load_model()
+      assert Dispatcher(max_batch_size=1) and MethodRegistry(PydanticValidatorFactory())
       '
 
       # Every delivered tree-sitter grammar must be loadable by the SAME

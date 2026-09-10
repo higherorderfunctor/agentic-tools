@@ -44,7 +44,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from scribe_client import ClientError, call_for_root  # noqa: E402
 from scribe_grammar import parse_sgra  # noqa: E402
 from scribe_paths import RootError, resolve_root  # noqa: E402
 from scribe_protocol import WRITES  # noqa: E402
@@ -348,6 +347,12 @@ def main(argv: list[str] | None = None) -> int:
             print(exc.code, file=sys.stderr)
             return 1
         return exc.code if isinstance(exc.code, int) else 1
+
+    # IMPORTED HERE, NOT AT THE TOP. scribe_client now types the reply
+    # envelope with pydantic, and `scribe --help` has no reply to type: an
+    # import at module scope would put that cost on every help print and on
+    # every argv this function refuses before it ever reaches the socket.
+    from scribe_client import ClientError, call_for_root
 
     try:
         result = call_for_root(root, "scribe.apply", payload)

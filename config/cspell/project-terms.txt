@@ -333,6 +333,7 @@ pdsolve
 peaceiris
 pgvector
 pinnable
+pjrpc
 pkgs
 pname
 posh
@@ -375,6 +376,7 @@ repoint
 reprioritize
 repros
 reqif
+requiredness
 rerere
 restager
 revertibility
@@ -475,6 +477,7 @@ ungradeable
 ungroomed
 unheld
 unhide
+unimportable
 unmappable
 unparameterized
 unparseable

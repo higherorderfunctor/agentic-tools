@@ -12,6 +12,7 @@ required nor disturbed.
 
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import socket
@@ -31,7 +32,7 @@ from scribe_client import ClientError, NoDaemon, call, call_for_root  # noqa: E4
 import scribe_cmd  # noqa: E402
 from scribe_grammar import parse_sgra  # noqa: E402
 import scribe_paths  # noqa: E402
-from scribe_rpc import build_server  # noqa: E402
+from scribe_rpc import MAX_REQUEST_BYTES, SCHEMA, build_server  # noqa: E402
 from scribe_workspace import Workspace  # noqa: E402
 
 # One tracked-tree corpus fixture, shared with the workspace suite. This file
@@ -386,6 +387,237 @@ def test_export_matches(root: Path, runtime: Path) -> None:
         f"exports differ beyond the {dropped} File item slot(s) the daemon adds"
     )
 
+# ── The twelve gaps WORK-RPC-ON-PJRPC-AND-PYDANTIC closes ────────────────────
+#
+# Five of them were SILENT: the request was accepted and something wrong
+# happened quietly. Each contract below sends the bad payload and asserts the
+# refusal names the field, because a refusal that does not name the field
+# leaves the caller bisecting its own payload.
+#
+# The three client-side ones need a daemon that answers WRONG, which a correct
+# daemon by definition will not, so they run against `fake_daemon` -- a socket
+# that replies with one fixed line.
+
+
+@contextmanager
+def fake_daemon(runtime: Path, reply: bytes):
+    """A socket that answers every request with `reply`, verbatim.
+
+    A malformed reply is the one thing the real server cannot produce, and the
+    client's handling of it is exactly what is under test.
+    """
+    runtime.mkdir(mode=0o700, parents=True, exist_ok=True)
+    path = runtime / "fake.sock"
+    listener = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    listener.bind(str(path))
+    listener.listen(1)
+
+    def serve() -> None:
+        try:
+            connection, _ = listener.accept()
+        except OSError:
+            return
+        with connection:
+            connection.recv(65536)
+            connection.sendall(reply)
+
+    thread = threading.Thread(target=serve, daemon=True)
+    thread.start()
+    try:
+        yield path
+    finally:
+        listener.close()
+        thread.join(timeout=5)
+        path.unlink(missing_ok=True)
+
+
+def _refusal(path: Path, params: dict) -> str:
+    """Send `params` to scribe.apply and return the refusal, or fail loudly."""
+    try:
+        call(path, "scribe.apply", params)
+    except ClientError as exc:
+        return str(exc)
+    raise AssertionError(f"the daemon accepted {params!r}")
+
+
+@contract("gap 1: a truthy STRING for dry_run is refused, not treated as true")
+def test_dry_run_string_refused(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (workspace, path):
+        uid = next(node.reserved_uid for node in workspace.graph.iter_nodes() if node.reserved_uid)
+        source = workspace.graph.path_of(workspace.graph.node(uid))
+        before = source.read_bytes()
+        params = {"op": "set", "uid": uid, "fields": {"TITLE": "String dry-run"}}
+
+        refusal = _refusal(path, {**params, "dry_run": "false"})
+        assert "-32602" in refusal, refusal
+        assert "dry_run" in refusal, f"the refusal does not name the field: {refusal}"
+        assert source.read_bytes() == before, "a string dry_run reached the disk"
+
+        # POSITIVE CONTROL: the same payload with a real bool is accepted, so
+        # the refusal above is about the TYPE and not about the operation.
+        assert call(path, "scribe.apply", {**params, "dry_run": True})["written"] == []
+
+
+@contract("gap 2: a key another operation declares is refused on THIS one")
+def test_unknown_param_key_refused(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (workspace, path):
+        uid = next(node.reserved_uid for node in workspace.graph.iter_nodes() if node.reserved_uid)
+        # `role` is real -- `relate` takes it -- and meaningless on a `set`.
+        # It used to be dropped, so the caller was told nothing.
+        refusal = _refusal(
+            path,
+            {"op": "set", "uid": uid, "fields": {"TITLE": "Stray role"}, "role": "Assumes"},
+        )
+        assert "-32602" in refusal, refusal
+        assert "role" in refusal, f"the refusal does not name the field: {refusal}"
+
+        # POSITIVE CONTROL: the same key on the operation that DOES declare it
+        # gets PAST parameter validation. What refuses it then is the corpus --
+        # a role the node's type does not declare, or a target that is not
+        # there -- and either way it is no longer -32602.
+        declined = _refusal(
+            path, {"op": "relate", "uid": uid, "role": "Assumes", "target": "NO-SUCH-UID"}
+        )
+        assert "-32602" not in declined, f"role was refused on relate too: {declined}"
+
+
+@contract("gap 3: fields as a list of pairs is refused, not silently ignored")
+def test_fields_list_of_pairs_refused(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (workspace, path):
+        uid = next(node.reserved_uid for node in workspace.graph.iter_nodes() if node.reserved_uid)
+        refusal = _refusal(path, {"op": "set", "uid": uid, "fields": [["TITLE", "Pairs"]]})
+        assert "-32602" in refusal, refusal
+        assert "fields" in refusal, f"the refusal does not name the field: {refusal}"
+
+
+@contract("gap 4: an int where a string was declared is refused, naming the field")
+def test_uid_int_refused_naming_field(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (_ws, path):
+        refusal = _refusal(path, {"op": "show", "uid": 7})
+        assert "-32602" in refusal, refusal
+        assert "uid" in refusal, f"the refusal does not name the field: {refusal}"
+        assert "string" in refusal.lower(), refusal
+
+
+@contract("gap 5: the served-root check RUNS on a non-dict result")
+def test_root_check_runs_on_non_dict_result(root: Path, runtime: Path) -> None:
+    """It used to be skipped: `result.get("root") if isinstance(result, dict)`
+    made a bare string or list pass the one assertion standing between a
+    misdirected socket and another worktree's canon."""
+    reply = json.dumps({"jsonrpc": "2.0", "id": 1, "result": "not an object"}) + "\n"
+    with fake_daemon(runtime / "fake", reply.encode("utf8")) as path:
+        try:
+            call_for_root(root, "daemon.ping", override=path)
+        except ClientError as exc:
+            assert "not an object" in str(exc) or "not an object" in repr(exc), exc
+            assert "str" in str(exc), f"the refusal does not name the shape: {exc}"
+            return
+        raise AssertionError("a non-dict result skipped the served-root check")
+
+
+@contract("gap 6: a reply with neither result nor error is a ClientError")
+def test_client_refuses_missing_result(root: Path, runtime: Path) -> None:
+    reply = json.dumps({"jsonrpc": "2.0", "id": 1}) + "\n"
+    with fake_daemon(runtime / "fake", reply.encode("utf8")) as path:
+        try:
+            call(path, "daemon.ping")
+        except ClientError as exc:
+            assert "neither a result nor an error" in str(exc), exc
+            return
+        raise AssertionError("a reply with no result was accepted")
+
+
+@contract("gap 7: an error that is not an object is a ClientError")
+def test_client_refuses_malformed_error(root: Path, runtime: Path) -> None:
+    reply = json.dumps({"jsonrpc": "2.0", "id": 1, "error": "boom"}) + "\n"
+    with fake_daemon(runtime / "fake", reply.encode("utf8")) as path:
+        try:
+            call(path, "daemon.ping")
+        except ClientError as exc:
+            assert "not a JSON-RPC response" in str(exc), exc
+            assert "error" in str(exc), f"the refusal does not name the field: {exc}"
+            return
+        raise AssertionError("a non-object error was indexed rather than refused")
+
+
+@contract("gap 8: a reply that is not JSON is a ClientError, not a traceback")
+def test_client_refuses_non_json_line(root: Path, runtime: Path) -> None:
+    with fake_daemon(runtime / "fake", b"this is not json\n") as path:
+        try:
+            call(path, "daemon.ping")
+        except ClientError as exc:
+            assert "not JSON" in str(exc), exc
+            return
+        raise AssertionError("a non-JSON line reached json.loads unguarded")
+
+
+@contract("gap 9: a request id of the wrong type is refused, naming id")
+def test_id_type_checked_or_documented(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (_ws, path):
+        try:
+            call(path, "daemon.ping", request_id={"not": "an id"})
+        except ClientError as exc:
+            assert "-32600" in str(exc), exc
+            assert "id" in str(exc), f"the refusal does not name the field: {exc}"
+        else:
+            raise AssertionError("an object id was accepted")
+
+        # POSITIVE CONTROL: a string id, which JSON-RPC 2.0 does allow.
+        assert call(path, "daemon.ping", request_id="an-id")["ok"] is True
+
+
+@contract("gap 10: a relations entry that is not an object is refused by index")
+def test_relations_non_dict_entry_refused(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (_ws, path):
+        refusal = _refusal(
+            path,
+            {
+                "op": "new", "type": "WORK", "uid": "WORK-RELATIONS-CONTRACT",
+                "path": "docs/plans/relations-contract/", "relations": ["Assumes=X"],
+            },
+        )
+        assert "-32602" in refusal, refusal
+        assert "relations" in refusal, f"the refusal does not name the field: {refusal}"
+        assert "0" in refusal, f"the refusal does not name the entry: {refusal}"
+
+
+@contract("gap 11: an oversized request is refused cleanly, and the daemon lives")
+def test_oversized_request_refused_cleanly(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (_ws, path):
+        try:
+            call(path, "scribe.apply", {"op": "show", "uid": "X" * (MAX_REQUEST_BYTES + 4096)})
+        except ClientError as exc:
+            assert "-32600" in str(exc), exc
+            assert str(MAX_REQUEST_BYTES) in str(exc), f"the refusal does not name the cap: {exc}"
+        else:
+            raise AssertionError("a request over the cap was accepted")
+        assert call(path, "daemon.ping")["ok"] is True, "the daemon died on an oversized request"
+
+
+@contract("gap 12: an unknown key on scribe.apply is refused, naming the key")
+def test_extra_key_on_scribe_apply_refused(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (_ws, path):
+        refusal = _refusal(path, {"op": "check", "verbosity": "loud"})
+        assert "-32602" in refusal, refusal
+        assert "verbosity" in refusal, f"the refusal does not name the key: {refusal}"
+
+        # POSITIVE CONTROL: without the stray key the identical call answers.
+        assert "text" in call(path, "scribe.apply", {"op": "check"})
+
+
+@contract("rpc.discover reports schema 2 and the methods the registry holds")
+def test_discover_reports_the_registry(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (_ws, path):
+        discovered = call(path, "rpc.discover")
+        assert discovered["schema"] == SCHEMA == "scribe-rpc/2", discovered
+        assert discovered["framing"] == "one-json-value-per-newline"
+        for method in discovered["methods"]:
+            # Every advertised method answers something other than -32601.
+            try:
+                call(path, method)
+            except ClientError as exc:
+                assert "-32601" not in str(exc), f"{method} is advertised and absent: {exc}"
+
 
 CONTRACTS = [
     test_fails_closed,
@@ -400,6 +632,19 @@ CONTRACTS = [
     test_rpc_dry_run_generation,
     test_cli_dry_run_refusal,
     test_export_matches,
+    test_discover_reports_the_registry,
+    test_dry_run_string_refused,
+    test_unknown_param_key_refused,
+    test_fields_list_of_pairs_refused,
+    test_uid_int_refused_naming_field,
+    test_root_check_runs_on_non_dict_result,
+    test_client_refuses_missing_result,
+    test_client_refuses_malformed_error,
+    test_client_refuses_non_json_line,
+    test_id_type_checked_or_documented,
+    test_relations_non_dict_entry_refused,
+    test_oversized_request_refused_cleanly,
+    test_extra_key_on_scribe_apply_refused,
 ]
 
 
