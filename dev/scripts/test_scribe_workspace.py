@@ -751,7 +751,7 @@ def test_apply_dry_run_unrelate(root: Path) -> None:
 
 @contract("a File relation names an item, through the daemon's own op path")
 def test_file_relation_names_an_item(root: Path) -> None:
-    """WORK-SCRIBE-RELATE-FILE-ROLE, and the export slots with it.
+    """MECH-FILE-RELATION-EXISTENCE, and the export slots with it.
 
     Goes through scribe_ops.apply rather than Graph directly, because the
     defect was there and nowhere else: `File` is the role a client NAMES and

@@ -103,3 +103,5 @@ RELATIONS:
   VALUE: docs/sdoc/board/assets/fsm.js
 - TYPE: File
   VALUE: docs/sdoc/board/grammar-groups.json
+- TYPE: File
+  VALUE: dev/scripts/grammar-groups-check.py
