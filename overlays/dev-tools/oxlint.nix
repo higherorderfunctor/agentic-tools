@@ -16,12 +16,12 @@
   vu = import ../lib.nix;
   tsgolint = import ./tsgolint.nix {inherit inputs final;};
 
-  rev = "42315366b1bed4bc363837a705f65c5be0ff3ebc";
+  rev = "d21d5cf32f21118763a9175c4aed386a78b1de78";
   unpatchedSrc = ourPkgs.fetchFromGitHub {
     owner = "oxc-project";
     repo = "oxc";
     inherit rev;
-    hash = "sha256-yIf3dTBEWxFS1fJnjGa9l1COTAgUIOW6GAmAMT3dhhc=";
+    hash = "sha256-54ak0t1pwdPa1xRm+jZfzSShHiQ1kCrALLmHUAblC4Y=";
   };
   # @napi-rs/cli's filesystem reconciliation probes a process incarnation with
   # execFile(/bin/ps) on Darwin. Node can reject that spawn synchronously under
@@ -34,7 +34,7 @@
   # to null, preserving napi-rs's fail-closed stale-lock behavior. Drop this
   # when the catch ships upstream — re-read `executeProcessIncarnationCommand`
   # in `dist/cli.js` on each repin rather than assuming; it was still uncaught
-  # in 3.9.0.
+  # in 3.9.1.
   #
   # The patch file itself is added as a NEW file, which never conflicts. The
   # workspace/lock metadata that points pnpm at it is applied by key in
@@ -51,7 +51,7 @@
   # fragment carries the full loop.
   napi = rec {
     pkg = "@napi-rs/cli";
-    version = "3.9.0";
+    version = "3.9.1";
     # DERIVED, never hand-written. As two independent literals a stale patch
     # could pair with a matching version key and build GREEN: `version =
     # "3.8.6"` alongside `patchPath = ".../@napi-rs__cli@3.9.0.patch"` produced
@@ -63,7 +63,7 @@
     # bytes — so it moves only when that file does, not when upstream's lock
     # does. It is the sha256 of the INNER pnpm patch the outer git patch
     # creates, NOT of that outer file.
-    patchHash = "a732a64909908b75156f0709c6f08cb75c6ffe313ca2fee3857dd952c317e4f4";
+    patchHash = "cd0ec720c5bdecf81d61c893359063f100271bd27eac5541d8338ec38b239668";
   };
   # The other half of the coupling. Deriving patchPath stops it disagreeing
   # with `version`; this stops BOTH disagreeing with the file on disk. A repin
@@ -104,13 +104,13 @@ in
     inherit version src;
     cargoDeps = ourPkgs.rustPlatform.fetchCargoVendor {
       inherit (finalAttrs) pname version src;
-      hash = "sha256-HdXMh15qFGhKmbcixIynINZ8YJCh+1kCbIn+gwY+eOg=";
+      hash = "sha256-nnJDL3k7B2Y7y/Pbi7GmLcFFb0f1qlkbicYCG3eegPQ=";
     };
     pnpmDeps = ourPkgs.fetchPnpmDeps {
       inherit (finalAttrs) pname version src;
       pnpm = ourPkgs.pnpm_11;
       fetcherVersion = 4;
-      hash = "sha256-xD7Y95zreA1uM27Kz0tbxdLRkgI0gQO1au2RL+/6GLY=";
+      hash = "sha256-bIbBs6+QYoJsRqCV2q7enpw5UIw1ugzRJff4OUOGQ+s=";
     };
     # Oxc declares pnpm@12.3.2 in `packageManager`, and we DELIBERATELY stay on
     # pnpm 11. nixpkgs' fetcher interpolates `--registry="$NIX_NPM_REGISTRY"`
