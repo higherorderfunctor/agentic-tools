@@ -50,7 +50,23 @@ routes and refuses to start without it. The route paths are unchanged, because
 layout.js resolves them relative to its own URL.
 <<<
 NOTES: >>>
-The ELK.js layout replaced the reference implementation's custom SCC, barycentric, and orthogonal router on 2026-09-02. elkjs 0.12.0 is EPL-2.0 OR GPL-3.0-or-later. It was vendored in the tree until 2026-09-08, when WORK-BOARD-ELKJS-VIA-NIX moved it behind SDOC_BOARD_ELKJS_DIR; the served bytes did not change.
+The ELK.js layout replaced the reference implementation's custom SCC,
+barycentric, and orthogonal router on 2026-09-02. elkjs 0.12.0 is EPL-2.0 OR
+GPL-3.0-or-later. It was vendored in the tree until 2026-09-08, when its Nix
+delivery moved it behind SDOC_BOARD_ELKJS_DIR; the served bytes did not change.
+
+Delivery facts retained when the completed WORK row was retired on 2026-09-10:
+devenv.nix builds boardElkjs with pkgs.runCommand from the published 0.12.0
+tarball (sha256-wddxlyPgILEHJOPMvJNWlqKITx5402HN0DdmMJ6Ojio=). A dev-only
+runCommand was chosen over a published overlay because the board alone consumes
+the asset. The realized npm package measured 7.8 MiB. The served elk-api.js and
+elk-worker.min.js hashes stayed
+ccca46175c05bbd280b5de6c9853103711e52c666a101f145b717e345363e24d and
+e4f5c51c6f2fd564bb64e52e81c4a85a316ef2f24f8b90e1db5eb886c765b030.
+server.py resolves SDOC_BOARD_ELKJS_DIR at import and refuses an unset or
+incomplete directory. Verification covered both unchanged asset byte counts,
+the Graph route, 16 board tests, formatting, repository lints, and all 14
+strictdoc checks.
 <<<
 RELATIONS:
 - TYPE: Parent
@@ -66,4 +82,7 @@ RELATIONS:
   VALUE: docs/sdoc/board/server.py
 - TYPE: Parent
   VALUE: EV-SDOC-BOARD-ELK-NEIGHBORHOOD-SMOKE
+  ROLE: Proven_By
+- TYPE: Parent
+  VALUE: EV-SDOC-BOARD-LAYOUT-LIBRARY-ASSESSMENT
   ROLE: Proven_By

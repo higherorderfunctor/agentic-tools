@@ -32,8 +32,8 @@ to the Board canvas when the Perspective view joined the app.
 2026-09-08, reconciling the ported Graph view against this tree: the
 "dependency-free" clause no longer describes the canvas. ELK.js 0.12.0 became
 the Graph view's layout and edge-routing engine on 2026-09-02 under
-WORK-GRAPH-NEIGHBORHOOD-VIEW, and since 2026-09-08 it arrives from Nix rather
-than from the tree (WORK-BOARD-ELKJS-VIA-NIX). The seam this decision exists to
+the Graph neighborhood delivery, and since 2026-09-08 it arrives from Nix rather
+than from the tree. The seam this decision exists to
 protect held: adapter, layout and renderer stayed separate modules over plain
 objects, and taking the dependency touched neither the server nor the snapshot
 schema. Nothing is retired here. MECH-SDOC-BOARD-LAYOUT describes the

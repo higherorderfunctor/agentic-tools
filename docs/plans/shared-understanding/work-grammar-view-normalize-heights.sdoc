@@ -13,7 +13,7 @@ Cards on the Grammars tab should share a height within a row or group, so
 that content length does not make the layout ragged. This is the carver's
 reading of a delegated call: normalize HEIGHT through content wrapping,
 not text size, because the type ramp carries a 12px floor the operator
-set (see WORK-GRAMMAR-TAB-GROUPS), and shrinking text to fit a card would
+set (see MECH-SDOC-BOARD-GRAMMARS-VIEW), and shrinking text to fit a card would
 break it.
 <<<
 NOTES: >>>
@@ -22,5 +22,5 @@ content drive your call on dynamic height vs dynamic text size."
 <<<
 RELATIONS:
 - TYPE: Parent
-  VALUE: WORK-GRAMMAR-TAB-GROUPS
+  VALUE: MECH-SDOC-BOARD-GRAMMARS-VIEW
   ROLE: Assumes

@@ -20,7 +20,7 @@ PROVIDED a check guards it: every node type the grammar declares is covered
 by the presentation and nothing stale remains in it, checked statically in
 nix flake check, with a runtime check on the page as the safety net for a
 refresh or reload. The first instance is the Grammars tab's groups
-(WORK-GRAMMAR-TAB-GROUPS).
+(MECH-SDOC-BOARD-GRAMMARS-VIEW).
 <<<
 NOTES: >>>
 Hedged by the operator -- verbatim: "one requirement I have we could add is
