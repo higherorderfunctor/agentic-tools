@@ -10,37 +10,14 @@ TITLE: The render reads an export generated from the held graph
 DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
-A render obtains the export JSON from the held graph rather than by running a
-fresh export. StrictDoc's JSON generator is a pure function of a built index --
-strictdoc's own server calls it against its live one -- so the daemon runs it
-against the resident graph into a directory the caller names, and every
-downstream consumer reads the same bytes it reads today.
+A render obtains the export JSON from the held graph rather than by running a fresh export. StrictDoc's JSON generator is a pure function of a built index -- strictdoc's own server calls it against its live one -- so the daemon runs it against the resident graph into a directory the caller names, and every downstream consumer reads those bytes. The payload is written to a directory rather than returned, because the current export is about 10 MB. An export reconciles first, like any read.
 
-The payload is written to a directory rather than returned, because the current
-export is 10.3 MB. An export reconciles first, like any read.
+Two things about those bytes differ deliberately from a hand-run export. First, StrictDoc's JSON generator drops ELEMENT and ID from element-grained File relations. `carry_file_element_into_json` patches that generator seam in memory so the daemon preserves both. Second, the generator receives each node's declaring document but omits its path. `carry_document_path_into_json` stamps every held document with its workspace-relative source path and patches `_write_requirement` once to emit `_DOCUMENT_PATH` on every node. Both patches are idempotent and fail closed when their upstream method changes shape. They live here rather than in the package because overlays/dev-tools/strictdoc.nix re-exports upstream's derivation unchanged for cache-hit parity; `strictdoc export` run by hand therefore still omits these additions.
 
-One thing about those bytes did change, deliberately, and it is the only
-divergence from a hand-run export. StrictDoc's JSON generator reads exactly
-TYPE, FORMAT, VALUE and LINE_RANGE off a File relation, so an element-grained
-relation would export as a whole-file one and every consumer would see a
-coarser graph than the corpus declares. sdoc_model.carry_file_element_into_json
-patches that one generator method in memory before each export -- idempotent,
-and fail-closed on an upstream rename -- so the daemon's export carries ELEMENT
-and ID too. The patch lives here rather than in the package because
-overlays/dev-tools/strictdoc.nix re-exports upstream's derivation unchanged for
-cache-hit parity. `strictdoc export` run by hand therefore still drops both
-fields, and that asymmetry is the cost.
-
-No downstream code changed. Wireline, view-check, render and status read the
-shape they always read, with two more optional keys on a File relation, and
-none of them imports strictdoc. The daemon's own graph load passes
-skip_source_files=True, so the source-traceability walk the project config
-turns on does not run inside it and none of that walk's cost reaches a read.
+The board adapter reads `_DOCUMENT_PATH` directly and no longer walks the canon for provenance. Other downstream readers continue to consume the same shape with additive metadata. The daemon's own graph load passes `skip_source_files=True`, so the source-traceability walk the project config enables does not run inside it and none of that walk's cost reaches a read.
 <<<
 NOTES: >>>
-Updated 2026-09-03 for commits 6fbaa76b and c64a0147: the daemon's export
-carries ELEMENT and ID through an in-memory patch, and the daemon's own load
-is exempt from the source-traceability walk the project config now enables.
+Updated 2026-09-09: the daemon export carries File-relation ELEMENT and ID plus each node's workspace-relative `_DOCUMENT_PATH` through two in-memory, idempotent generator patches. The board consumes the path directly. The daemon's graph load remains exempt from the configured source-traceability walk.
 <<<
 RELATIONS:
 - TYPE: Parent

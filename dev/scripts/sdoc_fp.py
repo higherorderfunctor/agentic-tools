@@ -31,9 +31,9 @@ HASH_LEN = 7
 # node first.
 EXCLUDED_FIELDS = {"RATIONALE", "NOTES", "PARENT_FP", "PLACE", "COMPONENT"}
 
-# Export-scaffolding keys strictdoc's JSON emits per node that are not sdoc
-# fields at all.
-STRUCTURAL_KEYS = {"_TOC", "_NODE_TYPE", "UID", "RELATIONS"}
+# Export-scaffolding keys emitted per node (including this repo's daemon-only
+# path addition) that are not sdoc fields at all.
+STRUCTURAL_KEYS = {"_DOCUMENT_PATH", "_TOC", "_NODE_TYPE", "UID", "RELATIONS"}
 
 READY_DEPTHS = {"interface-settled", "implemented", "verified"}
 
