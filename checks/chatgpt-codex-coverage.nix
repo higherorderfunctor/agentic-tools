@@ -39,9 +39,14 @@
     lib.optional (sorted extractedValues != sorted coveredValues)
     "${label}: missing dispositions (new upstream, classify these): ${builtins.toJSON missing}; stale dispositions (gone upstream, safe to delete): ${builtins.toJSON stale}";
 
-  uniqueProblems = label: values:
+  # `noun` is not decoration. Two of the three call sites check the COVERAGE
+  # lists, where a duplicate is a classification mistake; the third checks a
+  # command's flag names straight out of the EXTRACTION, where a duplicate
+  # means the extractor emitted the same flag twice. Calling both "duplicate
+  # dispositions" sent the reader to the wrong file.
+  duplicateProblems = noun: label: values:
     lib.optional (builtins.length values != builtins.length (lib.unique values))
-    "${label}: duplicate dispositions: ${builtins.toJSON (duplicateValues values)}";
+    "${label}: duplicate ${noun}: ${builtins.toJSON (duplicateValues values)}";
 
   # `expected` is the COVERAGE side, so it goes in the covered slot. Doing the
   # orientation here keeps all four record-field call sites reading naturally.
@@ -66,14 +71,14 @@
   featureMaturities = lib.unique (map (feature: feature.maturity) extracted.features);
   problems = lib.concatLists [
     (exactProblems "CLI commands" commandNames coveredCommands)
-    (uniqueProblems "CLI commands" coveredCommands)
+    (duplicateProblems "dispositions" "CLI commands" coveredCommands)
     (recordFieldProblems "CLI command fields" (builtins.attrNames coverage.cli.commandFields) commands)
     (lib.concatMap (command:
-      uniqueProblems "CLI flags for ${builtins.concatStringsSep " " command.path}"
+      duplicateProblems "extracted flag names" "CLI flags for ${builtins.concatStringsSep " " command.path}"
       (map (flag: builtins.head flag.names) command.flags))
     commands)
     (exactProblems "CLI flags" canonicalFlags coveredFlags)
-    (uniqueProblems "CLI flags" coveredFlags)
+    (duplicateProblems "dispositions" "CLI flags" coveredFlags)
     (recordFieldProblems "CLI flag fields" (builtins.attrNames coverage.cli.flagFields) (lib.concatMap (command: command.flags) commands))
     # Extractor-internal invariant, not a human ledger: both sides come from
     # the extraction, so "missing/stale" vocabulary would not apply. Kept
@@ -90,7 +95,11 @@
   ];
 in
   assert lib.assertMsg (problems == [])
-  ("chatgpt-codex coverage drift (${toString (builtins.length problems)} categories):\n  - "
+  ("chatgpt-codex coverage drift (${toString (builtins.length problems)} ${
+      if builtins.length problems == 1
+      then "problem"
+      else "problems"
+    }):\n  - "
     + builtins.concatStringsSep "\n  - " problems); {
     chatgpt-codex-coverage = pkgs.runCommand "chatgpt-codex-coverage" {} ''
       echo "ok — every extracted Codex vocabulary has a reviewed Nix disposition" > "$out"
