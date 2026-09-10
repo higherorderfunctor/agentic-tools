@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SEMANTICS-OP-TABLE-TEST-TAUTOLOGY
 TITLE: Give the operation-table agreement test something to disagree about
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 PREDICATE_OPERATIONS and the dispatch dict are now both derived from _OPERATION_TABLE, so test_closed_operation_table's set-equality assertion can never fail. Replace it with a test that pins the table's contents (the nine op names and each op's required and optional keys) against a literal, so an accidental addition or removal is caught.

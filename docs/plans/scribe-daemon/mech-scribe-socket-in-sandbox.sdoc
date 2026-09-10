@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SCRIBE-SOCKET-IN-SANDBOX
 TITLE: Whether the runtime directory is reachable inside the agent sandbox is unmeasured
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Whether the user runtime directory is visible inside the agent sandbox jail is

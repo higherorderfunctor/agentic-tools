@@ -61,9 +61,9 @@ supersession does not foreclose collection -- a superseded node is precisely the
 candidate set a collector would later operate on, which is a sharper signal than
 age plus absence of inbound fingerprints.
 
-Measured the same day: of 139 nodes, 64 are sketch and ZERO are superseded. A
-collector aimed at retired nodes would collect nothing today; the growth
-pressure is entirely at the ungroomed end. See DEC-SUPERSESSION-RULE.
+Measured the same day: of 139 nodes, ZERO are superseded. A collector aimed at
+retired nodes would collect nothing today; the growth pressure is entirely at
+the ungroomed end. See DEC-SUPERSESSION-RULE.
 
 Milestones three and four were floated for combination the same day and the
 operator dropped it -- "just an observation". They stay separate: three is the

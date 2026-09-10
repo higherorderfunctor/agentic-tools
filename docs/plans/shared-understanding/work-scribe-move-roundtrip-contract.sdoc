@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SCRIBE-MOVE-ROUNDTRIP-CONTRACT
 TITLE: Put the move round-trip refusal under a contract
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Since 07518382 both the dry and the real move path render and reparse the

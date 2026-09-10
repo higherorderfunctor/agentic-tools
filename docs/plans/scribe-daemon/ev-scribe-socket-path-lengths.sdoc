@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SCRIBE-SOCKET-PATH-LENGTHS
 TITLE: A socket under .devenv exceeds the sockaddr cap for most worktrees
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: 27 registered worktrees on the operator's machine; 104-byte cap; 2026-08-31
 STATEMENT: >>>

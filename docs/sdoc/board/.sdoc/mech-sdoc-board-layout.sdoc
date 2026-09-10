@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-LAYOUT
 TITLE: The board sends only a bounded neighborhood to ELK.js
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 layout.js first traverses only the selected node's filtered incoming and

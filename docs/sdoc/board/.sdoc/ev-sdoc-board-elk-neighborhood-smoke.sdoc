@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SDOC-BOARD-ELK-NEIGHBORHOOD-SMOKE
 TITLE: ELK removes measured label collisions without losing semantic edges
-DEPTH: verified
 AUTHORED_BY: llm
 SOURCE: Independent Chromium 152 headless DevTools probes at 1440x900 against the live scribe daemon, plus a synthetic pre-layout cap probe; 2026-09-03
 STATEMENT: >>>

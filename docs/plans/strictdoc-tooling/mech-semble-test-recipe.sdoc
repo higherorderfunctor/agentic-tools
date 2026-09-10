@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SEMBLE-TEST-RECIPE
 TITLE: Make a customized semble testable without a devenv shell
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Expose a documented way to build and exercise a grammar-customized semble.

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: INV-DECISIONS-ARRIVE-AS-CARDS
 TITLE: A decision brought to the operator is a card: reasoning, options with the discriminating argument, one explicit ask
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 A decision brought to the operator arrives as a CARD, and a card has a fixed

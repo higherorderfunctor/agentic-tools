@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-CANON-WORDS
 TITLE: The ruled vocabulary
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: glossary
 PLACE: tab

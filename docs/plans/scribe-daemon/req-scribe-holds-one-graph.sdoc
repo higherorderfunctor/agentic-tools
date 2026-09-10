@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: REQ-SCRIBE-HOLDS-ONE-GRAPH
 TITLE: One held graph per workspace serves every reader
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 A scribe daemon shall hold one workspace's graph and answer reads from it

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-COMPONENT-CATEGORY-NAME
 TITLE: Brainstorm the category the COMPONENT type belongs to
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The four families DEC-NODE-FAMILIES rules -- definition, coverage,

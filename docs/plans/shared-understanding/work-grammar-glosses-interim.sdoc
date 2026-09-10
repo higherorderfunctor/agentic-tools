@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAMMAR-GLOSSES-INTERIM
 TITLE: The grammar tab's glosses are a hand copy of the canon narrative
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Grammars tab's axis and type glosses are hard-coded in

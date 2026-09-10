@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-ASSESS-AUTO-AUTHORSHIP
 TITLE: Assess and select how authorship gets set automatically from the key
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 An assessment node, deliberately kept as one node because the operator framed

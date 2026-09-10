@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-STRICTDOC-DEVENV-MODULE-NOT-PUBLISHED
 TITLE: ai.strictdoc cannot be published as a devenv facet while options-doc demands exact HM parity
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 packages/strictdoc-grammar/modules/devenv/ is imported by PATH from devenv.nix

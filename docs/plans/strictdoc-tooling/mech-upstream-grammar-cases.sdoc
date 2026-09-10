@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-UPSTREAM-GRAMMAR-CASES
 TITLE: Borrow upstream's grammar test cases as fixtures rather than extracting them
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The strictdoc package ships no .sgra files at all, and upstream's grammar test

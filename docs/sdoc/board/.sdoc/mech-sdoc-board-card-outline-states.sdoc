@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-CARD-OUTLINE-STATES
 TITLE: Layered card plates keep tabs and semantic outlines clean
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Navigation and graph cards are built by one HTML summary-card function. Both

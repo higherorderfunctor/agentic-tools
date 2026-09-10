@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SDOC-BOARD-MERGED-SMOKE
 TITLE: The merged app serves both views from the live daemon
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: Live scribe daemon (generation 3) and headless ungoogled-chromium 151 driven over the DevTools pipe; system python3; 2026-09-01
 STATEMENT: >>>

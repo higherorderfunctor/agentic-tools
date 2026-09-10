@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LANG-CSS-HTML
 TITLE: Language items for CSS and HTML
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Grammar to load: `tree-sitter-grammars.tree-sitter-css` (nixpkgs, 0.25.0, binding present) and `tree-sitter-grammars.tree-sitter-html` (nixpkgs, 0.23.2, binding present) — two separate grammars, paired here because both files are the same small surface (`docs/sdoc/board/`, `docs/sdoc/view/`).

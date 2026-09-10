@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-VIEW-SELF-HOST-RENDER
 TITLE: The view rendering its own root through the same task
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: devenv tasks run --mode before view:render --input root=NAR-WHITEBOARD-VIEW
 STATEMENT: >>>

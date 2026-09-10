@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SCRIBE-GENERATION-ACROSS-RESTART
 TITLE: Keep workspace generations monotonic across a daemon restart
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The workspace generation counter is monotonic within one daemon process only

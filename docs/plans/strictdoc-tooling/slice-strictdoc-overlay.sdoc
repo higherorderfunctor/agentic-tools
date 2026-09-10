@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-STRICTDOC-OVERLAY
 TITLE: Step zero -- an overlay that keeps strictdoc current from upstream's flake
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 strictdoc comes from upstream's own flake, so every session, check and devShell

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-DIRTY-RIPPLE
 TITLE: Fingerprints and what happens when a parent changes
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen
@@ -24,9 +23,9 @@ Dirty edges, signing, revocation, where a dirty edge blocks, and the git hazards
 - Three shapes for the ripple are on the table — a per-field flag, a typed selector tree (unmeasured), or a per-role field list with a stored hash. No decision picks one.
 [LINK: SPIKE-RIPPLE-SELECTOR-AST]
 > ripple shape: per-field flag | selector AST (SPIKE-RIPPLE-SELECTOR-AST unrun) | per-role field list + stored hash; no DECISION picks [UNADDRESSED]
-- Clearing a dirty edge means signing — rewriting the child's hash to the parent's current one. It is refused while the parent is unsettled. Today a human does it at pull-request review.
+- Clearing a dirty edge means signing — rewriting the child's hash to the parent's current one. Today a human does it at pull-request review.
 [LINK: DEC-FP-ACCEPT-AUTHORITY] [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION] [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
-> clear = sign (rewrite to current hash), refused while the parent is unsettled; today identity:human at PR review [OPEN: DEC-FP-ACCEPT-AUTHORITY]
+> clear = sign (rewrite to current hash); today identity:human at PR review [OPEN: DEC-FP-ACCEPT-AUTHORITY]
 - Revocation gets a 'revoked' slot on the entry; revoking an unsigned entry, or signing over a revoked one, is refused. Open: who may revoke, what a rebase does (re-accept automatically, warn, or block), and who re-signs their own conflict.
 [LINK: DEC-FP-ACCEPT-AUTHORITY] [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION] [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
 > revocation: revoked:<hash> slot; refuse revoke-on-placeholder and sign-over-revoked; who = the key; rebase: auto re-accept? warn or block? who re-signs own conflict? [OPEN: DEC-FP-ACCEPT-AUTHORITY]

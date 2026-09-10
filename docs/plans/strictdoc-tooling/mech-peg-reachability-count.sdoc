@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: MECH-PEG-REACHABILITY-COUNT
 TITLE: Nineteen rules are reachable from DocumentGrammarWrapper, not twenty-five
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Measured on 0.28.3. Walking rule references out of the arpeggio parser tree,

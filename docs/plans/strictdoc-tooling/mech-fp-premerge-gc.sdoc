@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-FP-PREMERGE-GC
 TITLE: Keep fingerprint lineage during development, collapse it before merge
-DEPTH: sketch
 AUTHORED_BY: human
 STATEMENT: >>>
 Permit fingerprints referencing states between the branch head and its common

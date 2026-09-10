@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-FIRST-CONVERSION
 TITLE: First conversion target is the lane-iteration cluster
-DEPTH: needs-design
 AUTHORED_BY: llm
 STATEMENT: >>>
 Convert 12-flow-iterate, 13-flow-settle and 14-flow-kill. 426 lines, roughly 60

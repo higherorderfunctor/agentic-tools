@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-TERM-BEADS
 TITLE: beads
-DEPTH: interface-settled
 AUTHORED_BY: llm
 WIDGET: prose
 TAGS: term

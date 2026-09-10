@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-CODE-LINKAGE-EXTRACTORS
 TITLE: Extend code linkage: strictdoc source traceability plus Nix and TypeScript extractors
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Wire strictdoc's native source traceability so that a hard-coded render carries a File relation to the narrative it renders, and a change at either end dirties the edge and forces a review, ideally by an LLM. First case: the grammars grid in docs/sdoc/board/assets/grammars.js renders NAR-CANON-TYPES-GRID; today its glosses are copied prose in docs/sdoc/board/grammar-groups.json with no edge between them, so nothing notices when the narrative moves. Then extend the language coverage past what strictdoc ships (Python, the C family, Rust, Robot) with our own tree-sitter extractors: Nix modules and options, TypeScript types and interfaces. THE FEATURE IS NOW ON: REQUIREMENT_TO_SOURCE_TRACEABILITY is enabled in the repository's own strictdoc_config.py, and the operator's 2026-09-02 ruling keeps strictdoc's generic parser DISABLED -- only the configured glob manifest (dev/scripts/sdoc_extractors/registry.py) parses a file; every other path still gets indexed so a whole-file relation to it keeps resolving.

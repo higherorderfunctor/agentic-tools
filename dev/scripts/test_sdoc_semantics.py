@@ -154,10 +154,10 @@ def assert_shipped_diagnostics_silent(fragment: str) -> None:
 
 
 PREDICATE_GRAPH = graph(
-    node("A", "WORK", DEPTH="implemented", FLAG="yes"),
-    node("B", "REQUIREMENT", DEPTH="verified", FLAG="yes"),
-    node("C", "EVIDENCE", DEPTH="sketch", FLAG="no"),
-    node("D", "WORK", DEPTH="implemented", FLAG="yes"),
+    node("A", "WORK", AUTHORED_BY="llm-adopted", FLAG="yes"),
+    node("B", "REQUIREMENT", AUTHORED_BY="human", FLAG="yes"),
+    node("C", "EVIDENCE", AUTHORED_BY="llm", FLAG="no"),
+    node("D", "WORK", AUTHORED_BY="llm-adopted", FLAG="yes"),
     edges=(
         {"role": "Assumes", "source": "A", "target": "B"},
         {"role": "Assumes", "source": "A", "target": "C"},
@@ -188,14 +188,14 @@ def test_field_is() -> None:
 @contract("field_at_least uses ladder rank in both directions")
 def test_field_at_least() -> None:
     assert evaluate(
-        {"op": "field_at_least", "field": "DEPTH", "value": "needs-spike"},
+        {"op": "field_at_least", "field": "AUTHORED_BY", "value": "llm-accepted"},
         PREDICATE_NODE,
         PREDICATE_GRAPH,
         "human",
         SHIPPED,
     )
     assert not evaluate(
-        {"op": "field_at_least", "field": "DEPTH", "value": "verified"},
+        {"op": "field_at_least", "field": "AUTHORED_BY", "value": "human"},
         PREDICATE_NODE,
         PREDICATE_GRAPH,
         "human",
@@ -955,8 +955,8 @@ def test_single_payload_validation() -> None:
     with mock.patch.object(engine, "validate_model", wraps=engine.validate_model) as validate:
         data = build_payload(GRAMMAR)
         assert validate.call_count == 1
-        diagram = cli.render_mermaid(data, "DEPTH")
-        assert diagram == "%% DEPTH\n" + mermaid(SHIPPED["lifecycles"][0]) + "\n\n"
+        diagram = cli.render_mermaid(data, "STATUS")
+        assert diagram == "%% STATUS\n" + mermaid(SHIPPED["lifecycles"][0]) + "\n\n"
         assert validate.call_count == 1
     with mock.patch.object(engine, "validate_model", wraps=engine.validate_model) as validate:
         assert payload(SHIPPED, GRAMMAR) == data
@@ -966,18 +966,15 @@ def test_single_payload_validation() -> None:
 @contract("presentation order survives model loading and payload emission")
 def test_presentation_order() -> None:
     assert [row["name"] for row in SHIPPED["lifecycles"]] == [
-        "DEPTH",
         "STATUS",
         "AUTHORED_BY",
     ]
-    assert list(SHIPPED_PAYLOAD["machines"]) == ["DEPTH", "STATUS", "AUTHORED_BY"]
-    assert [row["name"] for row in SHIPPED_PAYLOAD["machines"]["DEPTH"]["states"]] == [
-        "sketch",
-        "needs-design",
-        "needs-spike",
-        "interface-settled",
-        "implemented",
-        "verified",
+    assert list(SHIPPED_PAYLOAD["machines"]) == ["STATUS", "AUTHORED_BY"]
+    assert [row["name"] for row in SHIPPED_PAYLOAD["machines"]["STATUS"]["states"]] == [
+        "open",
+        "accepted",
+        "rejected",
+        "superseded",
     ]
     assert all("rules" not in lifecycle for lifecycle in SHIPPED["lifecycles"])
     model = empty_model()
@@ -1011,7 +1008,6 @@ def test_presentation_order() -> None:
 @contract("lifecycle notes preserve the transcription and are optional strings")
 def test_lifecycle_notes() -> None:
     assert [row["note"] for row in SHIPPED["lifecycles"]] == [
-        "Transcribed for the spike. Every transition is unsettled by design.",
         "Branching on purpose: two terminal states, and one rule no machine can hold.",
         "Shape is settled by an accepted DECISION; the actor is not.",
     ]
@@ -1061,15 +1057,15 @@ def test_shipped_rows() -> None:
 @contract("mermaid uses safe identifiers and carries gate names")
 def test_mermaid() -> None:
     row = lifecycle(
-        states=("needs-design", "implemented"),
-        transitions=[transition("advance", "needs-design", "implemented", gates=["ready-gate"])],
-        initial="needs-design",
-        terminal=("implemented",),
+        states=("in-progress", "done"),
+        transitions=[transition("advance", "in-progress", "done", gates=["policy-gate"])],
+        initial="in-progress",
+        terminal=("done",),
     )
     drawing = mermaid(row)
-    assert "state_0 --> state_1 : advance [ready-gate]" in drawing
-    assert "needs-design -->" not in drawing
-    assert 'state "needs-design" as state_0' in drawing
+    assert "state_0 --> state_1 : advance [policy-gate]" in drawing
+    assert "in-progress -->" not in drawing
+    assert 'state "in-progress" as state_0' in drawing
 
 
 @contract("the CLI imports and renders with an isolated standard-library Python")
@@ -1085,7 +1081,7 @@ def test_cli_stdlib() -> None:
             str(REPO_ROOT / "dev" / "scripts" / "sdoc_semantics" / "__main__.py"),
             "--root",
             str(REPO_ROOT),
-            "DEPTH",
+            "STATUS",
         ],
         check=False,
         capture_output=True,
@@ -1093,7 +1089,7 @@ def test_cli_stdlib() -> None:
         env=environment,
     )
     assert completed.returncode == 0, completed.stderr
-    assert "DEPTH   [sdoc-semantics/2]" in completed.stdout
+    assert "STATUS   [sdoc-semantics/2]" in completed.stdout
 
 
 @contract("non-semantics verbs remain available without the semantics package")
@@ -1153,19 +1149,19 @@ def test_load_model() -> None:
     first = SimpleNamespace(
         reserved_uid="A",
         node_type="WORK",
-        ordered_fields_lookup={"DEPTH": [Field("sketch")]},
+        ordered_fields_lookup={"AUTHORED_BY": [Field("llm")]},
         relations=[SimpleNamespace(ref_uid="B", role="Assumes")],
     )
     second = SimpleNamespace(
         reserved_uid="B",
         node_type="REQUIREMENT",
-        ordered_fields_lookup={"DEPTH": [Field("verified")]},
+        ordered_fields_lookup={"AUTHORED_BY": [Field("human")]},
         relations=[],
     )
     loaded = SimpleNamespace(iter_nodes=lambda: iter((first, second)))
     assert adapt_graph(loaded) == graph(
-        node("A", "WORK", DEPTH="sketch"),
-        node("B", "REQUIREMENT", DEPTH="verified"),
+        node("A", "WORK", AUTHORED_BY="llm"),
+        node("B", "REQUIREMENT", AUTHORED_BY="human"),
         edges=[{"role": "Assumes", "source": "A", "target": "B"}],
     )
 

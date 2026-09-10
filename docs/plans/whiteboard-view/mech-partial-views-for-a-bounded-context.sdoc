@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-PARTIAL-VIEWS-FOR-A-BOUNDED-CONTEXT
 TITLE: The canon is read in bounded chunks: partial views cut by root, closure, system or query for a model's context
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The canon is not meant to sit in any agent's context whole. A model reads a

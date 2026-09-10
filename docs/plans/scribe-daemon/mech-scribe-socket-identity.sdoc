@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SCRIBE-SOCKET-IDENTITY
 TITLE: The socket path is derived from the resolved target root
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The socket path is derived, never configured, so a server and a client that

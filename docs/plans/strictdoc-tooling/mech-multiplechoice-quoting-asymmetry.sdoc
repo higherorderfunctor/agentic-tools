@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-MULTIPLECHOICE-QUOTING-ASYMMETRY
 TITLE: SingleChoice and MultipleChoice options are quoted by different rules on read and on write
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Measured on 0.28.3 while writing the .sgra emitter. StrictDoc's reader and

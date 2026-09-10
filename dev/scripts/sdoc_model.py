@@ -26,9 +26,9 @@ THREE OBLIGATIONS SIT HERE BECAUSE STRICTDOC DOES NOT CARRY THEM:
 * Path discovery. The model gives each node its own source file, so
   fp-accept's glob-and-grep scan for a "UID: " line is gone.
 
-WHAT THIS MODULE DOES NOT DO is enforce instance semantics -- who may sign,
-whether DEPTH may regress, when deleting is legitimate. Those are milestone
-five's (SLICE-INSTANCE-SEMANTICS-MIGRATION). The only instance rule here is
+WHAT THIS MODULE DOES NOT DO is enforce instance semantics -- who may sign or
+when deleting is legitimate. Those are milestone five's
+(SLICE-INSTANCE-SEMANTICS-MIGRATION). The only instance rule here is
 the guarded field set, which is MECH-RUNTIME-WRITE-GUARD's absence-of-a-code-
 path and belongs to the runtime by that node's ruling.
 """
@@ -1011,8 +1011,8 @@ def field_value(node: SDocNode, name: str) -> str | None:
     """A field's text, or None when the node does not carry it.
 
     get_field_by_name raises on an absent field, and absence is ordinary
-    here: DEPTH is on every type but DECISION and STATUS on DECISION alone, so every
-    caller iterating over both needs this guard.
+    here: STATUS is on DECISION alone, so a caller iterating over every node
+    needs this guard.
     """
     if name not in node.ordered_fields_lookup:
         return None

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-UC-INNER-SDOC-HIGHLIGHTING
 TITLE: Use case: syntax highlighting for inner sdocs in code
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 An unsettled use case, narrower than WORK-UC-INNER-SDOCS-IN-CODE-COMMENTS:

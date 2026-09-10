@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: MECH-FAITHFUL-IS-NOT-A-CONSUMER-WORD
 TITLE: Keep faithful out of the consumer glossary
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Faithful describes a transformation methodology -- how the surface is derived

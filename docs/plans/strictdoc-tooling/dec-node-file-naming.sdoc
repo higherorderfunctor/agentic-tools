@@ -27,7 +27,8 @@ for them to order. Plan directories are flat.
 A plan's backlog is not a file. It is a register NODE that items point at with
 Backlogged_In -- see DEC-BACKLOG-IS-A-REGISTER-NODE, which settled that a
 directory query was the wrong successor because it is not in the graph. Grooming
-raises a node's DEPTH where the node already sits; it moves nothing.
+drops the node's Backlogged_In edge where the node already sits; it moves
+nothing.
 <<<
 RATIONALE: >>>
 Naming the file for the UID makes the addressable unit and the fetchable unit

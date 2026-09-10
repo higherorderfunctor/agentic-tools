@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-CHUNK-LEADING-WHITESPACE
 TITLE: Chunks can begin on inter-node whitespace instead of the node header
-DEPTH: sketch
 AUTHORED_BY: human
 STATEMENT: >>>
 Measured on an 8762-byte document: of 17 AST chunks, roughly five begin on a

@@ -438,7 +438,7 @@ def new_narrative(
     stmt.write_text(statement.rstrip("\n") + "\n")
     cmd = [
         "new", "NARRATIVE",
-        "--uid", uid, "--title", title, "--depth", "sketch", "--widget", widget,
+        "--uid", uid, "--title", title, "--widget", widget,
         "--statement", f"@{stmt}", "--path", rel(dirpath) + "/",
     ]
     if place:
@@ -558,7 +558,6 @@ GRID_INTRO = (
     "([LINK: DEC-NODE-FAMILIES]). Tap a cell."
 )
 LADDER_ROWS = [
-    "- DEPTH: design maturity; live counts from the export",
     "- AUTHORED_BY: llm, llm-accepted, llm-adopted, human: ruled to be four rungs",
     "- STATUS: open, accepted, rejected, superseded: on a decision",
 ]
@@ -618,7 +617,7 @@ def step_start() -> None:
     layers = "\n".join([
         "Each layer may use only what is beneath it.",
         "",
-        "- L3: the semantic layer: lifecycles, gates, ripple, signing, readiness -- a language that decomposes into L1 plus L2 [HERE]",
+        "- L3: the semantic layer: lifecycles, gates, ripple and signing -- a language that decomposes into L1 plus L2 [HERE]",
         "- L2: hook machinery: where logic can attach and what a handler is handed; semantic-free",
         "- L1: this repo's grammar: which node types exist, their fields, their relation roles",
         "- L0: grammar machinery: the typed Nix options, the checks and the emitter that renders the grammar file",

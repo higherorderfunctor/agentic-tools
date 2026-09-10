@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-UC-PRESENTATION-SYNTAX-HIGHLIGHTING
 TITLE: Use case: presentation nodes with syntax highlighting
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 An unsettled use case: presentation nodes that carry syntax-highlighted code,

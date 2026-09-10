@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-EXTENSIONLESS-SHEBANG-CHECK
 TITLE: A fourth extensionless bash script would go unparsed silently
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 A fourth extensionless bash script would go unparsed silently:

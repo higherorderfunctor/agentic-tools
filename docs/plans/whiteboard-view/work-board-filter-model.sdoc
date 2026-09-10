@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-FILTER-MODEL
 TITLE: Decide the Board's filter model from what the explorer finds
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The whole-canon Board is denser than a person can read -- the operator's words

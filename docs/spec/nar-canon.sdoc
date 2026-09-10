@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-CANON
 TITLE: The canon
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: callout
 TAGS: whole canon, not settled

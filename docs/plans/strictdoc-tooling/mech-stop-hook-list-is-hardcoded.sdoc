@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-STOP-HOOK-LIST-IS-HARDCODED
 TITLE: A new prek hook does not reach the Stop checkpoint unless a second file is edited
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 `lib/validate-at-stop.sh:121` runs a hardcoded list of hook ids — `cspell deadnix shellcheck statix` — rather than deriving them from the git-hooks suite it mirrors. A hook added to `devenv.nix` git-hooks.hooks therefore runs at commit time and silently never runs at the Stop boundary. The comment at `:119-120` asks for the two to be kept in sync and is the only thing keeping them in sync. Derive the list from the same evaluation that defines the hooks, or make the divergence a check.

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-OLD-PLANS-RECONCILE
 TITLE: Groom the old plans against the new lens
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Reconcile the old plans with this thread's lens -- an EXPLICIT grooming

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SCRIBE-RPC-AND-SERVICE
 TITLE: Serve the workspace over a socket, as a devenv process
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Put the workspace behind a Unix socket and a devenv process. Derive the socket

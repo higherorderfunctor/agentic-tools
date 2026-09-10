@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-VIEW-QUERIES
 TITLE: The few tables no narrative can hold are computed by one registered query module
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 A narrative can draw over what it contains or names with Over. Three

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LANG-TOML
 TITLE: Language items for TOML
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Grammar to load: `tree-sitter-grammars.tree-sitter-toml` (nixpkgs, 0.7.0-unstable-2024-12-03, `python313Packages`/`python314Packages` binding present).

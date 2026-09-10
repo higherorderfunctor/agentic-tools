@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-GAP-GRAMMAR-CANNOT-SPELL-THE-VOCABULARY
 TITLE: The grammar cannot spell the ruled vocabulary
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: prose
 PLACE: screen

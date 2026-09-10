@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SGRA-SCANNED-PROJECT-WIDE
 TITLE: A whole-project export reads every .sgra under the root, referenced or not
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 strictdoc export . reads every file with an .sgra extension anywhere beneath the

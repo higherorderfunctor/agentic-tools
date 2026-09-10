@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: MECH-STRICTDOC-CLOSURE-TRIM
 TITLE: Drop the three strictdoc dependencies that cost closure and are unused
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 SPIKE-EXECUTABLE-RULES measured six dependencies in nixpkgs' strictdoc

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-EV-SCRIBE-WORKSPACE-CONTRACTS-STALE
 TITLE: Refresh the workspace-contracts evidence node to the current suite
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 EV-SCRIBE-WORKSPACE-CONTRACTS still says seven contracts pass against an

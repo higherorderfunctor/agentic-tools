@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SPIKE-CONVERSION-SIGNAL
 TITLE: Does converting 426 lines surface an unknown contradiction
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Convert the lane-iteration cluster and count contradictions discovered that were

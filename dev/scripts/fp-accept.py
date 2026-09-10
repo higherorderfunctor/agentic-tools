@@ -5,9 +5,7 @@
 Usage: fp-accept.py <export.json> --repo-root PATH UID [UID ...]
 
 For each named node, recomputes the hash of every parent it has a `Parent`
-relation to (any role) and writes a PARENT_FP entry for it -- unless
-MECH-FP-ACCEPT-READINESS refuses: a MECHANISM/SLICE/INVARIANT/SPIKE parent
-below interface-settled, or a DECISION parent whose STATUS is open.
+relation to (any role) and writes a PARENT_FP entry for it.
 
 This is the ONLY thing that writes PARENT_FP (DEC-FINGERPRINT-IN-NODE), and
 it writes through sdoc_model (MECH-SDOC-EDIT-VIA-MODEL) like every other
@@ -33,7 +31,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from sdoc_fp import build_uid_index, contract_hash, format_parent_fp, is_ready, load_index, parse_parent_fp, relation_parent_uids
+from sdoc_fp import build_uid_index, contract_hash, format_parent_fp, load_index, parse_parent_fp, relation_parent_uids
 from sdoc_model import SdocError, open_graph
 
 
@@ -69,15 +67,11 @@ def accept(index: dict, repo_root: Path, uids: list) -> int:
             if parent is None:
                 skipped.append((parent_uid, "parent not found in export"))
                 continue
-            ready, reason = is_ready(parent)
-            if not ready:
-                skipped.append((parent_uid, reason))
-                continue
             existing[parent_uid] = contract_hash(parent)
             signed.append(parent_uid)
 
         if not signed:
-            print(f"{uid}: nothing ready to sign ({len(skipped)} parent(s) still moving)")
+            print(f"{uid}: no available parents to sign")
             for parent_uid, reason in skipped:
                 print(f"  skipped {parent_uid}: {reason}")
             continue

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SDOC-BOARD-LAYOUT-LIBRARY-ASSESSMENT
 TITLE: ELK.js best preserves the board while replacing layout and routing
-DEPTH: verified
 AUTHORED_BY: llm
 SOURCE: Official ELK, ELK.js, Cytoscape.js, Dagre, and yFiles documentation plus a local ELK 0.12 probe against the live scribe payload; 2026-09-02
 STATEMENT: >>>

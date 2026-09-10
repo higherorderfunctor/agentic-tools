@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-LINE-ANCHORED-DENIAL-UNENFORCED
 TITLE: FieldName's anchored denials are decided from a register, not from the grammar
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The split itself is now decided per word rather than per anchor, and the rule
@@ -62,7 +61,7 @@ Enforcing it needs no regex and no new machinery. patternType already carries an
 addCheck branch for its enforced deny list, and a denial lifted out of a pattern
 is a list-membership test rather than a lookahead -- which is what makes it
 expressible at all, since POSIX extended regex has no lookaheads. Verified that
-addCheck fires on a scalar string type: DEPTH and UID accepted, RELATIONS and a
+addCheck fires on a scalar string type: AUTHORED_BY and UID accepted, RELATIONS and a
 lowercase name rejected.
 
 The earlier reasoning here was wrong twice over -- that the machinery did not
@@ -77,10 +76,9 @@ grammar is byte-identical to docs/sdoc/grammar.sgra, which declares UID five
 times, so the accept arm is not a bare assertion. What this node still names is
 the register, not the enforcement.
 
-DEPTH STAYS sketch, which is not drift against the paragraph above. What landed
-is the enforcement; what this node is TITLED for -- deriving FieldName's two
+What landed is the enforcement; what this node is TITLED for -- deriving FieldName's two
 answers from the document grammar instead of registering them -- is unbuilt and
-has no design yet. Raising DEPTH here would report the residual as done.
+has no design yet.
 <<<
 RELATIONS:
 - TYPE: Parent

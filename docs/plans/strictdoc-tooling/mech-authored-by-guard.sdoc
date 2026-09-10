@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-AUTHORED-BY-GUARD
 TITLE: Reject an AUTHORED_BY flip on a node already merged to main
-DEPTH: interface-settled
 AUTHORED_BY: human
 STATEMENT: >>>
 A static check over committed trees that reports every node claiming

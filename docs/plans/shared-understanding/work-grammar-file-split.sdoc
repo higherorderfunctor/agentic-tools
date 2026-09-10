@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAMMAR-FILE-SPLIT
 TITLE: Split the grammar into spec, plan and annotations files
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Split the one grammar into multiple .sgra files grouping functionality,

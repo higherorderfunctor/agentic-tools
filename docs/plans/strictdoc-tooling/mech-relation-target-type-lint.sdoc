@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-RELATION-TARGET-TYPE-LINT
 TITLE: Lint relation target types, which the parser never checks
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 A relation's legal target type is a contract keyed on the pair (source element tag, relation role), not on the role alone. The grammar declares thirteen Parent relations across the five element types, so the table has thirteen rows, one per declared pair. File relations carry no row: their VALUE names a filesystem path, not a UID.
@@ -40,8 +39,6 @@ There is no exemption or allowlist mechanism. The corpus is fixed before the gat
 
 SPIKE-CONVERSION-SIGNAL Governed_By SLICE-FIRST-CONVERSION becomes SLICE-FIRST-CONVERSION Proven_By SPIKE-CONVERSION-SIGNAL. SPIKE declares only Governed_By and File, so a spike has no role that can name what it probes; the reverse direction is expressible and is how the other seven spike citations are already written.
 
-MECH-FP-ACCEPT-READINESS Governed_By MECH-FP-CHECK becomes Assumes. It refines fp-check's behaviour rather than being governed by a decision, which is what the seven other MECHANISM-to-MECHANISM edges say. Its PARENT_FP entry stays and needs no re-signature: RELATIONS is excluded from the contract hash, so changing a role does not move it.
-
 The thirteen rows are data filling this surface, not part of it. Turning a row is a one-line edit that does not touch this mechanism.
 
 Refusing the write at edit time belongs to milestone four, in the sdoc CLI, consuming the same emitted model. It is not part of this mechanism.
@@ -64,7 +61,7 @@ Positive controls, same harness, same file, same anchor -- what strictdoc does c
 
 A thirteen-row prototype of the checker over the live export: 139 nodes, 92 parent edges checked, 2 violations -- exactly the two named in the STATEMENT. Re-run against each injected export it reported 3, catching the injected edge alongside them.
 
-THE ROLE TABLE HAS TWO AUTHORITIES AND THEY DISAGREE. MECH-CORPUS-EDGE-MAP is interface-settled, fingerprinted, and states a role table of its own: Assumes MECHANISM-to-DECISION, Proven_By MECHANISM-or-INVARIANT-to-SPIKE, Governed_By MECHANISM-to-DECISION. The live graph matches none of those three. It has zero MECHANISM Assumes DECISION edges against seven MECHANISM-to-MECHANISM and six SLICE-to-SLICE; zero MECHANISM or INVARIANT Proven_By against seven SLICE-to-SPIKE; and Governed_By sourced from SLICE, INVARIANT and SPIKE as well as MECHANISM. The rows above are the union, on the reading that MECH-CORPUS-EDGE-MAP forecasts how one unconverted corpus will be converted (its counts are of source material, not of nodes that exist) while this table is graph-wide. The union is safe because the argument that motivated its narrower Assumes -- "any-to-any is a cycle generator", written when nothing detected cycles -- has since been discharged by MECH-CYCLE-CHECK, which is implemented and gated in CI. Its STATEMENT is a contract field, so reconciling it is the operator's: MECH-EDGE-MAP-TABLE-RECONCILE.
+THE ROLE TABLE HAS TWO AUTHORITIES AND THEY DISAGREE. MECH-CORPUS-EDGE-MAP is fingerprinted and states a role table of its own: Assumes MECHANISM-to-DECISION, Proven_By MECHANISM-or-INVARIANT-to-SPIKE, Governed_By MECHANISM-to-DECISION. The live graph matches none of those three. It has zero MECHANISM Assumes DECISION edges against seven MECHANISM-to-MECHANISM and six SLICE-to-SLICE; zero MECHANISM or INVARIANT Proven_By against seven SLICE-to-SPIKE; and Governed_By sourced from SLICE, INVARIANT and SPIKE as well as MECHANISM. The rows above are the union, on the reading that MECH-CORPUS-EDGE-MAP forecasts how one unconverted corpus will be converted (its counts are of source material, not of nodes that exist) while this table is graph-wide. The union is safe because the argument that motivated its narrower Assumes -- "any-to-any is a cycle generator", written when nothing detected cycles -- has since been discharged by MECH-CYCLE-CHECK, which is gated in CI. Its STATEMENT is a contract field, so reconciling it is the operator's: MECH-EDGE-MAP-TABLE-RECONCILE.
 
 Logged, not decided: no Assumes edge in the graph carries a fingerprint, 0 of 14, while Governed_By carries one on 17 of 26 and Crosses on 3 of 29. The skill's fingerprint ladder runs strictly downward, DECISION to MECHANISM to SLICE, and has no place for a same-tier Assumes. Whether such an edge is contract-bearing at all is DEC-ASSUMES-CONTRACT-BEARING.
 

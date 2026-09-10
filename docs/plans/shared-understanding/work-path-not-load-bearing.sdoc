@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-PATH-NOT-LOAD-BEARING
 TITLE: Paths serve navigation, never meaning
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Stop the directory path being load-bearing. The operator hates that meaning

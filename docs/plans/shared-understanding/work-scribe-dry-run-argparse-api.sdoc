@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SCRIBE-DRY-RUN-ARGPARSE-API
 TITLE: Replace private argparse traversal in the dry-run flag injector
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The dry-run flag injector walks argparse's private \_SubParsersAction and

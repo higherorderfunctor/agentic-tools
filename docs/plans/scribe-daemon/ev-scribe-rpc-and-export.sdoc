@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-SCRIBE-RPC-AND-EXPORT
 TITLE: The socket holds one owner, and its export matches strictdoc byte for byte
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: dev/scripts/test_scribe_rpc.py plus live measurement on the 375-node canon; strictdoc 0.28.3; 2026-08-31
 STATEMENT: >>>

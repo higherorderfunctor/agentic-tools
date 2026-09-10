@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-START-SOLID
 TITLE: Where the design is solid, and where it is not
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: strip
 PLACE: screen

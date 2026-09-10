@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-NARRATIVE-PLACE-AND-OVER
 TITLE: The grammar carries PLACE, Over and the widget vocabulary on NARRATIVE, and PLACE is outside the contract hash
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 packages/strictdoc-grammar/values.nix gives NARRATIVE a PLACE field (tab,

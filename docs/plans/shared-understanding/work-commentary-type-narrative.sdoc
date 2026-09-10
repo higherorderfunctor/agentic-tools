@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-COMMENTARY-TYPE-NARRATIVE
 TITLE: COMMENTARY has no per-type narrative
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Every grammar type except COMMENTARY has a NAR-SEMANTIC-LAYER-TYPE-* narrative

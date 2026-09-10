@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SEMANTICS-CYCLE-SCAN-BOUND-MESSAGE
 TITLE: Make the relation cycle scan bound a depth, and its message a diagnostic
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 _simple_cycles bounds DFS iterations over the whole role subgraph, not search depth, so on a large corpus check() would report 'cycle scan exceeded step bound 10000', which reads like a contract finding rather than a scan limit. Bound by depth or by witnesses per role, and report an exhausted bound as a scan diagnostic distinct from a contract violation.

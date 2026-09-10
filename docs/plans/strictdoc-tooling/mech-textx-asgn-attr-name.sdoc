@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-TEXTX-ASGN-ATTR-NAME
 TITLE: The peg assignment node carries its attribute name, and positional correlation is wrong
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Measured on textx as pinned by 0.28.3. A synthetic __asgn_plain /

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-README-ROWS-FOLLOW-DESCRIPTIONS-NOT-PACKAGES
 TITLE: Make a package with no description fail rather than vanish from the README
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 dev/generate.nix's mkDescriptionRows maps over dev/data.nix's description

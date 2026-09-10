@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: SPIKE-SGRA-PARSE
 TITLE: Make the tree-sitter grammar parse standalone .sgra files
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The upstream tree-sitter grammar parses all sdoc documents but fails every

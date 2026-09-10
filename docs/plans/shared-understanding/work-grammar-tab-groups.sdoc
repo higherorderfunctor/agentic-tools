@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAMMAR-TAB-GROUPS
 TITLE: Group the Grammars tab for reasoning, guarded by a coverage check
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Group the Grammars tab by a hand-authored layout file, grammar-groups.json,

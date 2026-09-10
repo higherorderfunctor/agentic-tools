@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-GAP-MERGE-BOUNDARY-IS-NOT-A-JOINT
 TITLE: The merge boundary is not a joint
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: prose
 PLACE: screen

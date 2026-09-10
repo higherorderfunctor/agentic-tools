@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-FORMAT-NIX-DOWNGRADES-A-MISSING-FORMATTER
 TITLE: emit_nix.format_nix warns on a missing alejandra, which makes --check lie
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 extract/emit_nix.py's format_nix() shells out to alejandra when it is on PATH

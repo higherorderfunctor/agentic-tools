@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: INV-SETTLED-STAYS-VISIBLE
 TITLE: A settled ruling stays visible at every entry point until the corpus is migrated, and drift is corrected on sight
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 A ruling that is accepted but not yet applied to the corpus stays VISIBLE from

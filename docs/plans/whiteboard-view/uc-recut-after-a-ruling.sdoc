@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [USE_CASE]
 UID: UC-RECUT-AFTER-A-RULING
 TITLE: A ruling lands, the whiteboard is re-cut, and only the lines whose nodes changed need re-reading
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 A decision is accepted. The section narratives that Cites it show a drifted

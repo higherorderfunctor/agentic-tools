@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: REQ-BOARD-GRAMMAR-DRIVEN
 TITLE: The board app hard-codes nothing the grammar can say
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The board app SHALL contain minimal hard-coded knowledge of the system it
@@ -26,7 +25,7 @@ refresh or reload. The first instance is the Grammars tab's groups
 NOTES: >>>
 Hedged by the operator -- verbatim: "one requirement I have we could add is
 board (app) should contain minimal hard coded info about the system." Filed
-as a REQUIREMENT node at sketch rather than parked as a work item; that
+as a REQUIREMENT node rather than parked as a work item; that
 filing (and this node's continued existence) is the carver's resolution of
 "we could add", reversible at grooming. Known standing violations to burn
 down: TYPE_COLORS in card.js and the duplicated series colors in theme.css

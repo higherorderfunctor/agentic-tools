@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: SPIKE-CORPUS-NOT-NARRATIVE
 TITLE: The corpus is 14 percent prose
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Across 42 files and 4252 lines: 23.9 percent blank, 16.2 percent tables, 14.3

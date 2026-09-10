@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: INV-LISTS-WHERE-THE-READER-UNPACKS
 TITLE: Prose for description, lists for anything the reader must unpack
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Descriptive content may be paragraphs. Anything the reader must MENTALLY UNPACK

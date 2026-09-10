@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-GRAMMAR-SGRA-NOT-GENERATED
 TITLE: docs/sdoc/grammar.sgra is generated from values.nix and CI-gated
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 packages/strictdoc-grammar/values.nix renders docs/sdoc/grammar.sgra byte for

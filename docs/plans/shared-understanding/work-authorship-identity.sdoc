@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-AUTHORSHIP-IDENTITY
 TITLE: Authorship identity: keys for the LLM and how AUTHORED_BY gets set
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The umbrella node for giving the LLM its own signing identity and for making

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-WHITEBOARD-MIGRATION-COUNTS
 TITLE: What the whiteboard migration produced, counted from the export
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: strictdoc export --formats=json; sdoc check; dev/scripts/fp-check.py, cycle-check.py, file-check.py
 STATEMENT: >>>

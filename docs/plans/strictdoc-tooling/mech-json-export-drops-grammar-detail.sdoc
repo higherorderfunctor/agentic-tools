@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-JSON-EXPORT-DROPS-GRAMMAR-DETAIL
 TITLE: The JSON export flattens the grammar it reports, so it cannot verify an emitted .sgra
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 strictdoc export --formats=json reports a DOCUMENTS[].GRAMMAR block, and that

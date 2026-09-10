@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-MID-IS-PER-PARSE-RANDOM
 TITLE: StrictDoc mints a fresh MID on every parse, so two reads of one file disagree
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Measured on 0.28.3 while writing extract/compare.py. Every node StrictDoc

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-TYPE-COLORS-UNGUARDED
 TITLE: Node-type colors are hand-written in two files with no completeness check
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Graph-tab audit row, 2026-09-08:

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SYSTEMS-SOURCES-SPLIT-ON-COMMAS
 TITLE: The systems table's sources cell splits on commas, and a space fails silently
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 queries._split_words splits the systems table's sources cell on COMMAS, not on

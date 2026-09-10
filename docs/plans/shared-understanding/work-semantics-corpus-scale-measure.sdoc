@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SEMANTICS-CORPUS-SCALE-MEASURE
 TITLE: Measure the interpreter at corpus scale once it exists
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Nothing in the engine assessment was measured at real corpus scale except

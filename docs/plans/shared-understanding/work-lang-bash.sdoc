@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LANG-BASH
 TITLE: Language items for Bash
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Grammar to load: `tree-sitter-grammars.tree-sitter-bash` (nixpkgs, 0.25.1, `python313Packages`/`python314Packages` binding present).

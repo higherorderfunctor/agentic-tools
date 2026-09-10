@@ -53,7 +53,7 @@ correct or wrong; evidence valid, wrong or outdated; use case covered or
 uncovered; a representation's edge clean or dirty; work complete or incomplete.
 These name validator families, not fields: only the last two can be computed
 today, and a field nothing can set is a field nobody trusts. Each type keeps
-its own state field and its own name (DEPTH, STATUS); there is no shared STATUS.
+DECISION has STATUS; the other node families have no state field.
 <<<
 RATIONALE: >>>
 Offered by the operator from a fresh-lens session on 2026-08-30 and reconciled

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-TYPE-EVIDENCE
 TITLE: evidence
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: prose
 PLACE: screen
@@ -17,7 +16,7 @@ What happened this once. A measurement, a probe's finding, a proof that somethin
 
 Also: descriptive and particular in the grid ([LINK: DEC-NODE-FAMILIES]). On the sheet's day evidence hid in three places: a probe's STATUS, two measurements filed as INVARIANT, and proof of completion kept in the NOTES of finished work. The first two were retyped on 2026-08-30 -- the eight run probes and the two measurements are EVIDENCE now, keeping their SPIKE- and INV- prefixes under [LINK: DEC-UID-OUTLIVES-TYPE]; [LINK: MECH-SPIKE-IS-A-PIPELINE-TO-A-DECISION] is the reading that splits a probe into work, then evidence, then the decision it settles. Proof kept in NOTES is still where it was.
 
-State: DEPTH. An optional SOURCE names where the observation came from.
+State: none. An optional SOURCE names where the observation came from.
 <<<
 PARENT_FP: >>>
 DEC-NODE-FAMILIES:0000000

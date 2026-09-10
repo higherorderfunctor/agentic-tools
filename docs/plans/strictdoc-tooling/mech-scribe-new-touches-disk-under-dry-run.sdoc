@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SCRIBE-NEW-TOUCHES-DISK-UNDER-DRY-RUN
 TITLE: A create is a pure in-memory proposal, dry run or not
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 A create is a pure in-memory proposal. The document is built in memory, joins

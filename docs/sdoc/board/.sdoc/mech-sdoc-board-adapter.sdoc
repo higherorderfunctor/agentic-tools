@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-ADAPTER
 TITLE: One export becomes the snapshot and two queryable tables
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 adapter.py's adapt() turns one workspace.export index.json into both browser

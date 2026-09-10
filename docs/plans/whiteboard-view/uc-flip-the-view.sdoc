@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [USE_CASE]
 UID: UC-FLIP-THE-VIEW
 TITLE: The view renders its own design from its own root with no renderer change
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 The operator runs the task with --root NAR-WHITEBOARD-VIEW and reads the

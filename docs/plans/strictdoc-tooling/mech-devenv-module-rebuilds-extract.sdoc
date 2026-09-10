@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DEVENV-MODULE-REBUILDS-EXTRACT
 TITLE: The devenv module instantiates the extraction wrapper a second time
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 packages/strictdoc-grammar/lib/mkExtract.nix states the rule in its own header:

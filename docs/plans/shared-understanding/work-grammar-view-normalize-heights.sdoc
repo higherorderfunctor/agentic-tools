@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAMMAR-VIEW-NORMALIZE-HEIGHTS
 TITLE: Grammars view: normalize card heights
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Cards on the Grammars tab should share a height within a row or group, so

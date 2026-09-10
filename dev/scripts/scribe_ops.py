@@ -7,7 +7,7 @@ THE DAEMON DOES NOT KNOW ABOUT ARGV. A client parses its own command line --
 it can, because the option surface comes from the grammar FILE and needs no
 corpus (see scribe_grammar.py) -- and sends an operation:
 
-    {"op": "set", "uid": "MECH-X", "fields": {"DEPTH": "sketch"}}
+    {"op": "set", "uid": "MECH-X", "fields": {"TITLE": "A mechanism"}}
 
 Validation against the grammar happens here, against the graph the daemon
 already holds. A field illegal for that node's type is refused here, with the
@@ -73,8 +73,8 @@ def _known_fields(graph, tag: str) -> dict:
 
 def _check_fields(graph, tag: str, fields: dict) -> None:
     """Every field must be declared by THIS type, and every choice value must
-    be one of that field's words. The asymmetry is the point: a DECISION has
-    no DEPTH, so `--depth` on one is an error rather than a silent no-op."""
+    be one of that field's words. A field absent from the type is an error,
+    never a silent no-op."""
     declared = _known_fields(graph, tag)
     for name, value in fields.items():
         field = declared.get(name)
@@ -113,7 +113,6 @@ def apply(workspace: Workspace, op: str, params: dict) -> dict:
                 "text": _render(
                     sdoc_cli.do_list, graph, root,
                     node_type=params.get("type"),
-                    depth=params.get("depth"),
                     status=params.get("status"),
                 )
             }

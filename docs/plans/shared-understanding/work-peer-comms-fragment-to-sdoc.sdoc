@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-PEER-COMMS-FRAGMENT-TO-SDOC
 TITLE: The peer-communication guide ships as a fragment, then becomes canon
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The peer-communication style guide lands first as a dev fragment, so the

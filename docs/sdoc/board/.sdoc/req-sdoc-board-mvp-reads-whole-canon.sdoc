@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: REQ-SDOC-BOARD-MVP-READS-WHOLE-CANON
 TITLE: The board reads without mutation and bounds graph rendering
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 The app may read every node and resolved Parent or Child declaration from the

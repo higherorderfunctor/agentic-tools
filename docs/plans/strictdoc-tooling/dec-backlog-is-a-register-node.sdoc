@@ -25,8 +25,8 @@ whatever it actually relates to. Containment by edge does not consume the item's
 only parent, so an item can be in the backlog and in the graph at once.
 
 This supersedes containment by DOCUMENT. It does not change what an item IS: an
-ungroomed item is still an ordinary node at DEPTH sketch, there is still no
-BACKLOG node type, and grooming still raises DEPTH.
+ungroomed item is still an ordinary node, there is still no BACKLOG node type,
+and grooming drops its Backlogged_In edge.
 <<<
 RATIONALE: >>>
 DEC-PLAN-SCOPED-BACKLOG named this successor in its own retirement condition --
@@ -35,13 +35,12 @@ is the point at which an explicit register node and a Backlogged_In role become
 the cheaper answer. The one-node-per-file carve put every item outside that
 document, so the condition fired rather than being reinterpreted.
 
-The intermediate state the carve left behind was a directory query, DEPTH ==
-sketch scoped to a plan's directory. It answers correctly and it is not in the
-graph: it is a fact about where bytes sit, invisible to anything traversing
-edges, and unavailable to a reader who has a node and follows its relations. The
-whole point of the carve was to make the fetchable unit the addressable unit;
-leaving containment outside the edges would have moved the same problem up a
-level.
+The intermediate state the carve left behind was a directory query. It was not
+in the graph: it was a fact about where bytes sit, invisible to anything
+traversing edges, and unavailable to a reader who has a node and follows its
+relations. The whole point of the carve was to make the fetchable unit the
+addressable unit; leaving containment outside the edges would have moved the
+same problem up a level.
 
 An edge also composes where both a file and a directory query did not. A file
 forces exactly one containment, since a node sits in one file; the query forces
@@ -61,10 +60,8 @@ milestone five's questions and are not answered here. What is settled is only
 where an item is filed and how.
 
 Applied the same day: MECH-BACKLOG-STRICTDOC-TOOLING and
-MECH-BACKLOG-BEADS-MIGRATION exist, and all 81 nodes at DEPTH sketch carry
-Backlogged_In to their own plan's register. Verified as a set equality in both
-directions -- no sketch node unfiled, no filed node above sketch -- and nothing
-enforces it yet; MECH-SDOC-LAYOUT-CHECK is where that guard belongs.
+MECH-BACKLOG-BEADS-MIGRATION exist, and every then-ungroomed node carried
+Backlogged_In to its own plan's register.
 
 The Backlogged_In / Backlogs role pair was added to all five node types in
 packages/strictdoc-grammar/values.nix and the .sgra regenerated. Every type

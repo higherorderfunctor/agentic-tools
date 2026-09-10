@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: SPIKE-CORPUS-STALE-INVENTORY
 TITLE: What looks stale on a first reading
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Ordered by how much each would mislead an implementing model. This is a reading

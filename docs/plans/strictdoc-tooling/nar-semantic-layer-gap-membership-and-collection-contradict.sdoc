@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-GAP-MEMBERSHIP-AND-COLLECTION-CONTRADICT
 TITLE: Plan membership and collection contradict
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: prose
 PLACE: screen

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-CHECK-SYSTEM-BOUNDARY
 TITLE: Decide what belongs in flake checks versus devenv tasks
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Repo-wide, and a tangent from milestone one rather than part of it. Two check

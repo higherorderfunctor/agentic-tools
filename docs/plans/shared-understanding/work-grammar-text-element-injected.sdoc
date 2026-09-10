@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAMMAR-TEXT-ELEMENT-INJECTED
 TITLE: Grammar carries an injected TEXT element nobody authored
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Our grammar declares eight tags and no TEXT, so strictdoc injects its own

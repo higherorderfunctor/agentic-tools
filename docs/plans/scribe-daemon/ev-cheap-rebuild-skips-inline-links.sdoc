@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-CHEAP-REBUILD-SKIPS-INLINE-LINKS
 TITLE: The cheap rebuild accepts deleting a node the canon still links to
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: live 377-node canon plus three rolled-back mutations on an isolated copy; strictdoc 0.28.3; 2026-08-31
 STATEMENT: >>>

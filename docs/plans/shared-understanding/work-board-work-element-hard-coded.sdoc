@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-WORK-ELEMENT-HARD-CODED
 TITLE: The Graph left pane hard-codes WORK as the planning element
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Graph-tab audit row, 2026-09-08:

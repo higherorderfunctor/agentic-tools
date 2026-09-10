@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: MECH-SDOC-SKILL-CORRECTIONS
 TITLE: Correct the sdoc skill and README where they are now false
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Correct the sdoc skill and the design-graph README where they are now false.
@@ -21,8 +20,8 @@ operator's ruling the same day; the File-relation ROLE claim demoted from parser
 rule to house convention, measured; format's missing --output-dir and its
 inability to write a .sgra recorded; the cache literal corrected to Output/_cache
 with STRICTDOC_CACHE_DIR noted as overriding rather than inert; and the "what
-does not exist yet" paragraph rewritten, since suspect-link detection, the
-readiness query and a derived view all shipped.
+does not exist yet" paragraph rewritten, since suspect-link detection and a
+derived view shipped.
 
 What did NOT land, and why. The manage-new rule was corrected twice: the first
 attempt asserted that the command cannot work here, which an independent review
@@ -32,17 +31,13 @@ now says the command works and should still not be used, for that reason.
 <<<
 RATIONALE: >>>
 A skill that is loaded by every session and is wrong is worse than no skill: its
-statements read as verified. Two of its claims would have sent an agent to
+statements read as established. Two of its claims would have sent an agent to
 hand-edit a generated file and to run a UID minter whose output this corpus
 immediately renames.
 <<<
 NOTES: >>>
-Raised to implemented rather than verified: the session that corrected the skill
-is the session that wrote this, and verified requires an independent read.
-
 An independent review of that work found one blocker in it -- see the manage-new
-paragraph above -- which is itself the argument for the implemented/verified
-split existing at all.
+paragraph above.
 
 Deliberately still open, and NOT part of this node: the skill says nothing about
 the sys.path line strictdoc_config.py needs, because SLICE-CHECKPOINT-WIRING

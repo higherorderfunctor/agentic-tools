@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-GRAMMARS-VIEW
 TITLE: One card per grammar element; the declaration in the side pane
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Grammars view draws one uniform card per grammar element -- tag, UID
@@ -55,8 +54,8 @@ field stay distinct -- each drawn as an inline SVG by assets/fsm.js. The
 grammar says a type has a STATUS field with four words in it; the semantics
 engine says which of those words a node may move to next and under what
 rule. Rules come first because an operator shaping the model reads the
-sentence before the diagram. fsm.js knows no field name -- DEPTH, STATUS and
-AUTHORED_BY arrive as data, so a field rename does not reach it -- and it
+sentence before the diagram. fsm.js knows no field name -- STATUS and
+AUTHORED_BY arrive as data -- and it
 lays its machines out transposed, rank running down and branches spreading
 across, because the pane is 350px wide and a six-rung ladder never fit it
 sideways. Its geometry is measured in CSS pixels with no viewBox, so no
@@ -76,7 +75,7 @@ Lifecycle sections over the semantics payload.
 Corrected 2026-09-08: the payload is sdoc-semantics/2, and its machines are
 keyed by lifecycle name and indexed by type under by_type rather than being
 one per state field. Today the two readings coincide -- the engine emits
-STATUS, DEPTH and AUTHORED_BY, and machinesFor() maps a tag through by_type --
+STATUS and AUTHORED_BY, and machinesFor() maps a tag through by_type --
 but the tab reads the index, not the field list.
 <<<
 RELATIONS:

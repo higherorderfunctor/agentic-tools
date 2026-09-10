@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LANG-JSON
 TITLE: Language items for JSON
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Grammar to load: `tree-sitter-grammars.tree-sitter-json` (nixpkgs, 0.24.8, `python313Packages`/`python314Packages` binding present) for the current repo. `tree-sitter-grammars.tree-sitter-json5` (nixpkgs, 0.1.0, upstream `Joakker/tree-sitter-json5`, binding present) exists and is packaged if a forcing function ever appears.

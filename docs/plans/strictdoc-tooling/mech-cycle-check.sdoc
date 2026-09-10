@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-CYCLE-CHECK
 TITLE: Cycle detection over the JSON export
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Detect relation cycles in the exported graph independently of StrictDoc.
@@ -18,7 +17,6 @@ role, and the graph database returns only the bucket of role-less edges. Every
 relation in this grammar carries a role, so no cycle in this corpus is detected;
 the failure surfaces as a recursion-depth crash during render.
 <<<
-PARENT_FP: DEC-LOCAL-IMPLEMENTABILITY:0000000
 NOTES: >>>
 Implemented: dev/scripts/cycle-check.py, an iterative (non-recursive, so it
 cannot hit the exact recursion-depth failure it replaces) DFS over every
@@ -39,7 +37,3 @@ edges, 0 cycles found.
 
 Positive control re-run independently at review, against the real graph rather than a fixture: a role-carrying two-cycle was injected by closing a loop back against an existing Governed_By edge. strictdoc export exited 0 and reported nothing; cycle-check exited 1 and named the path. The role-blind premise is therefore measured here, not inherited.
 <<<
-RELATIONS:
-- TYPE: Parent
-  VALUE: DEC-LOCAL-IMPLEMENTABILITY
-  ROLE: Governed_By

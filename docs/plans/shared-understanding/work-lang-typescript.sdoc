@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LANG-TYPESCRIPT
 TITLE: Language items for TypeScript
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Grammar to load: `tree-sitter-grammars.tree-sitter-typescript` (nixpkgs, 0.23.2, `python313Packages`/`python314Packages` binding present). TSX is a second, separate nixpkgs attribute from the same upstream repo, `tree-sitter-grammars.tree-sitter-tsx` (0.23.2, binding present) — TypeScript and TSX are two distinct grammars, not one grammar with a mode flag, so a `.tsx` extractor needs the second attribute even though this repo has no `.tsx` file today.

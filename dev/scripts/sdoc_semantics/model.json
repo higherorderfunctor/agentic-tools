@@ -3,100 +3,6 @@
   "model_version": "1",
   "lifecycles": [
     {
-      "name": "DEPTH",
-      "subject": {
-        "kind": "field",
-        "field": "DEPTH"
-      },
-      "states": [
-        {
-          "name": "sketch",
-          "label": "sketch",
-          "note": "a shape, not yet a design"
-        },
-        {
-          "name": "needs-design",
-          "label": "needs design",
-          "note": "the shape is agreed; the design is not"
-        },
-        {
-          "name": "needs-spike",
-          "label": "needs spike",
-          "note": "the design turns on something unmeasured"
-        },
-        {
-          "name": "interface-settled",
-          "label": "interface settled",
-          "note": "the seam is fixed; the body is not"
-        },
-        {
-          "name": "implemented",
-          "label": "implemented",
-          "note": "it exists"
-        },
-        {
-          "name": "verified",
-          "label": "verified",
-          "note": "something other than its author has checked it"
-        }
-      ],
-      "initial": "sketch",
-      "terminal": ["verified"],
-      "note": "Transcribed for the spike. Every transition is unsettled by design.",
-      "transitions": [
-        {
-          "trigger": "advance",
-          "from": "sketch",
-          "to": "needs-design",
-          "gates": [],
-          "writes": [],
-          "emits": [],
-          "rule_text": "one rung at a time, forwards, with nothing gating the move",
-          "settled": false
-        },
-        {
-          "trigger": "advance",
-          "from": "needs-design",
-          "to": "needs-spike",
-          "gates": [],
-          "writes": [],
-          "emits": [],
-          "rule_text": "one rung at a time, forwards, with nothing gating the move",
-          "settled": false
-        },
-        {
-          "trigger": "advance",
-          "from": "needs-spike",
-          "to": "interface-settled",
-          "gates": [],
-          "writes": [],
-          "emits": [],
-          "rule_text": "one rung at a time, forwards, with nothing gating the move",
-          "settled": false
-        },
-        {
-          "trigger": "advance",
-          "from": "interface-settled",
-          "to": "implemented",
-          "gates": [],
-          "writes": [],
-          "emits": [],
-          "rule_text": "one rung at a time, forwards, with nothing gating the move",
-          "settled": false
-        },
-        {
-          "trigger": "advance",
-          "from": "implemented",
-          "to": "verified",
-          "gates": [],
-          "writes": [],
-          "emits": [],
-          "rule_text": "one rung at a time, forwards, with nothing gating the move",
-          "settled": false
-        }
-      ]
-    },
-    {
       "name": "STATUS",
       "subject": {
         "kind": "element",
@@ -237,38 +143,6 @@
   "flows": [],
   "rules": [
     {
-      "id": "DEPTH-ORDERED",
-      "lifecycle": "DEPTH",
-      "text": "The six values are a LADDER in the order the grammar declares them, and the spike reads that order as the only legal path: one trigger, adjacent rungs, no skipping.",
-      "kind": "transcription",
-      "settled": false,
-      "cites": ["SLICE-GRAMMAR-FROM-NIX"]
-    },
-    {
-      "id": "DEPTH-REGRESSION-UNDECIDED",
-      "lifecycle": "DEPTH",
-      "text": "May DEPTH fall? A design invalidated by a spike arguably returns to needs-design, but a falling DEPTH also erases the record that it once stood higher. Nobody has ruled.",
-      "kind": "open",
-      "settled": false,
-      "cites": []
-    },
-    {
-      "id": "DEPTH-RUNGS-UNDECIDED",
-      "lifecycle": "DEPTH",
-      "text": "Do implemented and verified belong to DEPTH? They describe the artifact rather than the thinking, and a node can be interface-settled forever without either being false.",
-      "kind": "open",
-      "settled": false,
-      "cites": []
-    },
-    {
-      "id": "DEPTH-SHARED-MACHINE-UNDECIDED",
-      "lifecycle": "DEPTH",
-      "text": "One machine per FIELD is the cheapest shape and is what the spike builds: the six types carrying DEPTH share this lifecycle exactly. The alternative is one machine per (type, field), which lets a REQUIREMENT and a WORK disagree about what a rung means, at the cost of six tables to keep aligned.",
-      "kind": "open",
-      "settled": false,
-      "cites": []
-    },
-    {
       "id": "STATUS-SUPERSEDE-NEVER-EDIT",
       "lifecycle": "STATUS",
       "text": "Never edit an accepted DECISION's STATEMENT. Set STATUS to superseded, add Superseded_By, and write a new decision (dev/skills/sdoc/SKILL.md rule 4; DEC-UID-OUTLIVES-TYPE records four accepted decisions whose statements are frozen).",
@@ -279,7 +153,7 @@
     {
       "id": "STATUS-SUPERSEDE-NEEDS-A-TARGET",
       "lifecycle": "STATUS",
-      "text": "Reaching superseded without a Superseded_By relation is a dangling supersession. That is a rule ABOUT TWO NODES, so no state machine can carry it -- it wants the graph query the closure verdict already uses.",
+      "text": "Reaching superseded without a Superseded_By relation is a dangling supersession. That is a rule ABOUT TWO NODES, so no state machine can carry it -- it needs graph validation.",
       "kind": "open",
       "settled": false,
       "cites": ["DEC-UID-OUTLIVES-TYPE"]

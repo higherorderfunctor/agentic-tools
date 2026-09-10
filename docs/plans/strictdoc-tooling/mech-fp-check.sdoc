@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-FP-CHECK
 TITLE: Suspect-link detection over the JSON export
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Hash each node's contract-bearing fields from the JSON export. A node is suspect

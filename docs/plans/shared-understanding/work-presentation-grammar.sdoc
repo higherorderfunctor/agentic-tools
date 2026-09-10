@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-PRESENTATION-GRAMMAR
 TITLE: presentation.sgra: the human reasoning layer
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 presentation.sgra -- the human reasoning layer, way under-specced by the

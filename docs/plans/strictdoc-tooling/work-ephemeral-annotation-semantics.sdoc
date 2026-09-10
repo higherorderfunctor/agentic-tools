@@ -1,26 +1,15 @@
 [DOCUMENT]
-TITLE: Work out annotation that is not meant to last, and whether DEPTH survives it
+TITLE: Work out annotation that is not meant to last
 
 [GRAMMAR]
 IMPORT_FROM_FILE: @repo
 
 [WORK]
 UID: WORK-EPHEMERAL-ANNOTATION-SEMANTICS
-TITLE: Work out annotation that is not meant to last, and whether DEPTH survives it
-DEPTH: sketch
+TITLE: Work out annotation that is not meant to last
 AUTHORED_BY: llm
 STATEMENT: >>>
-DEPTH is a bad field and the annotation vocabulary around it is underdefined.
-Two separate problems, worth drilling into together.
-
-DEPTH names a design-maturity ladder -- sketch, needs-design, needs-spike,
-interface-settled, implemented, verified -- and the word says nothing of the
-kind. It reads as distance from a root, which is what a person meets it
-expecting. DEC-WORK-STATE-FIELD already asks what it means on a WORK node and
-is open; this is the wider question of whether the field earns its place at
-all, and under what name.
-
-The gap it sits next to: there is no way to annotate a node with something
+There is no way to annotate a node with something
 NOT meant to survive to main. Comments, observed gaps, working notes, a
 verdict left for the next session -- none of them are durable claims, and
 today the only places to put them are NOTES on a real node or a new node that

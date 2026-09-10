@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-BACKLOG-BEADS-MIGRATION
 TITLE: The beads-migration plan's backlog register
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 The linchpin every ungroomed item in this plan points at. An item is in the

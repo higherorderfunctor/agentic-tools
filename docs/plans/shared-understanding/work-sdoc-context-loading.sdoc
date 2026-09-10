@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SDOC-CONTEXT-LOADING
 TITLE: Loading agent context from the canon
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Loading agent context out of the canon, rather than authoring it twice. Two

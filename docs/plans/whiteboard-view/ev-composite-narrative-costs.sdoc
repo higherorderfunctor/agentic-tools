@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-COMPOSITE-NARRATIVE-COSTS
 TITLE: What nesting narratives inside one file costs, measured on strictdoc 0.28.3
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: fixtures and exports under the session scratchpad wf4/strictdoc-organization/ (run.sh, fx-a-*, fx-a2-*, fx-a3-*, out/)
 STATEMENT: >>>

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-RELATION-ROLE-STYLES
 TITLE: Relation roles use evenly distributed solid colors
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Graph view assigns each payload-derived relation role a deterministic hue

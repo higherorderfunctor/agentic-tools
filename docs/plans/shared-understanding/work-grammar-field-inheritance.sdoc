@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAMMAR-FIELD-INHERITANCE
 TITLE: Shared fields inherited across every grammar file
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 A set of shared fields present on every node in every grammar file;

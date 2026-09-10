@@ -5,8 +5,8 @@ nits, missed expectations and fuzzy wants, carved on 2026-09-01 while those
 expectations are still fuzzy — on purpose. A session on this thread is guided
 elicitation: the operator picks a topic, and the session helps them pull out
 what they actually want, name what they did not consider, and sharpen what is
-fuzzy. There is no dependency order to work through, because nothing here is
-ready to build.
+fuzzy. There is no dependency order to work through; this is an exploratory
+plan.
 
 Their goal sentence, verbatim because it reads two ways: **"the goal crosses the
 whole system but it's to shift the board as a whole for human reasoning."** This
@@ -31,7 +31,7 @@ the branch: **promote a shared understanding between human and LLM.**
    root. A child hangs under its group by an `Assumes` edge — that edge is TREE
    STRUCTURE for the board's Plan tab, chosen by the carving agent, not an
    operator ruling. `REQ-BOARD-GRAMMAR-DRIVEN` is the one requirement the
-   operator offered; everything else is WORK at `sketch`.
+   operator offered; everything else is WORK.
 
 3. The board app renders this plan: `devenv up -d scribe board` from a shell in
    the worktree, then the Plan tab (tree, right-pane card) —
@@ -72,7 +72,8 @@ the branch: **promote a shared understanding between human and LLM.**
   their words on that node's own topic and nothing else (operator ruling
   2026-09-01, see `WORK-ONE-NODE-ONE-TOPIC`).
 - **Work items only, until groomed.** Nothing here converts to spec or
-  presentation nodes without the operator in the loop.
+  presentation nodes without the operator in the loop. Grooming drops the item's
+  `Backlogged_In` edge; it does not change node state.
 - **Ambiguity is preserved, not resolved.** Where the dump was ambiguous, the
   item's NOTES carries the operator's verbatim (spelling cleaned) so they can
   separate intent from the carver's reading. Keep doing that.
@@ -83,17 +84,17 @@ the branch: **promote a shared understanding between human and LLM.**
   `MECH-BACKLOG-SHARED-UNDERSTANDING` instead of narrating them.
 - **New tech debt is filed against the debt register, and the register is kept
   current.** `MECH-DEBT-SHARED-UNDERSTANDING` is the linchpin the operator reads
-  to review what this branch's work left behind. A debt item is a WORK node at
-  `sketch` carrying two `Assumes` edges: one to the register, and one to the
-  work item whose landing produced it, so it surfaces in the Plan tab under
-  both. The register holds no list — the edges are the list, and reviewing the
-  new debt means reading its inbound edges. This is separate from
+  to review what this branch's work left behind. A debt item is a WORK node
+  carrying two `Assumes` edges: one to the register, and one to the work item
+  whose landing produced it, so it surfaces in the Plan tab under both. The
+  register holds no list — the edges are the list, and reviewing the new debt
+  means reading its inbound edges. This is separate from
   `MECH-BACKLOG-SHARED-UNDERSTANDING`, which collects ungroomed items rather
   than debt; a node may sit under both. File debt on your own initiative,
   without asking, in the session that created it.
 - **Scope is the board viewer and StrictDoc in general, not only the carve.**
-  The operator adds items on the fly. File each as a WORK node at `sketch`,
-  under the concept group it fits or directly under the root.
+  The operator adds items on the fly. File each as a WORK node under the concept
+  group it fits or directly under the root.
 - **The plan tracks what changed.** When a session changes something a node
   describes, update that node in the same commit. An outcome that is spec-worthy
   goes where settled things live — `docs/spec/` for the plan model, `**/.sdoc/`

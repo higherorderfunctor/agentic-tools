@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: MECH-SDOC-CONFIG-HOOK-IMPORTABILITY
 TITLE: strictdoc_config.py must put itself on sys.path before defining a hook class
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 On nixpkgs strictdoc 0.27.1, any Format or StrictDocPlugin subclass defined in

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-FAIL-CLOSED-ARM-HAS-NO-GATE
 TITLE: The unrecognised-shape refusal is demonstrated but nothing runs it
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 SLICE-GRAMMAR-FROM-NIX's acceptance list includes "an unrecognised grammar shape

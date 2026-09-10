@@ -39,10 +39,8 @@ over a plan sits in that plan's directory and is collected with it; a view
 over the spec is durable; a view that must mention another plan's nodes does
 so with inline links only.
 
-A narrative carries DEPTH and PARENT_FP like the claim types, so readiness,
-signing and the fingerprint check need no special case; DEPTH on a narrative
-reads sketch for a draft and interface-settled once the operator has read it
-and let it stand.
+A narrative carries PARENT_FP like the claim types, so signing and the
+fingerprint check need no special case.
 <<<
 RATIONALE: >>>
 Three designs were judged against the operator's priorities and a skeptic's

@@ -7,15 +7,13 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-GRAMMAR-TAB-LIFECYCLE-VIEW
 TITLE: Grammar tab: file drawer, lifecycle FSM, semantics table
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Redesign the Grammars tab around lifecycle and semantics: a left drawer
 listing the grammar cards grouped by grammar FILE (once the split exists); a
-middle view showing the selected element's lifecycle graph (the DEPTH/STATUS
-ladder as an FSM) and a semantics table; the right pane unchanged, rendering
-what the grammar file declares. Motivated by DEPTH's grading being liked
-while its semantics are unrememberable -- see WORK-DEPTH-RENAME.
+middle view showing the selected element's lifecycle graph (the STATUS and
+AUTHORED_BY ladders as FSMs) and a semantics table; the right pane unchanged,
+rendering what the grammar file declares.
 <<<
 NOTES: >>>
 The reasoning groups landed first as WORK-GRAMMAR-TAB-GROUPS (2026-09-02);

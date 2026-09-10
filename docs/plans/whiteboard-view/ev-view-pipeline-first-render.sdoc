@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-VIEW-PIPELINE-FIRST-RENDER
 TITLE: First render of the semantic-layer root through the view pipeline
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: devenv tasks run --mode before view:render --input root=NAR-SEMANTIC-LAYER; docs/sdoc/view/
 STATEMENT: >>>

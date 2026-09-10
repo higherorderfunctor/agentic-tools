@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SGRA-ADMITS-NO-COMMENTS
 TITLE: A .sgra file cannot carry a generated-file header, because it has no comment syntax
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The grammar for .sgra files admits nothing before [GRAMMAR] and nothing between

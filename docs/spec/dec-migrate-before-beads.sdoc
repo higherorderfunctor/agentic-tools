@@ -17,9 +17,7 @@ argument that if execution lives in beads then work and probes might leave the
 canon rather than become WORK. The operator ruled on 2026-08-30 that the
 migration does not wait: probes become WORK when unrun and EVIDENCE when run;
 beads, when it runs, may take execution STATE out of the canon, but not the
-WORK nodes that declare what is to be built and what it crosses. What DEPTH
-means on a WORK node -- design maturity or delivery -- stays open as
-DEC-WORK-STATE-FIELD.
+WORK nodes that declare what is to be built and what it crosses.
 <<<
 RATIONALE: >>>
 The operator's words: "the migration was the one question I care to answer" and

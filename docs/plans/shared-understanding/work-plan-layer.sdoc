@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-PLAN-LAYER
 TITLE: The plan grammar and its views
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Concept group: the plan grammar and its views. Holds the plan-grammar

@@ -2,8 +2,8 @@
 """Shared fingerprint logic for fp-check / fp-accept (SLICE-FP-DETECTOR,
 docs/plans/strictdoc-tooling/slice-fp-detector.sdoc).
 
-Contract-bearing fields, the placeholder value, and the readiness predicate
-all live here so the two CLIs cannot drift against each other. Consumes the
+Contract-bearing fields and the placeholder value live here so the two CLIs
+cannot drift against each other. Consumes the
 `strictdoc export --formats=json` output directly -- see MECH-FP-CHECK.
 
 Kept underscore-named so both scripts can import it with a plain
@@ -34,9 +34,6 @@ EXCLUDED_FIELDS = {"RATIONALE", "NOTES", "PARENT_FP", "PLACE", "COMPONENT"}
 # Export-scaffolding keys strictdoc's JSON emits per node that are not sdoc
 # fields at all.
 STRUCTURAL_KEYS = {"_TOC", "_NODE_TYPE", "UID", "RELATIONS"}
-
-READY_DEPTHS = {"interface-settled", "implemented", "verified"}
-
 
 def load_index(json_path: Path) -> dict:
     return json.loads(json_path.read_text())
@@ -95,22 +92,3 @@ def relation_parent_uids(node: dict) -> set:
     not a contract-bearing node.
     """
     return {r["VALUE"] for r in node.get("RELATIONS", []) if r.get("TYPE") == "Parent"}
-
-
-def is_ready(node: dict):
-    """MECH-FP-ACCEPT-READINESS: refuse to sign a fingerprint against a
-    parent that is still moving.
-
-    A MECHANISM/SLICE/INVARIANT/SPIKE must be interface-settled or better; a
-    DECISION must not be STATUS: open. Returns (ready, reason).
-    """
-    node_type = node.get("_NODE_TYPE")
-    if node_type == "DECISION":
-        status = node.get("STATUS")
-        if status == "open":
-            return False, "DECISION is still open"
-        return True, ""
-    depth = node.get("DEPTH")
-    if depth not in READY_DEPTHS:
-        return False, f"DEPTH is {depth!r}, needs interface-settled or better"
-    return True, ""

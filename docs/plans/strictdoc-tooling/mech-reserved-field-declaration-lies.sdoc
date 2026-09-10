@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-RESERVED-FIELD-DECLARATION-LIES
 TITLE: A reserved field name can be declared with a type that is then ignored
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Declaring UID as a choice type parses clean, and the document tokenizer then

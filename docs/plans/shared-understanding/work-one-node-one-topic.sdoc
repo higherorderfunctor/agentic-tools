@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-ONE-NODE-ONE-TOPIC
 TITLE: One node, one topic: keep nodes small and let count carry complexity
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Nodes are small: one node, one topic. The plan tree should carry one node per

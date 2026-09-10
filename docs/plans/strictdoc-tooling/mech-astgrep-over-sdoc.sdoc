@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-ASTGREP-OVER-SDOC
 TITLE: ast-grep could match sdoc files directly using the grammar we already package
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 ast-grep is tree-sitter based and takes custom languages through a dynamic

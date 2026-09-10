@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-PERSPECTIVE-CELL-FONT
 TITLE: Perspective cells ignore the theme monospace font
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Aurora theme (docs/sdoc/board/assets/theme.css) declares JetBrains Mono

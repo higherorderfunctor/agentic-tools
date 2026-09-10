@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LLM-SIGNING-KEYS
 TITLE: Give the LLM SSH and GPG keys, stored in SecretSpec
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Provision the LLM an SSH key and a GPG key of its own, held in devenv's

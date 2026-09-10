@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-STRICTDOC-DEVENV-MODULE
 TITLE: A devenv module owns strictdoc's wrapping and its grammar generation
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Add a devenv module, named for the tool rather than the milestone --

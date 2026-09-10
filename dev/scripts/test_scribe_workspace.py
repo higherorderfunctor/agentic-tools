@@ -149,7 +149,6 @@ def create(workspace: Workspace, path: Path, uid: str, tag: str = "MECHANISM", *
     values = {
         "UID": uid,
         "TITLE": f"Contract node {uid}",
-        "DEPTH": "sketch",
         "AUTHORED_BY": "llm",
         "STATEMENT": "Written by a contract.",
     }
@@ -625,7 +624,6 @@ def test_apply_dry_run_paths(root: Path) -> None:
         "uid": "WORK-CONTRACT-NEW",
         "fields": {
             "TITLE": "Dry-run create contract",
-            "DEPTH": "sketch",
             "STATEMENT": "A proposed node.",
         },
         "relations": [],
@@ -828,6 +826,49 @@ def test_file_relation_names_an_item(root: Path) -> None:
     } in relations, f"the export dropped the item slots: {relations}"
 
 
+@contract("fp-accept signs an available parent regardless of its state")
+def test_fp_accept_has_no_readiness_gate(root: Path) -> None:
+    """Signing has no governance-state readiness refusal."""
+    workspace = Workspace(root)
+    plan = root / "docs" / "plans" / "scribe-daemon"
+    parent_uid = "DEC-CONTRACT-OPEN-PARENT"
+    child_uid = "MECH-CONTRACT-SIGNED-CHILD"
+    child_path = plan / "mech-contract-signed-child.sdoc"
+    create(
+        workspace,
+        plan / "dec-contract-open-parent.sdoc",
+        parent_uid,
+        tag="DECISION",
+        STATUS="open",
+        RETIRES_ON="The contract ends with the test.",
+    )
+    create(
+        workspace,
+        child_path,
+        child_uid,
+        _relations=[("Governed_By", parent_uid)],
+    )
+    exported = workspace.export_json(root / "export")
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(root / "dev" / "scripts" / "fp-accept.py"),
+            exported["index"],
+            "--repo-root",
+            str(root),
+            child_uid,
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr or result.stdout
+    written = child_path.read_text(encoding="utf8")
+    assert f"{parent_uid}:" in written, result.stdout
+    assert f"{parent_uid}:0000000" not in written, result.stdout
+
+
 CONTRACTS = [
     test_read_is_free,
     test_write_defers,
@@ -852,6 +893,7 @@ CONTRACTS = [
     test_apply_dry_run_relate,
     test_apply_dry_run_unrelate,
     test_file_relation_names_an_item,
+    test_fp_accept_has_no_readiness_gate,
 ]
 
 

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-PLAN-TREE
 TITLE: The Plan view: a collapsible tree over the declaring directories
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 The Plan view renders the canon as a collapsible tree with the selected

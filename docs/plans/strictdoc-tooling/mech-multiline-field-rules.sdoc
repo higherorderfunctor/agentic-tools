@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-MULTILINE-FIELD-RULES
 TITLE: Which fields may carry block values belongs to the writing tool
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 A field's value is written either inline or as a block delimited by the

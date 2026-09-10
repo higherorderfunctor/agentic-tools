@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [USE_CASE]
 UID: UC-RENAME-A-TERM
 TITLE: The operator chooses a different word for a ruled term, and every narrative that used it is flagged
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 The operator decides "joint" should be another word. They retitle the term

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-MKEXTRACT-CTYPES-COMMENT-STALE
 TITLE: The ctypes-route comment overstates what tree-sitter-grammars adds
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The comment at packages/strictdoc-grammar/lib/mkExtract.nix:69-75 justifies

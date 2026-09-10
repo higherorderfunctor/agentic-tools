@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-LANG-MARKDOWN
 TITLE: Language items for Markdown
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Grammar to load: two grammars, not one. `tree-sitter-grammars.tree-sitter-markdown` (nixpkgs, 0.5.3, binding present) covers block structure; `tree-sitter-grammars.tree-sitter-markdown-inline` (nixpkgs, 0.5.3, binding present) covers inline spans (links, emphasis, code spans). Upstream ships them as two grammars/subdirectories in one repo (`tree-sitter-grammars/tree-sitter-markdown`, `split_parser` branch layout) for exactly this reason — block parsing and inline parsing are genuinely separate passes in CommonMark. A heading-level or fenced-code-level extractor needs only the block grammar; only a span-aware extractor (e.g. resolving this corpus's own cross-reference link syntax inside a STATEMENT, or a wikilink) needs the inline one too.

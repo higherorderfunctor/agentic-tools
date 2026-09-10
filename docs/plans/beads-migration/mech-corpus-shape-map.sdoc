@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-CORPUS-SHAPE-MAP
 TITLE: Which content shape becomes which node type
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Measured across 42 files and 4252 lines. Counts are instances found, not

@@ -23,8 +23,8 @@ on later.
 Two exclusions, both deliberate and both cheap to reverse. Targets outside
 the repository are not supported; no File relation names one today. Forward
 references are not supported either -- a node may not name a path its own
-unbuilt work will create. Relaxing that later by gating existence on DEPTH
-is a one-line change, where tightening it later would not be.
+unbuilt work will create. Relaxing that later is a one-line change, where
+tightening it later would not be.
 
 The second argument is the repository root, which neither cycle-check.py nor
 fp-check.py takes: the JSON export carries no path for anything, so there is

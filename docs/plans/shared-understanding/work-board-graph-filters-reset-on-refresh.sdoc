@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-BOARD-GRAPH-FILTERS-RESET-ON-REFRESH
 TITLE: Refresh silently re-enables every graph filter the reader turned off
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Graph-tab audit row, 2026-09-08:

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-BOARD-PERSPECTIVE-VIEW
 TITLE: Perspective explores two named tables under a registered Aurora theme
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 perspective.js loads the pinned CDN modules, builds two named tables (nodes,

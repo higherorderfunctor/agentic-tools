@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-CANON-COLOURS
 TITLE: What a colour means, wherever it appears
-DEPTH: interface-settled
 AUTHORED_BY: llm
 WIDGET: table
 PLACE: screen

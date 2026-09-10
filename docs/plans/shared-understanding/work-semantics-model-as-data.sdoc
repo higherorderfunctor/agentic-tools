@@ -1,22 +1,19 @@
 [DOCUMENT]
-TITLE: Turn the three transcribed machines into one model document
+TITLE: Turn the transcribed machines into one model document
 
 [GRAMMAR]
 IMPORT_FROM_FILE: @repo
 
 [WORK]
 UID: WORK-SEMANTICS-MODEL-AS-DATA
-TITLE: Turn the three transcribed machines into one model document
-DEPTH: implemented
+TITLE: Turn the transcribed machines into one model document
 AUTHORED_BY: llm
 STATEMENT: >>>
-Replace dev/scripts/sdoc_semantics/machines/depth.py, status.py,
-authored_by.py and registry.py with one committed document,
+Replace the per-field machine modules and registry.py with one committed document,
 dev/scripts/sdoc_semantics/model.json, in the shape DEC-SEMANTICS-MODEL-IS-DATA
 names and SLICE-BEHAVIOUR-MODEL's emitter will later produce. The content is a
-TRANSCRIPTION of exactly what the three machines say today: three lifecycles
-(DEPTH on every element that declares the field, STATUS on DECISION,
-AUTHORED_BY rise-only), their transitions with their rule text and settled
+TRANSCRIPTION of exactly what the two machines say today: two lifecycles
+(STATUS on DECISION and AUTHORED_BY rise-only), their transitions with their rule text and settled
 false, and the rules of kind transcription and open, including the three open
 questions word for word. No gate is added; the gates list is empty. After this
 item the document is the only place the semantics are written.
@@ -65,19 +62,16 @@ prove it first, but make sure path to nix if it surfaces is logged as sdocs".
 The path is WORK-SEMANTICS-NIX-EMITTER-PATH.
 
 The shaping of the real content is the operator's and starts only when they
-say so. This item must leave DEPTH-REGRESSION-UNDECIDED,
-DEPTH-RUNGS-UNDECIDED and DEPTH-SHARED-MACHINE-UNDECIDED as open rules in the
-document, unchanged.
+say so.
 
 Why one document and not one per lifecycle: SLICE-BEHAVIOUR-MODEL emits one
 JSON carrying a schema version, a model version and the resolved model, and
 relation contracts, checkpoints and flows are not per-lifecycle things.
 
-Implemented 2026-09-03 (commit pending). The committed model carries 3
-lifecycles, 14 states, 11 transitions and 10 rules: 4 transcription and 6 open.
-Gates and each other model collection are empty. The DEPTH, STATUS and
-AUTHORED_BY text renderings each diff to zero lines against the pre-change
-scribe semantics baseline. The three former machine modules and registry.py
+Implemented 2026-09-03 (commit pending). The committed model carries STATUS and
+AUTHORED_BY lifecycles. Gates and each other model collection are empty. Their
+text renderings diff to zero lines against the pre-change scribe semantics
+baseline. The former machine modules and registry.py
 are deleted; model.json is the only lifecycle declaration surface.
 <<<
 RELATIONS:

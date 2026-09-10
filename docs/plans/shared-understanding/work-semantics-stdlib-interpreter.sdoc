@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SEMANTICS-STDLIB-INTERPRETER
 TITLE: Replace the transitions engine with a standard-library interpreter over the model document
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Rewrite dev/scripts/sdoc_semantics/engine.py as a standard-library-only
@@ -105,7 +104,7 @@ separate backstop. Relation diagnostics now return one deterministic cycle
 witness per role with an explicit scan bound, as requested in the follow-up.
 An isolated copy without sdoc_semantics imports scribe_cmd and accepts --help
 for all 9 non-semantics verbs; the semantics verb reports unavailable.
-DEPTH, STATUS and AUTHORED_BY still differ from the base only in the schema
+STATUS and AUTHORED_BY still differ from the base only in the schema
 header. Rule ownership is explicit data, edge subject identities are stable,
 and every provenance step carries the same keys with a gate-name list.
 <<<

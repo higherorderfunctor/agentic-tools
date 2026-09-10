@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-LIST-SEPARATOR-SUPPRESSED
 TITLE: A separated list's separator does not survive into the faithful surface
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Measured on 0.28.3. The choice-option list is spelled

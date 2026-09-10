@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-LEAN-FORMATS
 TITLE: Pin formats to SDoc and JSON in strictdoc_config.py
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 strictdoc_config.py registers exactly two formats, SDocFormat and JSONFormat,

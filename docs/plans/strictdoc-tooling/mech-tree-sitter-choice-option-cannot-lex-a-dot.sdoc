@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-TREE-SITTER-CHOICE-OPTION-CANNOT-LEX-A-DOT
 TITLE: The patched tree-sitter grammar cannot lex a dot in an unquoted choice option
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 overlays/generic/tree-sitter-strictdoc.patch now adds the QUOTED arm to

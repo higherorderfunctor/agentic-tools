@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: MECH-SDOC-LOOP-SHELL-ENTRY-STAGES-FILES
 TITLE: devenv shell -- strictdoc runs the enterTest DAG and stages the working tree
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 The sdoc skill's required loop is `strictdoc format .` then a clean export, and

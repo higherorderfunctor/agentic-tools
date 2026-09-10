@@ -12,8 +12,8 @@ the table in the payload. The list is closed: a new word is a canon
 decision and an edit here.
 
   roots    every root narrative: uid, title, dir_class, path
-  nodes    every node's count and facets: by type, dir_class, system,
-           DEPTH, STATUS, AUTHORED_BY and whether any narrative cites it
+  nodes    every node's count and facets: by type, dir_class, system, STATUS,
+           AUTHORED_BY and whether any narrative cites it
   systems  the systems table, parsed from the one narrative tagged systems
            (DEC-SYSTEM-IS-A-TYPE-SET): name, types, roles, meaning
   terms    every narrative tagged term: uid, title, dir_class, path
@@ -39,7 +39,7 @@ def _import_view_check():
 vc = _import_view_check()
 
 QUERY_WORDS = vc.QUERY_WORDS
-STATE_FIELDS = ("DEPTH", "STATUS", "AUTHORED_BY")
+STATE_FIELDS = ("STATUS", "AUTHORED_BY")
 
 
 def query_of(tags: list):

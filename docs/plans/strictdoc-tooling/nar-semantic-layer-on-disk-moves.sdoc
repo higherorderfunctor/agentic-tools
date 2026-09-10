@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-ON-DISK-MOVES
 TITLE: Moving a node between files
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen
@@ -22,9 +21,9 @@ Retention class changes by file move; what survives collection; where a backlog 
 - Two nodes still say handover freezes the whole plan. A later mechanism narrowed that to the scope handed over.
 [LINK: DEC-PLAN-LIFECYCLE-OPEN] [LINK: MECH-PLAN-BEADS-SNAPSHOT] [LINK: MECH-PLAN-CHANGE-KINDS] [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION] [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM]
 > DEC-PLAN-LIFECYCLE-OPEN STATEMENT and MECH-PLAN-BEADS-SNAPSHOT still say "ingest freezes the plan" [FALLS OUT: MECH-PLAN-CHANGE-KINDS]
-- Is a backlog item canon (reviewed) or beads (private)? An unreviewed sketch node sitting on the branch is neither.
+- Is a backlog item canon (reviewed) or beads (private)? An unreviewed backlog node sitting on the branch is neither.
 [LINK: NAR-SEMANTIC-LAYER-GAP-MEMBERSHIP-AND-COLLECTION-CONTRADICT]
-> a backlog item: canon (reviewed) or beads (private)? an unreviewed sketch node on the branch is neither [GAP]
+> a backlog item: canon (reviewed) or beads (private)? an unreviewed node on the branch is neither [GAP]
 - The beads-migration plan's authoritative source is a rendered artifact plus private markdown, neither in the repo. Which one wins is undecided.
 [LINK: DEC-SOURCE-OUT-OF-REPO] [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION]
 > beads-migration plan's source = an artifact + private markdown, neither in repo; which wins [OPEN: DEC-SOURCE-OUT-OF-REPO]

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-DERIVE-CACHED-LAYERS
 TITLE: Delete the hand-maintained summary layers and derive them from JSON
-DEPTH: interface-settled
 AUTHORED_BY: llm
 STATEMENT: >>>
 Delete the index table, the grain index, and the per-file frontmatter counters.

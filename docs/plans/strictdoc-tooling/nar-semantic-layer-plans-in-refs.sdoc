@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-SEMANTIC-LAYER-PLANS-IN-REFS
 TITLE: Plans and git refs
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: rows
 PLACE: screen

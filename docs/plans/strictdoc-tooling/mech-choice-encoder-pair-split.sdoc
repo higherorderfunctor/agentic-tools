@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-CHOICE-ENCODER-PAIR-SPLIT
 TITLE: The choice-option converter pair is split across two files with nothing checking they agree
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 ChoiceOption is now the one converter whose two halves live in different files.

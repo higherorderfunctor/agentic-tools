@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [NARRATIVE]
 UID: NAR-MECHANISM-MOOD-REVIEW-LEGEND
 TITLE: How to read the verdicts
-DEPTH: sketch
 AUTHORED_BY: llm
 WIDGET: legend
 PLACE: card

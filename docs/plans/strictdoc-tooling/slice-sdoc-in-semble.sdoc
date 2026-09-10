@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: SLICE-SDOC-IN-SEMBLE
 TITLE: Index sdoc documents in semble
-DEPTH: verified
 AUTHORED_BY: llm
 STATEMENT: >>>
 Package a tree-sitter grammar for the sdoc format as a flake output, add it to
@@ -18,7 +17,7 @@ extra-grammars check, parsing a real sdoc sample.
 RATIONALE: >>>
 The repository's flake instructions already require that a custom grammar absent
 from nixpkgs be exposed as a flake package so the authenticated matrix publishes
-it. Every mechanism this slice crosses is already implemented.
+it. Every mechanism this slice crosses already exists.
 <<<
 NOTES: >>>
 Implemented: overlays/generic/tree-sitter-strictdoc.nix (flake package

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SOURCE-FILES-MKDIR-NOISE
 TITLE: A JSON-only export leaves an empty HTML source tree behind
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 A JSON-only export still creates the HTML source-file tree, leaving roughly 400

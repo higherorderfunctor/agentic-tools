@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-CONTRACT-FIELDS-EDGE-TO-SEMANTIC-LAYER
 TITLE: Contract-bearing fields are semantic, and their edge should move
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 SLICE-GRAMMAR-FROM-NIX still carries a Governed_By edge to

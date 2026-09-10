@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [EVIDENCE]
 UID: EV-VIEW-ORGANIZATION-FIRST-RENDER
 TITLE: First whole-canon render of the view organization: counts, checks, sizes, timings
-DEPTH: implemented
 AUTHORED_BY: llm
 SOURCE: /tmp/claude-1000/-home-caubut-Documents-projects-nix-agentic-tools/3dc654a0-2cd2-4447-a890-5bfe23555a4b/scratchpad/wf5/integrate/shots
 STATEMENT: >>>

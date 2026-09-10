@@ -77,7 +77,7 @@ uid_paths = _view_check().uid_paths
 SNAPSHOT_SCHEMA = "sdoc-board/2"
 ROWS_SCHEMA = "sdoc-perspective/2"
 SEMANTICS_SCHEMA = "sdoc-semantics/2"
-STATE_FIELDS = ("STATUS", "DEPTH")
+STATE_FIELDS = ("STATUS",)
 STRUCTURAL = ("_TOC", "_NODE_TYPE", "RELATIONS")
 
 

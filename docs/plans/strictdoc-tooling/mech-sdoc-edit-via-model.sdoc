@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SDOC-EDIT-VIA-MODEL
 TITLE: Replace sdoc_edit.py's hand-copied field order with strictdoc's node model
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Replace dev/scripts/sdoc_edit.py with dev/scripts/sdoc_model.py, a module over
@@ -109,8 +108,8 @@ only: sdoc_fp.py:32 excludes PARENT_FP from the contract hash, so no fingerprint
 churns.
 
 What set_field_value accepts silently, each confirmed by a clean full export
-exiting 1 where the unmutated corpus exits 0: DEPTH "totally-not-a-depth"
-("invalid SingleChoice value"), AUTHORED_BY "robot", and value=None on a
+exiting 1 where the unmutated corpus exits 0: AUTHORED_BY "robot"
+("invalid SingleChoice value"), and value=None on a
 required STATEMENT ("Node is missing a field that is required by grammar").
 validate_node catches all three plus a newline inside a single-line choice
 field, raising StrictDocSemanticError. It does not catch a "<<<" line inside a

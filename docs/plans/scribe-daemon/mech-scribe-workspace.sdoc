@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [MECHANISM]
 UID: MECH-SCRIBE-WORKSPACE
 TITLE: A workspace holds one graph and publishes it as an immutable generation
-DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 A workspace owns one project root, hydrates its graph once, and publishes it as

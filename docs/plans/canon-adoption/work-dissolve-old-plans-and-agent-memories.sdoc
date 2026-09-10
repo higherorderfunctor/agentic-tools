@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-DISSOLVE-OLD-PLANS-AND-AGENT-MEMORIES
 TITLE: Dissolve the markdown plans and the agent memories into the canon
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Dissolve the old plans and the agent memories. The markdown plans under

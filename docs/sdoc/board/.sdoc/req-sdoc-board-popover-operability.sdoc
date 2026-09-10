@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [REQUIREMENT]
 UID: REQ-SDOC-BOARD-POPOVER-OPERABILITY
 TITLE: Scrollable popovers show help first and dismiss outside
-DEPTH: verified
 AUTHORED_BY: llm
 STATEMENT: >>>
 Any scrollable popover in the Board app MUST place instructions needed to

@@ -7,7 +7,6 @@ IMPORT_FROM_FILE: @repo
 [WORK]
 UID: WORK-SDOC-GRAMMAR-LANGUAGE-SWITCH
 TITLE: The sdoc tree-sitter grammar switches the inner grammar on the language field
-DEPTH: sketch
 AUTHORED_BY: llm
 STATEMENT: >>>
 Extend the sdoc tree-sitter grammar (WORK-SDOC-TREE-SITTER-GRAMMAR) so that,
