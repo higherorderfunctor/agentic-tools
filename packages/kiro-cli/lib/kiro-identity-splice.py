@@ -1,15 +1,16 @@
 """Splice the kiro-cli identity sentence in an extracted KAS engine bundle.
 
-The vendor's `getIdentity(client)` returns ONE template literal per client id.
+The vendor's identity function returns ONE template literal per client id.
 For `kiro-cli` it opens with an identity sentence and continues with prose about
 the terminal environment (no GUI, refer to files by path, ...). Only the leading
 sentence is replaced; the remainder is preserved byte-for-byte, because it is
 the part that keeps the agent behaving like a terminal program.
 
-NOTHING here matches vendor prose. The anchor is built from a function name and
-a protocol client id, and the sentence boundary is found by punctuation, so a
-vendor reword still splices correctly. What the anchor cannot survive is a
-STRUCTURAL change, and that is deliberately fatal rather than silent: a
+NOTHING here matches vendor prose. Older bundles expose `getIdentity(client)`;
+2.21.1/2.21.2 minify it into a renamed function with a ternary return. Match the
+complete CLI/IDE dispatch in that form, without pinning the mangled identifiers.
+The sentence boundary is found by punctuation, so a vendor reword still splices
+correctly. An unrecognized structural change is deliberately fatal: a
 half-applied or mis-targeted identity patch is worse than an unpatched engine,
 since neither the CLI nor the session artifact would show which one you got.
 
@@ -28,6 +29,17 @@ import sys
 FN = re.compile(rb"function getIdentity\(")
 BRANCH = re.compile(rb'if \(client\d* === "kiro-cli"\) \{\s*\n\s*return `([^`]*)`')
 NEXT_FN = re.compile(rb"\nfunction \w+\(")
+# Measured in the extracted 2.21.2 engine: xSs(e) supplies the leading
+# interpolation of VZ's prompt. The complete function is the boundary, not the
+# next newline (minified functions are adjacent). The IDE arm is a positive
+# control, and both comparisons must use the function's own argument.
+IDENTIFIER = rb"[A-Za-z_$][A-Za-z0-9_$]*"
+TEMPLATE_BODY = rb"(?:\\[\s\S]|[^`\\])*"
+MINIFIED_FN = re.compile(
+    rb"\bfunction\s+" + IDENTIFIER + rb"\s*\(\s*(?P<client>" + IDENTIFIER + rb")\s*\)\s*\{\s*"
+    rb'return\s+(?P=client)\s*===\s*"kiro-cli"\s*\?\s*`(?P<body>' + TEMPLATE_BODY + rb")`\s*:\s*"
+    rb'(?P=client)\s*===\s*"kiro-ide"\s*\?\s*`' + TEMPLATE_BODY + rb'`\s*:\s*""\s*;?\s*\}'
+)
 # Sentence-ending punctuation plus the single separating space. The space is
 # part of the match so the tail is sliced at `m.end()` and stays byte-for-byte
 # identical to what followed it.
@@ -59,12 +71,21 @@ def find_literal(data):
     whole replacement, so a correct splice was reported as a failed one.
     """
     fns = list(FN.finditer(data))
-    if len(fns) != 1:
+    compact = list(MINIFIED_FN.finditer(data))
+    # A ternary function may retain the old name. Count that declaration once,
+    # but reject multiple candidates even if they use different bundle shapes.
+    fns = [fn for fn in fns if not any(m.start() == fn.start() for m in compact)]
+    count = len(fns) + len(compact)
+    if count != 1:
         die(
-            "expected exactly one `function getIdentity(`, found %d. The engine "
+            "expected exactly one identity function (getIdentity or complete "
+            "kiro-cli/kiro-ide ternary), found %d. The engine "
             "bundle's prompt module was restructured; re-locate the identity "
-            "before shipping a patch." % len(fns)
+            "before shipping a patch." % count
         )
+
+    if compact:
+        return compact[0].start("body"), compact[0].group("body")
 
     start = fns[0].start()
     # Bound the window to this function only. A fixed-size window overruns into
