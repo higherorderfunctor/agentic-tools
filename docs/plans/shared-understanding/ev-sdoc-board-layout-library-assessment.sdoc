@@ -15,9 +15,10 @@ custom layout and routing while preserving its existing SVG cards, filters,
 inspector, hash selection, and bounded-neighborhood behavior. ELK Layered
 accepts measured node and edge-label boxes, supports orthogonal edge sections,
 and exposes label-label, label-node, edge-edge, and edge-node spacing. A local
-ELK 0.12 probe on WORK-SCRIBE-RPC-AND-SERVICE at two hops laid out its 14 nodes
-and 20 edges with zero label-node and zero label-label bounding-box overlaps in
-1675 by 934 layout units, compared with the custom layout's 1864 by 1322.
+ELK 0.12 probe on the then-current RPC-and-service delivery node at two hops
+laid out its 14 nodes and 20 edges with zero label-node and zero label-label
+bounding-box overlaps in 1675 by 934 layout units, compared with the custom
+layout's 1864 by 1322.
 
 The integration should filter and cap the neighborhood before layout, measure
 card and label boxes, invoke a pinned vendored ELK worker, discard stale async

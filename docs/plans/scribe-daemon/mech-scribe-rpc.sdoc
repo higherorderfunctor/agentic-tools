@@ -23,6 +23,13 @@ JSON-RPC errors, and the method set is discoverable. Every method names the
 workspace root it served, so a client can assert it reached the workspace it
 asked for.
 <<<
+NOTES: >>>
+Retained from the retired RPC-and-service delivery row on 2026-09-10: daemon
+hydration completes before the socket is bound
+(dev/scripts/scribe_daemon.py calls workspace.current() before build_server()).
+The socket's existence is therefore the readiness signal: a client checks by
+connecting rather than by polling a second state surface.
+<<<
 RELATIONS:
 - TYPE: Parent
   VALUE: MECH-SCRIBE-WORKSPACE

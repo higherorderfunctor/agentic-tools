@@ -40,6 +40,14 @@ NOTES: >>>
 Updated 2026-09-03 for commits 6fbaa76b and c64a0147: the daemon's export
 carries ELEMENT and ID through an in-memory patch, and the daemon's own load
 is exempt from the source-traceability walk the project config now enables.
+
+Retained from the retired export-payload delivery row on 2026-09-10:
+view:render falls back LOUDLY to a fresh strictdoc export when no
+daemon answers (dev/tasks/generate.nix). This deliberately diverges from
+DEC-SCRIBE-DAEMON-NO-FALLBACK because one render is one slow hit rather than
+many compounding small reads. REQ-DAEMON-IS-THE-ONLY-SOURCE has no carve-out
+for that fallback, so it is also a recorded violation of the newer rule until
+the fallback is removed or the requirement is revised.
 <<<
 RELATIONS:
 - TYPE: Parent

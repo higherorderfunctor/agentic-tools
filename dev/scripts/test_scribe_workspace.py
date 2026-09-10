@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # cspell:ignore uids sdoc precheck unrelate
-"""Contracts for scribe_workspace (WORK-SCRIBE-WORKSPACE).
+"""Contracts for scribe_workspace (MECH-SCRIBE-WORKSPACE).
 
 Runs against an ISOLATED COPY of the canon, never the working tree: every
 contract writes, and several deliberately break a document to prove a check
