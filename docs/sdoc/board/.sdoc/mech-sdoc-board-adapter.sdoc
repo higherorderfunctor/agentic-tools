@@ -14,14 +14,15 @@ payloads in a single pass. Each node's provenance path arrives in the export
 itself as `_DOCUMENT_PATH`, so the board neither walks the canon nor imports
 view-check.py to recover it. What the export still does not carry is the parsed
 grammar for field kinds and option lists, since the export types every field as
-String; the caller hands that in, and today source.py supplies it by calling
-parse_sgra locally. The snapshot (sdoc-board/2) is one record per node plus one
-edge per RESOLVED Parent or Child declaration, with unresolved targets kept as
-diagnostics rather than dropped. The rows payload (sdoc-perspective/2) is two
-tables: nodes, one row per node with PATH, DIR and degree facets; and relations,
-one row per declared relation, denormalized with both endpoints' type, title,
-state and path. Every row of a table carries the union key set with nulls for
-absent fields, because Perspective infers its column schema from the rows.
+String; the caller hands that in, and source.py obtains it from the daemon's
+workspace.grammar result rather than parsing grammar.sgra itself. The snapshot
+(sdoc-board/2) is one record per node plus one edge per RESOLVED Parent or Child
+declaration, with unresolved targets kept as diagnostics rather than dropped.
+The rows payload (sdoc-perspective/2) is two tables: nodes, one row per node
+with PATH, DIR and degree facets; and relations, one row per declared relation,
+denormalized with both endpoints' type, title, state and path. Every row of a
+table carries the union key set with nulls for absent fields, because
+Perspective infers its column schema from the rows.
 
 A File relation may name part of a file rather than the whole of it, and both payloads carry that grain: ELEMENT and ID for a named item, or a LINE_RANGE, travel onto the relation row and onto the node's own fileRelations list. One thing beside them is not in the export at all -- the extractor's KIND word for the named item, such as option, module or binding -- and the adapter joins it by asking dev/scripts/sdoc_extractors for the items of that file. That lookup is optional by construction. The board's strictdoc-pinned interpreter carries the extractor, but an extractor that cannot be imported, or a file no configured glob covers, leaves kind null and the card falls back to the ELEMENT word. Reporting that an ID names nothing is element-check.py's job, not the board's; a null kind here means "unknown", never "wrong".
 
@@ -45,9 +46,8 @@ schema strings the adapter itself owns, sdoc-board/2 and sdoc-perspective/2,
 are unchanged.
 
 Corrected 2026-09-10 to distinguish adapt() from its caller: adapt receives the
-grammar rather than reading that source itself. The current caller still parses
-grammar.sgra locally; changing that input to a daemon RPC is deferred until that
-implementation lands.
+grammar rather than reading that source itself. The caller obtains it from the
+daemon's workspace.grammar result; no board process parses grammar.sgra.
 
 Updated 2026-09-10: provenance now comes from each exported node's
 `_DOCUMENT_PATH`; the UID-to-file walk and the dynamic view-check.py import are

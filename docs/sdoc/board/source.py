@@ -8,7 +8,9 @@ second in-process StrictDoc load. `workspace.export` writes StrictDoc's own
 JSON export from the held graph (~0.3 s against ~2.3 s for the one-shot
 command), and the export lands under `output/`, which the daemon's freshness
 sweep skips, so exporting never dirties the thing being exported. Each node's
-source path is carried by that export; this process never walks the canon.
+source path is carried by that export; this process never walks the canon. The
+grammar is the daemon's parsed scribe-grammar/1 result, not a second reading of
+grammar.sgra.
 
 FAIL CLOSED, LOUDLY. When no daemon answers, requests surface the client's
 own refusal -- the socket and the command that starts one -- instead of
@@ -33,10 +35,15 @@ sys.path.insert(0, str(REPO_ROOT / "dev" / "scripts"))
 
 from scribe_client import ClientError, NoDaemon, call_for_root  # noqa: E402,F401
 
+# UNCONDITIONAL. The `sdoc-board` wrapper pins this process to strictdoc's own
+# virtual-environment interpreter, which carries pydantic and every scribe
+# module, so the daemon's reply is validated by the SAME model the daemon
+# serialised it with rather than by a second hand-written reading of the wire.
+from scribe_contract import WorkspaceGrammarResult  # noqa: E402
+
 from adapter import (  # noqa: E402
     adapt,
     load_index,
-    parse_sgra,
     semantics_unavailable,
 )
 
@@ -56,7 +63,6 @@ class DaemonSource:
     def __init__(self, root: Path, *, socket_override=None) -> None:
         self.root = Path(root).resolve()
         self.export_dir = self.root / "output" / "board" / "export"
-        self.grammar_path = self.root / "docs" / "sdoc" / "grammar.sgra"
         self._socket_override = socket_override
         self._lock = threading.Lock()
         self._cached: Payloads | None = None
@@ -84,7 +90,7 @@ class DaemonSource:
                 "root": str(self.root),
                 "generation": exported["generation"],
             }
-            grammar = parse_sgra(self.grammar_path)
+            grammar = grammar_types(self._call("workspace.grammar"))
             adapted = adapt(
                 index,
                 grammar,
@@ -120,12 +126,28 @@ def semantics_payload(grammar: dict) -> dict:
     fallback that computes a lesser answer (DEC-SCRIBE-DAEMON-NO-FALLBACK
     forbids those); it is the absence of an answer, named.
     """
+    # RECORDED VIOLATION of REQ-DAEMON-IS-THE-ONLY-SOURCE: build_payload
+    # reads sdoc_semantics/model.json from disk. The operator owns that layer;
+    # this board must not invent a daemon representation before it is set.
     try:
         from sdoc_semantics import build_payload
 
         return build_payload(grammar)
     except Exception as error:  # noqa: BLE001 - a widget is never worth a 500
         return semantics_unavailable(f"{type(error).__name__}: {error}")
+
+
+def grammar_types(reply: dict) -> dict:
+    """Validate one workspace.grammar reply and return its type map.
+
+    The shared contract model is the validator: a malformed or wrong-schema
+    reply is a ClientError here, not a partly-built parser surface later.
+    """
+    try:
+        validated = WorkspaceGrammarResult.model_validate(reply)
+    except ValueError as error:
+        raise ClientError(f"invalid workspace.grammar result: {error}") from error
+    return validated.model_dump(by_alias=True)["types"]
 
 
 def _encode(payload: dict) -> bytes:

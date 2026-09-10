@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Adapt one scribe-daemon JSON export into the board's browser payloads.
 
-Pure functions over data already on disk: the daemon's `workspace.export`
-JSON, including each node's declaring path, and the `.sgra` grammar file.
-Nothing here talks to the daemon or imports strictdoc.
+Pure functions over data the caller already obtained: the daemon's
+`workspace.export` JSON, including each node's declaring path, and the daemon's
+`workspace.grammar` result. Nothing here talks to the daemon or imports
+strictdoc, which keeps adaptation separate from transport.
 The `sdoc-board` wrapper nevertheless pins the process to strictdoc's own
 virtual-environment interpreter so every runtime dependency is Nix-resolved.
 
@@ -56,7 +57,6 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT / "dev" / "scripts"))
 
 from sdoc_fp import iter_nodes, load_index  # noqa: E402,F401
-from scribe_grammar import parse_sgra  # noqa: E402,F401
 
 
 SNAPSHOT_SCHEMA = "sdoc-board/2"
