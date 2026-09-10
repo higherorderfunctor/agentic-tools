@@ -66,6 +66,7 @@
       "quietHours",
       "remoteControl",
       "remoteTools",
+      "secDefault",
       "skipWorkflowUsageWarning",
       "totalTokensReminder",
       "totalTokensReminderAfterUserTurn",
@@ -1878,6 +1879,10 @@
         "enum": ["first-wins", "merge"],
         "type": "string"
       },
+      "maxEffortLevel": {
+        "enum": ["high", "low", "max", "medium", "xhigh"],
+        "type": "string"
+      },
       "minimumVersion": {
         "type": "string"
       },
@@ -1950,6 +1955,10 @@
       },
       "modelSettings.*.effortLevel": {
         "enum": ["high", "low", "medium", "xhigh"],
+        "type": "string"
+      },
+      "modelSettings.*.maxEffortLevel": {
+        "enum": ["high", "low", "max", "medium", "xhigh"],
         "type": "string"
       },
       "otelHeadersHelper": {
@@ -2606,6 +2615,9 @@
       },
       "sandbox.socatPath": {
         "type": "string"
+      },
+      "secDefault": {
+        "type": "boolean"
       },
       "showClearContextOnPlanAccept": {
         "type": "boolean"
@@ -3294,6 +3306,7 @@
       "language",
       "managedMcpServers",
       "managedSourcesBehavior",
+      "maxEffortLevel",
       "minimumVersion",
       "model",
       "modelOverrides",
