@@ -25,15 +25,18 @@ import time
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from scribe_client import ClientError, NoDaemon, call, call_for_root  # noqa: E402
+from scribe_contract import WorkspaceGrammarResult  # noqa: E402
 import scribe_cmd  # noqa: E402
 from scribe_grammar import parse_sgra  # noqa: E402
 import scribe_paths  # noqa: E402
 from scribe_rpc import MAX_REQUEST_BYTES, SCHEMA, build_server  # noqa: E402
 from scribe_workspace import Workspace  # noqa: E402
+from sdoc_model import authoring_elements  # noqa: E402
 
 # One tracked-tree corpus fixture, shared with the workspace suite. This file
 # proves the copy can go through a separate `strictdoc export` process rather
@@ -674,6 +677,47 @@ def test_discover_reports_the_registry(root: Path, runtime: Path) -> None:
                 assert "-32601" not in str(exc), f"{method} is advertised and absent: {exc}"
 
 
+@contract("workspace.grammar round-trips all eight author-facing types")
+def test_workspace_grammar(root: Path, runtime: Path) -> None:
+    with served(root, runtime) as (workspace, path):
+        result = call(path, "workspace.grammar")
+        parsed = WorkspaceGrammarResult.model_validate(result)
+        assert json.loads(parsed.model_dump_json(by_alias=True)) == result
+        assert set(result) == {"schema", "types"}
+        assert result["schema"] == "scribe-grammar/1"
+        assert set(result["types"]) == {
+            "COMMENTARY",
+            "DECISION",
+            "EVIDENCE",
+            "MECHANISM",
+            "NARRATIVE",
+            "REQUIREMENT",
+            "USE_CASE",
+            "WORK",
+        }
+        assert "TEXT" in workspace.graph.grammar.elements_by_type
+        assert "TEXT" not in result["types"]
+        assert result["types"]["WORK"]["fields"][0] == {
+            "name": "UID",
+            "kind": "String",
+            "required": True,
+            "options": [],
+        }
+        assert {role["role"] or role["type"] for role in result["types"]["WORK"]["roles"]} >= {
+            "Assumes",
+            "File",
+        }
+
+
+@contract("the author-facing grammar filter removes even a declared TEXT")
+def test_workspace_grammar_declared_text_positive_control(
+    _root: Path, _runtime: Path
+) -> None:
+    grammar = SimpleNamespace(elements_by_type={"TEXT": object(), "WORK": object()})
+    assert "TEXT" in grammar.elements_by_type, "positive control did not declare TEXT"
+    assert list(authoring_elements(grammar)) == ["WORK"]
+
+
 CONTRACTS = [
     test_fails_closed,
     test_permissions,
@@ -703,6 +747,8 @@ CONTRACTS = [
     test_apply_workspace_error_is_refused,
     test_method_exception_keeps_diagnostic,
     test_top_level_line_range_alias,
+    test_workspace_grammar,
+    test_workspace_grammar_declared_text_positive_control,
 ]
 
 

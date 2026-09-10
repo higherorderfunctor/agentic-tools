@@ -42,11 +42,19 @@ this workspace and the start fails. On stop the socket is removed only if its
 inode is the one that was bound.
 
 rpc.discover reports the schema -- `scribe-rpc/2` since the envelope moved onto
-pjrpc -- the framing, the served root, and the method list READ OFF THE
-REGISTRY, so what exists and what is advertised cannot drift apart. Every
-method that answers about the workspace names the root it served, and the
-client refuses any reply that is not a well-formed JSON-RPC response, a result
-that is not an object included, rather than indexing into it.
+pjrpc -- the framing, the served root, and the seven methods READ OFF THE
+REGISTRY: daemon.ping, rpc.discover, scribe.apply, workspace.describe,
+workspace.export, workspace.grammar and workspace.reload. What exists and what
+is advertised cannot drift apart. The discovery and mutable-workspace replies
+name the root they served, and the client refuses a malformed result rather
+than indexing into it.
+
+workspace.grammar is the versioned exception to the root-bearing result shape:
+its exact scribe-grammar/1 result is the types map and schema name. It is read
+from the GrammarElement objects on the held graph, preserving field kinds and
+choice options that the JSON export flattens. The socket path is derived from
+the client's resolved root. StrictDoc's injected TEXT element is excluded by
+the same one filter that supplies sdoc_model's author-facing tag list.
 <<<
 NOTES: >>>
 Retained from the retired RPC-and-service delivery row on 2026-09-10: daemon
