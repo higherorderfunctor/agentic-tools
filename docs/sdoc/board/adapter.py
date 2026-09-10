@@ -3,8 +3,9 @@
 
 Pure functions over data already on disk: the daemon's `workspace.export`
 JSON, the worktree walk that maps each UID to its declaring file, and the
-`.sgra` grammar file. Nothing here talks to the daemon or imports strictdoc,
-which is what keeps the whole app runnable under any python3.
+`.sgra` grammar file. Nothing here talks to the daemon or imports strictdoc.
+The `sdoc-board` wrapper nevertheless pins the process to strictdoc's own
+virtual-environment interpreter so every runtime dependency is Nix-resolved.
 
 Two payloads out of one pass:
 
@@ -39,12 +40,10 @@ in the extractor, so the adapter resolves each id against the file it names
 and recovers it. Only files an existing relation NAMES are parsed, one
 tree-sitter parse each, cached on the file's stat -- never the corpus.
 
-THAT IMPORT IS SOFT, AND DELIBERATELY SO. "Nothing here imports strictdoc,
-which is what keeps the whole app runnable under any python3" is worth more
-than the kind word: the board is served and tested by a plain `python3`,
-while the extractor needs `tree_sitter` and a compiled grammar. A missing
-extractor therefore leaves `kind` null and the card falls back to the ELEMENT
-it always drew. This degrades a label; it must never take the board down.
+THAT IMPORT IS SOFT, AND DELIBERATELY SO. The board's pinned interpreter carries
+the extractor, but a missing or broken optional label lookup still leaves `kind`
+null and the card falls back to the ELEMENT it always drew. This degrades a
+label; it must never take the board down.
 """
 
 from __future__ import annotations

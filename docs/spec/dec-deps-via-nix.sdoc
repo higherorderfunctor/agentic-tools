@@ -35,8 +35,10 @@ packages/strictdoc-grammar/lib/tsGrammars.nix; and elkjs reaches the board as
 boardElkjs, a derivation built in devenv.nix, after sitting vendored in the
 tree until 2026-09-08. None needs a user global and none needs pip.
 
-Not yet holding: docs/sdoc/board/serve execs a bare python3 off PATH, so the
-board server's own interpreter is whatever the ambient environment supplies.
+The scribe programs and the board server are all wrappers over that one
+strictdoc virtual environment, and the remaining devenv Python tasks name their
+nixpkgs interpreter by absolute store path. No program in the tree execs a bare
+python3 off PATH.
 <<<
 NOTES: >>>
 The operator, verbatim: "we should log a sdoc like a decision or mechanism for

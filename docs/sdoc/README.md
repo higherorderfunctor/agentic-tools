@@ -83,8 +83,10 @@ devenv up -d scribe board
 
 ### The board
 
-`http://127.0.0.1:8765/` — `docs/sdoc/board/serve`, port 8765 unless `--port`
-says otherwise. Four tabs, each also a URL:
+`http://127.0.0.1:8765/` — the `sdoc-board` wrapper in the devenv package set,
+port 8765 unless `--port` says otherwise. The wrapper pins strictdoc's own
+virtual-environment interpreter; `processes.board` invokes its absolute Nix
+store path. Four tabs, each also a URL:
 
 | tab         | URL                 | shows                                                                                |
 | ----------- | ------------------- | ------------------------------------------------------------------------------------ |

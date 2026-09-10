@@ -17,24 +17,25 @@ happens to carry the Nix-built one.
 <<<
 RATIONALE: >>>
 DEC-DEPS-VIA-NIX rules where the bytes come from. This rules that a program
-cannot get them from anywhere else. The gap between the two is a launcher
-that is correct only because of what happens to be on PATH: the board's
-serve script execs `python3`, which under `devenv up` is grammarPython and
-hand-run outside the shell is whatever the machine has, and the script's own
-comment invites the second case ("any python3 serves -- no devenv shell
-required"). True by accident is not the property the decision asks for.
+cannot get them from anywhere else. The gap between the two was a launcher
+that was correct only because of what happened to be on PATH: the board's
+serve script executed `python3`, which under `devenv up` happened to be
+grammarPython and outside the shell was whatever the machine supplied.
+WORK-BOARD-SERVE-PINS-ITS-INTERPRETER replaced it with a Nix wrapper whose
+interpreter is strictdoc's own virtual environment. True by accident is not
+the property the decision asks for.
 <<<
 NOTES: >>>
 Operator, 2026-09-09, verbatim: "every dependency should be coming from
 devenv here, nothing should come from the system. requirement."
 
-Recorded violation at filing: docs/sdoc/board/serve:11, `exec python3`.
-WORK-BOARD-SERVE-PINS-ITS-INTERPRETER lands the fix.
-
-Nothing executes this yet (INV-GUARDS-MUST-EXECUTE). The intended guard is
-a scanner over launcher scripts and devenv process/task definitions for an
-exec of a bare interpreter or binary name; the fix above is its first
-positive control.
+The recorded violation was fixed 2026-09-09 by
+WORK-BOARD-SERVE-PINS-ITS-INTERPRETER: `processes.board` executes the absolute
+Nix store path of the `sdoc-board` wrapper, which launches server.py with
+strictdoc's own virtual-environment interpreter. The executable
+`interpreter-launchers` check scans devenv process/task definitions and shell
+launchers under docs/ and dev/; its positive-control fixture is the removed
+serve script and fails on `exec python3`.
 <<<
 RELATIONS:
 - TYPE: Parent

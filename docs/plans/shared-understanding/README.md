@@ -36,7 +36,9 @@ the branch: **promote a shared understanding between human and LLM.**
 3. The board app renders this plan: `devenv up -d scribe board` from a shell in
    the worktree, then the Plan tab (tree, right-pane card) —
    http://127.0.0.1:8765/?view=plan. `docs/sdoc/README.md` has the rest: start
-   and stop, the other tabs, the scribe verbs, the checks by name.
+   and stop, the other tabs, the scribe verbs, the checks by name. The process
+   runs the devenv-packaged `sdoc-board` wrapper, not a repository launcher or
+   an ambient Python interpreter.
 
    Two things there that will cost you an hour if you meet them cold:
    - **The scribe daemon never reloads Python.** It imports everything under

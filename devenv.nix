@@ -170,9 +170,9 @@
   # `ai.strictdoc.enable` installs — packages/strictdoc-grammar/lib/mkExtract.nix
   # wraps upstream's OWN venv interpreter, because `python3Packages.strictdoc`
   # does not exist and `withPackages` cannot reach the grammar builder.
-  # `dev/scripts/sdoc_semantics/` is deliberately standard-library-only. The
-  # board server imports it in process (docs/sdoc/board/source.py), and
-  # `python3 -m sdoc_semantics` reaches it from a hand-run shell.
+  # `dev/scripts/sdoc_semantics/` is deliberately standard-library-only, and
+  # `python3 -m sdoc_semantics` reaches it from a hand-run shell. The board
+  # imports it through the strictdoc-venv wrapper owned by `ai.strictdoc`.
   grammarPython = pkgs.python3.withPackages (ps: [ps.ast-grep-py]);
 
   # elkjs 0.12.0 — the layout engine docs/sdoc/board/assets/layout.js loads in a
@@ -278,10 +278,9 @@ in {
   # locally built grammar.
   #
   # SDOC_BOARD_ELKJS_DIR joins them because it is the same kind of thing: a
-  # store path a program resolves at RUN time and cannot guess. It reaches both
-  # readers from this one place — the dev shell, where `docs/sdoc/board/serve`
-  # is hand-run and `test_board.py` imports the server, and `processes.board`,
-  # which devenv launches out of this same environment.
+  # store path a program resolves at RUN time and cannot guess. It reaches the
+  # dev shell, `test_board.py`, and the `processes.board` wrapper that the
+  # `ai.strictdoc` module launches from the same environment.
   env =
     sdocTsGrammars.env
     // {
@@ -722,14 +721,6 @@ in {
     package = pkgs.ai.mcpServers.agnix-mcp;
     command = "${pkgs.ai.mcpServers.agnix-mcp}/bin/agnix-mcp";
   };
-
-  # ── Processes ───────────────────────────────────────────────────────────
-  # The board app (MECH-SDOC-BOARD-SERVER): loopback HTTP over the resident
-  # scribe. A process rather than a task so `devenv up board`, `-d` and
-  # `devenv processes down` manage it without holding a pane — same lifecycle
-  # as processes.scribe, which the ai.strictdoc module declares. Independent
-  # of the scribe: with no daemon it serves the refusal page until one is up.
-  processes.board.exec = ''"$DEVENV_ROOT"/docs/sdoc/board/serve --root "$DEVENV_ROOT"'';
 
   # ── Shell Init ──────────────────────────────────────────────────────────
   enterShell = ''
