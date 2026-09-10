@@ -30,22 +30,7 @@ sdocw. Scribe won on carrying "writes the record under another's authority",
 which matches identity coming from the environment rather than from the tool.
 <<<
 NOTES: >>>
-Ruled by the operator on 2026-08-28. Rewritten IN PLACE on 2026-09-09 on the
-operator's ruling that a wrong accepted decision on this branch is corrected,
-not superseded, because the branch is not in main and supersession semantics
-are not settled; the pre-rewrite text is in git history at fda6c066.
+The earlier implementation put argv parsing, graph writes, rendering, rollback, and dry-run in one standalone module exposed through a second command name. That boundary is retired. The only command is scribe: scribe_cmd.py derives its option surface from workspace.grammar and sends typed requests to the daemon; scribe_ops.py owns writes; scribe_verbs.py contains only shared renderers and path checks and has no main, parser, or dispatch table.
 
-What the earlier text said, kept here for forensics: it named
-dev/scripts/sdoc_cli.py, "invoked as `sdoc`", as the writer, and recorded the
-library form as PARTIAL because the argv guard, prefix and filename checks,
-restore map, verify, rollback and dry-run lived in that script's main. All of
-that is now the daemon's: sdoc_cli.py became the library the daemon imports
-(scribe_ops.py calls its do_show, do_list, do_check, target_path and
-check_prefix), the `scribe` binary wraps dev/scripts/scribe_cmd.py, the
-client took --dry-run on 2026-09-03, and the standalone `sdoc` entrypoint is
-being removed under WORK-SDOC-CLI-BECOMES-A-LIBRARY. If a stale reference to
-sdoc_cli or to an `sdoc` command turns up before the main merge, this
-paragraph is where it came from.
-
-AUTHORED_BY reads llm because the writer has no flag for the other value.
+The client gained dry-run on 2026-09-03. WORK-SDOC-CLI-BECOMES-A-LIBRARY completes the naming ruling by removing the standalone entrypoint and making the remaining library role explicit.
 <<<

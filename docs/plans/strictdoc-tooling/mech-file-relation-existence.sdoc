@@ -10,51 +10,7 @@ TITLE: File relations to nonexistent paths export clean
 DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
-Check every File relation against the repository tree in
-dev/scripts/file-check.py, built in cycle-check.py's shape: it reuses
-sdoc_fp's load_index and iter_nodes, prints every finding with its node UID
-and owning document title, and exits non-zero when there is one. Its argv is
-the export JSON plus the repository root, a second argument neither
-cycle-check.py nor fp-check.py takes, because the JSON export carries no path
-for anything and so offers nothing to resolve against.
-checks/strictdoc-file-check.nix runs it over the flake source beside the
-cycle and fingerprint checks, which puts it in nix flake check.
-
-A VALUE is well-formed in exactly one shape: a normalized POSIX path relative
-to the repository root, not absolute, with no leading ./ and no .. segment.
-Any other shape is a finding in its own right rather than a path to normalize
-and then resolve. The target must be an existing regular file; a directory is
-a finding. That rule is upstream's, not ours -- strictdoc's own
-file-traceability validation accepts precisely this shape and rejects ./x,
-../x, an absolute path and a directory with the same message.
-
-Upstream's validation is no longer hypothetical: source traceability was
-turned on for this project on 2026-09-02, so strictdoc now applies that rule
-itself at parse time. file-check.py stays beside it for two reasons rather
-than out of caution. Upstream reports one broken relation per run, and the
-checker reports every finding in one pass at 0.03 s. And the scribe daemon's
-own graph load passes skip_source_files=True, so nothing upstream checks runs
-on the path most writes actually take.
-
-The scribe CLI checks only the VALUEs it is about to write, applying the same
-well-formedness rule plus one stat: microseconds, not a whole-graph pass. It
-also verifies the grain now, since a File relation may name an item rather
-than a whole file: an ELEMENT and ID pair is checked against the items the
-configured extractor really finds in that file, and a missing id is refused
-with the nearest names and the command that lists them. The corpus-wide gate
-stays alongside both, because a write-time check cannot see a file deleted or
-moved after its relation was written, and that is the direction the ghost
-problem actually runs. dev/scripts/element-check.py is the corpus-wide half
-of the grain check and runs as strictdoc-element-check in nix flake check.
-
-Two exclusions, both deliberate and both cheap to reverse. Targets outside
-the repository are not supported; no File relation names one today. Forward
-references are not supported either -- a node may not name a path its own
-unbuilt work will create. The corpus carries 64 File relations on 37 nodes,
-4 of them element-grained and none using LINE_RANGE, and they sit on nodes at
-implemented or better, so the strict rule still costs nothing and relaxing it
-later by gating existence on DEPTH is a one-line change, where tightening it
-later would not be.
+File relations are validated at both command and corpus boundaries. scribe_ops normalizes File targets and the workspace precheck refuses a write whose repository-relative target is missing, absolute, or contains forbidden dot segments. scribe_verbs.do_check repeats normalization and existence checks over every held relation, covering a file moved or deleted after the relation was written. checks/strictdoc-file-check.py performs the same whole-corpus contract in the Nix gate, with the repository root passed explicitly.
 <<<
 RATIONALE: >>>
 This node's own earlier premise -- that the parser will not do it -- is
@@ -156,9 +112,7 @@ check by checks/strictdoc-file-check.nix. Built in cycle-check.py's shape as
 specified, reusing sdoc_fp's iter_nodes and load_index and taking the
 repository root as a second argument.
 
-The write-time half is in dev/scripts/sdoc_cli.py: normalize_file_value plus
-one stat, applied to the VALUEs a command is about to write, and it refuses
-an absolute path, a './' or '..' segment and a nonexistent target.
+The write-time half now enters through scribe_ops.py and the workspace precheck: normalization plus an existence check refuse an absolute path, a dot segment, a parent segment, or a nonexistent target.
 
 Positive control rather than a clean run reported as proof: against the real
 corpus the checker reports 3 File relations and 0 findings, and against an

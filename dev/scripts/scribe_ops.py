@@ -16,12 +16,11 @@ is a birth-name and not a type.
 
 WRITES GO TO THE MODEL, READS REUSE THE RENDERER
 -------------------------------------------------
-Writes call sdoc_model.Graph directly. They deliberately do NOT go through
-sdoc_cli's handlers, because those re-read every value through `read_value`,
-which treats a leading `@` as a file path -- correct for a command line,
-wrong for a value a client already resolved.
+Writes call sdoc_model.Graph directly. They deliberately do NOT go through a
+command parser because a leading `@` is already a resolved value at this layer,
+not a request to read a file.
 
-Reads call sdoc_cli's do_show / do_list / do_check, which are pure rendering
+Reads call scribe_verbs do_show / do_list / do_check, which are pure rendering
 over a graph. Reimplementing them would be duplication; calling them with
 named values rather than a parsed argv is not.
 
@@ -55,7 +54,7 @@ import pydantic
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import sdoc_cli  # noqa: E402
+import scribe_verbs  # noqa: E402
 from scribe_diff import unified_pending_diff  # noqa: E402
 from scribe_protocol import OPERATIONS, READS  # noqa: E402
 from scribe_workspace import (  # noqa: E402
@@ -284,17 +283,17 @@ def apply(workspace: Workspace, op: str, params: dict) -> dict:
         validate_guarded(graph)
         root = workspace.root
         if isinstance(typed, ShowParams):
-            return {"text": _render(sdoc_cli.do_show, graph, root, uid=typed.uid)}
+            return {"text": _render(scribe_verbs.do_show, graph, root, uid=typed.uid)}
         if isinstance(typed, ListParams):
             return {
                 "text": _render(
-                    sdoc_cli.do_list, graph, root,
+                    scribe_verbs.do_list, graph, root,
                     node_type=typed.type,
                     depth=typed.depth,
                     status=typed.status,
                 )
             }
-        return {"text": _render(sdoc_cli.do_check, graph, root)}
+        return {"text": _render(scribe_verbs.do_check, graph, root)}
 
     graph = workspace._held()
     validate_guarded(graph)
@@ -359,7 +358,7 @@ def apply(workspace: Workspace, op: str, params: dict) -> dict:
         )
 
     if isinstance(typed, MoveParams):
-        destination = sdoc_cli.target_path(typed.path, uid, workspace.root)
+        destination = scribe_verbs.target_path(typed.path, uid, workspace.root)
         return _move(workspace, uid, destination, dry_run=dry_run)
 
     raise SdocError(f"operation {op!r} is not implemented")
@@ -406,7 +405,7 @@ def _new(workspace: Workspace, params: NewParams, fields: dict, *, dry_run: bool
     if tag not in graph.tags():
         raise SdocError(f"unknown node type {tag!r}; expected one of {', '.join(graph.tags())}")
     uid = params.uid
-    sdoc_cli.check_prefix(graph, tag, uid)
+    scribe_verbs.check_prefix(graph, tag, uid)
     if graph.has_node(uid):
         raise SdocError(f"{uid} already exists at {graph.path_of(graph.node(uid))}")
     _check_fields(graph, tag, fields)
@@ -415,7 +414,7 @@ def _new(workspace: Workspace, params: NewParams, fields: dict, *, dry_run: bool
     values["AUTHORED_BY"] = "llm"  # MECH-RUNTIME-WRITE-GUARD
 
     relations = [_relation_spec(r) for r in params.relations]
-    path = sdoc_cli.target_path(params.path, uid, workspace.root)
+    path = scribe_verbs.target_path(params.path, uid, workspace.root)
     if path.exists():
         raise SdocError(f"{path} already exists")
 

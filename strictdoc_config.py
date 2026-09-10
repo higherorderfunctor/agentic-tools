@@ -26,8 +26,8 @@ Four things make that work and all four are load-bearing:
   --formats flag, so this config is the only lever on their cost, and a second
   config would be two files obliged to agree about the same thing.
 
-  It is also what makes dev/scripts/sdoc_cli.py able to hold strictdoc's
-  progress output in a buffer: html2pdf4doc, reached through the default
+  It is also what makes the daemon's in-process graph operations able to hold
+  strictdoc's progress output in a buffer: html2pdf4doc, reached through the default
   format stack, reassigns sys.stdout at IMPORT time and needs a real file
   descriptor, so a captured stdout raised io.UnsupportedOperation before this
   pin existed.
@@ -55,7 +55,7 @@ Four things make that work and all four are load-bearing:
   dispatched, so a corpus with a field-order violation exits 1 under every one
   of those handles. Both existing gates read their output file immediately
   after exporting and die on its absence, so neither can pass on an empty
-  export. `sdoc check` is the loud replacement and does not go through a
+  export. `scribe check` is the loud replacement and does not go through a
   format handle at all.
 
 * dir_for_sdoc_cache (MECH-SDOC-CACHE-DIR-FOR-WORKTREES): "$TMPDIR" is a

@@ -174,11 +174,12 @@ held state unchanged. Every field flag takes **`@FILE`** to read the value from
 a file and `-` to read it from stdin — which is how a multi-paragraph
 `STATEMENT` gets in without a shell-quoting accident.
 
-What the tool does that hand-editing does not: it validates against the grammar,
-writes **canonical form through strictdoc's own writer**, then reloads the whole
-graph to prove it still parses — **restoring the original bytes if it does
-not.** A command that cannot validate leaves no changed file behind, and
-`format` afterwards is no longer a step.
+What the tool does that hand-editing does not: it validates against the grammar
+and writes **canonical form through strictdoc's own writer** inside the resident
+workspace. A command that cannot validate leaves no changed file behind, and
+`format` afterwards is no longer a step. If an external edit or checkout makes
+the held graph stale, run `scribe reload` and then `scribe check`; there is no
+no-daemon validator to fall back to.
 
 Two fields have **no flags at all** and that is the enforcement: `AUTHORED_BY`
 and `PARENT_FP` are the operator's (MECH-RUNTIME-WRITE-GUARD). Naming one exits

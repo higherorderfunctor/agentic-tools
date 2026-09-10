@@ -9,7 +9,7 @@ A File relation to a path that does not exist EXPORTS CLEAN: strictdoc's
 own file-traceability validation is off here, so a node can point at a file
 that was deleted or moved and nothing notices. That is the direction the
 ghost problem actually runs, and it is why a write-time check cannot
-replace this one -- dev/scripts/sdoc_cli.py checks the VALUEs it is about to
+replace this one -- dev/scripts/scribe_verbs.py checks the VALUEs it is about to
 write, which says nothing about a file removed afterwards.
 
 A VALUE is well-formed in exactly one shape: a normalized POSIX path

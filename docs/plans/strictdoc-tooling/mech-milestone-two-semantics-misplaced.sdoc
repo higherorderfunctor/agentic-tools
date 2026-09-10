@@ -25,7 +25,7 @@ finding, and neither should be decided by whether the code happens to work.
 What is affected, named so the eventual judgement has a list rather than a
 search: dev/scripts/sdoc_fp.py, dev/scripts/fp-check.py, dev/scripts/fp-accept.py,
 docs/sdoc/status.py's readiness walk, and the parts of dev/scripts/sdoc_model.py
-and sdoc_cli.py that know what a fingerprint means. The grammar-derived option
+and scribe_ops.py that know what a fingerprint means. The grammar-derived option
 surface is NOT in scope: deriving flags from the grammar is L1 consuming L0,
 which is the layering working.
 <<<

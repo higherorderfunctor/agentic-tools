@@ -120,7 +120,7 @@ def default_root() -> Optional[Path]:
     matches whole segments and a leading `/` makes the first one empty, so
     every file would report as covered by nothing. Walking up for
     `strictdoc_config.py` is the same marker mkScribe.nix's wrapper and
-    sdoc_cli.py use, so the tool routes a path exactly as the writer does.
+    scribe_verbs.py use, so the tool routes a path exactly as the writer does.
     """
     for directory in (Path.cwd(), *Path.cwd().parents):
         if (directory / "strictdoc_config.py").is_file():

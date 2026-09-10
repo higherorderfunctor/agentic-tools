@@ -10,23 +10,10 @@ TITLE: Turn the scribe command into a client that fails closed
 DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
-Make the scribe command a client. Resolve the target workspace from --root,
-SCRIBE_ROOT, or the walk up from the current directory; assert the daemon's
-reported root matches; and on an unreachable socket exit non-zero naming the
-socket and the command that starts one. Add the daemon preflight and the
-rebuild-triggering table to the scribe skill.
+scribe is a thin command client over the resident daemon. It scans guarded flags before connecting, requests workspace.grammar to build the selected command surface, resolves file-backed argument values locally, and sends show, list, check, new, set, relate, unrelate, move, and delete as typed scribe.apply operations. It never loads the corpus or grammar file and has no fallback when the daemon is absent; the refusal names the socket and the command that starts one. The semantics subcommand remains a separate operator-owned model read and does not claim to validate the corpus.
 <<<
 NOTES: >>>
-PARTIALLY implemented 2026-08-31 as scribe_client.py: the transport, the
---root / SCRIBE_ROOT / walk-up precedence, the served-root assertion, and the
-fail-closed refusal that names the socket and the command to start one. It
-carries no strictdoc import, so asking whether a daemon is up costs no parser.
-
-WHAT IS NOT DONE: the scribe commands do not go through the daemon. `scribe show`, `list`,
-`check`, `new`, `set` and the rest still load the graph in-process, because
-sdoc_cli's finish() calls verify(), which is a full reload -- the exact cost
-the daemon exists to remove, so routing commands through it without replacing
-that verification would defer nothing. See MECH-SCRIBE-COMMANDS-LOAD-IN-PROCESS.
+Implemented in the daemon stack. scribe_client.py owns root and socket discovery, the served-root assertion, and the fail-closed transport refusal. scribe_cmd.py obtains the grammar contract and turns argv into operations. scribe_ops.py applies those operations to scribe_workspace.py, so commands no longer load or verify a second graph in the client process.
 <<<
 RELATIONS:
 - TYPE: Parent

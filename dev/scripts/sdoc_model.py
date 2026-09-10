@@ -11,7 +11,7 @@ afterward" step disappears -- SDWriter emits the canonical form directly.
 Measured on this corpus: SDWriter().write(doc) is byte-identical to the
 formatted file on disk.
 
-Two consumers, and the split is deliberate. sdoc_cli.py is the verb and
+Two consumers, and the split is deliberate. scribe_verbs.py is the shared verb
 flag surface; fp-accept.py writes exactly one field. Both go through Graph.
 
 THREE OBLIGATIONS SIT HERE BECAUSE STRICTDOC DOES NOT CARRY THEM:
@@ -72,7 +72,7 @@ from strictdoc.helpers.textx import drop_textx_meta
 
 # MECH-RUNTIME-WRITE-GUARD: two fields are the operator's, and what enforces
 # that is the absence of a code path rather than a check in front of one.
-# sdoc_cli derives its field flags from the grammar MINUS this set, so no
+# scribe_cmd derives its field flags from the grammar MINUS this set, so no
 # flag for either exists to pass. There is deliberately no override.
 #
 # AUTHORED_BY is REQUIRED on every element type, so `new` cannot omit it

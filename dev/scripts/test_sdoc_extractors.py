@@ -394,7 +394,7 @@ def test_registry_globs() -> None:
     assert registry.matching_glob("flake.nix", REPO_ROOT) == "**/*.nix"
     assert registry.matching_glob("a/b/c/mod.nix", REPO_ROOT) == "**/*.nix"
     # NEGATIVE: an uncovered extension is claimed by nothing.
-    assert registry.matching_glob("dev/scripts/sdoc_cli.py", REPO_ROOT) is None
+    assert registry.matching_glob("dev/scripts/scribe_verbs.py", REPO_ROOT) is None
     # `*` is segment-local: `*.nix` must not swallow a directory separator,
     # which is exactly what `fnmatch.translate` would do here.
     assert registry.matches_glob("*.nix", "flake.nix")
@@ -405,10 +405,10 @@ def test_registry_globs() -> None:
 def test_registry_refuses_an_uncovered_path() -> None:
     try:
         registry.items_of(
-            REPO_ROOT / "dev/scripts/sdoc_cli.py", path_root=REPO_ROOT
+            REPO_ROOT / "dev/scripts/scribe_verbs.py", path_root=REPO_ROOT
         )
     except registry.UnsupportedPath as error:
-        assert "sdoc_cli.py" in str(error), error
+        assert "scribe_verbs.py" in str(error), error
         assert "**/*.nix" in str(error), error
     else:
         raise AssertionError("a .py file was parsed by the nix extractor")
@@ -462,7 +462,7 @@ def test_write_time_refusal() -> None:
     # NEGATIVE: a path no glob covers cannot carry an id at all, and the
     # message names the globs that do exist.
     try:
-        check_file_item(REPO_ROOT, "dev/scripts/sdoc_cli.py", "main")
+        check_file_item(REPO_ROOT, "dev/scripts/scribe_verbs.py", "do_check")
     except SdocError as error:
         assert "**/*.nix" in str(error), error
     else:
