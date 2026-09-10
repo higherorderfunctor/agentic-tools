@@ -258,10 +258,9 @@ ls /nix/store/*-kiro-cli-*fhsenv-rootfs/usr/bin | wc -l   # 233 = the whole worl
 
 # kiro-cli wrapper: the argv contract
 
-> **Last verified:** 2026-08-16 — Linux `trustedMcpTools` now wraps the payload
-> inside nixpkgs' FHS package, restoring launcher-dispatched devenv grants
-> without moving environment or secret exports across the boundary;
-> `useFhsSandbox = false` explicitly selects that same unwrapped payload.
+> **Last verified:** 2026-09-09 — identity extraction now handles the minified
+> CLI/IDE ternary function in the installed 2.21.2 engine, alongside the older
+> named function.
 >
 > **Settled — do not relitigate.** Full lineage:
 > `git show 0057d8ed:packages/kiro-cli/docs/launcher-argv.md`.
@@ -390,6 +389,16 @@ does not cover it. The module-eval tests do:
 the option is set, and `module-kiro-identity-default-is-stock` asserts it stays
 byte-identical to stock when it is not — which is what protects the cache hit.
 Bundle mechanics live in `packages/kiro-cli/lib/identityBundle.nix`.
+
+The 2.21.1 and 2.21.2 engines minify the identity function: in the measured
+2.21.2 bundle, `xSs(e)` returns a CLI/IDE ternary and `VZ` inserts its result at
+the start of the shared prompt. The splicer matches that complete dispatch,
+including the IDE arm and the shared argument, without pinning either mangled
+name or vendor prose. Older bundles retain the `getIdentity`/`if` path. Multiple
+candidates or an unknown shape fail before writing a patched bundle.
+`checks/kiro-identity-splice.nix` exercises both forms, checks byte preservation
+outside the first sentence, and executes synthetic functions to verify the CLI,
+IDE, and fallback results.
 
 ### `extraPackages` — a PATH prefix, not an FHS rebuild
 

@@ -285,8 +285,9 @@
         };
       };
       kiroExtractedCheck = import ./checks/kiro-cli-extracted.nix {inherit pkgs self;};
-      kiroWorkspaceSettingsFixturesCheck = {kiro-workspace-settings-fixtures = import ./checks/kiro-workspace-settings-fixtures.nix {inherit pkgs;};};
       kiroFhsContractCheck = {kiro-fhs-contract = import ./checks/kiro-fhs-contract.nix {inherit pkgs;};};
+      kiroIdentitySpliceCheck = {kiro-identity-splice = import ./checks/kiro-identity-splice.nix {inherit pkgs;};};
+      kiroWorkspaceSettingsFixturesCheck = {kiro-workspace-settings-fixtures = import ./checks/kiro-workspace-settings-fixtures.nix {inherit pkgs;};};
       kiroWrapperArgvCheck = {kiro-wrapper-argv = import ./checks/kiro-wrapper-argv.nix {inherit lib pkgs;};};
       markdownTableCellsFixturesCheck = {markdown-table-cells-fixtures = import ./checks/markdown-table-cells-fixtures.nix {inherit pkgs;};};
       moduleChecks = import ./checks/module-eval.nix {inherit lib pkgs;};
@@ -303,7 +304,7 @@
       prWatchAtStopCheck = {pr-watch-at-stop = import ./checks/pr-watch-at-stop.nix {inherit pkgs;};};
       validateAtStopCheck = {validate-at-stop = import ./checks/validate-at-stop.nix {inherit pkgs;};};
     in
-      bareCommandsCheck // beadsContractsCheck // beadsLifecycleCheck // cacheHitParityCheck // claudeDelegationClampCheck // claudeDevenvHooksRealTypeCheck // claudeExtractedCheck // claudeHeronBrookCheck // claudeMemoryCollisionGuardCheck // claudeSettingsSchemaCheck // codexCoverageCheck // codexExtractedCheck // copilotWrapperArgvCheck // doubledWordsCheck // doubledWordsFixturesCheck // markdownTableCellsFixturesCheck // facetMockChecks // factoryChecks // formattingCheck // fragmentsChecks // glabExtractedCheck // goFloorDriftChecks // goFloorExtractOrderChecks // goToolchainFloorChecks // instructionMaterializationCheck // instructionsDriftCheck // isolatePrekHooksCheck // kiroExtractedCheck // kiroFhsContractCheck // kiroWorkspaceSettingsFixturesCheck // kiroWrapperArgvCheck // moduleChecks // optionsDocsCheck // pnpmFetcherContractCheck // pnpmFetcherParityCheck // repoValidationChecks // sembleTemplatesCheck // splitCodeSpansCheck // targetSubshellShapeCheck // updateTargetsParityCheck // prWatchAtStopCheck // validateAtStopCheck);
+      bareCommandsCheck // beadsContractsCheck // beadsLifecycleCheck // cacheHitParityCheck // claudeDelegationClampCheck // claudeDevenvHooksRealTypeCheck // claudeExtractedCheck // claudeHeronBrookCheck // claudeMemoryCollisionGuardCheck // claudeSettingsSchemaCheck // codexCoverageCheck // codexExtractedCheck // copilotWrapperArgvCheck // doubledWordsCheck // doubledWordsFixturesCheck // markdownTableCellsFixturesCheck // facetMockChecks // factoryChecks // formattingCheck // fragmentsChecks // glabExtractedCheck // goFloorDriftChecks // goFloorExtractOrderChecks // goToolchainFloorChecks // instructionMaterializationCheck // instructionsDriftCheck // isolatePrekHooksCheck // kiroExtractedCheck // kiroFhsContractCheck // kiroIdentitySpliceCheck // kiroWorkspaceSettingsFixturesCheck // kiroWrapperArgvCheck // moduleChecks // optionsDocsCheck // pnpmFetcherContractCheck // pnpmFetcherParityCheck // repoValidationChecks // sembleTemplatesCheck // splitCodeSpansCheck // targetSubshellShapeCheck // updateTargetsParityCheck // prWatchAtStopCheck // validateAtStopCheck);
 
     # devShells.default provided by devenv CLI (devenv shell / devenv test)
     # from devenv.nix; nothing in this flake constructs it.
