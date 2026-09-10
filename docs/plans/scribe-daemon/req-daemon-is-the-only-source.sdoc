@@ -15,6 +15,10 @@ content is the .sdoc nodes, the grammar, the UID-to-path map, and the
 semantics model. A consumer obtains all of it from the daemon over RPC, or it
 does without.
 
+A check that validates the corpus in the Nix sandbox is not a consumer of it:
+the sandbox has no daemon, and the checks are what prove the bytes the daemon
+serves.
+
 This is not satisfiable today. The semantics layer is not defined well enough
 to encode, so the representation the daemon would serve does not yet exist.
 Until it does, the board's model.json read stands as a recorded violation
