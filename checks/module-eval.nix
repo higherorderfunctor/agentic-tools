@@ -1712,10 +1712,31 @@ in {
       == ./fixtures/claude-skills/skill-b
   );
 
-  module-codex-empty-settings-emits-no-toml = mkTest "codex-empty-settings-emits-no-toml" (
+  module-codex-default-model-effort-parity = mkTest "codex-default-model-effort-parity" (
     let
       hm = evalHm {ai.codex.enable = true;};
       devenv = evalDevenv {ai.codex.enable = true;};
+      expected = {
+        model = "gpt-6-astra";
+        model_reasoning_effort = "xhigh";
+      };
+    in
+      hmCodexSettings hm
+      == expected
+      && devenv.config.files.".codex/config.toml".source.value == expected
+  );
+
+  module-codex-empty-settings-emits-no-toml = mkTest "codex-empty-settings-emits-no-toml" (
+    let
+      config.ai.codex = {
+        enable = true;
+        nativeSettings = {
+          model = null;
+          model_reasoning_effort = null;
+        };
+      };
+      hm = evalHm config;
+      devenv = evalDevenv config;
     in
       !(hm.config.home.file ? ".codex/config.toml")
       && hmCodexSettings hm == {}
@@ -1766,6 +1787,25 @@ in {
       passes = evaluated: builtins.all (assertion: assertion.assertion) evaluated.config.assertions;
     in
       passes (evalHm config) && passes (evalDevenv config)
+  );
+
+  module-codex-profile-model-effort-inherit = mkTest "codex-profile-model-effort-inherit" (
+    let
+      config.ai.codex = {
+        enable = true;
+        profiles.inherit-model = {};
+      };
+      inherits = evaluated: let
+        failing = builtins.filter (assertion: !assertion.assertion) evaluated.config.assertions;
+        profile = evaluated.config.ai.codex.profiles.inherit-model;
+      in
+        profile.model
+        == null
+        && profile.model_reasoning_effort == null
+        && builtins.length failing == 1
+        && lib.hasInfix "ai.codex.profiles is locked out" (builtins.head failing).message;
+    in
+      inherits (evalHm config) && inherits (evalDevenv config)
   );
 
   module-codex-profile-name-rejects-unsafe-stems = mkTest "codex-profile-name-rejects-unsafe-stems" (
@@ -2100,9 +2140,9 @@ in {
     in
       (hm.config.programs.claude-code.settings.effortLevel or null)
       == "medium"
-      && !(hm.config.home.file ? ".codex/config.toml")
+      && hmCodexSettings hm == {model = "gpt-6-astra";}
       && (devenv.config.files.".claude/settings.json".json.effortLevel or null) == "medium"
-      && !(devenv.config.files ? ".codex/config.toml")
+      && devenv.config.files.".codex/config.toml".source.value == {model = "gpt-6-astra";}
   );
 
   module-codex-settings-rendering-parity = mkTest "codex-settings-rendering-parity" (
@@ -2173,7 +2213,15 @@ in {
         };
       };
     };
-    activationEmpty = codexSettingsActivation {ai.codex.enable = true;};
+    activationEmpty = codexSettingsActivation {
+      ai.codex = {
+        enable = true;
+        nativeSettings = {
+          model = null;
+          model_reasoning_effort = null;
+        };
+      };
+    };
     activationMalformed = codexSettingsActivation {
       ai.codex = {
         configDir = ".codex-malformed";

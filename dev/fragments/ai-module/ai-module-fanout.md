@@ -1,9 +1,8 @@
 ## ai Module Fanout Semantics
 
-> **Last verified:** 2026-09-02 — package installation moved out of per-factory
-> backend callbacks into the shared transform
-> (`lib/ai/app/mkBackendTransform.nix`); every runtime installs its package now,
-> fixing `claude`, which had silently installed on neither backend before.
+> **Last verified:** 2026-09-10 — Codex's shared native settings default to
+> GPT-6 Astra with xhigh reasoning effort on both backends. Explicit native
+> values and normalized reasoning effort override these option defaults.
 >
 > **Settled — do not relitigate.** Each of these records an approach that was
 > TRIED and rejected, or a measurement that would otherwise be re-derived
@@ -176,21 +175,27 @@ The ai module fans out TWO kinds of configuration:
   packages may declare `passthru.kiroFhsSandbox = false`; the overlay does this
   for darwin and pre-split nixpkgs.
 - `ai.codex.nativeSettings` — typed stable keys plus a TOML-compatible native
-  freeform tail. Home Manager reconciles exact declared leaves into a writable
-  `${configDir}/config.toml`; devenv writes a statically Nix-owned
-  trusted-project `.codex/config.toml`. An empty first HM generation is a no-op,
-  while an empty later generation uses the ownership manifest to remove formerly
-  managed leaves without deleting native state. Devenv rejects provider,
-  profile, notification, and telemetry keys that Codex documents as ignored at
-  project scope. The backend ownership difference is deliberate: Codex's
-  user-level trust prompt writes ad-hoc `projects.<path>.trust_level` entries
-  into the same file through `config/batchWrite`, while no project-local writer
-  has been observed. A versioned XDG-state manifest tracks Nix-owned leaf paths
-  so activation can reassert and retire them while preserving unknown/native
-  siblings, including siblings inside `projects`, `features`, and `mcp_servers`.
-  MCP configuration is composed into that shared user file or the static project
-  file through the same typed server pool. Stable security settings type
-  `allow_login_shell`, `approval_policy` (including granular prompt categories),
+  freeform tail. Its model defaults to `gpt-6-astra` and reasoning effort to
+  `xhigh` on both backends. Explicit native values override these defaults;
+  normalized reasoning effort also overrides the native option default. Setting
+  either native key to null omits it, allowing Codex's lower config layers or
+  runtime defaults to supply it. Named config profiles retain null defaults so
+  they do not pin a model or effort implicitly. Home Manager reconciles exact
+  declared leaves into a writable `${configDir}/config.toml`; devenv writes a
+  statically Nix-owned trusted-project `.codex/config.toml`. An empty first HM
+  generation is a no-op, while an empty later generation uses the ownership
+  manifest to remove formerly managed leaves without deleting native state.
+  Devenv rejects provider, profile, notification, and telemetry keys that Codex
+  documents as ignored at project scope. The backend ownership difference is
+  deliberate: Codex's user-level trust prompt writes ad-hoc
+  `projects.<path>.trust_level` entries into the same file through
+  `config/batchWrite`, while no project-local writer has been observed. A
+  versioned XDG-state manifest tracks Nix-owned leaf paths so activation can
+  reassert and retire them while preserving unknown/native siblings, including
+  siblings inside `projects`, `features`, and `mcp_servers`. MCP configuration
+  is composed into that shared user file or the static project file through the
+  same typed server pool. Stable security settings type `allow_login_shell`,
+  `approval_policy` (including granular prompt categories),
   `approvals_reviewer`, `sandbox_mode`, and `sandbox_workspace_write`.
   `default_permissions` and named `permissions` profiles type inheritance,
   workspace roots, filesystem access and scoped paths, deny-glob scan depth, and

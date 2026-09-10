@@ -366,157 +366,158 @@
       };
     };
   };
-  codexSettingsType = lib.types.submodule {
-    freeformType = tomlFormat.type;
-    options = {
-      agents = lib.mkOption {
-        type = lib.types.nullOr (lib.types.submodule {
-          freeformType = tomlFormat.type;
-          options = {
-            default_subagent_model = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = null;
-              description = "Default model identifier used for spawned Codex subagents.";
+  codexSettingsType = defaults:
+    lib.types.submodule {
+      freeformType = tomlFormat.type;
+      options = {
+        agents = lib.mkOption {
+          type = lib.types.nullOr (lib.types.submodule {
+            freeformType = tomlFormat.type;
+            options = {
+              default_subagent_model = lib.mkOption {
+                type = lib.types.nullOr lib.types.str;
+                default = null;
+                description = "Default model identifier used for spawned Codex subagents.";
+              };
+              default_subagent_reasoning_effort = lib.mkOption {
+                type = lib.types.nullOr (lib.types.enum reasoningEffortLevels);
+                default = null;
+                description = "Default reasoning effort used for spawned Codex subagents.";
+              };
+              enabled = lib.mkOption {
+                type = lib.types.nullOr lib.types.bool;
+                default = null;
+                description = "Whether Codex multi-agent functionality is enabled.";
+              };
+              interrupt_message = lib.mkOption {
+                type = lib.types.nullOr lib.types.bool;
+                default = null;
+                description = "Whether Codex sends an interruption message when stopping a subagent.";
+              };
+              max_concurrent_threads_per_session = lib.mkOption {
+                type = lib.types.nullOr lib.types.ints.positive;
+                default = null;
+                description = "Maximum concurrent agent threads allowed in one Codex session.";
+              };
             };
-            default_subagent_reasoning_effort = lib.mkOption {
-              type = lib.types.nullOr (lib.types.enum reasoningEffortLevels);
-              default = null;
-              description = "Default reasoning effort used for spawned Codex subagents.";
+          });
+          default = null;
+          description = "Global Codex multi-agent defaults and optional native role declarations.";
+        };
+        allow_login_shell = lib.mkOption {
+          type = lib.types.nullOr lib.types.bool;
+          default = null;
+          description = "Whether shell tools may invoke login shells.";
+        };
+        approval_policy = lib.mkOption {
+          type = lib.types.nullOr approvalPolicyType;
+          default = null;
+          description = "When Codex pauses for approval, either as a preset or granular prompt-category policy.";
+        };
+        approvals_reviewer = lib.mkOption {
+          type = lib.types.nullOr (lib.types.enum ["auto_review" "user"]);
+          default = null;
+          description = "Who reviews eligible interactive approval requests; this does not change the sandbox boundary.";
+        };
+        default_permissions = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = null;
+          description = "Named or built-in permission profile Codex applies by default. Do not combine this permission model with sandbox_mode/sandbox_workspace_write in any loaded config layer.";
+        };
+        features = lib.mkOption {
+          type = lib.types.nullOr (lib.types.submodule {
+            freeformType = lib.types.attrsOf lib.types.bool;
+            options = lib.genAttrs stableFeatureNames (name:
+              lib.mkOption {
+                type = lib.types.nullOr lib.types.bool;
+                default = null;
+                description = "Whether Codex enables the extracted stable `${name}` feature.";
+              });
+          });
+          default = null;
+          description = ''
+            Codex feature toggles. Stable flags extracted from the pinned
+            binary are typed; additional boolean flags remain available
+            for experimental and forward-compatible use.
+          '';
+        };
+        model = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = defaults.model or null;
+          description = ''
+            Default Codex model. The pinned binary's model catalog is a
+            non-enforcing hint because account and provider availability
+            can add valid model identifiers dynamically.
+          '';
+        };
+        model_reasoning_effort = lib.mkOption {
+          type = lib.types.nullOr (lib.types.enum reasoningEffortLevels);
+          default = defaults.model_reasoning_effort or null;
+          description = ''
+            Default reasoning effort for supported models. Values come
+            from the model metadata extracted from the pinned binary.
+          '';
+        };
+        personality = lib.mkOption {
+          type = lib.types.nullOr (lib.types.enum ["friendly" "none" "pragmatic"]);
+          default = null;
+          description = "Default communication style for supported models.";
+        };
+        permissions = lib.mkOption {
+          type = lib.types.attrsOf permissionProfileType;
+          default = {};
+          description = "Named least-privilege filesystem and network permission profiles. Profiles with the same name merge across Codex config layers.";
+        };
+        projects = lib.mkOption {
+          type = lib.types.attrsOf (lib.types.submodule {
+            options.trust_level = lib.mkOption {
+              type = lib.types.enum ["trusted" "untrusted"];
+              description = "Whether Codex loads project-scoped .codex configuration, hooks, and rules for this path.";
             };
-            enabled = lib.mkOption {
-              type = lib.types.nullOr lib.types.bool;
-              default = null;
-              description = "Whether Codex multi-agent functionality is enabled.";
+          });
+          default = {};
+          description = "User-level project trust declarations. Devenv rejects this bootstrap-global setting only in project config.toml, not in named user profiles.";
+        };
+        sandbox_mode = lib.mkOption {
+          type = lib.types.nullOr (lib.types.enum sandboxModeNames);
+          default = null;
+          description = "OS-enforced filesystem and network sandbox policy for model-generated commands.";
+        };
+        sandbox_workspace_write = lib.mkOption {
+          type = lib.types.nullOr (lib.types.submodule {
+            options = {
+              exclude_slash_tmp = lib.mkOption {
+                type = lib.types.nullOr lib.types.bool;
+                default = null;
+                description = "Whether `/tmp` is excluded from workspace-write sandbox access.";
+              };
+              exclude_tmpdir_env_var = lib.mkOption {
+                type = lib.types.nullOr lib.types.bool;
+                default = null;
+                description = "Whether the directory named by TMPDIR is excluded from workspace-write access.";
+              };
+              network_access = lib.mkOption {
+                type = lib.types.nullOr lib.types.bool;
+                default = null;
+                description = "Whether workspace-write sandboxed commands may access the network.";
+              };
+              writable_roots = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = [];
+                description = "Additional writable roots granted to workspace-write sandboxed commands.";
+              };
             };
-            interrupt_message = lib.mkOption {
-              type = lib.types.nullOr lib.types.bool;
-              default = null;
-              description = "Whether Codex sends an interruption message when stopping a subagent.";
-            };
-            max_concurrent_threads_per_session = lib.mkOption {
-              type = lib.types.nullOr lib.types.ints.positive;
-              default = null;
-              description = "Maximum concurrent agent threads allowed in one Codex session.";
-            };
-          };
-        });
-        default = null;
-        description = "Global Codex multi-agent defaults and optional native role declarations.";
-      };
-      allow_login_shell = lib.mkOption {
-        type = lib.types.nullOr lib.types.bool;
-        default = null;
-        description = "Whether shell tools may invoke login shells.";
-      };
-      approval_policy = lib.mkOption {
-        type = lib.types.nullOr approvalPolicyType;
-        default = null;
-        description = "When Codex pauses for approval, either as a preset or granular prompt-category policy.";
-      };
-      approvals_reviewer = lib.mkOption {
-        type = lib.types.nullOr (lib.types.enum ["auto_review" "user"]);
-        default = null;
-        description = "Who reviews eligible interactive approval requests; this does not change the sandbox boundary.";
-      };
-      default_permissions = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = "Named or built-in permission profile Codex applies by default. Do not combine this permission model with sandbox_mode/sandbox_workspace_write in any loaded config layer.";
-      };
-      features = lib.mkOption {
-        type = lib.types.nullOr (lib.types.submodule {
-          freeformType = lib.types.attrsOf lib.types.bool;
-          options = lib.genAttrs stableFeatureNames (name:
-            lib.mkOption {
-              type = lib.types.nullOr lib.types.bool;
-              default = null;
-              description = "Whether Codex enables the extracted stable `${name}` feature.";
-            });
-        });
-        default = null;
-        description = ''
-          Codex feature toggles. Stable flags extracted from the pinned
-          binary are typed; additional boolean flags remain available
-          for experimental and forward-compatible use.
-        '';
-      };
-      model = lib.mkOption {
-        type = lib.types.nullOr lib.types.str;
-        default = null;
-        description = ''
-          Default Codex model. The pinned binary's model catalog is a
-          non-enforcing hint because account and provider availability
-          can add valid model identifiers dynamically.
-        '';
-      };
-      model_reasoning_effort = lib.mkOption {
-        type = lib.types.nullOr (lib.types.enum reasoningEffortLevels);
-        default = null;
-        description = ''
-          Default reasoning effort for supported models. Values come
-          from the model metadata extracted from the pinned binary.
-        '';
-      };
-      personality = lib.mkOption {
-        type = lib.types.nullOr (lib.types.enum ["friendly" "none" "pragmatic"]);
-        default = null;
-        description = "Default communication style for supported models.";
-      };
-      permissions = lib.mkOption {
-        type = lib.types.attrsOf permissionProfileType;
-        default = {};
-        description = "Named least-privilege filesystem and network permission profiles. Profiles with the same name merge across Codex config layers.";
-      };
-      projects = lib.mkOption {
-        type = lib.types.attrsOf (lib.types.submodule {
-          options.trust_level = lib.mkOption {
-            type = lib.types.enum ["trusted" "untrusted"];
-            description = "Whether Codex loads project-scoped .codex configuration, hooks, and rules for this path.";
-          };
-        });
-        default = {};
-        description = "User-level project trust declarations. Devenv rejects this bootstrap-global setting only in project config.toml, not in named user profiles.";
-      };
-      sandbox_mode = lib.mkOption {
-        type = lib.types.nullOr (lib.types.enum sandboxModeNames);
-        default = null;
-        description = "OS-enforced filesystem and network sandbox policy for model-generated commands.";
-      };
-      sandbox_workspace_write = lib.mkOption {
-        type = lib.types.nullOr (lib.types.submodule {
-          options = {
-            exclude_slash_tmp = lib.mkOption {
-              type = lib.types.nullOr lib.types.bool;
-              default = null;
-              description = "Whether `/tmp` is excluded from workspace-write sandbox access.";
-            };
-            exclude_tmpdir_env_var = lib.mkOption {
-              type = lib.types.nullOr lib.types.bool;
-              default = null;
-              description = "Whether the directory named by TMPDIR is excluded from workspace-write access.";
-            };
-            network_access = lib.mkOption {
-              type = lib.types.nullOr lib.types.bool;
-              default = null;
-              description = "Whether workspace-write sandboxed commands may access the network.";
-            };
-            writable_roots = lib.mkOption {
-              type = lib.types.listOf lib.types.str;
-              default = [];
-              description = "Additional writable roots granted to workspace-write sandboxed commands.";
-            };
-          };
-        });
-        default = null;
-        description = "Workspace-write sandbox refinements; effective only with sandbox_mode = \"workspace-write\".";
-      };
-      web_search = lib.mkOption {
-        type = lib.types.nullOr (lib.types.enum ["cached" "disabled" "indexed" "live"]);
-        default = null;
-        description = "Codex web-search mode.";
+          });
+          default = null;
+          description = "Workspace-write sandbox refinements; effective only with sandbox_mode = \"workspace-write\".";
+        };
+        web_search = lib.mkOption {
+          type = lib.types.nullOr (lib.types.enum ["cached" "disabled" "indexed" "live"]);
+          default = null;
+          description = "Codex web-search mode.";
+        };
       };
     };
-  };
   applyWorkspaceWriteRoots = settings: writableRoots: let
     workspaceSettings = settings.sandbox_workspace_write;
     existingRoots =
@@ -1005,7 +1006,7 @@ in
         '';
       };
       profiles = lib.mkOption {
-        type = lib.types.attrsOf codexSettingsType;
+        type = lib.types.attrsOf (codexSettingsType {});
         default = {};
         description = ''
           LOCKED OUT. Setting this fails evaluation. These are whole extra
@@ -1033,14 +1034,18 @@ in
         '';
       };
       nativeSettings = lib.mkOption {
-        type = codexSettingsType;
+        type = codexSettingsType {
+          model = "gpt-6-astra";
+          model_reasoning_effort = "xhigh";
+        };
         default = {};
         description = ''
           Codex config.toml settings. Common stable keys are typed; unknown
           TOML-compatible keys are accepted as a native escape hatch. Home
           Manager reconciles declared leaves into writable user config, while
           devenv statically writes trusted-project config and rejects keys
-          Codex ignores at project scope.
+          Codex ignores at project scope. Model and reasoning effort default
+          to GPT-6 Astra and xhigh; set either key to null to omit it.
         '';
       };
     };
