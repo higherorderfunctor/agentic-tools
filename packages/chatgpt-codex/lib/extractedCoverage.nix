@@ -63,7 +63,6 @@
         "codex debug prompt-input"
         "codex exec-server"
         "codex exec-server forward"
-        "codex mcp-server"
       ];
 
       # Codex is installed from the pinned Nix package. Letting its self-update
@@ -206,6 +205,10 @@
       # configuration surface this factory owns.
       developerTooling = [
         "--analytics-default-enabled"
+        "--aws-profile"
+        "--aws-region"
+        "--aws-service"
+        "--aws-sigv4"
         "--code-mode-host"
         "--concurrent-requests"
         "--connect"
@@ -217,6 +220,7 @@
         "--out"
         "--prettier"
         "--remote-control"
+        "--remote-transport"
         "--sandbox-state-disable-network"
         "--sandbox-state-json"
         "--sandbox-state-readable-root"
@@ -250,6 +254,27 @@
       # other one-shot controls stay on the invocation. Some names such as
       # --env are context-dependent across commands; that is further reason
       # not to assign them one persistent config meaning.
+      #
+      # `--worktree` — read from UPSTREAM SOURCE, not from `--help`, because
+      # the one-line help ("Run the session in a new managed Git worktree")
+      # does not say whether a config key exists. codex is open source; at
+      # tag `rust-v0.154.0` (36eab010) the flag is
+      # `codex-rs/utils/cli/src/shared_options.rs`:
+      #
+      #     /// Run the session in a new managed Git worktree.
+      #     #[arg(long = "worktree", default_value_t = false)]
+      #     pub worktree: bool,
+      #
+      # Two facts decide the disposition. It is a plain per-invocation
+      # `bool` in the SHARED options struct — the same struct as `--cd`,
+      # which this file already classifies `sessionOnly`. And upstream has
+      # no config surface for it at all: searching that tag for `worktree`
+      # in `config.rs` and `config_types.rs`, and for `use_worktree`,
+      # returns nothing, so `declarativeEquivalent` has nothing to map onto.
+      #
+      # Reclassify the moment upstream grows a config key: a persistent
+      # "always use a managed worktree" default is exactly the shape this
+      # factory would want to own.
       sessionOnly = [
         "--add-dir"
         "--all"
@@ -295,6 +320,7 @@
         "--uncommitted"
         "--verbose"
         "--version"
+        "--worktree"
       ];
     };
   };
