@@ -17,7 +17,7 @@ decision and an edit here.
   systems  the systems table, parsed from the one narrative tagged systems
            (DEC-SYSTEM-IS-A-TYPE-SET): name, types, roles, meaning
   terms    every narrative tagged term: uid, title, dir_class, path
-  grammar  the grammar, as view-check.parse_sgra reads it
+  grammar  the grammar returned by the resident daemon
 
 Nothing here knows a UID: the systems narrative is found by its tag, the
 terms by theirs, the roots by having no container.

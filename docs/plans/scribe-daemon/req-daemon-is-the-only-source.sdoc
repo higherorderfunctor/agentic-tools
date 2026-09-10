@@ -37,9 +37,11 @@ something the other does not.
 NOTES: >>>
 Operator, 2026-09-09, verbatim: "ideally i want everything going through the daemon ... even board shouldn't read the disk directly for the sdoc contents including semantics, ever. id call that a requirement, just not satisfiable right now because we dont have the semantic layer defined well enough to encode. i dont want you just filling in that until ive made it definable through nix." And on the path map: "the daemon should be injecting the path, board shouldn't be walking that."
 
-The scribe client now obtains its grammar and every corpus operation from the daemon, and the board obtains its grammar from workspace.grammar. On this branch the board temporarily retains uid_paths until the separately landed R2 export-path commit is combined. The board semantics payload and the operator-facing scribe semantics command still read the operator-owned semantics model from disk; those are the recorded violation in the requirement statement.
+The scribe client, board, view-check, and wireline now obtain grammar from workspace.grammar and validate the shared scribe-grammar/1 contract. Corpus operations remain daemon-backed and every consumer fails closed with the NoDaemon socket and start remedy. On this branch the board and view tooling temporarily retain uid_paths because the separately landed R2 export-path commit is not merged here; checks/daemon-only-source.py permits only that one named walk finding until the stacks combine.
 
-checks/daemon-only-source.py now executes this boundary in the daemon-only-source flake check. It scans Python programs under dev/scripts and docs/sdoc for parse_sgra imports, grammar.sgra path literals, and filesystem walks over .sdoc files. Its permanent allowances are daemon implementation modules, sandboxed checks, test fixtures, and dev/scripts/sdoc_semantics as the named recorded violation. In this ordered stack only, view-check.py and wireline.py are named transitional R13 entries so R11 itself remains green; R13 moves both to RPC and deletes those entries.
+The board semantics payload and operator-facing scribe semantics command still read the operator-owned semantics model from disk. Those are the recorded violation in the requirement statement.
+
+The daemon-only-source flake check executes this boundary. It scans Python programs under dev/scripts and docs/sdoc for parse_sgra imports, grammar.sgra path literals, and filesystem walks over .sdoc files. Its permanent allowances are daemon implementation modules, sandboxed checks, tests, and dev/scripts/sdoc_semantics as the recorded violation.
 <<<
 RELATIONS:
 - TYPE: Parent
