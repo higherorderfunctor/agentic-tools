@@ -1112,17 +1112,22 @@ import sys
 sys.path.insert(0, sys.argv[1])
 assert importlib.util.find_spec("sdoc_semantics") is None
 import scribe_cmd
-grammar = scribe_cmd.parse_sgra(scribe_cmd.Path(sys.argv[2]) / "docs/sdoc/grammar.sgra")
+from scribe_grammar import parse_sgra
+grammar = parse_sgra(scribe_cmd.Path(sys.argv[2]) / "docs/sdoc/grammar.sgra")
 parser = scribe_cmd.build_parser(grammar, None, None)
 verbs = next(action.choices for action in parser._actions if isinstance(action.choices, dict))
 for verb in verbs:
     if verb != "semantics":
         with contextlib.redirect_stdout(io.StringIO()) as output:
-            assert scribe_cmd.main(["--root", sys.argv[2], verb, "--help"]) == 0, verb
+            try:
+                parser.parse_args([verb, "--help"])
+            except SystemExit as exc:
+                assert exc.code == 0, verb
         assert "usage: scribe" in output.getvalue(), verb
         print(verb)
+args = parser.parse_args(["semantics"])
 with contextlib.redirect_stderr(io.StringIO()) as error:
-    assert scribe_cmd.main(["--root", sys.argv[2], "semantics"]) == 1
+    assert scribe_cmd.run_semantics(args, grammar) == 1
 assert "semantics engine is unavailable" in error.getvalue()
 """
         result = subprocess.run(

@@ -11,22 +11,38 @@ DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
 Every scribe command is a typed operation against the graph the daemon already
-holds. The client parses its own command line -- it can, because the option
-surface comes from the grammar FILE and needs no corpus -- and sends an
-operation. The daemon validates that operation against the held graph and
-never sees an argv. No command loads a graph of its own.
+holds. The client parses its command line in two passes. A boot parser consumes
+only --root; the client resolves it, asks that workspace's daemon for
+workspace.grammar, validates the scribe-grammar/1 result, and builds the full
+grammar-derived parser over the remaining arguments. The real parser re-declares
+--root for help but ignores its value. No command reads grammar.sgra.
 
-The last one that did was `new`, which reloaded mid-operation to resolve the
-grammar alias on the file it had just written. That stopped on 2026-09-01:
-[LINK: MECH-SCRIBE-NEW-BUILDS-THE-DOCUMENT].
+The guarded-field scan remains ahead of both parsers and every socket attempt,
+so AUTHORED_BY or PARENT_FP is refused before a missing daemon can mask it.
+With no daemon, every command -- help included -- exits non-zero with the
+NoDaemon remedy and the boot parser's usage. There is no autostart, fallback,
+or client-side grammar load.
 
-What this node predicted got one thing right and one thing wrong, and the
-wrong one is worth keeping. RIGHT: the commands could not move until their
-verification was the workspace's rather than finish() -> verify()'s, which is
-a change to the writer and not to transport. WRONG: the shape was expected to
-be one socket call carrying the command line, and the seam is TYPED instead.
-A daemon that parsed an argv would have to own the caller's working directory
-and the caller's stdin, which is where `@file` and `-` are resolved.
+The daemon validates the resulting operation against the held graph and never
+sees an argv. The caller still resolves @file and stdin values before sending,
+because the daemon does not own the caller's working directory or input.
+
+The last command that loaded a graph itself was `new`, which reloaded
+mid-operation to resolve the grammar alias on the file it had just written.
+That stopped on 2026-09-01: [LINK: MECH-SCRIBE-NEW-BUILDS-THE-DOCUMENT].
+
+One recorded violation remains and is not this mechanism's to invent away:
+`scribe semantics` obtains the grammar from the daemon and then reads
+dev/scripts/sdoc_semantics/model.json from disk. The operator owns the semantics
+representation under [LINK: REQ-DAEMON-IS-THE-ONLY-SOURCE].
+
+What this node predicted got one thing right and one thing wrong, and the wrong
+one is worth keeping. RIGHT: the commands could not move until their
+verification was the workspace's rather than finish() -> verify()'s, which is a
+change to the writer and not to transport. WRONG: the shape was expected to be
+one socket call carrying the command line, and the seam is TYPED instead. A
+daemon that parsed an argv would have to own the caller's working directory and
+the caller's stdin, which is where @file and - are resolved.
 <<<
 RELATIONS:
 - TYPE: Parent

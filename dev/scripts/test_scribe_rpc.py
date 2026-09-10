@@ -202,30 +202,71 @@ def test_cli_dry_run_surface(root: Path, _runtime: Path) -> None:
         assert real["dry_run"] is False
 
 
-@contract("the client imports and prints help with only the standard library")
-def test_cli_stdlib_only(root: Path, _runtime: Path) -> None:
-    script_dir = root / "dev" / "scripts"
-    code = (
-        "import sys; "
-        f"sys.path.insert(0, {str(script_dir)!r}); "
-        "import scribe_cmd; "
-        "raise SystemExit(scribe_cmd.main("
-        f"['--root', {str(root)!r}, '--help']))"
+@contract("help gets all eight types and per-type flags from the daemon")
+def test_cli_help_from_daemon(root: Path, runtime: Path) -> None:
+    with served(root, runtime):
+        outputs = []
+        for argv in (
+            ["--root", str(root), "new", "--help"],
+            ["--root", str(root), "new", "WORK", "--help"],
+        ):
+            stdout = StringIO()
+            with redirect_stdout(stdout):
+                assert scribe_cmd.main(argv) == 0
+            outputs.append(stdout.getvalue())
+        type_help, work_help = outputs
+        for tag in (
+            "COMMENTARY",
+            "DECISION",
+            "EVIDENCE",
+            "MECHANISM",
+            "NARRATIVE",
+            "REQUIREMENT",
+            "USE_CASE",
+            "WORK",
+        ):
+            assert tag in type_help, f"new help omitted {tag}: {type_help}"
+        for flag in ("--uid", "--title", "--depth", "--statement", "--relate"):
+            assert flag in work_help, f"WORK help omitted {flag}: {work_help}"
+        assert "--authored-by" not in work_help
+
+
+@contract("help without a daemon prints the unchanged remedy and boot usage")
+def test_cli_help_without_daemon(root: Path, runtime: Path) -> None:
+    os.environ["XDG_RUNTIME_DIR"] = str(runtime)
+    stderr = StringIO()
+    with redirect_stderr(stderr):
+        assert scribe_cmd.main(["--root", str(root), "--help"]) == 1
+    path = scribe_paths.socket_path(root)
+    assert stderr.getvalue() == (
+        f"scribe: no scribe daemon on {path}.\n"
+        "  start one with:  devenv up scribe\n"
+        "  or directly:     scribe-daemon --root <worktree>\n"
+        "usage: scribe [--root ROOT]\n"
     )
-    environment = {
-        key: value
-        for key, value in os.environ.items()
-        if key not in ("PYTHONHOME", "PYTHONPATH")
-    }
-    result = subprocess.run(
-        [sys.executable, "-I", "-S", "-c", code],
-        capture_output=True,
-        text=True,
-        env=environment,
-        check=False,
-    )
-    assert result.returncode == 0, result.stderr
-    assert result.stdout.startswith("usage: scribe "), result.stdout
+
+
+@contract("a guarded flag is refused before any socket connect")
+def test_cli_guard_precedes_connect(root: Path, _runtime: Path) -> None:
+    attempted = []
+    original = socket.socket.connect
+
+    def unexpected_connect(connection, address):
+        attempted.append(address)
+        raise AssertionError(f"guarded argv reached socket connect: {address}")
+
+    socket.socket.connect = unexpected_connect
+    try:
+        stderr = StringIO()
+        with redirect_stderr(stderr):
+            code = scribe_cmd.main(
+                ["--root", str(root), "new", "WORK", "--authored-by", "human"]
+            )
+    finally:
+        socket.socket.connect = original
+    assert code == 1
+    assert "AUTHORED_BY is the operator's to set" in stderr.getvalue()
+    assert attempted == []
 
 
 @contract("a socket dry-run returns its diff and leaves disk and reads unchanged")
@@ -720,7 +761,9 @@ CONTRACTS = [
     test_unknown_method,
     test_root_assertion,
     test_cli_dry_run_surface,
-    test_cli_stdlib_only,
+    test_cli_help_from_daemon,
+    test_cli_help_without_daemon,
+    test_cli_guard_precedes_connect,
     test_rpc_dry_run,
     test_rpc_dry_run_generation,
     test_cli_dry_run_refusal,

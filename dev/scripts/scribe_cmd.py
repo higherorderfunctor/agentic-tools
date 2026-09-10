@@ -3,17 +3,16 @@
 """The `scribe` command: turn a command line into one typed operation
 (WORK-SCRIBE-CLIENT, docs/plans/scribe-daemon/).
 
-Stdlib only. No strictdoc import, no corpus load, no graph.
+No strictdoc import, no corpus load, no graph. Pydantic validates the grammar
+payload before any of it becomes an argparse surface.
 
 WHERE THE FLAGS COME FROM
 -------------------------
-The option surface is derived from the grammar, the same as it always was --
-one flag per declared field, each choice list read off that field, the
-relation roles off the element. What changed is that it is read from the
-grammar FILE rather than from a loaded project, so building it costs no
-corpus and needs no daemon. `scribe new DECISION --help` and
-`scribe new NARRATIVE --help` still print different surfaces, and still get
-them from the one place the daemon also resolves.
+The option surface is derived from the grammar the daemon holds -- one flag per
+declared field, each choice list read off that field, and the relation roles off
+the element. `scribe new DECISION --help` and `scribe new NARRATIVE --help`
+print different surfaces because workspace.grammar reports the parsed
+GrammarElement objects rather than a second client-side reading of grammar.sgra.
 
 WHAT THE DAEMON GETS
 --------------------
@@ -44,7 +43,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from scribe_grammar import parse_sgra  # noqa: E402
 from scribe_paths import RootError, resolve_root  # noqa: E402
 from scribe_protocol import WRITES  # noqa: E402
 
@@ -231,6 +229,9 @@ def run_semantics(args, grammar: dict) -> int:
             file=sys.stderr,
         )
         return 1
+    # RECORDED VIOLATION of REQ-DAEMON-IS-THE-ONLY-SOURCE: build_payload
+    # still reads sdoc_semantics/model.json from disk. The operator owns that
+    # layer; do not invent a daemon payload before its representation is set.
     data = semantics_cli.build_payload(grammar)
     try:
         sys.stdout.write(
@@ -327,18 +328,10 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     try:
         reject_guarded(argv)
-        root = resolve_root(next(
-            (argv[i + 1] for i, a in enumerate(argv) if a == "--root" and i + 1 < len(argv)),
-            next((a.split("=", 1)[1] for a in argv if a.startswith("--root=")), None),
-        ))
-        grammar = parse_sgra(root / "docs" / "sdoc" / "grammar.sgra")
-        command, tag = peek(argv)
-        args = build_parser(grammar, command, tag).parse_args(argv)
-        if args.command == "semantics":
-            # SHORT-CIRCUIT BEFORE ANY RPC. Everything this needs is already
-            # in hand: the grammar was parsed client-side a few lines up.
-            return run_semantics(args, grammar)
-        payload = operation(args, grammar)
+        boot = argparse.ArgumentParser(prog="scribe", add_help=False)
+        boot.add_argument("--root")
+        known, rest = boot.parse_known_args(argv)
+        root = resolve_root(known.root)
     except RootError as exc:
         print(f"scribe: {exc}", file=sys.stderr)
         return 1
@@ -348,11 +341,45 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         return exc.code if isinstance(exc.code, int) else 1
 
-    # IMPORTED HERE, NOT AT THE TOP. scribe_client now types the reply
-    # envelope with pydantic, and `scribe --help` has no reply to type: an
-    # import at module scope would put that cost on every help print and on
-    # every argv this function refuses before it ever reaches the socket.
-    from scribe_client import ClientError, call_for_root
+    from scribe_client import ClientError, NoDaemon, call_for_root
+    from scribe_contract import WorkspaceGrammarResult
+
+    try:
+        raw_grammar = call_for_root(root, "workspace.grammar")
+    except NoDaemon as exc:
+        # The real parser cannot exist without its grammar. Keep NoDaemon's
+        # remedy byte-for-byte and add the only honest usage available at
+        # this first pass. This applies to --help as well.
+        print(f"scribe: {exc}", file=sys.stderr)
+        sys.stderr.write(boot.format_usage())
+        return 1
+    except ClientError as exc:
+        print(f"scribe: {exc}", file=sys.stderr)
+        return 1
+
+    try:
+        grammar = WorkspaceGrammarResult.model_validate(raw_grammar).model_dump(
+            by_alias=True
+        )["types"]
+    except ValueError as exc:
+        print(f"scribe: invalid workspace.grammar result: {exc}", file=sys.stderr)
+        return 1
+
+    try:
+        command, tag = peek(rest)
+        # --root is re-declared so the real help surface tells the whole truth,
+        # but its value was consumed by the boot parser and is ignored here.
+        args = build_parser(grammar, command, tag).parse_args(rest)
+        if args.command == "semantics":
+            # The grammar came from the daemon. The semantics model still
+            # comes from disk inside run_semantics: the recorded violation.
+            return run_semantics(args, grammar)
+        payload = operation(args, grammar)
+    except SystemExit as exc:
+        if isinstance(exc.code, str):  # our own refusals carry text
+            print(exc.code, file=sys.stderr)
+            return 1
+        return exc.code if isinstance(exc.code, int) else 1
 
     try:
         result = call_for_root(root, "scribe.apply", payload)
