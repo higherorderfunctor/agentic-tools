@@ -14,20 +14,52 @@
   flattenCategories = categories: lib.concatLists (builtins.attrValues categories);
   duplicateValues = values:
     lib.filter (value: builtins.length (lib.filter (candidate: candidate == value) values) > 1) (lib.unique values);
-  exactMessage = label: extractedValues: coveredValues: let
-    # lib.subtractLists takes removals first and candidates second. Missing
-    # dispositions are therefore extracted - covered; stale dispositions are
-    # covered - extracted. Naming both sets prevents the tempting reversal.
+
+  # Every producer below returns a LIST of problem strings — empty when clean.
+  # They are concatenated and reported in ONE throw at the bottom.
+  #
+  # This replaced a chain of 14 `assert`s. Nix short-circuits at the first
+  # failing assert, so a bump that added six flags AND removed one command
+  # reported only the command (PR #1578), and the fix took a CI round trip per
+  # category. The categories are independent; there is no reason to run them one at a time
+  # discovering them.
+  #
+  # ORIENTATION, and the trap this file fell into: `lib.subtractLists` takes
+  # removals FIRST. So `missing` (new upstream, needs a disposition) is
+  # extracted - covered, and `stale` (gone upstream, safe to delete) is
+  # covered - extracted. Six call sites used to pass these the wrong way
+  # round, which printed an ADDITION as "stale dispositions" — the exact
+  # opposite of what happened, to whoever reads it. Two guards now:
+  # the argument names below, and `recordFieldProblems` doing the swap ONCE
+  # rather than at each of its four call sites.
+  exactProblems = label: extractedValues: coveredValues: let
     missing = lib.subtractLists coveredValues extractedValues;
-    unexpected = lib.subtractLists extractedValues coveredValues;
-  in "chatgpt-codex coverage drift in ${label}; missing dispositions: ${builtins.toJSON missing}; stale dispositions: ${builtins.toJSON unexpected}";
-  assertExact = label: extractedValues: coveredValues:
-    lib.assertMsg (sorted extractedValues == sorted coveredValues) (exactMessage label extractedValues coveredValues);
-  assertUnique = label: values:
-    lib.assertMsg (builtins.length values == builtins.length (lib.unique values))
-    "chatgpt-codex coverage duplicates in ${label}: ${builtins.toJSON (duplicateValues values)}";
-  assertRecordFields = label: expected: records:
-    lib.all (record: assertExact label expected (builtins.attrNames record)) records;
+    stale = lib.subtractLists extractedValues coveredValues;
+  in
+    lib.optional (sorted extractedValues != sorted coveredValues)
+    "${label}: missing dispositions (new upstream, classify these): ${builtins.toJSON missing}; stale dispositions (gone upstream, safe to delete): ${builtins.toJSON stale}";
+
+  # `noun` is not decoration. Two of the three call sites check the COVERAGE
+  # lists, where a duplicate is a classification mistake; the third checks a
+  # command's flag names straight out of the EXTRACTION, where a duplicate
+  # means the extractor emitted the same flag twice. Calling both "duplicate
+  # dispositions" sent the reader to the wrong file.
+  duplicateProblems = noun: label: values:
+    lib.optional (builtins.length values != builtins.length (lib.unique values))
+    "${label}: duplicate ${noun}: ${builtins.toJSON (duplicateValues values)}";
+
+  # `expected` is the COVERAGE side, so it goes in the covered slot. Doing the
+  # orientation here keeps all four record-field call sites reading naturally.
+  recordFieldProblems = label: expected: records:
+    lib.unique (lib.concatMap (record: exactProblems label (builtins.attrNames record) expected) records);
+
+  # Maturities are a POLICY list, not a ledger of what upstream ships. An
+  # exact match went red whenever upstream stopped shipping any feature at
+  # some maturity — demanding the deletion of a policy that is still correct.
+  # Only the other direction is a real gap: a maturity we have no policy for.
+  subsetProblems = label: observed: allowed:
+    lib.optional (lib.subtractLists allowed observed != [])
+    "${label}: no policy for ${builtins.toJSON (lib.subtractLists allowed observed)}";
 
   commands = builtins.attrValues extracted.cli.commands;
   commandNames = builtins.attrNames extracted.cli.commands;
@@ -37,25 +69,38 @@
   rootCanonicalFlags = map (flag: builtins.head flag.names) extracted.cli.commands.codex.flags;
   globalCanonicalFlags = map (flag: builtins.head flag.names) extracted.cli.globalFlags;
   featureMaturities = lib.unique (map (feature: feature.maturity) extracted.features);
+  problems = lib.concatLists [
+    (exactProblems "CLI commands" commandNames coveredCommands)
+    (duplicateProblems "dispositions" "CLI commands" coveredCommands)
+    (recordFieldProblems "CLI command fields" (builtins.attrNames coverage.cli.commandFields) commands)
+    (lib.concatMap (command:
+      duplicateProblems "extracted flag names" "CLI flags for ${builtins.concatStringsSep " " command.path}"
+      (map (flag: builtins.head flag.names) command.flags))
+    commands)
+    (exactProblems "CLI flags" canonicalFlags coveredFlags)
+    (duplicateProblems "dispositions" "CLI flags" coveredFlags)
+    (recordFieldProblems "CLI flag fields" (builtins.attrNames coverage.cli.flagFields) (lib.concatMap (command: command.flags) commands))
+    # Extractor-internal invariant, not a human ledger: both sides come from
+    # the extraction, so "missing/stale" vocabulary would not apply. Kept
+    # exact in both directions.
+    (lib.optional (sorted rootCanonicalFlags != sorted globalCanonicalFlags)
+      "global flags versus root command flags disagree; extraction is internally inconsistent: root ${builtins.toJSON (sorted rootCanonicalFlags)} vs global ${builtins.toJSON (sorted globalCanonicalFlags)}")
+    (exactProblems "config vocabulary fields" (builtins.attrNames extracted.config) (builtins.attrNames coverage.config))
+    (lib.optional (!lib.all (values: values == []) (builtins.attrValues extracted.config))
+      "config extraction is no longer empty; classify each extracted key before accepting the new seam")
+    (recordFieldProblems "feature fields" (builtins.attrNames coverage.features.fields) extracted.features)
+    (subsetProblems "feature maturities" featureMaturities (builtins.attrNames coverage.features.maturities))
+    (recordFieldProblems "model fields" (builtins.attrNames coverage.models) extracted.models)
+    (exactProblems "provenance fields" (builtins.attrNames extracted.provenance) (builtins.attrNames coverage.provenance))
+  ];
 in
-  assert assertExact "CLI commands" commandNames coveredCommands;
-  assert assertUnique "CLI commands" coveredCommands;
-  assert assertRecordFields "CLI command fields" (builtins.attrNames coverage.cli.commandFields) commands;
-  assert lib.all (command:
-    assertUnique "CLI flags for ${builtins.concatStringsSep " " command.path}"
-    (map (flag: builtins.head flag.names) command.flags))
-  commands;
-  assert assertExact "CLI flags" canonicalFlags coveredFlags;
-  assert assertUnique "CLI flags" coveredFlags;
-  assert assertRecordFields "CLI flag fields" (builtins.attrNames coverage.cli.flagFields) (lib.concatMap (command: command.flags) commands);
-  assert assertExact "global flags versus root command flags" rootCanonicalFlags globalCanonicalFlags;
-  assert assertExact "config vocabulary fields" (builtins.attrNames coverage.config) (builtins.attrNames extracted.config);
-  assert lib.assertMsg (lib.all (values: values == []) (builtins.attrValues extracted.config))
-  "chatgpt-codex config extraction is no longer empty; classify each extracted key before accepting the new seam";
-  assert assertRecordFields "feature fields" (builtins.attrNames coverage.features.fields) extracted.features;
-  assert assertExact "feature maturities" featureMaturities (builtins.attrNames coverage.features.maturities);
-  assert assertRecordFields "model fields" (builtins.attrNames coverage.models) extracted.models;
-  assert assertExact "provenance fields" (builtins.attrNames coverage.provenance) (builtins.attrNames extracted.provenance); {
+  assert lib.assertMsg (problems == [])
+  ("chatgpt-codex coverage drift (${toString (builtins.length problems)} ${
+      if builtins.length problems == 1
+      then "problem"
+      else "problems"
+    }):\n  - "
+    + builtins.concatStringsSep "\n  - " problems); {
     chatgpt-codex-coverage = pkgs.runCommand "chatgpt-codex-coverage" {} ''
       echo "ok — every extracted Codex vocabulary has a reviewed Nix disposition" > "$out"
     '';
