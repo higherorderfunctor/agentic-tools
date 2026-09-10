@@ -1,0 +1,47 @@
+[DOCUMENT]
+TITLE: The scribe RPC runs on pjrpc with a typed pydantic contract per method
+
+[GRAMMAR]
+IMPORT_FROM_FILE: @repo
+
+[WORK]
+UID: WORK-RPC-ON-PJRPC-AND-PYDANTIC
+TITLE: The scribe RPC runs on pjrpc with a typed pydantic contract per method
+DEPTH: needs-design
+AUTHORED_BY: llm
+STATEMENT: >>>
+The scribe RPC stops hand-rolling JSON-RPC. pjrpc supplies the sync,
+framework-free dispatcher and pydantic supplies one typed contract per method,
+so a malformed request is refused by name instead of being absorbed.
+
+WHY. Validation today checks the envelope in scribe_rpc.py and the field VALUES
+against the grammar in scribe_ops.py, and reaches everything else through
+`.get()`. That leaves twelve gaps, five of them SILENT: a truthy string for
+dry_run writes for real, an unknown parameter key is ignored, `fields` as a
+list of pairs is accepted, the client's served-root assertion is skipped when
+the result is not a dict, and the client indexes `response["result"]` bare so a
+malformed reply is a traceback rather than a refusal.
+
+The operator's ruling is that a maintained, Nix-packageable library beats
+hand-rolled protocol code. pjrpc 2.2.0 (2026-08-08, Unlicense, python >=3.10)
+has ZERO hard dependencies -- pydantic is an extra -- and
+`pjrpc.server.Dispatcher.dispatch(request_text, context)` is synchronous and
+framework-free, which is what a threading Unix-socket server can use. pydantic
+is already in the strictdoc venv every scribe program execs through, so the
+typed half costs nothing. pjrpc is not in nixpkgs: it is a buildPythonPackage
+from the PyPI sdist, spliced onto the strictdoc-grammar-extract wrapper's
+PYTHONPATH beside ast_grep_py, with the install check making a missing copy a
+build failure.
+
+THE TRANSPORT STAYS OURS. The Unix socket, one JSON value per newline, the
+16 MiB request cap, the threading server, the derived socket path and
+DEC-SCRIBE-DAEMON-NO-FALLBACK are unchanged: pjrpc replaces the envelope
+handling inside the frame, not the frame.
+<<<
+RELATIONS:
+- TYPE: Parent
+  VALUE: MECH-SCRIBE-RPC
+  ROLE: Crosses
+- TYPE: Parent
+  VALUE: DEC-SCRIBE-DAEMON-NO-FALLBACK
+  ROLE: Governed_By
