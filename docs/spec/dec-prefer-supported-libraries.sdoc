@@ -8,7 +8,7 @@ IMPORT_FROM_FILE: @repo
 UID: DEC-PREFER-SUPPORTED-LIBRARIES
 TITLE: A maintained library beats a hand-rolled parser or protocol
 AUTHORED_BY: llm
-STATUS: open
+STATUS: accepted
 RETIRES_ON: A hand-rolled replacement lands for something a qualifying library does, and the reason is recorded on it.
 STATEMENT: >>>
 Where a maintained library does a thing this repository's tooling needs -- a
@@ -43,4 +43,10 @@ validator, not in nixpkgs, packaged in devenv.nix.
 
 Drafted by the writer from the operator's words; STATUS open until they
 accept or reject it.
+
+Accepted by the operator on 2026-09-10 -- their words: "your packages are
+fine, approved" and, asked whether that was the decision or only the two
+packages, "human graded decision". The first instances it ratifies are
+pjrpc 2.2.0 and pydantic as direct dependencies of the scribe RPC layer.
+AUTHORED_BY is the operator's to raise; the writer has no flag for it.
 <<<
