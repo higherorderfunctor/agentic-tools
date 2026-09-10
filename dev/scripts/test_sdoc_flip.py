@@ -279,10 +279,12 @@ def test_extensionless_routing() -> None:
         for glob, spec in registry.SOURCE_EXTRACTORS.items()
     )
     reader = GlobRoutingReader(routes=routes, path_root=str(REPO_ROOT))
-    target = REPO_ROOT / "docs" / "sdoc" / "board" / "serve"
+    target = REPO_ROOT / "checks" / "fixtures" / "claude-hooks" / "post-edit"
     info = reader.read_from_file(str(target))
-    assert info.functions, f"{target} produced no items"
-    assert ROUTING_STATS["docs/sdoc/board/serve"] == 1, dict(ROUTING_STATS)
+    assert info.file_stats.lines_total > 0, f"{target} was not read"
+    assert ROUTING_STATS["checks/fixtures/claude-hooks/post-edit"] == 1, dict(
+        ROUTING_STATS
+    )
     # NEGATIVE CONTROL: an unlisted extensionless script with the SAME shebang
     # is NOT routed to bash. Sniffing would find it; a manifest does not, and
     # that is the documented, deliberate behavior.

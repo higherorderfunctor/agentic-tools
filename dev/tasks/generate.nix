@@ -15,6 +15,7 @@
   '';
 
   log = ''log() { echo "==> $*" >&2; }'';
+  python = pkgs.lib.getExe pkgs.python3;
 
   # Copy one generated file out of the nix store into the working tree.
   # Used by the two generate:repo:* tasks; the instruction files go
@@ -339,14 +340,14 @@ in {
           log "Checking the tree under $r"
           rc=0
           # To stderr: devenv shows a task's stderr in its summary and hides stdout.
-          env -u PYTHONPATH python3 "$view/view-check.py" "$index" . --root "$r" >&2 || rc=$?
+          env -u PYTHONPATH ${python} "$view/view-check.py" "$index" . --root "$r" >&2 || rc=$?
           if [ "$rc" -gt 1 ]; then exit "$rc"; fi
         done
         payload="$out/$stem.json"
         log "Writing the payload"
-        env -u PYTHONPATH python3 "$view/wireline.py" "$index" . "''${scope[@]}" --out "$payload"
+        env -u PYTHONPATH ${python} "$view/wireline.py" "$index" . "''${scope[@]}" --out "$payload"
         render() {
-          env -u PYTHONPATH python3 "$view/render.py" "$payload" "$view/template.html" --wrap "$1" --out "$2" >/dev/null
+          env -u PYTHONPATH ${python} "$view/render.py" "$payload" "$view/template.html" --wrap "$1" --out "$2" >/dev/null
           log "wrote $2"
         }
         render page "$out/$stem.html"
@@ -365,8 +366,8 @@ in {
     #   devenv tasks run view:serve
     #   devenv tasks run view:serve --input port=8080
     #
-    # Foreground on purpose: Ctrl-C stops it. python3 is already in the
-    # shell for the pipeline, and http.server is in its standard library.
+    # Foreground on purpose: Ctrl-C stops it. The explicit Nix interpreter is
+    # the pipeline's Python, and http.server is in its standard library.
     "view:serve" = {
       description = "Serve output/view on 127.0.0.1 (input port, default 8765)";
       exec = ''
@@ -385,7 +386,7 @@ in {
         url="http://127.0.0.1:$port/canon.html"
         log "Serving $dir at $url (Ctrl-C stops it)"
         echo "$url"
-        exec env -u PYTHONPATH python3 -m http.server --bind 127.0.0.1 --directory "$dir" "$port"
+        exec env -u PYTHONPATH ${python} -m http.server --bind 127.0.0.1 --directory "$dir" "$port"
       '';
     };
 

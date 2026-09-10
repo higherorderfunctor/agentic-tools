@@ -16,18 +16,16 @@
 #    file, and it must be invoked separately -- a suite nothing runs is a suite
 #    that does not exist. It covers the surface the source-traceability flip
 #    added and arm 1 does not touch: the bash kinds, the glob routing table,
-#    `NullSourceReader`, the three NAMED extensionless scripts, and the bash
+#    `NullSourceReader`, the two NAMED extensionless scripts, and the bash
 #    sub-grammar injected into Nix indented strings (ids, kinds, absolute line
 #    numbers, Nix interpolation excluded from the bash parse, inject_bash off).
 #
 #    IT ALSO CARRIES THE ONLY DEMONSTRATION THAT AN EXTENSIONLESS SCRIPT YIELDS
 #    A FUNCTION ITEM, and that is a property of the repository rather than a
-#    shortcut. All three extensionless scripts the manifest names are real
-#    files with no shell function in them -- `docs/sdoc/board/serve` offers one
-#    variable, the two `checks/fixtures/claude-hooks/` hooks offer nothing --
-#    so routing is provable on repository files and the function half is not.
-#    The suite's own fixture is what closes that, which is exactly why it has
-#    to run somewhere merge-blocking.
+#    shortcut. Both extensionless scripts the manifest names are real
+#    files with no shell function in them, so routing is provable on repository
+#    files and the function half is not. The suite's own fixture is what closes
+#    that, which is exactly why it has to run somewhere merge-blocking.
 #
 # 2. A REAL strictdoc export, in a scratch project, with
 #    REQUIREMENT_TO_SOURCE_TRACEABILITY ON and `include_source_paths` narrowed

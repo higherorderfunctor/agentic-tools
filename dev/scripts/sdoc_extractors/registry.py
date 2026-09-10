@@ -119,10 +119,10 @@ BASH_SOURCE_EXTRACTOR = SourceExtractor(
 #: glob -> extractor. THE table. A new language is one row here plus its
 #: queries module; nothing in `tree_sitter_extractor.py` moves.
 #:
-#: EXTENSIONLESS SCRIPTS ARE NAMED, NOT SNIFFED. There are three of them and
+#: EXTENSIONLESS SCRIPTS ARE NAMED, NOT SNIFFED. There are two of them and
 #: they are listed by path, which is the operator's "glob not covered not in
 #: scope" applied literally. Content detection would mean opening all ~1300
-#: files in the tree to identify three; a glob that stops matching is a hole a
+#: files in the tree to identify two; a glob that stops matching is a hole a
 #: test can assert on, a shebang sniffer that stops matching is a silent
 #: full-tree read.
 #:
@@ -137,7 +137,6 @@ SOURCE_EXTRACTORS: dict[str, SourceExtractor] = {
     "**/*.sh": BASH_SOURCE_EXTRACTOR,
     "checks/fixtures/claude-hooks/post-edit": BASH_SOURCE_EXTRACTOR,
     "checks/fixtures/claude-hooks/pre-edit": BASH_SOURCE_EXTRACTOR,
-    "docs/sdoc/board/serve": BASH_SOURCE_EXTRACTOR,
 }
 
 

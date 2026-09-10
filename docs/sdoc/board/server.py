@@ -13,6 +13,11 @@ and holds no graph. No daemon answering is HTTP 503 with the client's own
 remedy in the body -- the browser shows it and offers a retry, rather than
 this server quietly loading the corpus itself.
 
+The `sdoc-board` Nix wrapper launches this module with strictdoc's own
+virtual-environment interpreter. That is the same interpreter the scribe
+programs use, and it makes the board's current and future Python dependencies
+available by construction rather than through an ambient `python3`.
+
 The Content-Security-Policy admits same-origin workers for the board's ELK
 layout engine. It also admits cdn.jsdelivr.net, blob: scripts and workers,
 and wasm-unsafe-eval: Perspective's pinned CDN build loads its wasm and worker

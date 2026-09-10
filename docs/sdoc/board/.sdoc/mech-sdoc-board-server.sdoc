@@ -10,41 +10,47 @@ TITLE: One stdlib HTTP server serves the app over the resident daemon
 DEPTH: implemented
 AUTHORED_BY: llm
 STATEMENT: >>>
-server.py is one stdlib threaded HTTP server: GET and HEAD only, an
-allowlisted static surface, and three JSON routes -- /api/health (the daemon's
-describe), /api/graph (the sdoc-board/2 snapshot) and /api/rows (the
-sdoc-perspective/2 tables). source.py's DaemonSource holds the adapted
-payloads keyed by daemon generation and re-exports only when describe reports
-movement, so a repeat request costs no export. A NoDaemon refusal becomes HTTP
-503 with the remedy in the body; any other daemon error is a 502. The process
-imports nothing from strictdoc, so ./serve runs under any python3, and
-devenv.nix declares it as processes.board -- `devenv up board`, `-d`, and
-`devenv processes down`, the same lifecycle as processes.scribe and
-independent of it.
+server.py is one stdlib threaded HTTP server: GET and HEAD only, an allowlisted
+static surface, and three JSON routes -- /api/health (the daemon's describe),
+/api/graph (the sdoc-board/2 snapshot) and /api/rows (the sdoc-perspective/2
+tables). source.py's DaemonSource holds the adapted payloads keyed by daemon
+generation and re-exports only when describe reports movement, so a repeat
+request costs no export. A NoDaemon refusal becomes HTTP 503 with the remedy in
+the body; any other daemon error is a 502.
+
+The ai.strictdoc devenv module builds `sdoc-board` with the same mkScribe
+factory and strictdoc virtual-environment runner as the three scribe programs,
+then `processes.board` executes that wrapper by absolute Nix store path. The
+board therefore shares scribe's interpreter and its pydantic dependency by
+construction; no repository launcher or ambient Python lookup sits between
+the process manager and server.py.
 
 source.py also builds the snapshot's semantics key, by calling
 sdoc_semantics.build_payload over the same parsed grammar the adapter already
-reads. That is the server's only optional dependency: the engine needs
-transitions, which reaches this process through grammarPython in devenv.nix,
-and an import that fails becomes a named refusal inside the payload rather
-than a missing key or a dead process. The same holds for the extractor the
-adapter asks for KIND words. So "any python3" still serves the app, and what a
-leaner interpreter costs is those two enrichments, each of which says out loud
-that it is absent.
+reads. The pinned interpreter carries both the semantics engine and the source
+extractor used for KIND words. Their lookups remain fail-soft at the adapter
+boundary: an import or lookup failure becomes a named refusal or a null label
+rather than a missing payload key or a dead process.
 <<<
 NOTES: >>>
-Updated 2026-09-03 for commits 8823edf1 and 46cd3cf1: the static allowlist
-grew grammar-groups.json and fsm.js, and source.py gained the semantics
-payload. The three JSON routes are unchanged -- semantics rides inside
-/api/graph rather than on a fourth route.
+Updated 2026-09-03 for commits 8823edf1 and 46cd3cf1: the static allowlist grew
+grammar-groups.json and fsm.js, and source.py gained the semantics payload. The
+three JSON routes are unchanged -- semantics rides inside /api/graph rather
+than on a fourth route.
 
 Updated 2026-09-08 for commit 8b936c3c: the allowlist grew two more entries,
-/assets/vendor/elkjs/elk-api.js and /assets/vendor/elkjs/elk-worker.min.js,
-and they are the only ones not backed by a file in this directory -- server.py
-resolves them against the Nix store path in SDOC_BOARD_ELKJS_DIR and refuses
-to start when that variable is unset or does not hold both files. So the
-process now asks one thing of its environment beyond a python3;
-MECH-SDOC-BOARD-LAYOUT owns the delivery. Still three JSON routes.
+/assets/vendor/elkjs/elk-api.js and /assets/vendor/elkjs/elk-worker.min.js, and
+they are the only ones not backed by a file in this directory -- server.py
+resolves them against the Nix store path in SDOC_BOARD_ELKJS_DIR and refuses to
+start when that variable is unset or does not hold both files. Still three JSON
+routes.
+
+Updated 2026-09-09 by WORK-BOARD-SERVE-PINS-ITS-INTERPRETER: the ambient
+docs/sdoc/board/serve launcher was deleted. The strictdoc devenv module now
+packages server.py as `sdoc-board`, launches its absolute store path as the
+board process, and shares the strictdoc virtual-environment interpreter used by
+scribe. The interpreter-launchers check guards the boundary with the removed
+launcher as its positive control.
 <<<
 RELATIONS:
 - TYPE: Parent
@@ -63,7 +69,5 @@ RELATIONS:
   VALUE: docs/sdoc/board/server.py
 - TYPE: File
   VALUE: docs/sdoc/board/source.py
-- TYPE: File
-  VALUE: docs/sdoc/board/serve
 - TYPE: File
   VALUE: dev/scripts/sdoc_semantics/__init__.py

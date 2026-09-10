@@ -22,9 +22,14 @@ Surface:
                             which this repository's own grammar file is
                             generated
 
-Generating the grammar through this module is this repository's convention, not
-a constraint on anyone consuming the published surface: a consumer may use the
-module, call the library directly, or hand-write the file.
+One runner over strictdoc's own virtual-environment interpreter is reused by
+four repository entry points: scribe, scribe-daemon, scribe-client and
+sdoc-board. The module also owns the scribe and board process declarations, so
+both execute absolute wrapper paths and resolve no ambient interpreter.
+
+Generating the grammar through this module is this repository's convention,
+not a constraint on anyone consuming the published surface: a consumer may use
+the module, call the library directly, or hand-write the file.
 
 Closes the wrapping half of MECH-GRAMMAR-EXTRACT-SOURCE-BOUNDARY and settles
 MECH-GRAMMAR-SGRA-NOT-GENERATED.
@@ -48,4 +53,9 @@ dev/tasks/generate.nix so the module references no task it does not own and
 stays importable by a project that has none. It deliberately carries no edge to
 generate:sdoc-grammar -- see MECH-GRAMMAR-SGRA-NOT-GENERATED for why chaining
 the two would write a stale grammar.
+
+Updated 2026-09-09 by WORK-BOARD-SERVE-PINS-ITS-INTERPRETER: a fourth mkScribe
+instantiation packages docs/sdoc/board/server.py as `sdoc-board`, installs it
+beside the scribe programs, and owns `processes.board` so the wrapper path and
+interpreter cannot drift apart.
 <<<

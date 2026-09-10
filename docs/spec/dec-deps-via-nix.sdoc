@@ -26,12 +26,12 @@ machine gets the same ones, not about which tool arranges them.
 <<<
 RATIONALE: >>>
 Anyone on another machine gets the same runtime, and a dependency cannot go
-missing because a developer's global environment happened to carry it. The two
-instances already live in the tree: the tree-sitter grammars and transitions
-reach the strictdoc venv through the PYTHONPATH splice in
-packages/strictdoc-grammar/lib/mkExtract.nix, and the board gets its
-interpreter from grammarPython = python3.withPackages in devenv.nix. Neither
-needs a user global and neither needs pip.
+missing because a developer's global environment happened to carry it. The
+tree-sitter grammars reach strictdoc's virtual environment through the
+PYTHONPATH splice in packages/strictdoc-grammar/lib/mkExtract.nix. The scribe
+programs and board server all use wrappers over that same interpreter, while
+the remaining devenv Python tasks name their nixpkgs interpreter by absolute
+store path. None needs a user global and none needs pip.
 <<<
 NOTES: >>>
 The operator, verbatim: "we should log a sdoc like a decision or mechanism for

@@ -78,10 +78,11 @@
     runner = extract;
   };
 
-  # The resident writer and its client (docs/plans/scribe-daemon/). Same
-  # wrapper, same run-time script resolution, different entry points --
-  # parameterized rather than copied so the root-walk and the interpreter
-  # indirection stay in one place.
+  # The resident writer, its client, and the board server. Same wrapper, same
+  # run-time script resolution, different entry points -- parameterized rather
+  # than copied so the root-walk and the interpreter indirection stay in one
+  # place. The board deliberately shares this interpreter: strictdoc's venv
+  # already carries pydantic, which the server's reply validation will use.
   scribeDaemon = import ../../lib/mkScribe.nix {
     inherit lib pkgs;
     runner = extract;
@@ -96,6 +97,14 @@
     name = "scribe-client";
     script = "dev/scripts/scribe_client.py";
     description = "Talk to a scribe daemon, and fail when there isn't one";
+  };
+
+  sdocBoard = import ../../lib/mkScribe.nix {
+    inherit lib pkgs;
+    runner = extract;
+    name = "sdoc-board";
+    script = "docs/sdoc/board/server.py";
+    description = "Serve the read-only StrictDoc board over the scribe daemon";
   };
 
   # Store paths rather than bare names: `generate:sgra` is a plain script and
@@ -231,6 +240,7 @@ in {
       scribe
       scribeClient
       scribeDaemon
+      sdocBoard
     ];
 
     # MECH-SCRIBE-DEVENV-PROCESS. Per-worktree isolation is inherited rather
@@ -244,6 +254,10 @@ in {
     # in this repository uses yet. `devenv up scribe` until then.
     processes.scribe = {
       exec = "${lib.getExe scribeDaemon} --root \"$DEVENV_ROOT\"";
+    };
+
+    processes.board = {
+      exec = "${lib.getExe sdocBoard} --root \"$DEVENV_ROOT\"";
     };
 
     # Declared even when `grammars` is empty, so `devenv tasks list` shows the
