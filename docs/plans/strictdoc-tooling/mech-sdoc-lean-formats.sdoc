@@ -46,10 +46,10 @@ empty export.
 
 Making that loud is owed and is not this node's to build. strictdoc's --formats
 allowlist is a hardcoded list of built-in handles that a config can only extend,
-never narrow, so the guard belongs in the tool SLICE-SDOC-CLI builds -- the same
-slice this mechanism blocks. Until then the mitigation is documentary, which per
-INV-GUARDS-MUST-EXECUTE is not a guard and should be written as one that does
-not yet execute.
+never narrow, so MECH-SDOC-CLI-COVERS-STRICTDOC-SILENCE requires every program
+invoking strictdoc's command line to validate its handle before invocation. Every
+repository call currently hardcodes json; the remaining hand-run exposure has no
+wrapper to intercept it.
 
 Explicitly out of scope: making HTML render. This node does not repair it, gate
 it, or decide whether it should exist -- MECH-DEFAULT-EXPORT-IS-RED-ON-RST is
@@ -170,12 +170,7 @@ objects and the dispatcher calls read_grammar on the member, so
 formats=[SDocFormat, JSONFormat] raises a missing-self TypeError at load
 rather than registering anything.
 
-The pin buys one thing the statement did not predict, and SLICE-SDOC-CLI
-depends on it. html2pdf4doc, reached only through the default format stack,
-reassigns sys.stdout AT IMPORT TIME and needs a real file descriptor, so any
-caller holding stdout in a buffer got io.UnsupportedOperation before this
-landed. That is what lets the CLI keep strictdoc's progress narration out of
-a --dry-run diff.
+The pin also enabled the original in-process writer's dry-run path. html2pdf4doc, reached only through the default format stack, reassigns sys.stdout at import time and needs a real file descriptor, so a caller holding stdout in a buffer got io.UnsupportedOperation before this landed. The daemon client no longer imports that stack, but the delivery measurement remains the reason the original dry-run diff stayed free of strictdoc's progress narration.
 <<<
 RELATIONS:
 - TYPE: File

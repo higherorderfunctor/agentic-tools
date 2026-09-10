@@ -9,7 +9,10 @@ UID: UC-WRITE-A-VIEW-BY-HAND
 TITLE: An author writes a new view with the scribe and gets a page without touching the renderer
 AUTHORED_BY: llm
 STATEMENT: >>>
-An author writes a root, a legend card, tabs, screens and cards with sdoc new NARRATIVE, giving each its WIDGET, PLACE and, where a figure draws over other narratives, its Over target. The task renders it. No file under docs/sdoc/view changes.
+An author writes a root, a legend card, tabs, screens and cards with scribe new
+NARRATIVE, giving each its WIDGET, PLACE and, where a figure draws over other
+narratives, its Over target. The task renders it. No file under docs/sdoc/view
+changes.
 <<<
 RELATIONS:
 - TYPE: Parent

@@ -26,12 +26,17 @@ machine gets the same ones, not about which tool arranges them.
 <<<
 RATIONALE: >>>
 Anyone on another machine gets the same runtime, and a dependency cannot go
-missing because a developer's global environment happened to carry it. The two
-instances already live in the tree: the tree-sitter grammars and transitions
-reach the strictdoc venv through the PYTHONPATH splice in
-packages/strictdoc-grammar/lib/mkExtract.nix, and the board gets its
-interpreter from grammarPython = python3.withPackages in devenv.nix. Neither
-needs a user global and neither needs pip.
+missing because a developer's global environment happened to carry it. The
+instances already in the tree: ast_grep_py reaches the strictdoc venv through
+the PYTHONPATH splice in packages/strictdoc-grammar/lib/mkExtract.nix; the
+tree-sitter grammars reach the same wrapper as store paths in
+SDOC_TS_<NAME>_PARSER, baked on with --set-default from
+packages/strictdoc-grammar/lib/tsGrammars.nix; and elkjs reaches the board as
+boardElkjs, a derivation built in devenv.nix, after sitting vendored in the
+tree until 2026-09-08. None needs a user global and none needs pip.
+
+Not yet holding: docs/sdoc/board/serve execs a bare python3 off PATH, so the
+board server's own interpreter is whatever the ambient environment supplies.
 <<<
 NOTES: >>>
 The operator, verbatim: "we should log a sdoc like a decision or mechanism for

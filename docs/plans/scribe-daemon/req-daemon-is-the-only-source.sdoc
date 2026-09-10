@@ -56,8 +56,7 @@ paragraph of the STATEMENT is deleted and the model.json reads become plain
 violations to fix. Extends DEC-SCRIBE-DAEMON-NO-FALLBACK and
 DEC-SDOC-BOARD-READS-THE-SCRIBE-DAEMON, which forbid a second GRAPH and a
 fallback LOAD but say nothing about reading corpus bytes directly;
-MECH-SCRIBE-COMMANDS-LOAD-IN-PROCESS explicitly carves out the grammar file
-as "needs no corpus", and this requirement withdraws that carve-out.
+MECH-SCRIBE-COMMANDS-LOAD-IN-PROCESS previously justified the client-side grammar read as "needs no corpus"; this requirement withdraws that carve-out. The daemon bootstrap remains unimplemented on this branch.
 <<<
 RELATIONS:
 - TYPE: Parent

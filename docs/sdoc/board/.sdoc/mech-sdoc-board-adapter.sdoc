@@ -10,10 +10,11 @@ TITLE: One export becomes the snapshot and two queryable tables
 AUTHORED_BY: llm
 STATEMENT: >>>
 adapter.py's adapt() turns one workspace.export index.json into both browser
-payloads in a single pass, joining two sources the export does not carry: the
-UID-to-file walk (view-check's uid_paths, imported rather than duplicated) for
-provenance paths, and parse_sgra for field kinds and option lists, since the
-export types every field as String. The snapshot (sdoc-board/2) is one record
+payloads in a single pass, joining two things the export does not carry, both
+handed in by the caller: the UID-to-path map for provenance paths and the parsed
+grammar for field kinds and option lists, since the export types every field as
+String. Today source.py supplies them by calling the locally imported uid_paths
+and parse_sgra helpers. The snapshot (sdoc-board/2) is one record
 per node plus one edge per RESOLVED Parent or Child declaration, with
 unresolved targets kept as diagnostics rather than dropped. The rows payload
 (sdoc-perspective/2) is two tables: nodes, one row per node with PATH, DIR and
@@ -56,6 +57,8 @@ not /1. The engine's SCHEMA and adapter.py's SEMANTICS_SCHEMA both read
 sdoc-semantics/2; the statement had been carrying the older string. The two
 schema strings the adapter itself owns, sdoc-board/2 and sdoc-perspective/2,
 are unchanged.
+
+Corrected 2026-09-10 to distinguish adapt() from its caller: adapt receives paths and grammar rather than reading either source itself. The current caller still walks the worktree and parses grammar.sgra locally; changing those inputs to daemon RPC is deferred until that implementation lands.
 <<<
 RELATIONS:
 - TYPE: Parent

@@ -21,15 +21,15 @@ devenv.nix declares it as processes.board -- `devenv up board`, `-d`, and
 `devenv processes down`, the same lifecycle as processes.scribe and
 independent of it.
 
-source.py also builds the snapshot's semantics key, by calling
+source.py also builds the snapshot's semantics key by calling
 sdoc_semantics.build_payload over the same parsed grammar the adapter already
-reads. That is the server's only optional dependency: the engine needs
-transitions, which reaches this process through grammarPython in devenv.nix,
-and an import that fails becomes a named refusal inside the payload rather
-than a missing key or a dead process. The same holds for the extractor the
-adapter asks for KIND words. So "any python3" still serves the app, and what a
-leaner interpreter costs is those two enrichments, each of which says out loud
-that it is absent.
+reads. sdoc_semantics is standard-library-only, so its import can fail only
+when that package is off the path; a failure becomes a named refusal inside
+the payload rather than a missing key or a dead process. The extractor the
+adapter asks for KIND words is the one real optional dependency because it
+needs tree_sitter and a compiled grammar, and it degrades the same way. Thus
+any python3 still serves the base app, while either absent enrichment says so
+explicitly.
 <<<
 NOTES: >>>
 Updated 2026-09-03 for commits 8823edf1 and 46cd3cf1: the static allowlist
@@ -41,9 +41,10 @@ Updated 2026-09-08 for commit 8b936c3c: the allowlist grew two more entries,
 /assets/vendor/elkjs/elk-api.js and /assets/vendor/elkjs/elk-worker.min.js,
 and they are the only ones not backed by a file in this directory -- server.py
 resolves them against the Nix store path in SDOC_BOARD_ELKJS_DIR and refuses
-to start when that variable is unset or does not hold both files. So the
-process now asks one thing of its environment beyond a python3;
+to start when that variable is unset or does not hold both files. SDOC_BOARD_ELKJS_DIR is the one environment variable the process requires beyond its interpreter;
 MECH-SDOC-BOARD-LAYOUT owns the delivery. Still three JSON routes.
+
+Corrected 2026-09-10: sdoc_semantics has been standard-library-only since the transitions dependency was removed. The current server still executes python3 from PATH and still parses grammar.sgra locally; the planned pinned interpreter and daemon-served grammar revisions are deferred until those code paths land.
 <<<
 RELATIONS:
 - TYPE: Parent
