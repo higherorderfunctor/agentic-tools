@@ -35,16 +35,20 @@ checker reports every finding in one pass at 0.03 s. And the scribe daemon's
 own graph load passes skip_source_files=True, so nothing upstream checks runs
 on the path most writes actually take.
 
-The scribe CLI checks only the VALUEs it is about to write, applying the same
-well-formedness rule plus one stat: microseconds, not a whole-graph pass. It
-also verifies the grain now, since a File relation may name an item rather
-than a whole file: an ELEMENT and ID pair is checked against the items the
-configured extractor really finds in that file, and a missing id is refused
-with the nearest names and the command that lists them. The corpus-wide gate
-stays alongside both, because a write-time check cannot see a file deleted or
-moved after its relation was written, and that is the direction the ghost
-problem actually runs. dev/scripts/element-check.py is the corpus-wide half
-of the grain check and runs as strictdoc-element-check in nix flake check.
+The scribe write path checks only the VALUEs it is about to write, applying the
+same well-formedness rule plus one stat: microseconds, not a whole-graph pass.
+scribe_ops.py normalizes each File target and the workspace precheck refuses a
+write whose repository-relative target is missing, absolute, or carries a
+forbidden dot segment. It also verifies the grain now, since a File relation
+may name an item rather than a whole file: an ELEMENT and ID pair is checked
+against the items the configured extractor really finds in that file, and a
+missing id is refused with the nearest names and the command that lists them.
+scribe_verbs.do_check repeats the same normalization and existence rules over
+every relation in the held graph. The corpus-wide gate stays alongside both,
+because a write-time check cannot see a file deleted or moved after its
+relation was written, and that is the direction the ghost problem actually
+runs. dev/scripts/element-check.py is the corpus-wide half of the grain check
+and runs as strictdoc-element-check in nix flake check.
 
 Two exclusions, both deliberate and both cheap to reverse. Targets outside
 the repository are not supported; no File relation names one today. Forward
@@ -154,9 +158,7 @@ check by checks/strictdoc-file-check.nix. Built in cycle-check.py's shape as
 specified, reusing sdoc_fp's iter_nodes and load_index and taking the
 repository root as a second argument.
 
-The write-time half is in dev/scripts/sdoc_cli.py: normalize_file_value plus
-one stat, applied to the VALUEs a command is about to write, and it refuses
-an absolute path, a './' or '..' segment and a nonexistent target.
+The write-time half now enters through scribe_ops.py and the workspace precheck: normalization plus an existence check refuse an absolute path, a dot segment, a parent segment, or a nonexistent target.
 
 Positive control rather than a clean run reported as proof: against the real
 corpus the checker reports 3 File relations and 0 findings, and against an

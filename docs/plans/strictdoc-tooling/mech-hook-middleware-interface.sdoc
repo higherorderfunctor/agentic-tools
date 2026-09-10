@@ -75,7 +75,7 @@ Written 2026-08-29 from the conversation, at the operator's request to
 snapshot rather than unpack. Three things the operator has not formed an
 opinion on are the three open decisions this node is Governed_By; each names
 what the operator said at the time. The finer scribe phases in the operation
-list came from reading the writer's code (sdoc_cli.py, sdoc_model.py), which
+list came from reading the writer code that now lives in scribe_ops.py, scribe_workspace.py, and sdoc_model.py, which
 the operator had not yet read.
 <<<
 RELATIONS:

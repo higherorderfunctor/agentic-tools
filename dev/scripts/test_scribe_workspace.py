@@ -180,6 +180,17 @@ def inline_linked_node(workspace: Workspace):
 # ---- contracts ---------------------------------------------------------
 
 
+@contract("shared verbs expose no command entrypoint")
+def test_verbs_are_a_library(_root: Path) -> None:
+    import scribe_verbs
+
+    assert callable(scribe_verbs.do_show)
+    assert callable(scribe_verbs.do_list)
+    assert callable(scribe_verbs.do_check)
+    assert not hasattr(scribe_verbs, "main")
+    assert not hasattr(scribe_verbs, "DISPATCH")
+
+
 @contract("a repeated read does not reload")
 def test_read_is_free(root: Path) -> None:
     workspace = Workspace(root)
@@ -887,6 +898,7 @@ def test_fp_accept_has_no_readiness_gate(root: Path) -> None:
 
 
 CONTRACTS = [
+    test_verbs_are_a_library,
     test_read_is_free,
     test_write_defers,
     test_batch_pays_once,
