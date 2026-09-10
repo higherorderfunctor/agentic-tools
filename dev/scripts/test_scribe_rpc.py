@@ -324,38 +324,44 @@ def test_cli_dry_run_refusal(root: Path, runtime: Path) -> None:
         assert "NO-SUCH-CLI-DRY-RUN-UID" in outcomes[0][2]
 
 
-def _without_item_slots(index: dict) -> tuple[dict, int]:
-    """The export as strictdoc's own CLI would write it, and how many item
-    slots were dropped to get there."""
-    dropped = 0
+def _without_daemon_additions(index: dict) -> tuple[dict, int, int]:
+    """The export as strictdoc's own CLI would write it, and how many of each
+    daemon-only addition were dropped to get there: element-grained File item
+    slots, and every node's declaring `_DOCUMENT_PATH`."""
+    slots = 0
+    paths = 0
     for document in index.get("DOCUMENTS", []):
         for node in document.get("NODES", []):
+            if node.pop("_DOCUMENT_PATH", None) is not None:
+                paths += 1
             for relation in node.get("RELATIONS", []) or []:
                 if relation.get("TYPE") != "File":
                     continue
                 for slot in ("ELEMENT", "ID"):
                     if relation.pop(slot, None) is not None:
-                        dropped += 1
-    return index, dropped
+                        slots += 1
+    return index, slots, paths
 
 
-@contract("the daemon's export is strictdoc's own, plus the File item slots")
+@contract("the daemon's export is strictdoc's own, plus the item slots and node paths")
 def test_export_matches(root: Path, runtime: Path) -> None:
     """It used to be byte-identical, and it is still identical everywhere the
     two can agree.
 
-    The one deliberate difference is ELEMENT and ID on a File relation:
-    strictdoc's JSON generator reads neither off a FileReference, so an
-    element-grained relation would export as a whole-file one and the board
-    would draw a coarser graph than the corpus declares. sdoc_model wraps
-    that one method for exports taken through this repo -- see
-    carry_file_element_into_json -- and `strictdoc export` run BY HAND still
-    drops the slots, which is the accepted cost of leaving the packaged
-    strictdoc untouched.
+    Two deliberate differences. ELEMENT and ID on a File relation: strictdoc's
+    JSON generator reads neither off a FileReference, so an element-grained
+    relation would export as a whole-file one and the board would draw a
+    coarser graph than the corpus declares. And `_DOCUMENT_PATH`: the
+    generator receives each node's declaring document but omits its path, so
+    a consumer would have to walk the corpus a second time to recover it.
+    sdoc_model wraps one generator method for each -- see
+    carry_file_element_into_json and carry_document_path_into_json -- and
+    `strictdoc export` run BY HAND still writes neither, which is the accepted
+    cost of leaving the packaged strictdoc untouched.
 
-    So the comparison normalizes the difference away and then asserts the
-    difference was real: strip the slots and the two exports must be equal,
-    and a corpus that carries any must have had some to strip.
+    So the comparison normalizes both differences away and then asserts they
+    were real: strip them and the two exports must be equal, and every node
+    must have had a path to strip.
     """
     import json
 
@@ -374,17 +380,17 @@ def test_export_matches(root: Path, runtime: Path) -> None:
     )
     a = (mine / "json" / "index.json").read_bytes()
     b = (theirs / "json" / "index.json").read_bytes()
-    if a == b:
-        # Nothing in this corpus names an item, so there is nothing to
-        # normalize and byte equality is the whole contract.
-        return
-    normalized, dropped = _without_item_slots(json.loads(a))
-    assert dropped, (
-        f"exports differ by something other than the File item slots: "
+    normalized, slots, paths = _without_daemon_additions(json.loads(a))
+    # A positive control on the path patch: every exported node carries one,
+    # so zero means the patch did not fire rather than that the corpus is
+    # unusual. The item slots are optional -- a corpus may name no items.
+    assert paths, (
+        f"the daemon export carried no _DOCUMENT_PATH at all: "
         f"{len(a)} vs {len(b)} bytes"
     )
     assert normalized == json.loads(b), (
-        f"exports differ beyond the {dropped} File item slot(s) the daemon adds"
+        f"exports differ beyond the {paths} document path(s) and "
+        f"{slots} File item slot(s) the daemon adds"
     )
 
 # ── The twelve gaps WORK-RPC-ON-PJRPC-AND-PYDANTIC closes ────────────────────

@@ -808,6 +808,18 @@ def test_file_relation_names_an_item(root: Path) -> None:
     # reads neither slot off a FileReference.
     exported = workspace.export_json(root / "export")
     index = json.loads(Path(exported["index"]).read_text(encoding="utf8"))
+    exported_nodes = [
+        node
+        for document in index["DOCUMENTS"]
+        for node in document.get("NODES", [])
+        if node.get("UID")
+    ]
+    for node in exported_nodes:
+        source = root / node["_DOCUMENT_PATH"]
+        assert source.is_file(), f"exported source path does not exist: {source}"
+        assert f"UID: {node['UID']}" in source.read_text(encoding="utf8"), (
+            f"exported source path {source} does not contain UID {node['UID']}"
+        )
     relations = [
         relation
         for document in index["DOCUMENTS"]
@@ -824,6 +836,11 @@ def test_file_relation_names_an_item(root: Path) -> None:
         "ELEMENT": "function",
         "ID": "processes.scribe",
     } in relations, f"the export dropped the item slots: {relations}"
+
+    repeated = workspace.export_json(root / "export-repeated")
+    assert Path(repeated["index"]).read_bytes() == Path(exported["index"]).read_bytes(), (
+        "a repeated export changed bytes after the in-memory patches were installed"
+    )
 
 
 @contract("fp-accept signs an available parent regardless of its state")

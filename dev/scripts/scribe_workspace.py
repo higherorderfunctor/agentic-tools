@@ -67,6 +67,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from sdoc_model import (  # noqa: E402
     Graph,
     SdocError,
+    carry_document_path_into_json,
     carry_file_element_into_json,
     open_graph,
 )
@@ -177,12 +178,13 @@ class Workspace:
         """
         from strictdoc.backend.json.json_generator import JSONGenerator
 
-        # An element-grained File relation exports as a whole-file one
-        # otherwise: the generator reads neither ELEMENT nor ID off a
-        # FileReference. Idempotent, so a second export does not re-wrap.
+        # StrictDoc omits both element-grained File details and the declaring
+        # document path. These patches carry graph-owned data into the export
+        # in memory and are idempotent, so repeated exports do not re-wrap.
         carry_file_element_into_json()
 
         state = self.current()
+        carry_document_path_into_json(state.graph)
         destination = Path(output_dir).expanduser().resolve() / "json"
         destination.mkdir(parents=True, exist_ok=True)
         self._guarded(

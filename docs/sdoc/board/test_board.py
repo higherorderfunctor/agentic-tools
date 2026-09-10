@@ -42,6 +42,7 @@ FIXTURE_INDEX = {
             "GRAMMAR": [],
             "NODES": [
                 {
+                    "_DOCUMENT_PATH": "docs/plans/fixture/dec-fix-one.sdoc",
                     "_TOC": "1",
                     "_NODE_TYPE": "DECISION",
                     "UID": "DEC-FIX-ONE",
@@ -58,6 +59,7 @@ FIXTURE_INDEX = {
             "GRAMMAR": [],
             "NODES": [
                 {
+                    "_DOCUMENT_PATH": "docs/plans/fixture/mech-fix-two.sdoc",
                     "_TOC": "1",
                     "_NODE_TYPE": "MECHANISM",
                     "UID": "MECH-FIX-TWO",
@@ -83,10 +85,6 @@ FIXTURE_INDEX = {
             ],
         },
     ],
-}
-FIXTURE_PATHS = {
-    "DEC-FIX-ONE": "docs/plans/fixture/dec-fix-one.sdoc",
-    "MECH-FIX-TWO": "docs/plans/fixture/mech-fix-two.sdoc",
 }
 FIXTURE_GRAMMAR = {
     "DECISION": {"prefix": "DEC-", "fields": [], "roles": []},
@@ -213,7 +211,7 @@ NIX_FIXTURE_PATH = "dev/scripts/sdoc_extractors/fixtures/mod.nix"
 
 
 def adapted():
-    return adapt(FIXTURE_INDEX, FIXTURE_PATHS, FIXTURE_GRAMMAR, FIXTURE_PROJECT)
+    return adapt(FIXTURE_INDEX, FIXTURE_GRAMMAR, FIXTURE_PROJECT)
 
 
 class AdapterContractTest(unittest.TestCase):
@@ -249,6 +247,7 @@ class AdapterContractTest(unittest.TestCase):
         )
         self.assertEqual(mechanism["files"], ["docs/sdoc/board/server.py"])
         self.assertNotIn("RELATIONS", mechanism["fields"])
+        self.assertNotIn("_DOCUMENT_PATH", mechanism["fields"])
         self.assertNotIn("_NODE_TYPE", mechanism["fields"])
 
     def test_snapshot_carries_the_item_a_file_relation_names(self) -> None:
@@ -325,7 +324,6 @@ class AdapterContractTest(unittest.TestCase):
         }
         payloads = adapt(
             index,
-            FIXTURE_PATHS,
             FIXTURE_GRAMMAR,
             FIXTURE_PROJECT,
             source_root=REPO_ROOT,
@@ -412,7 +410,6 @@ class SemanticsCarriageTest(unittest.TestCase):
     def test_a_payload_rides_the_snapshot_verbatim(self) -> None:
         snapshot = adapt(
             FIXTURE_INDEX,
-            FIXTURE_PATHS,
             FIXTURE_GRAMMAR,
             FIXTURE_PROJECT,
             semantics=FIXTURE_SEMANTICS,

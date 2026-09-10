@@ -1024,7 +1024,8 @@ def file_path_of(relation: FileReference) -> str:
     return relation.get_posix_path()
 
 
-_EXPORT_PATCHED = False
+_EXPORT_FILE_ELEMENT_PATCHED = False
+_EXPORT_DOCUMENT_PATH_PATCHED = False
 
 
 def carry_file_element_into_json() -> None:
@@ -1050,8 +1051,8 @@ def carry_file_element_into_json() -> None:
     Fails closed: a renamed or re-shaped upstream method raises naming this
     file, rather than leaving a silently unpatched exporter behind.
     """
-    global _EXPORT_PATCHED
-    if _EXPORT_PATCHED:
+    global _EXPORT_FILE_ELEMENT_PATCHED
+    if _EXPORT_FILE_ELEMENT_PATCHED:
         return
     from strictdoc.backend.json.json_generator import JSONGenerator
 
@@ -1075,7 +1076,62 @@ def carry_file_element_into_json() -> None:
         return relations
 
     JSONGenerator._write_requirement_relations = staticmethod(with_file_element)
-    _EXPORT_PATCHED = True
+    _EXPORT_FILE_ELEMENT_PATCHED = True
+
+
+def carry_document_path_into_json(graph: Graph) -> None:
+    """Make every exported node carry its repository-relative source path.
+
+    StrictDoc passes the declaring document into ``_write_requirement`` but
+    omits that provenance from the resulting dictionary. Stamp the path onto
+    each held document, then patch that generator seam once so every node from
+    the document receives ``_DOCUMENT_PATH``. Both operations stay in memory;
+    the graph and source files are unchanged.
+
+    Fails closed when a document is outside the workspace or the upstream
+    method changes shape. Refreshing the stamps on every call keeps an
+    idempotently patched process correct if it later serves another graph.
+    """
+    for document in graph.documents:
+        if document.meta is None:
+            raise SdocError("cannot export a document without source metadata")
+        try:
+            relative = Path(document.meta.input_doc_full_path).relative_to(graph.root)
+        except ValueError as error:
+            raise SdocError(
+                f"document {document.meta.input_doc_full_path!r} is outside "
+                f"workspace {str(graph.root)!r}"
+            ) from error
+        document._scribe_document_path = relative.as_posix()
+
+    global _EXPORT_DOCUMENT_PATH_PATCHED
+    if _EXPORT_DOCUMENT_PATH_PATCHED:
+        return
+    from strictdoc.backend.json.json_generator import JSONGenerator
+
+    original = inspect.getattr_static(JSONGenerator, "_write_requirement", None)
+    if not isinstance(original, classmethod):
+        raise SdocError(
+            "strictdoc's JSONGenerator._write_requirement is no longer a "
+            "classmethod -- dev/scripts/sdoc_model.py "
+            "carry_document_path_into_json needs re-deriving from "
+            "strictdoc/backend/json/json_generator.py"
+        )
+    unwrapped = original.__func__
+
+    def with_document_path(cls, node, document, level_stack):
+        exported = unwrapped(cls, node, document, level_stack)
+        path = getattr(document, "_scribe_document_path", None)
+        if path is None:
+            raise SdocError(
+                "JSON export reached an unstamped document -- call "
+                "carry_document_path_into_json before export_tree"
+            )
+        exported["_DOCUMENT_PATH"] = path
+        return exported
+
+    JSONGenerator._write_requirement = classmethod(with_document_path)
+    _EXPORT_DOCUMENT_PATH_PATCHED = True
 
 
 def roles_of(element: GrammarElement) -> list[str]:

@@ -2,8 +2,8 @@
 """Adapt one scribe-daemon JSON export into the board's browser payloads.
 
 Pure functions over data already on disk: the daemon's `workspace.export`
-JSON, the worktree walk that maps each UID to its declaring file, and the
-`.sgra` grammar file. Nothing here talks to the daemon or imports strictdoc.
+JSON, including each node's declaring path, and the `.sgra` grammar file.
+Nothing here talks to the daemon or imports strictdoc.
 The `sdoc-board` wrapper nevertheless pins the process to strictdoc's own
 virtual-environment interpreter so every runtime dependency is Nix-resolved.
 
@@ -48,7 +48,6 @@ label; it must never take the board down.
 
 from __future__ import annotations
 
-import importlib.util
 import sys
 from collections import Counter
 from pathlib import Path
@@ -60,24 +59,11 @@ from sdoc_fp import iter_nodes, load_index  # noqa: E402,F401
 from scribe_grammar import parse_sgra  # noqa: E402,F401
 
 
-def _view_check():
-    """docs/sdoc/view/view-check.py, loaded the way wireline.py loads it --
-    the module name carries a hyphen. Only `uid_paths` is used here; the walk
-    that maps UIDs to files belongs to the checker and is not duplicated."""
-    path = REPO_ROOT / "docs" / "sdoc" / "view" / "view-check.py"
-    spec = importlib.util.spec_from_file_location("view_check", path)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-uid_paths = _view_check().uid_paths
-
 SNAPSHOT_SCHEMA = "sdoc-board/2"
 ROWS_SCHEMA = "sdoc-perspective/2"
 SEMANTICS_SCHEMA = "sdoc-semantics/2"
 STATE_FIELDS = ("STATUS",)
-STRUCTURAL = ("_TOC", "_NODE_TYPE", "RELATIONS")
+STRUCTURAL = ("_DOCUMENT_PATH", "_TOC", "_NODE_TYPE", "RELATIONS")
 
 
 def kind_resolver(source_root):
@@ -172,7 +158,6 @@ def semantics_unavailable(reason: str) -> dict:
 
 def adapt(
     index: dict,
-    paths: dict,
     grammar: dict,
     project: dict,
     *,
@@ -217,7 +202,7 @@ def adapt(
                 "summary": _summary_of(node),
                 "state": _state_of(node),
                 "fields": _fields_of(node),
-                "source": {"path": paths.get(uid)},
+                "source": {"path": node.get("_DOCUMENT_PATH")},
                 "relations": node.get("RELATIONS") or [],
             }
         )

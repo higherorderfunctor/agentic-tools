@@ -6,9 +6,9 @@ content hash notices an edit, a checkout, a rebase -- so "fresh" here means
 "whatever the daemon serves right now", with no exporter subprocess and no
 second in-process StrictDoc load. `workspace.export` writes StrictDoc's own
 JSON export from the held graph (~0.3 s against ~2.3 s for the one-shot
-command, byte-identical), and the export lands under `output/`, which both
-the daemon's freshness sweep and the UID walk skip, so exporting never dirties
-the thing being exported.
+command), and the export lands under `output/`, which the daemon's freshness
+sweep skips, so exporting never dirties the thing being exported. Each node's
+source path is carried by that export; this process never walks the canon.
 
 FAIL CLOSED, LOUDLY. When no daemon answers, requests surface the client's
 own refusal -- the socket and the command that starts one -- instead of
@@ -38,7 +38,6 @@ from adapter import (  # noqa: E402
     load_index,
     parse_sgra,
     semantics_unavailable,
-    uid_paths,
 )
 
 
@@ -88,7 +87,6 @@ class DaemonSource:
             grammar = parse_sgra(self.grammar_path)
             adapted = adapt(
                 index,
-                uid_paths(self.root),
                 grammar,
                 project,
                 semantics=semantics_payload(grammar),
