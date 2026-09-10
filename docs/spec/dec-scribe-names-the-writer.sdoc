@@ -11,14 +11,14 @@ AUTHORED_BY: llm
 STATUS: accepted
 RETIRES_ON: The writer is replaced by something that is not this pipeline, or upstream ships a writer that makes it redundant.
 STATEMENT: >>>
-The program that writes .sdoc files -- today dev/scripts/sdoc_cli.py, invoked
-as `sdoc` -- is SCRIBE. The name covers both forms of one thing: the
-command-line tool, and the Python library a consumer imports to reach the
-identical pipeline in-process. Scribe is the ONLY write path to the canon
-expected when this plan closes, and joints behave the same through either
-form.
+The writer of the canon is SCRIBE. The name covers every form of one
+pipeline: the resident daemon that holds the graph and applies each write,
+the `scribe` command that hands it a typed operation, and the Python modules
+a consumer imports to drive the same daemon-side pipeline in-process. Scribe
+is the ONLY write path to the canon, and joints behave the same through
+every form.
 
-"sdoc" is no longer used for the writer. It names the file format and its
+"sdoc" is not a name for the writer. It names the file format and its
 grammar, nothing else. "strictdoc" names the upstream package.
 <<<
 RATIONALE: >>>
@@ -30,15 +30,22 @@ sdocw. Scribe won on carrying "writes the record under another's authority",
 which matches identity coming from the environment rather than from the tool.
 <<<
 NOTES: >>>
-Ruled by the operator on 2026-08-28. The binary and the script are still spelled
-sdoc; the rename is implementation and is owed, not done. The library form is
-PARTIAL today, measured the same day: sdoc_model.Graph imports cleanly and
-dev/scripts/fp-accept.py already drives it in-process, but the pipeline around
-it -- the argv guard, the prefix and filename checks, the restore map, verify
-and rollback, dry-run -- lives in sdoc_cli.py's main and does not. The ruling is
-that both forms fire the same joints, so a phase only the CLI runs is a defect
-to close, not a difference to document. AUTHORED_BY reads llm because the writer
-has no flag for the other value.
+Ruled by the operator on 2026-08-28. Rewritten IN PLACE on 2026-09-09 on the
+operator's ruling that a wrong accepted decision on this branch is corrected,
+not superseded, because the branch is not in main and supersession semantics
+are not settled; the pre-rewrite text is in git history at fda6c066.
 
-The daemon client closed the --dry-run gap in feat/scribe-dry-run on 2026-09-03.
+What the earlier text said, kept here for forensics: it named
+dev/scripts/sdoc_cli.py, "invoked as `sdoc`", as the writer, and recorded the
+library form as PARTIAL because the argv guard, prefix and filename checks,
+restore map, verify, rollback and dry-run lived in that script's main. All of
+that is now the daemon's: sdoc_cli.py became the library the daemon imports
+(scribe_ops.py calls its do_show, do_list, do_check, target_path and
+check_prefix), the `scribe` binary wraps dev/scripts/scribe_cmd.py, the
+client took --dry-run on 2026-09-03, and the standalone `sdoc` entrypoint is
+being removed under WORK-SDOC-CLI-BECOMES-A-LIBRARY. If a stale reference to
+sdoc_cli or to an `sdoc` command turns up before the main merge, this
+paragraph is where it came from.
+
+AUTHORED_BY reads llm because the writer has no flag for the other value.
 <<<
