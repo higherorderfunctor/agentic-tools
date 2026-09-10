@@ -32,6 +32,26 @@ asking at the definition layer. The two are easy to conflate because the
 instance is the only worked example, and conflating them is how a meta-model
 ends up shaped by one implementation's preferences.
 <<<
+NOTES: >>>
+Implementation record retained from the semantics delivery rows retired on
+2026-09-10. dev/scripts/sdoc_semantics/model.json is the sole lifecycle
+declaration surface in schema sdoc-semantics-model/1; model-shape.md documents
+the ordered-list shape. The standard-library interpreter validates the closed
+predicate vocabulary and references, stages transactional writes, records
+deterministic ripple provenance, refuses repeated transitions and a separate
+step bound, checks relation contracts, renders Mermaid, and emits
+sdoc-semantics/2. The daemon remains an observer: no write path calls fire().
+Rules carry an explicit lifecycle name or null, so compatibility rendering
+never infers ownership from an opaque rule ID.
+
+The former transitions-backed modules and registry were removed after the
+replacement passed its contract suite. Removing pytransitions and its
+unconditional pygraphviz propagation reduced both measured Nix delivery
+closures by 88.12 MiB; the final strictdocGrammarExtract measurement was
+928,235,704 bytes. DEC-SEMANTICS-MODEL-IS-DATA and
+EV-SEMANTICS-ENGINE-ALTERNATIVES retain the design and comparative evidence;
+EV-TRANSITIONS-ENGINE-SPIKE retains the superseded spike findings.
+<<<
 RELATIONS:
 - TYPE: Parent
   VALUE: DEC-SYSTEM-PURPOSE
@@ -39,3 +59,6 @@ RELATIONS:
 - TYPE: Parent
   VALUE: MECH-BACKLOG-STRICTDOC-TOOLING
   ROLE: Backlogged_In
+- TYPE: Parent
+  VALUE: EV-TRANSITIONS-ENGINE-SPIKE
+  ROLE: Proven_By

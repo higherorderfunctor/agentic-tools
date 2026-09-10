@@ -66,9 +66,9 @@ pkgs.runCommand "strictdoc-semantics" {
       loaded = open_graph(root, output_dir=Path(directory))
       graph = adapt_graph(loaded)
 
-  debt = graph["nodes"]["WORK-SEMANTICS-RULE-LIFECYCLE-ASSOCIATION"]
-  assert isinstance(debt["fields"], dict)
-  assert isinstance(debt["fields"]["AUTHORED_BY"], str)
+  decision = graph["nodes"]["DEC-SEMANTICS-MODEL-IS-DATA"]
+  assert isinstance(decision["fields"], dict)
+  assert isinstance(decision["fields"]["AUTHORED_BY"], str)
   assert isinstance(graph["edges"], list)
   for edge in graph["edges"]:
       assert isinstance(edge, dict)
