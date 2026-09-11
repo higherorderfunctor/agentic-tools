@@ -101,14 +101,9 @@
         "note": "written by a model, not looked at -- free to reverse"
       },
       {
-        "name": "llm-accepted",
-        "label": "llm accepted",
-        "note": "a human saw it and let it stand -- an undo must surface"
-      },
-      {
-        "name": "llm-adopted",
-        "label": "llm adopted",
-        "note": "a human took it on as their own -- a model may not reverse it"
+        "name": "human-adopted",
+        "label": "human adopted",
+        "note": "a human took model-written words on as their own -- a model may not reverse them"
       },
       {
         "name": "human",
@@ -120,7 +115,7 @@
       {
         "trigger": "raise",
         "source": "llm",
-        "dest": "llm-accepted",
+        "dest": "human-adopted",
         "conditions": [],
         "unless": [],
         "rule_text": "rises one rung; who is permitted to raise it is undecided",
@@ -128,16 +123,7 @@
       },
       {
         "trigger": "raise",
-        "source": "llm-accepted",
-        "dest": "llm-adopted",
-        "conditions": [],
-        "unless": [],
-        "rule_text": "rises one rung; who is permitted to raise it is undecided",
-        "settled": false
-      },
-      {
-        "trigger": "raise",
-        "source": "llm-adopted",
+        "source": "human-adopted",
         "dest": "human",
         "conditions": [],
         "unless": [],
@@ -155,14 +141,14 @@
       },
       {
         "id": "AUTHORED-BY-TREATMENT",
-        "text": "Three classes over four values: llm is FREE to reverse, llm-accepted is SOFT (an undo has to surface in the closing report), llm-adopted and human are HARD -- being unable to meet one is a STOP condition, not a workaround.",
+        "text": "Two classes over three values: llm is FREE to reverse; human-adopted and human are HARD -- being unable to meet one is a STOP condition, not a workaround.",
         "kind": "transcription",
         "settled": true,
         "cites": ["DEC-AUTHORSHIP-LADDER"]
       },
       {
         "id": "AUTHORED-BY-WHO-MAY-RAISE-UNDECIDED",
-        "text": "No actor is attached to any transition. The decision's own comment says raising to llm-accepted is a human act with no natural place to happen, and the write guard makes the field the operator's, so the machine below is a shape with no hand on it yet.",
+        "text": "No actor is attached to any transition. The decision's own comment says raising to human-adopted is a human act with no natural place to happen, and the write guard makes the field the operator's, so the machine below is a shape with no hand on it yet.",
         "kind": "open",
         "settled": false,
         "cites": ["DEC-AUTHORSHIP-LADDER", "MECH-RUNTIME-WRITE-GUARD"]

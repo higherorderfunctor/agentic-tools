@@ -323,7 +323,7 @@ use.
 
 The operator read the render, approved a permanent view system and the grid
 migration, and delegated first-pass decisions. Landed: the grammar (seven types,
-`Cites` / `Contains` / `Covered_By` / `Produces`, the four-rung authorship
+`Cites` / `Contains` / `Covered_By` / `Produces`, the three-rung authorship
 ladder), the in-place retype of 34 nodes, the scribe reading a node's type from
 its tag, and four rulings in `docs/spec/` — `DEC-NODE-FAMILIES` (supersedes the
 grid), `DEC-UID-OUTLIVES-TYPE`, `DEC-MIGRATE-BEFORE-BEADS`,
@@ -435,7 +435,7 @@ the system is reasoned about.
 
 **The other four rulings.** One grammar, not two (`DEC-ONE-GRAMMAR`) — the
 two-grammar sketch stays on disk, wired to nothing, as a written-out
-alternative. Authorship is one monotonic four-value field governing reversal
+alternative. Authorship is one monotonic three-value field governing reversal
 rather than credit (`DEC-AUTHORSHIP-LADDER`). An open decision _is_ a question
 (`DEC-OPEN-IS-THE-QUESTION`), flagged for re-evaluation because where contention
 lives is still unproven. And `MECH-MILESTONE-TWO-SEMANTICS-MISPLACED` records
@@ -460,9 +460,10 @@ plan is an immutable snapshot taken at ingest — decides whether `PLAN` and
 
 **Owed and not yet done:** `PLAN`, `WORK`, `USE CASE` and `NARRATIVE` are ruled
 in but not in the grammar. Adding them is a `values.nix` edit and a regenerate.
-`DEC-AUTHORSHIP-LADDER` likewise extends `AUTHORED_BY`'s word list, and who may
-raise a value is unanswered — raising to `llm-accepted` is a human act with no
-place to happen yet.
+`DEC-AUTHORSHIP-LADDER` defines `llm`, `human-adopted` and `human`, and who may
+raise a value is unanswered — raising to `human-adopted` is a human act with no
+place to happen yet. The writer still stamps `llm` and exposes no authorship
+flag.
 
 <details>
 <summary>Prior — 2026-08-27 (end of session 3)</summary>

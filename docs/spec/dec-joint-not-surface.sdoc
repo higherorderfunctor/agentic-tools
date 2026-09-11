@@ -33,5 +33,5 @@ the layering rule -- the machinery owns where, a higher layer owns what.
 COMMENT: >>>
 The operator asked that the term be reinforced and their own drift corrected
 on sight, which INV-SETTLED-STAYS-VISIBLE now requires generally. AUTHORED_BY
-reads llm because the writer has no flag for the other value.
+reads llm because the writer has no flag for the human rungs.
 <<<

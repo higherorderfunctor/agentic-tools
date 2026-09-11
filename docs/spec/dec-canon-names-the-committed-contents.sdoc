@@ -35,5 +35,5 @@ Ruled by the operator on 2026-08-28. Existing nodes and code say "graph" and
 "corpus" throughout; under INV-SETTLED-STAYS-VISIBLE they are READ as canon
 and are not rewritten by this decision. The beads side is not modelled in the
 canon at all and this node is the only place it is described. AUTHORED_BY
-reads llm because the writer has no flag for the other value.
+reads llm because the writer has no flag for the human rungs.
 <<<

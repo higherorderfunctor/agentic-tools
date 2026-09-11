@@ -21,7 +21,7 @@ The ruled words live once, in the canon's own glossary above. The field names an
 - lane: What a piece of work declares it crosses — the mechanisms and, once layers exist, the files it may touch.
 - flow: One operation the canon supports end to end — create, sign, check, ingest — with joints before and after it.
 - STATUS: A decision's state: open, accepted, rejected, superseded. Only a decision carries it.
-- AUTHORED_BY: Who wrote a node's statement: a four-rung ladder -- llm, llm-accepted, llm-adopted, human -- that only rises. The writer stamps llm; the other rungs are a human's acts.
+- AUTHORED_BY: Who wrote or adopted a node's statement: a three-rung ladder -- llm, human-adopted, human -- that only rises. llm means a model wrote it, human-adopted means a human took model-written words on, and human means a human wrote it. The writer stamps llm and has no flag for the other rungs.
 - RETIRES_ON: The condition under which a decision expires. Required, and prose.
 - contract: A node's fingerprinted fields — everything but RATIONALE, COMMENT, PARENT_FP and RELATIONS.
 - fingerprint / PARENT_FP: Seven hex characters hashed from a parent's contract, recorded on the child, one entry per line. 0000000 means never signed, and nothing has ever been signed.

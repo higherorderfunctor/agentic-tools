@@ -11,7 +11,7 @@ ELEMENTS:
     TYPE: String
     REQUIRED: True
   - TITLE: AUTHORED_BY
-    TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
+    TYPE: SingleChoice(llm, human-adopted, human)
     REQUIRED: True
   - TITLE: STATUS
     TYPE: SingleChoice(open, accepted, rejected, superseded)
@@ -49,7 +49,7 @@ ELEMENTS:
     TYPE: String
     REQUIRED: True
   - TITLE: AUTHORED_BY
-    TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
+    TYPE: SingleChoice(llm, human-adopted, human)
     REQUIRED: True
   - TITLE: STATEMENT
     TYPE: String
@@ -94,7 +94,7 @@ ELEMENTS:
     TYPE: String
     REQUIRED: True
   - TITLE: AUTHORED_BY
-    TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
+    TYPE: SingleChoice(llm, human-adopted, human)
     REQUIRED: True
   - TITLE: STATEMENT
     TYPE: String
@@ -139,7 +139,7 @@ ELEMENTS:
     TYPE: String
     REQUIRED: True
   - TITLE: AUTHORED_BY
-    TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
+    TYPE: SingleChoice(llm, human-adopted, human)
     REQUIRED: True
   - TITLE: SOURCE
     TYPE: String
@@ -187,7 +187,7 @@ ELEMENTS:
     TYPE: String
     REQUIRED: True
   - TITLE: AUTHORED_BY
-    TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
+    TYPE: SingleChoice(llm, human-adopted, human)
     REQUIRED: True
   - TITLE: STATEMENT
     TYPE: String
@@ -225,7 +225,7 @@ ELEMENTS:
     TYPE: String
     REQUIRED: True
   - TITLE: AUTHORED_BY
-    TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
+    TYPE: SingleChoice(llm, human-adopted, human)
     REQUIRED: True
   - TITLE: WIDGET
     TYPE: SingleChoice(prose, callout, rows, table, facts, glossary, legend, stack, grid, ladder, strip, tally, index, list, edges, fingerprints)
@@ -272,7 +272,7 @@ ELEMENTS:
     TYPE: String
     REQUIRED: True
   - TITLE: AUTHORED_BY
-    TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
+    TYPE: SingleChoice(llm, human-adopted, human)
     REQUIRED: True
   - TITLE: STATEMENT
     TYPE: String
@@ -317,7 +317,7 @@ ELEMENTS:
     TYPE: String
     REQUIRED: True
   - TITLE: AUTHORED_BY
-    TYPE: SingleChoice(llm, llm-accepted, llm-adopted, human)
+    TYPE: SingleChoice(llm, human-adopted, human)
     REQUIRED: True
   - TITLE: STANDING
     TYPE: SingleChoice(open, closed, withdrawn)

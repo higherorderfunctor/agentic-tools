@@ -16,7 +16,7 @@ in SecretSpec, and WORK-ASSESS-AUTO-AUTHORSHIP, assessing how a key turns into
 recorded authorship at write time.
 
 This does not reopen DEC-AUTHORSHIP-LADDER, the accepted decision that
-AUTHORED_BY is one monotonic field (llm / llm-accepted / llm-adopted / human)
+AUTHORED_BY is one monotonic field (llm / human-adopted / human)
 governing reversal rather than credit, nor MECH-RUNTIME-WRITE-GUARD, which
 already keeps AUTHORED_BY and PARENT_FP out of the writer's hands by giving the
 CLI no flag for either and writing llm unconditionally on create. What the two

@@ -558,7 +558,7 @@ GRID_INTRO = (
     "([LINK: DEC-NODE-FAMILIES]). Tap a cell."
 )
 LADDER_ROWS = [
-    "- AUTHORED_BY: llm, llm-accepted, llm-adopted, human: ruled to be four rungs",
+    "- AUTHORED_BY: llm, human-adopted, human: ruled to be three rungs",
     "- STATUS: open, accepted, rejected, superseded: on a decision",
 ]
 LADDER_INTRO = "One ladder per state field, each rung with its live count over the selection."

@@ -71,10 +71,11 @@
   inherit (dsl) el field rel;
   inherit (field) one required str tag;
 
-  # DEC-AUTHORSHIP-LADDER: one monotonic ladder that only rises. The middle two
-  # rungs are a human's acts (seen and let stand; adopted as their own); the
-  # writer stamps the bottom rung and has no flag for the others.
-  authors = ["llm" "llm-accepted" "llm-adopted" "human"];
+  # DEC-AUTHORSHIP-LADDER: one monotonic ladder that only rises. The bottom
+  # says a model wrote the words, the middle says a human adopted them, and the
+  # top says a human wrote them. The writer stamps the bottom rung and has no
+  # flag for the others.
+  authors = ["llm" "human-adopted" "human"];
 
   # Shared fields, in grammar order. DECISION has no PARENT_FP, so it is
   # spelled out on its own below rather than assembled by subtraction.

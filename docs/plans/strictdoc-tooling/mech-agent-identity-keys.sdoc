@@ -17,7 +17,7 @@ Absence is a third state. A commit with no trailer is unattributed, not the oper
 
 A verifier reads git, not the graph: blame the PARENT_FP line in porcelain mode to get the commit, then read that commit's trailer. PARENT_FP entries are UID:hash and carry no signer, and putting one there would store a per-event fact in a per-node field.
 
-No new sdoc field, and AUTHORED_BY is unchanged. AUTHORED_BY is the class of a node's statement author; this is the identity of a single act. A rule keyed on grade reads the first, an audit of who turned a key reads the second. This is also what makes MECH-AUTHORED-BY-GUARD enforceable at a checkpoint rather than only inside the acting session.
+No new sdoc field. AUTHORED_BY records whether a node's statement was model-written, human-adopted or human-written; this is the identity of a single act. A rule keyed on that stance reads the first, an audit of who turned a key reads the second. This is also what makes MECH-AUTHORED-BY-GUARD enforceable at a checkpoint rather than only inside the acting session.
 
 Scope is the branch: attribution durable across a branch's own history, which is where the review that catches a bad signature happens. Out of scope, deliberately -- cryptographic signing and key issuance; any rule about who may sign what, which is DEC-FP-ACCEPT-AUTHORITY's; and whether attribution must survive the squash to main.
 <<<
@@ -53,7 +53,7 @@ where they get written.
 
 - Whether attribution must survive the squash to main, and what carrier could do it. Measured that neither committer nor trailer survives, so the answer is a statement about what the record is for -- and it meets MECH-FP-PREMERGE-GC and MECH-FP-GIT-FLOW-HAZARDS.
 
-- The vocabulary of the actor class. The trailer carries whatever the environment names; whether that vocabulary is AUTHORED_BY's llm/human, a finer grading, or something else is a semantics call, not plumbing.
+- The vocabulary of the actor class. The trailer carries whatever the environment names; whether that vocabulary is AUTHORED_BY's llm/human-adopted/human ladder, a finer grading, or something else is a semantics call, not plumbing.
 
 - Whether an unattributed commit should be refused rather than recorded. The plumbing only distinguishes the three states; turning 'unattributed' into a gate is a rule.
 

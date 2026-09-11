@@ -39,5 +39,5 @@ The earlier implementation put argv parsing, graph writes, rendering, rollback, 
 
 The client gained dry-run on 2026-09-03. WORK-SDOC-CLI-BECOMES-A-LIBRARY completed the naming ruling by removing the standalone entrypoint and making the remaining library role explicit.
 
-AUTHORED_BY reads llm because the writer has no flag for the other value.
+AUTHORED_BY reads llm because the writer has no flag for the human rungs.
 <<<

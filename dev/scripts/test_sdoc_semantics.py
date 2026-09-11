@@ -154,10 +154,10 @@ def assert_shipped_diagnostics_silent(fragment: str) -> None:
 
 
 PREDICATE_GRAPH = graph(
-    node("A", "WORK", AUTHORED_BY="llm-adopted", FLAG="yes"),
+    node("A", "WORK", AUTHORED_BY="human-adopted", FLAG="yes"),
     node("B", "REQUIREMENT", AUTHORED_BY="human", FLAG="yes"),
     node("C", "EVIDENCE", AUTHORED_BY="llm", FLAG="no"),
-    node("D", "WORK", AUTHORED_BY="llm-adopted", FLAG="yes"),
+    node("D", "WORK", AUTHORED_BY="human-adopted", FLAG="yes"),
     edges=(
         {"role": "Assumes", "source": "A", "target": "B"},
         {"role": "Assumes", "source": "A", "target": "C"},
@@ -188,7 +188,7 @@ def test_field_is() -> None:
 @contract("field_at_least uses ladder rank in both directions")
 def test_field_at_least() -> None:
     assert evaluate(
-        {"op": "field_at_least", "field": "AUTHORED_BY", "value": "llm-accepted"},
+        {"op": "field_at_least", "field": "AUTHORED_BY", "value": "human-adopted"},
         PREDICATE_NODE,
         PREDICATE_GRAPH,
         "human",
@@ -975,6 +975,11 @@ def test_presentation_order() -> None:
         "accepted",
         "rejected",
         "superseded",
+    ]
+    assert [row["name"] for row in SHIPPED_PAYLOAD["machines"]["AUTHORED_BY"]["states"]] == [
+        "llm",
+        "human-adopted",
+        "human",
     ]
     assert all("rules" not in lifecycle for lifecycle in SHIPPED["lifecycles"])
     model = empty_model()

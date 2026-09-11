@@ -13,8 +13,8 @@ PLACE: screen
 STATEMENT: >>>
 The types, the fields every node carries, and the AUTHORED_BY ladder.
 
-- The grammar is generated from one Nix file. Every node carries a UID, a TITLE, who wrote it (AUTHORED_BY: llm or human) and a STATEMENT; RATIONALE and COMMENT are optional, and the parser enforces the field order.
-> grammar = values.nix -> generated .sgra; DECISION|MECHANISM|SLICE|INVARIANT|SPIKE; all: UID, TITLE, AUTHORED_BY: llm|human, STATEMENT; RATIONALE, COMMENT optional; field order enforced [WORKS]
+- The grammar is generated from one Nix file. Every node carries a UID, a TITLE, who wrote it or adopted it (AUTHORED_BY: llm, human-adopted or human) and a STATEMENT; RATIONALE and COMMENT are optional, and the parser enforces the field order.
+> grammar = values.nix -> generated .sgra; all: UID, TITLE, AUTHORED_BY: llm|human-adopted|human, STATEMENT; RATIONALE, COMMENT optional; field order enforced [WORKS]
 - A decision (41 on the sheet's day) carries a STATUS of open, accepted, rejected or superseded, and a RETIRES_ON condition. It has no fingerprint of its own; its only relations are Superseded_By and Backlogged_In.
 [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION]
 > DECISION (41): +STATUS: open|accepted|rejected|superseded, +RETIRES_ON; no PARENT_FP; rels Superseded_By, Backlogged_In [WORKS]
@@ -42,11 +42,11 @@ The types, the fields every node carries, and the AUTHORED_BY ladder.
 - A narrative assembles the grid — the claims about the system — for a person to read start to finish, yet the system's stated purpose names a model with a bounded context as the reader. The direction has not reconciled the two.
 [LINK: DEC-SYSTEM-PURPOSE] [LINK: NAR-SEMANTIC-LAYER-TYPE-NARRATIVE]
 > NARRATIVE (assembles the grid for a person, start to finish) vs DEC-SYSTEM-PURPOSE (reader = a model with bounded context) [UNADDRESSED]
-- AUTHORED_BY is a four-rung ladder — llm, llm-accepted, llm-adopted, human — that only rises. It governs whether an agent may undo a change: freely at the bottom rung, with a report above it, and only by stopping to ask at the top.
-> AUTHORED_BY ladder llm < llm-accepted < llm-adopted < human, rises only; governs undo by the writer's class: FREE | SOFT (report the undo) | HARD (stop, ask) [WORKS]
-- Who made a write is read off the ssh key: a human or an agent. But the grammar still spells only llm and human, scribe always stamps llm, and there is no move by which a human raises a node up the ladder.
+- AUTHORED_BY is a three-rung ladder — llm, human-adopted, human — that only rises. It governs whether an agent may undo a change: freely at the bottom rung and only by stopping to ask at either human rung.
+> AUTHORED_BY ladder llm < human-adopted < human, rises only; governs undo by the writer's class: FREE | HARD (stop, ask) [WORKS]
+- Who made a write is read off the ssh key: a human or an agent. The grammar spells all three authorship rungs, but scribe always stamps llm and there is no move by which a human raises a node up the ladder.
 [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
-> identity:human | identity:llm = the class read off the ssh key that makes a write; ladder spelling: values.nix has llm|human, scribe stamps llm, no raise move [GAP]
+> identity:human | identity:llm = the class read off the ssh key that makes a write; ladder spelling: values.nix has llm|human-adopted|human, scribe stamps llm, no raise move [GAP]
 - An agent has rewritten 10 of the 31 statements marked human-authored, and the mark did not change. Three remedies were listed — hash the text into the mark, drop the mark, or forbid the edit — and none was chosen; the ladder rules out dropping it.
 [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
 > identity:llm rewrote 10 of 31 identity:human STATEMENTs, key unchanged; hash-into-key | drop | forbid unpicked; the ladder forecloses drop [UNADDRESSED]

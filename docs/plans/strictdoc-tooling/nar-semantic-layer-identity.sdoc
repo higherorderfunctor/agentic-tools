@@ -23,16 +23,16 @@ The ssh key, its class (human or agent), and what authority each class has.
 > channel discriminators: harness hook fires only in an agent session; CLI cannot tell who; PreToolUse deny; Stop hook [FALLS OUT: class check at the joint; canon check catches edits around scribe]
 - Attributing writes through a commit trailer read from environment variables is dissolved. The agent holds its own key in its sandbox; an unknown key falls to the default class.
 > Acted-By trailer from env vars; "per-agent keys buy nothing"; no trailer = unattributed; "override token is forgeable" [FALLS OUT: identity:llm holds its own key in a VM; unknown key -> default class]
-- Two distinct things, both kept: the class of whoever wrote a node's statement (AUTHORED_BY), and the identity of whoever performs each act (the key).
-> per-node class (AUTHORED_BY = class of the statement's author) + per-act identity (the key): two things, keep both [WORKS]
-- How an agent may treat a node depends on the writer's rung: undo freely at the bottom, undo but report above that, and stop to ask at the top.
-> ladder treatment by class: FREE identity:llm may undo; SOFT undo must be reported; HARD identity:llm stops and asks [WORKS]
-- About ten nodes say 'ruled by the operator' yet read AUTHORED_BY: llm. A human ruling carried by an agent's write has no form in the model.
+- Two distinct things, both kept: whether a node's statement was model-written, human-adopted or human-written (AUTHORED_BY), and the identity of whoever performs each act (the key).
+> per-node authorship or adoption stance (AUTHORED_BY) + per-act identity (the key): two things, keep both [WORKS]
+- How an agent may treat a node depends on the writer's rung: undo freely at llm, and stop to ask at human-adopted or human.
+> ladder treatment by class: FREE identity:llm may undo; HARD identity:llm stops and asks [WORKS]
+- About ten nodes say 'ruled by the operator' yet read AUTHORED_BY: llm. human-adopted can represent a human taking model-written words on, but no write path can set it.
 [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
-> relayed rulings: ~10 nodes "ruled by the operator, AUTHORED_BY llm"; human authority carried by an llm write has no form [GAP]
-- Who may clear a dirty edge — accept that a parent's contract changed — depends on the rungs of both ends: an agent if both are below llm-accepted, otherwise a human. Which end's authorship decides is undecided.
+> relayed rulings: ~10 nodes "ruled by the operator, AUTHORED_BY llm"; human-adopted exists but has no write path [GAP]
+- Who may clear a dirty edge — accept that a parent's contract changed — depends on the rungs of both ends: an agent if both remain llm, otherwise a human. Which end's authorship decides is undecided.
 [LINK: DEC-FP-ACCEPT-AUTHORITY] [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION] [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
-> clearing a dirty edge (child's fingerprint stale vs parent): identity:llm if both ends' AUTHORED_BY < llm-accepted, else identity:human; whose key decides, parent's or child's? [OPEN: DEC-FP-ACCEPT-AUTHORITY]
+> clearing a dirty edge (child's fingerprint stale vs parent): identity:llm if both ends' AUTHORED_BY = llm, else identity:human; whose key decides, parent's or child's? [OPEN: DEC-FP-ACCEPT-AUTHORITY]
 - Whoever signs a contract should not be whoever wrote it. Nothing enforces that.
 [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
 > signer independence: signer key != author key of the contract [GAP]

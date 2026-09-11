@@ -9,17 +9,18 @@ UID: MECH-AUTHORED-BY-GUARD
 TITLE: Reject an AUTHORED_BY flip on a node already merged to main
 AUTHORED_BY: human
 STATEMENT: >>>
-A static check over committed trees that reports every node claiming
-AUTHORED_BY: human, classified by what a baseline tree said about the same node.
+A static check over committed trees that reports every node claiming a human
+AUTHORED_BY rung, classified by what a baseline tree said about the same node.
 
 Build a map of UID to AUTHORED_BY from every .sdoc file in a tree -- plans,
 docs/spec, and the co-located packages/*/.sdoc alike -- and build it twice, once
 at the baseline and once at the candidate. Key by UID across the whole tree,
 never per file: grooming moves a node between files with its UID intact, and a
 per-file or line-diff view reads that move as a fresh claim. Every node whose
-candidate value is human falls into one of two classes. A FLIP is a node the
-baseline carried as llm. A NEW-HUMAN is a node the baseline tree does not carry
-at all. A flip fails the check; a new-human node is listed and does not.
+candidate value is human-adopted or human falls into one of two classes. A FLIP
+is a node whose baseline value differs. A NEW-HUMAN-RUNG is a node the baseline
+tree does not carry at all. A flip fails the check; a new-human-rung node is
+listed and does not.
 
 The baseline is the merge base of the branch and origin/main, not origin/main's
 tip. It attributes exactly the changes this branch made and is unmoved by main
@@ -27,8 +28,9 @@ advancing underneath a long-lived branch. It moves only when the branch rebases,
 and then it moves forward past claims that have already reached main, which is
 correct -- those are main's now, and re-reporting them would train the reader to
 skip the report. On the branch's first restacked pull request the baseline
-carries no .sdoc file at all, so every human node in it reports as new-human;
-that is the intended reading of a first appearance, not noise to suppress.
+carries no .sdoc file at all, so every node on a human rung reports as
+new-human-rung; that is the intended reading of a first appearance, not noise
+to suppress.
 
 The checkpoint is a CI job checked out with full history. It cannot be a nix
 flake check: the flake source tree has no .git, so nothing running under nix
@@ -72,7 +74,7 @@ Measured 2026-08-27 on feat/strictdoc-trial at bc646f12, merge base ec980d15.
 
 origin/main carries 0 .sdoc files; the branch carries 9 across three locations.
 Every one of the 139 nodes is a first appearance against main today, so the
-llm-to-human transition the earlier statement described has no subject yet.
+llm-to-a-human-rung transition the earlier statement described has no subject yet.
 Over the branch's 71 commits: 0 flips and 31 nodes born human, introduced in 13
 commits. Creation, not flipping, is what happens.
 
@@ -129,11 +131,9 @@ where they get written.
 
 - What an entitled flip by the operator looks like: whether it is accompanied by anything at all, and what form an override takes once MECH-AGENT-IDENTITY-KEYS makes one authenticatable.
 
-- Whether AUTHORED_BY may move human back to llm, and whether an agent rewriting a human-authored statement must make it do so.
+- Whether an agent rewriting a statement on a human rung must replace it with a new llm-authored node.
 
-- Whether new-human nodes accumulate an acceptance record once reviewed, or are simply re-listed against each pull request's own merge base until they land in main.
-
-- Whether the key means 'the operator wrote these words' or 'the operator originated this node' -- the guard's direction is one-sided either way, but the second reading leaves the words under the key free to drift.
+- Whether new-human-rung nodes accumulate an acceptance record once reviewed, or are simply re-listed against each pull request's own merge base until they land in main.
 
 AUTHORED_BY STILL READS human AND THE STATEMENT ABOVE IS NOT THE OPERATOR'S
 PROSE. It was rewritten wholesale by a model during the 2026-08-27 grooming

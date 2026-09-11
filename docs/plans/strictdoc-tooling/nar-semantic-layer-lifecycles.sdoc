@@ -31,9 +31,9 @@ Accepting and superseding decisions, deletion and the migration.
 - No gate reads a probe's STATUS. Under the pipeline reading the field dissolves: 'run' simply means an evidence node exists.
 [LINK: MECH-SPIKE-IS-A-PIPELINE-TO-A-DECISION] [LINK: SPIKE-CONVERSION-SIGNAL] [LINK: NAR-SEMANTIC-LAYER-TYPE-EVIDENCE] [LINK: NAR-SEMANTIC-LAYER-TYPE-WORK]
 > SPIKE STATUS: no gate consults it [FALLS OUT: MECH-SPIKE-IS-A-PIPELINE-TO-A-DECISION, run = an EVIDENCE node exists]
-- Raising AUTHORED_BY from llm to llm-accepted or llm-adopted is a human act with no place to happen: no verb, no joint.
+- Raising AUTHORED_BY from llm to human-adopted is a human act with no place to happen: no verb, no joint.
 [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
-> AUTHORED_BY raise (llm -> llm-accepted|llm-adopted): identity:human act with no place to happen [GAP]
+> AUTHORED_BY raise (llm -> human-adopted): identity:human act with no place to happen [GAP]
 - 'Supersede, never delete' is the rule for now. Expressed in the model it is 'no class may delete' — a handler refusing before scribe deletes.
 [LINK: DEC-NO-DELETES-YET] [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION] [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
 > delete: supersede, never delete = "no class may delete", a pre handler on scribe.change(delete) [OPEN: DEC-NO-DELETES-YET]

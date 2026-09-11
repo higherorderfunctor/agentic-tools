@@ -119,10 +119,10 @@ nodes with `[LINK:]` only.
 
 ## The three governance fields
 
-- **`AUTHORED_BY`** — `llm` / `llm-accepted` / `llm-adopted` / `human`, a ladder
-  that only rises (`DEC-AUTHORSHIP-LADDER`). Who wrote the statement, and how
-  far a human has taken it on. The writer stamps `llm`; the other rungs are a
-  human's acts.
+- **`AUTHORED_BY`** — `llm` / `human-adopted` / `human`, a ladder that only
+  rises (`DEC-AUTHORSHIP-LADDER`). `llm` means a model wrote the statement,
+  `human-adopted` means a human took model-written words on, and `human` means a
+  human wrote them. The writer stamps `llm`; it has no flag for the other rungs.
 - **`PARENT_FP`** — `<PARENT-UID>:<hash>` per parent whose contract this node
   depends on. Fingerprints point strictly **downward** (`DECISION` → `MECHANISM`
   → `WORK` → `NARRATIVE`), so a collectable node never strands an inbound one. A
