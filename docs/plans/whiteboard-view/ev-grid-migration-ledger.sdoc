@@ -8,7 +8,7 @@ IMPORT_FROM_FILE: @repo
 UID: EV-GRID-MIGRATION-LEDGER
 TITLE: What the node-type migration did to each node, in two passes
 AUTHORED_BY: llm
-SOURCE: the retype scripts of the session and the mood-test workflow's verdicts (wf_9c9bcb70-975); every retype is also recorded in the node's own NOTES
+SOURCE: the retype scripts of the session and the mood-test workflow's verdicts (wf_9c9bcb70-975); every retype is also recorded in the node's own COMMENT
 STATEMENT: >>>
 FIRST PASS (2026-08-30, by grammar type; 34 nodes, tag changed, UID kept):
   INV-DECISIONS-ARRIVE-AS-CARDS: INVARIANT -> REQUIREMENT
@@ -79,6 +79,6 @@ HELD for the operator (low confidence; each needs a split into a rule and a desi
   MECH-HTML-RENDER-MUST-PASS: proposed REQUIREMENT -- Genuinely half rule, half design; the split is the real answer. Split: REQUIREMENT 'the corpus renders to HTML' (paragraph 1 + RATIONALE) and MECHANISM 'the render gate invokes strictdoc's own field p
   MECH-SEMBLE-TEST-RECIPE: proposed EVIDENCE -- Genuinely mixed. What would split it: an EVIDENCE node for the PYTHONPATH-shadowing finding (measured on SLICE-SDOC-IN-SEMBLE, one false defect report caused) plus a WORK item for the recipe. If the o
 <<<
-NOTES: >>>
-Every retyped node keeps its UID (DEC-UID-OUTLIVES-TYPE) and carries the retype and its reason in NOTES, so this ledger is a convenience, not the record. The review a person can rule from is NAR-MECHANISM-MOOD-REVIEW in the strictdoc-tooling plan.
+COMMENT: >>>
+Every retyped node keeps its UID (DEC-UID-OUTLIVES-TYPE) and carries the retype and its reason in COMMENT, so this ledger is a convenience, not the record. The review a person can rule from is NAR-MECHANISM-MOOD-REVIEW in the strictdoc-tooling plan.
 <<<

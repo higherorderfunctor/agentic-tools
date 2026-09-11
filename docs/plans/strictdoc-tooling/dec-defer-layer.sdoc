@@ -21,7 +21,7 @@ RATIONALE: >>>
 No content in this document sits in a layer. Adding LAYER now would make every
 MECHANISM carry a field with one possible value.
 <<<
-NOTES: >>>
+COMMENT: >>>
 This is a real gap, not a cost-free deferral: half the horizontal-and-vertical
 tracking the operator asked for is absent until it is closed.
 <<<

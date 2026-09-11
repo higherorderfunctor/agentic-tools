@@ -27,7 +27,7 @@ removing the injection upstream would not break us; the exposure is that a
 grammar file nobody can read as complete is the thing every session reasons
 from.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-09-09 against strictdoc-env
 cck3q51nd32dpbmpkwv5xpkxxhpnr2ak. Sites: the injection at index build is
 core/traceability_index_builder.py:449-456, guarded by

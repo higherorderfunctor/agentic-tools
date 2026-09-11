@@ -50,6 +50,6 @@ One field rather than two -- provenance plus a separate human stance -- because
 only four of the combinations mean anything and they form a ladder. Two fields
 would be a product with unreachable corners.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The grammar today carries AUTHORED_BY with values llm and human only, and the sdoc writer refuses to set it at all -- MECH-RUNTIME-WRITE-GUARD makes it the operator's key. Extending the word list and deciding who may raise a value are both open, and the second is the harder one: raising to llm-accepted is a human act with no natural place to happen yet. The stop-condition and report-on-undo behaviour is semantic and belongs in L3, not in the field.
 <<<

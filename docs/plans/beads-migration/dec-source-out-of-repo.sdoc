@@ -23,6 +23,6 @@ is not human signed off.
 RATIONALE: >>>
 Recorded as a node so that a conversion session does not silently pick one.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Human acceptance needed. This node points at content this graph cannot validate.
 <<<

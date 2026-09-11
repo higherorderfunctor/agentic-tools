@@ -50,6 +50,6 @@ The distinction the split was reaching for is real, but it is between the
 IMPERATIVE and a CLAIM, which DEC-NODE-TYPE-GRID already draws with two node
 types instead of two grammars.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The two-grammar sketch is committed at packages/strictdoc-grammar/values/plan.nix and values/spec.nix, wired to nothing, with its devenv block commented out. It stays as a written-out alternative rather than being deleted, and MECH-LAYER-ZERO-GRAMMAR-ADOPTION carries what it held open. PLAN and WORK still have to be added to the one grammar, and whether both survive beads is DEC-PLAN-LIFECYCLE-OPEN's.
 <<<

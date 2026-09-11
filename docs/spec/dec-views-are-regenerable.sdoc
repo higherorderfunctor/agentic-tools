@@ -32,7 +32,7 @@ rendered page succeeded (SLICE-SEMANTIC-LAYER-RENDER). A view that only exists
 while a session is open cannot be iterated on, reviewed, or combed for
 decisions; one generated from the canon can.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's delegation;
 overrule by superseding. Their words: "what would it take to build this as a
 permanent view to iterate on" and "ideally I could flip the view to the

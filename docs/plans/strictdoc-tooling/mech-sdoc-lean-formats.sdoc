@@ -82,7 +82,7 @@ invokes an unregistered handle and both gates would fail if one did. Against
 roughly halving every strictdoc invocation, on the commands every authoring loop
 and both CI checks run, that trades well.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Re-measured 2026-08-27 against strictdoc 0.28.3, cold cache (clean --output-dir
 per run, since the cache lives at <output-dir>/_cache/<version>), on a copy of
 the worktree. Interleaved A/B/C rounds, four of them:

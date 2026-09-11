@@ -60,6 +60,6 @@ disappears from the tab with a green build. The Gaps tab is currently the one
 screen already meeting the aspiration. Breaking it to prove a mechanism is the
 wrong trade.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed 2026-08-31. The element and its CI gate ship together because INV-GUARDS-MUST-EXECUTE forbids the other order; the check carries its own negative fixture, because a green over zero commentary nodes is otherwise indistinguishable from a checker that always returns 0.
 <<<

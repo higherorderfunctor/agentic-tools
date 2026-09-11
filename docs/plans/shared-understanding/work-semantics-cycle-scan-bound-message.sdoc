@@ -11,7 +11,7 @@ AUTHORED_BY: llm
 STATEMENT: >>>
 _simple_cycles bounds DFS iterations over the whole role subgraph, not search depth, so on a large corpus check() would report 'cycle scan exceeded step bound 10000', which reads like a contract finding rather than a scan limit. Bound by depth or by witnesses per role, and report an exhausted bound as a scan diagnostic distinct from a contract violation.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Found by the semantics re-review on 2026-09-08 (engine.py:1394). Latent: model.json ships no relation contracts.
 <<<
 RELATIONS:

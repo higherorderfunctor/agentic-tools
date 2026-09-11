@@ -32,7 +32,7 @@ label-node, and label-to-unrelated-edge intersections. Every path remained
 solid, inspection and dimming semantics remained consistent across visible
 nodes, and the page reported no runtime, console, or network errors.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Taken 2026-09-03 on the reference branch feat/work-graph-neighborhood-reference,
 against a board that had no Grammars tab, no lifecycle widget and no semantics
 payload, and that loaded elkjs from docs/sdoc/board/assets/vendor/elkjs/ in the

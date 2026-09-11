@@ -20,7 +20,7 @@ The cache is the only thing strictdoc writes into the checkout that nobody asked
 
 The $TMPDIR sentinel rather than a hand-picked absolute path because the cached parses are per-file but the dependency map is a single file per cache directory, so worktrees pointed at one fixed path would overwrite each other's. The sentinel's md5-of-cwd component gives each worktree its own directory with no per-worktree configuration to keep in sync.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 against strictdoc 0.28.3, on a scratch copy of the corpus, never in the tree.
 
 STRICTDOC_CACHE_DIR is worse than inert. project_config.py:244 asserts it equals exactly "Output/_cache" -- capital O, which the earlier draft of this node got wrong. Lowercase output/_cache aborts too, with the bare message "error: output/_cache" and no explanation. The branch is checked BEFORE the config value (241-245 versus 246-251), so it overrides dir_for_sdoc_cache: with the config already set to "$TMPDIR", STRICTDOC_CACHE_DIR=Output/_cache put the cache back inside the checkout at ./Output/_cache/0.28.3. It is not a relocation lever, it is a way to undo this mechanism. Nothing in this repository sets it.

@@ -31,7 +31,7 @@ absence: no engine, no machine for this type, or a machine with no rules yet
 all still render a section that says so, because a missing section reads as
 settled and nothing here is.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Updated 2026-09-02 for commits 8823edf1 and 35f2a499 (grammar-groups.json,
 coverage check, pill order).
 

@@ -35,7 +35,7 @@ Sheet; the whiteboard view's Start and data model; a node; Nodes; and the
 canon's Start, Edges and Nodes with whiteboard switched off), compared
 screen by screen against the v1 page's 82-element inventory.
 <<<
-NOTES: >>>
+COMMENT: >>>
 What the comparison changed, all in docs/sdoc/view/template.html and the
 canon, none in the backend: the top tab strip clamps a label to two lines
 at 9rem instead of one line at 14rem, so a root's title reads instead of

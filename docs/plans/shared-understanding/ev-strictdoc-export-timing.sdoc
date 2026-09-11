@@ -33,7 +33,7 @@ The generic parser is dead and its cost is gone. Before it was disabled, a cold 
 
 To reproduce: `devenv tasks run strictdoc:bench`. It writes one derived config from the repository's own `create_config()`, runs the four arms interleaved against the worktree read-only, and prints this table plus the indexed-file count and the strictdoc version. `SDOC_BENCH_RUNS=1` for a single repetition; `SDOC_BENCH_PROFILE=1` adds one serialized on-cold run under cProfile, bucketed into source read / sdoc parse / walk / other. Nothing it does touches the repository; scratch lives under `$TMPDIR`.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The table is a completed observation, run and re-run by its author, but no independent session has re-taken it.
 
 Filed 2026-09-02 against strictdoc 0.28.3 (the dev shell's binary) and this worktree on feat/strictdoc-trial, one machine, `/usr/bin/time` around a JSON export.

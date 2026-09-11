@@ -30,6 +30,6 @@ The operator asked for the glossary to take advantage of dirty edges when
 they choose a different word. A term that is only a row in a glossary
 cannot be cited, so nothing could depend on it; a term that is a node can.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's delegation of that day ("I'll trust you to take first pass at making decisions"); overrule by superseding. AUTHORED_BY reads llm because the writer has no flag for the human rungs. The skill's glossary table and the README stay as projections of these nodes (INV-SETTLED-STAYS-VISIBLE); generating the table from the nodes is MECH-SDOC-VOCABULARY-SINGLE-SOURCE's, still open.
 <<<

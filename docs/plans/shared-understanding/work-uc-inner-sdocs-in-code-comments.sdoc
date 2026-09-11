@@ -14,7 +14,7 @@ source-code comment, as a match target for tree-sitter tooling working over
 that source file. Parent to two narrower use cases below it: highlighting
 such an inner sdoc, and extracting it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "match inner sdocs in code comments"
 <<<
 RELATIONS:

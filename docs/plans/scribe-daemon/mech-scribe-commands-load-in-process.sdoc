@@ -49,7 +49,7 @@ came from the grammar FILE and so needed no corpus.
 client above closes it: the option surface now comes from the daemon. The argv
 seam is unaffected.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Dry-run delivery record retained when its completed WORK row was retired on
 2026-09-10. Every writing leaf named by scribe_protocol.WRITES receives one
 --dry-run flag through the built parser tree, and dry_run is folded into the

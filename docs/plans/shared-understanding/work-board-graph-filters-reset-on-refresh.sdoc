@@ -32,7 +32,7 @@ right shape is to carry the DISABLED set across the refetch and enable
 anything newly observed. Whether a pair that vanished and returned should
 stay disabled is the judgement call.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed by the Graph-tab contract audit, 2026-09-08. A browser reload legitimately resets both filters and hops -- MECH-SDOC-BOARD-CANVAS makes one hop the default and the filters are page-local by contract. This node is only about the in-page Refresh button.
 <<<
 RELATIONS:

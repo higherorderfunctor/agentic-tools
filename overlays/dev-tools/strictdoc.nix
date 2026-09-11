@@ -15,7 +15,7 @@
 # package (SLICE-STRICTDOC-OVERLAY,
 # docs/plans/strictdoc-tooling/slice-strictdoc-overlay.sdoc). That node's
 # STATEMENT was rewritten in place on 2026-08-27 to describe THIS shape; its
-# NOTES keep the retired first-party build as history. See
+# COMMENT keeps the retired first-party build as history. See
 # docs/plans/strictdoc-tooling/mech-strictdoc-upstream-flake.sdoc for the record
 # of the switch.
 #

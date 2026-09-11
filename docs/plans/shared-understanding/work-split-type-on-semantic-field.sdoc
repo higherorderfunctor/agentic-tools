@@ -23,7 +23,7 @@ reason the operator leans node-type over kind-field there. It also bears on
 STATUS-style state fields, where one field's value already selects which
 rules apply; whether any of those should split is not decided here.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-01, verbatim: "actually i think i also said that session
 that if a single field changes the semantics of a node, we should consider
 the split simply to divide the semantic rules. and it doubles as the visual

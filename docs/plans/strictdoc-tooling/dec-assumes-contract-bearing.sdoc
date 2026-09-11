@@ -18,8 +18,8 @@ Measured over the 144-node graph, 0 of 14 Assumes edges carry a PARENT_FP entry,
 RATIONALE: >>>
 Either Assumes is deliberately not contract-bearing, in which case fp-accept should refuse to sign one and say so, or it is and fourteen edges are unsigned. Today neither is written down, and a uniform absence is indistinguishable from nobody having got round to it.
 <<<
-NOTES: >>>
-The fingerprint face is named in committed text: `MECH-RELATION-TARGET-TYPE-LINT`'s NOTES cites this UID directly, twice.
+COMMENT: >>>
+The fingerprint face is named in committed text: `MECH-RELATION-TARGET-TYPE-LINT`'s COMMENT cites this UID directly, twice.
 
 Absorbs the proposed `DEC-CLOSURE-EDGE-ROLES`.
 <<<

@@ -23,7 +23,7 @@ the Grammars view. On a narrow screen, the work list and populated inspector
 become dismissible drawers over a full-width canvas. The shell (app.js) fetches
 the snapshot and calls renderBoard; the view module fetches nothing itself.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The bounded-neighborhood reference implementation replaced the whole-canon
 canvas on 2026-09-02. The operator asked for a searchable list of WORK nodes,
 a highlighted focal node, immediate-neighbor rendering, and right-pane details

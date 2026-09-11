@@ -17,7 +17,7 @@ role, and the graph database returns only the bucket of role-less edges. Every
 relation in this grammar carries a role, so no cycle in this corpus is detected;
 the failure surfaces as a recursion-depth crash during render.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Implemented: dev/scripts/cycle-check.py, an iterative (non-recursive, so it
 cannot hit the exact recursion-depth failure it replaces) DFS over every
 Parent-type RELATIONS entry regardless of ROLE -- File relations excluded,

@@ -11,7 +11,7 @@ AUTHORED_BY: llm
 STATEMENT: >>>
 MECH-SDOC-BOARD-LAYOUT records two two-node cycles preserved in the real snapshot, condensed as strongly connected components for ranking, while MECH-CYCLE-CHECK's recorded run reports zero cycles and the gate is green. The two walk different edge sets: the gate filters on TYPE Parent and skips all Child edges, the board takes the whole snapshot. Either the board's count names cycles through Child edges that the canon permits, or the gate has a hole. Identify the two cycles and say which.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Found by the acyclicity sweep on 2026-09-08.
 <<<
 RELATIONS:

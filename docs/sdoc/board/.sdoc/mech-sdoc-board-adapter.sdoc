@@ -34,7 +34,7 @@ Perspective cannot explode a string back into rows, so relations were
 unqueryable (the operator's report, 2026-09-01). The denormalized second table
 is the fix.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Updated 2026-09-03 for commits 6fbaa76b, 7d6886d1 and 46cd3cf1: File
 relations became element-grained in both payloads, the KIND word is joined
 from the extractor, and the snapshot gained the semantics key.

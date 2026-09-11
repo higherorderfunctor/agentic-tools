@@ -35,7 +35,7 @@ statements read as established. Two of its claims would have sent an agent to
 hand-edit a generated file and to run a UID minter whose output this corpus
 immediately renames.
 <<<
-NOTES: >>>
+COMMENT: >>>
 An independent review of that work found one blocker in it -- see the manage-new
 paragraph above.
 

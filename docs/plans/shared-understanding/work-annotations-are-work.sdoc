@@ -15,7 +15,7 @@ rather than a family of their own. The exact node types this yields still
 need design. This reframes WORK-ANNOTATION-NODES, which is parked, and bears
 on WORK-GRAMMAR-FILE-SPLIT's proposed annotations file.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "combine Work and annotations, annotations
 are things to be addressed, so work. exact node types still needs design."
 <<<

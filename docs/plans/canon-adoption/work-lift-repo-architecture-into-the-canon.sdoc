@@ -17,7 +17,7 @@ and the per-package docs they compose -- as prose no check can hold to the
 code. Each becomes claims of the canon (requirements, decisions, mechanisms,
 evidence) with the edges that let a change re-suspect what depends on it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed 2026-08-30 from the operator's list of things to do before they forget, restated under the ruled vocabulary; some restate earlier items. Covers: repo design, model runtime, dev tools, CI, beads (after WORK-IMPORT-BEADS-DESIGN).
 <<<
 RELATIONS:

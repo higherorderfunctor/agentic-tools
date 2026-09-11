@@ -40,7 +40,7 @@ Recommendation. The cheapest grid-in-code with a dirty edge is entirely repo-sid
 | Dirty edge, step 4: CI wiring and the review verb | hours for the check; 0.5-1 day for the review and re-sign loop; severity policy undecided | mirror checks/strictdoc-file-check.nix:43-46 and :63-64 with ${self} as root, the same local-vs-CI asymmetry file-check.py:90-98 has; review is a re-sign after a human or LLM compares the ends, hosted by traceability_index_build_finished only if the native feature is on; fail-vs-report left to the operator as in mech-plan-refs-check.sdoc:43,53 |
 | Fix scribe relate --role File (the since-fixed scribe File-role defect) | 1 line plus a test: 1-2 hours | scribe_ops.py:147-153 passes the role verbatim where :203-206 maps File to the empty string; measured refusal against the live graph; two File relations on MECH-SDOC-BOARD-GRAMMARS-VIEW are missing because of it, and the dirty-edge work hits it on its first relate |
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed 2026-09-02 against strictdoc 0.28.3 (the dev shell's binary, /nix/store/9khac7sfda0rzk6blqd3cnlwb7q3hsvz-strictdoc) and this worktree at 2f90b224 on feat/strictdoc-trial; main at 4705317b has none of dev/scripts/sdoc_*, docs/sdoc or strictdoc_config.py. Four independent readers covered the package's registry and readers, its marker grammar and resolver, the repo's fingerprint and check tooling, and grammar packaging; their reports were reconciled into the STATEMENT, and every disagreement among them or with upstream prose is kept below rather than resolved.
 
 Contradictions, all kept:

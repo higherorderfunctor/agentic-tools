@@ -20,7 +20,7 @@ Closing it means moving the view pipeline's export onto the daemon
 (workspace.export) so the map comes off _DOCUMENT_PATH like the board's
 does, then deleting the exception. Not a contained change; left as debt.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Surfaced 2026-09-10 by the agent landing session 3 onto the trial branch
 and confirmed by its verifier: the only remaining allowlisted violation of
 REQ-DAEMON-IS-THE-ONLY-SOURCE outside the semantics layer.

@@ -32,7 +32,7 @@ nothing connects "a file I added under packages/" to "the command that reads the
 design graph". A session that adds an invalid grammar anywhere and then sees the
 graph command break has no reason to look in packages/ for it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 A second producer of .sgra files under the root arrived 2026-08-27: the
 ai.strictdoc module's generate:sgra task writes every declared grammar into the
 working tree. It MITIGATES this node rather than resolving it. The task writes

@@ -14,8 +14,8 @@ The sdoc skill states that a broken input can exit 1 and then exit 0 on a re-run
 RATIONALE: >>>
 The two questions are one answer. If the false green is real, the clean-directory discipline is load-bearing and the cold parse is the price. If it is refuted, that discipline costs about 0.5 s per gate invocation for nothing, and the callers can converge on one path — they do not agree today, with the two check scripts documenting `--output-dir output` inside the checkout, `dev/tasks/check.nix` exporting into a temporary project, and sessions exporting into ad-hoc scratch directories.
 <<<
-NOTES: >>>
-`MECH-SDOC-CACHE-DIR-FOR-WORKTREES`'s NOTES records the non-reproduction and points at this spike; its STATEMENT already binds the tool to one stable `--output-dir` for the warm-cache reason, so the retirement of the clean-directory rule is what remains unsettled. A negative result here needs a positive control: show the harness detecting a false green on some break class before reporting that no break class produces one.
+COMMENT: >>>
+`MECH-SDOC-CACHE-DIR-FOR-WORKTREES`'s COMMENT records the non-reproduction and points at this spike; its STATEMENT already binds the tool to one stable `--output-dir` for the warm-cache reason, so the retirement of the clean-directory rule is what remains unsettled. A negative result here needs a positive control: show the harness detecting a false green on some break class before reporting that no break class produces one.
 
 Absorbs the proposed `MECH-SDOC-STABLE-OUTPUT-DIR`.
 

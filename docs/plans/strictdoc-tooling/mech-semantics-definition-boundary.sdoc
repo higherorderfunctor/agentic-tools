@@ -32,7 +32,7 @@ asking at the definition layer. The two are easy to conflate because the
 instance is the only worked example, and conflating them is how a meta-model
 ends up shaped by one implementation's preferences.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Implementation record retained from the semantics delivery rows retired on
 2026-09-10. dev/scripts/sdoc_semantics/model.json is the sole lifecycle
 declaration surface in schema sdoc-semantics-model/1; model-shape.md documents

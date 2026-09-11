@@ -52,7 +52,7 @@ order, so no ORDER counter exists anywhere, and because nothing then depends
 on a narrative. Parent for citation was chosen because a fingerprint must be
 backed by a Parent relation on the node that carries it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's delegation of that day ("I'll trust you to take first pass at making decisions"); overrule by superseding. AUTHORED_BY reads llm because the writer has no flag for the human rungs. The strictdoc measurements this rests on: RELATIONS order is preserved in the JSON export; a Child written on A registers a derived parent link on the target in strictdoc's own index (harmless within one plan); an inline link inside a multiline field is resolved and refused if dangling, while one inside TITLE is inert text.
 <<<
 RELATIONS:

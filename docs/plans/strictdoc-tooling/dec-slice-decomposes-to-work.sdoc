@@ -33,6 +33,6 @@ the edges to a type asserted up front.
 RATIONALE: >>>
 Less machinery for the same meaning. A type that asserts a shape cannot enforce the rule that motivated it, and the rule was the valuable half -- so removing the type and keeping the rule loses nothing and makes the rule testable for the first time.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled by the operator on 2026-08-28; AUTHORED_BY reads llm because the writer has no flag for that key. Eleven SLICE nodes exist today and the Crosses role is declared on SLICE alone, so the migration moves both -- the nodes to WORK and the role with them. That cost is MECH-GRID-MIGRATION-UNCOSTED's, and this ruling makes it smaller rather than larger, since a type removed is a type nobody has to re-test.
 <<<

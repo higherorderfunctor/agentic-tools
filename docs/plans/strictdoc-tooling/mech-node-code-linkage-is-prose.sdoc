@@ -20,7 +20,7 @@ whose prose said implementation had landed. `SLICE-GRAPH-CHECKS` and
 `checks/strictdoc-cycle-check.nix` existed for it with no edge between them;
 `SLICE-GRAMMAR-FROM-NIX` named five flake checks and a
 package directory with no edge to any of them. So the claim that code landed
-was prose in NOTES, and no structured query could join the node to
+was prose in COMMENT, and no structured query could join the node to
 what it implemented. Inward, measured over the git-tracked non-.sdoc tree: 67
 UID citations in 34 files, 61 of them naming a node under `docs/plans/` and 27
 distinct plan nodes cited, plus two tokens that resolved to nothing at all --
@@ -65,7 +65,7 @@ that check beside it. That gap is closed twice over now -- by the corpus
 checker and by upstream's own validation -- which leaves the requirement itself
 as the only missing piece.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27. `MECH-PLAN-REFS-CHECK` puts the source-annotation arm explicitly out of scope with a reason — strictdoc_config.py sets no source root and `@relation` comments never reach the JSON export — so this is unowned rather than deferred. Not decided here: whether the 61 existing citations are remediated or grandfathered until the extractor lands.
 
 Absorbs the proposed `MECH-ANNOTATION-TARGET-DURABILITY` and `MECH-NODE-TO-CODE-EDGE-COVERAGE`.

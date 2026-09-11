@@ -22,7 +22,7 @@ that refusal with a retry; there is deliberately no fallback load.
 RATIONALE: >>>
 One loaded graph per worktree already exists, reconciles itself on every read, and exports in about 0.3 s. Both spikes duplicated it: the board hydrated its own in-process StrictDoc workspace (3.4 s cold) beside the daemon's, and the explorer paid a 2.2 s strictdoc export subprocess on every page load. The export lands under output/, which the daemon's freshness sweep skips, so serving never dirties what it serves. The export itself now carries each node's source path, so provenance needs no second walk.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Written 2026-09-01 for the merge. It replaces the codex spike's data-plane
 decisions (DEC-SDOC-BOARD-SERVER-OWNS-SNAPSHOT, DEC-SDOC-BOARD-COHOST-ADAPTERS,
 DEC-SDOC-BOARD-LOCAL-RPC, DEC-SDOC-PERSPECTIVE-EXPORT-BOUNDARY): the spike's

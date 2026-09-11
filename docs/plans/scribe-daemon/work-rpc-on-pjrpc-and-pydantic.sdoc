@@ -37,7 +37,7 @@ THE TRANSPORT STAYS OURS. The Unix socket, one JSON value per newline, the
 DEC-SCRIBE-DAEMON-NO-FALLBACK are unchanged: pjrpc replaces the envelope
 handling inside the frame, not the frame.
 <<<
-NOTES: >>>
+COMMENT: >>>
 MEASURED 2026-09-09.
 
 pjrpc 2.2.0 from the PyPI sdist, hash

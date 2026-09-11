@@ -13,7 +13,7 @@ Let an sdoc field's content be written in another language, with a companion
 field on the same node naming which language it is, so the tree-sitter
 grammar knows what to parse the embedded content as.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "allow fields to contain other languages
 embedded, maybe with another field for the language."
 <<<

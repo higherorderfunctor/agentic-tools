@@ -29,7 +29,7 @@ full evaluation measured 29 ms with a pinned lib and 825 ms through the flake
 registry, so the board reads the committed document and never runs a nix eval
 per page.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-03, verbatim: "make sure path to nix if it surfaces is
 logged as sdocs". Not for Codex now; it is milestone three of
 DEC-EXECUTABLE-RULES-ROADMAP.

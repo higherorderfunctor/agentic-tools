@@ -27,7 +27,7 @@ keep the authored layer as data; treat the render as a one-off and re-author
 it next time; or carry the plain-language headline in the canon as a field,
 which is a grammar question and not this node's to answer.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed by the rendering session, 2026-08-29. Measured while building: 145
 tagged lines plus the five top gaps; the sheet's own tag counts (45 works, 17
 fall out, 20 unaddressed, 18 open, 45 gaps) reproduce exactly from the parse;

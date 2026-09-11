@@ -41,7 +41,7 @@ it is one implementation composed, then as an escape hatch for the
 inexpressible, which was wrong because the untranslated case never leaves the
 normalized surface in the first place.
 <<<
-NOTES: >>>
+COMMENT: >>>
 OPEN, and deliberately not decided here: what the inner entry point is called
 and whether it is exposed at all yet. It cannot be called faithful -- see
 MECH-FAITHFUL-IS-NOT-A-CONSUMER-WORD. A leading underscore reads as private

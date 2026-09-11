@@ -15,7 +15,7 @@ This is the buildout of MECH-NODE-CODE-LINKAGE-IS-PROSE, the observation that th
 
 Still open, the operator's call: option 1, render the grid from the narrative, versus option 2, keep the render in code and hang a dirty edge on it (see MECH-SDOC-BOARD-GRAMMARS-VIEW); where the code-side hash lives, strictdoc's HASH slot on the relation or PARENT_FP under a path key; and the direction of the edge, since the operator's phrasing has the render depend on the narrative while the canon's rules (nothing in the grid may depend on a narrative; MECHANISM has no Cites role) leave the narrative as the only lawful holder of that edge once NARRATIVE is given a File role.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim, on option 1 (render from the narrative) versus option 2 (code plus a dirty edge): "on option 1, it isn't a no but before I invest more in that I feel like it would be whack-a-mole maintaining an inner DSL inside an sdoc for different views where simple relating code to spec is the generic abstraction using core ideas of canon like dirty refs. could be a forcing function to apply some real settled mechanics also like just general dirty edge ripples and what not."
 
 Operator, 2026-09-02, verbatim, on the grid as code with a dirty edge: "so hard coding the grid becomes like @relation(REQ-1, scope=file) pointed to NAR-CANON-TYPES-GRID. If the narrative changes it dirties your edge to the hard coded grammar render in code forcing a review (ideally LLM). this is a core feature of canon we just haven't built out yet."

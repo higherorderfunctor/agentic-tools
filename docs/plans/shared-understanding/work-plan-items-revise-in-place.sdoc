@@ -14,7 +14,7 @@ superseded the way an accepted DECISION is. Two questions stay open and are to
 be re-evaluated: whether a plan item needs a reject state at all, and whether
 supersession of a plan item should exist only as a tracked edge.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-01, verbatim (spelling cleaned): "no reject on plan items,
 just supersedes I think? edge tracked only. may need to re-evaluate this. I
 mention reject because I wanted to say you can revise nodes, not

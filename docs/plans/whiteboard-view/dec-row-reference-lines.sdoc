@@ -23,6 +23,6 @@ link-role word in its prose; the grouping is read off the tree.
 RATIONALE: >>>
 v1 showed a clean headline, then the cited nodes with their titles, then the sheet's wording one tap below. The v2 rows carried 'See X. Speaks about Y. Feeds Z.' inside the prose, which read as noise.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's delegation ('I don't want to be bothered by the recommendation before implementation'); overrule by superseding. Chosen from three independent designs judged against an 82-element inventory of the v1 page. AUTHORED_BY reads llm because the writer has no flag for the human rungs.
 <<<

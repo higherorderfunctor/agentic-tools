@@ -38,7 +38,7 @@ Gap: no forcing function beyond the file count and the sub-grammar/extensionless
 cases named above; this WORK stays a design sketch until the manifest-and-glob
 mechanism is picked.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim, on backlogging generally: "we should track
 these in an sdoc, doesn't mean we have to implement any until a forcing
 function. lang, langitem/query can all be backlog items until there is a

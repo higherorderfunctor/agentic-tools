@@ -84,7 +84,7 @@ The defect itself is worth closing rather than tolerating because a design
 that claims code which no longer exists is the ghost problem the File role
 was adopted to catch.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 on a scratch copy of the tree, strictdoc 0.28.3
 (/nix/store/cck3q51nd32dpbmpkwv5xpkxxhpnr2ak-strictdoc-env), every export
 into a clean output directory.

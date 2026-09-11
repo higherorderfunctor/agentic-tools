@@ -69,6 +69,7 @@ FIXTURE_INDEX = {
                     "TITLE": "A mechanism",
                     "AUTHORED_BY": "llm",
                     "STATEMENT": "How it behaves.",
+                    "COMMENT": "How it was recorded.",
                     "RELATIONS": [
                         {"TYPE": "Parent", "VALUE": "DEC-FIX-ONE", "ROLE": "Governed_By"},
                         {"TYPE": "Parent", "VALUE": "DEC-FIX-GONE", "ROLE": "Governed_By"},
@@ -253,6 +254,7 @@ class AdapterContractTest(unittest.TestCase):
             mechanism["source"]["path"], "docs/plans/fixture/mech-fix-two.sdoc"
         )
         self.assertEqual(mechanism["files"], ["docs/sdoc/board/server.py"])
+        self.assertEqual(mechanism["fields"]["COMMENT"], "How it was recorded.")
         self.assertNotIn("RELATIONS", mechanism["fields"])
         self.assertNotIn("_DOCUMENT_PATH", mechanism["fields"])
         self.assertNotIn("_NODE_TYPE", mechanism["fields"])

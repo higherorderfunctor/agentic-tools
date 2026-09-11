@@ -30,7 +30,7 @@ decision, not a board edit. It is the same question WORK-PRESENTATION-GRAMMAR
 and WORK-WIRE-REQ-BOARD-GRAMMAR-DRIVEN circle, so groom it against those
 rather than in isolation.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed by the Graph-tab contract audit, 2026-09-08. Recorded as a gap under the requirement rather than as a defect: every observable behavior matches MECH-SDOC-BOARD-CANVAS today.
 <<<
 RELATIONS:

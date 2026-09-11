@@ -29,7 +29,7 @@ own scope. This node is that obligation at the actual boundary: every program
 that invokes strictdoc's command line must validate the format handle before
 treating exit status as success.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The exposure is live: strictdoc_config.py registers only SDocFormat and
 JSONFormat. No program in the tree currently accepts a caller-supplied format
 handle; every repository invocation hardcodes json. The residual exposure is a

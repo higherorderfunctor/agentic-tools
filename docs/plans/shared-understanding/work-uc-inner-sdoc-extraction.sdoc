@@ -16,7 +16,7 @@ source-to-graph extraction WORK-CODE-LINKAGE-EXTRACTORS is already building
 tree-sitter extractors for, just for sdoc-shaped content instead of Nix or
 TypeScript.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "extraction"
 <<<
 RELATIONS:

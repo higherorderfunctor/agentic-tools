@@ -10,7 +10,7 @@
 # composed.
 #
 # THIS FILE NAME IS NOT A PUBLIC NAME. What the inner emitter is called, and
-# whether it is exposed at all, is deliberately open (see that node's NOTES);
+# whether it is exposed at all, is deliberately open (see that node's COMMENT);
 # nothing outside ./emit.nix reaches this file today.
 #
 # INPUT CONTRACT — what ./denormalize.nix hands over, and what a hand-written

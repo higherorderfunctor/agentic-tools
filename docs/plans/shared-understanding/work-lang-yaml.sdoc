@@ -17,7 +17,7 @@ Present in this repo today: 7 tracked files — `.github/actions/{assert-nix-con
 
 Gap: this is under the ~10-file presence bar this survey used elsewhere, and the operator did not name YAML directly; it is filed here because the survey brief pre-scoped it (both as one of the languages to check a grammar for and as one of the UIDs to file). Whether it earns real extractor work is an open question for whoever grooms this backlog.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim, on backlogging generally: "we should track
 these in an sdoc, doesn't mean we have to implement any until a forcing
 function. lang, langitem/query can all be backlog items until there is a

@@ -47,7 +47,7 @@ states.<s>.on.<event> -> PRE hook on scribe.change.set for STATUS with to = targ
 type = "final" -> PRE hook denying any set of STATUS away from that value.
 ripple, actors, gates -> exactly as in the Jira-style candidate.
 <<<
-NOTES: >>>
+COMMENT: >>>
 STRENGTHS.
 - Named guards give the cleanest overshadow: mkForce one body, every transition that names it follows; XState calls this provide().
 - The machine is pure structure, so Nix can render a state diagram and check reachability from the same eval.

@@ -28,7 +28,7 @@ and expensive once it is not. The prototype labels itself honestly -- fixture
 backend, no SDoc writes -- so nothing is wrong yet; this is only the fork that
 gets chosen when the fixtures are replaced.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Not a criticism of the prototype, which is deliberately unspecced at this
 layer. The operator raised the same gap independently.
 <<<

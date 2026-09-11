@@ -20,7 +20,7 @@ Re-measure rather than reword: run the same comparison on the current corpus
 and record what differs and by how much, then rewrite the TITLE and STATEMENT
 to say "identical modulo the daemon's additions" with the additions named.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Surfaced 2026-09-10 by the agent landing session 2's export-path change onto
 the trial branch, which had to teach test_export_matches about a second
 deliberate difference. Left untouched there because correcting an EVIDENCE

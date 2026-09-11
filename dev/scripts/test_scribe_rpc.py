@@ -226,7 +226,7 @@ def test_cli_help_from_daemon(root: Path, runtime: Path) -> None:
             "WORK",
         ):
             assert tag in type_help, f"new help omitted {tag}: {type_help}"
-        for flag in ("--uid", "--title", "--statement", "--relate"):
+        for flag in ("--uid", "--title", "--statement", "--comment", "--relate"):
             assert flag in work_help, f"WORK help omitted {flag}: {work_help}"
         assert "--authored-by" not in work_help
 

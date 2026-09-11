@@ -33,8 +33,8 @@ also prefers the styles be literally a CSS sheet, which the JS map is not.
 Deciding whether the palette becomes generated CSS, a payload field, or a
 checked hand-authored sheet is the design work here.
 <<<
-NOTES: >>>
-Filed by the Graph-tab contract audit, 2026-09-08. REQ-BOARD-GRAMMAR-DRIVEN already names TYPE_COLORS and the duplicated theme.css series colors in its own NOTES as standing violations to burn down; this node is that burn-down with the measurement attached. Two smaller instances of the same shape were fixed in the same session (commit 344c4dfd): the unreachable hard-coded edge-hue fallback in renderEdges, and the graph key focus swatch that pinned --outline-color to --accent-success rather than reading the focal node type color.
+COMMENT: >>>
+Filed by the Graph-tab contract audit, 2026-09-08. REQ-BOARD-GRAMMAR-DRIVEN already names TYPE_COLORS and the duplicated theme.css series colors in its own COMMENT as standing violations to burn down; this node is that burn-down with the measurement attached. Two smaller instances of the same shape were fixed in the same session (commit 344c4dfd): the unreachable hard-coded edge-hue fallback in renderEdges, and the graph key focus swatch that pinned --outline-color to --accent-success rather than reading the focal node type color.
 <<<
 RELATIONS:
 - TYPE: Parent

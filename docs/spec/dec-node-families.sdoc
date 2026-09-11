@@ -65,7 +65,7 @@ design does not survive it", which is uncovered, not violated. The grid's own
 RETIRES_ON -- a durable claim that fits no cell -- fired on that argument, so
 this is the grid retiring by its own terms.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's delegation of
 that day ("I'll trust you to take first pass at making decisions"); the operator
 overrules by superseding. AUTHORED_BY reads llm because the writer has no flag

@@ -41,7 +41,7 @@ stacked them. Placement is a fact about the view, so it belongs in the
 canon, in a field strictdoc refuses to misspell, outside the contract hash
 so that moving a card never dirties what cites it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's delegation ('I don't want to be bothered by the recommendation before implementation'); overrule by superseding. Chosen from three independent designs judged against an 82-element inventory of the v1 page. AUTHORED_BY reads llm because the writer has no flag for the human rungs. Composite narratives, a SECTION element and DOCUMENT_FROM_FILE were measured and rejected for this: DEC-FILES-STAY-FLAT-FOR-VIEWS.
 <<<
 RELATIONS:

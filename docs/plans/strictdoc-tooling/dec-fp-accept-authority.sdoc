@@ -28,7 +28,7 @@ A queue of a hundred no-impact acceptances trains the operator to approve
 without reading, which is the same rubber stamp the rule exists to prevent,
 arrived at from the other direction.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Unsettled: whether the deciding field is the PARENT's authority, the CHILD's,
 or either end being human. The parent owns the contract that moved; the child
 owns the assumption that may no longer hold. Both readings are defensible and

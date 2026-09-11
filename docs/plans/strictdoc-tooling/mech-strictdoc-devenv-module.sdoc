@@ -39,7 +39,7 @@ overlays not importing from packages was read as forbidding the layout rather
 than as pointing at the wrong layer. The module is where the wrap was always
 meant to live.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Implemented 2026-08-27, all three options live in
 packages/strictdoc-grammar/modules/devenv/default.nix. `enable` installs
 strictdoc plus the extraction runner, `package` carries its own unsafe-override

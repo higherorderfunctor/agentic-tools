@@ -11,7 +11,7 @@ AUTHORED_BY: llm
 STATEMENT: >>>
 The ripple's cycle key is (lifecycle, subject, transition, event) and omits the emitter, so two distinct emitters legitimately driving the same self-transition on the same subject in one command refuse the whole command as a cycle. Decide whether the key should carry the emitter, or whether a self-transition driven twice is a cycle by definition, and add a contract either way.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Found by the semantics re-review on 2026-09-08 (engine.py:1288).
 <<<
 RELATIONS:

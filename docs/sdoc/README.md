@@ -119,7 +119,7 @@ scribe show WORK-SHARED-UNDERSTANDING     # one node, relations resolved to titl
 scribe list --type WORK                   # filtered listing
 scribe check                              # every node, relation and File path
 scribe new MECHANISM --help               # the flags this type actually declares
-scribe set MECH-THING --notes @notes.md
+scribe set MECH-THING --comment @comment.md
 scribe relate MECH-THING --role Governed_By --target DEC-SOMETHING
 scribe semantics DECISION                 # the lifecycle its state field claims
 ```
@@ -131,8 +131,8 @@ or no-daemon validator.
 
 `set` **replaces** a field rather than appending to it: read the current value
 with `show`, then write old plus new. Every field flag takes `@FILE` to read the
-value from a file, which is how a multi-paragraph `STATEMENT` or `NOTES` gets in
-without a shell-quoting accident. Every writing verb — `new` (including every
+value from a file, which is how a multi-paragraph `STATEMENT` or `COMMENT` gets
+in without a shell-quoting accident. Every writing verb — `new` (including every
 type leaf), `set`, `relate`, `unrelate`, `move`, and `delete` — accepts
 `--dry-run`. It validates exactly like the real write, then prints a unified
 diff path by path. For `move`, it prints the rename it would perform. A move
@@ -371,12 +371,12 @@ placeholder fingerprints, which nobody has.
 
 ## Where this stands — 2026-08-29 (session 7: the render exists)
 
-**The semantic layer is rendered.** `SLICE-SEMANTIC-LAYER-RENDER`'s NOTES carry
-the artifact link, the page's shape, the measurements and the review that ran
-before hand-over. No decision was brought. The next step is the operator's: read
-the render, then ask for decisions as cards, one per turn. Do not re-run the
-render prompt below; it is done. The generator lives outside the repository
-(`MECH-RENDER-GENERATOR-OUTSIDE-REPO`, backlog).
+**The semantic layer is rendered.** `SLICE-SEMANTIC-LAYER-RENDER`'s COMMENT
+carries the artifact link, the page's shape, the measurements and the review
+that ran before hand-over. No decision was brought. The next step is the
+operator's: read the render, then ask for decisions as cards, one per turn. Do
+not re-run the render prompt below; it is done. The generator lives outside the
+repository (`MECH-RENDER-GENERATOR-OUTSIDE-REPO`, backlog).
 
 ## Where this stands — 2026-08-29 (end of session 6)
 

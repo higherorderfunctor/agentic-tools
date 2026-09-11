@@ -14,8 +14,8 @@ Every check the design system has today is a pure function of the JSON export. `
 RATIONALE: >>>
 `MECH-TESTS-AS-CONTRACT` makes a flow's declared outcome its contract and requires a test that runs in `nix flake check`. Without a synthetic repository, flows whose gates read git would have a silent exemption from that contract.
 <<<
-NOTES: >>>
-Cited by UID in `MECH-TESTS-AS-CONTRACT`'s NOTES — "Logged as MECH-FLOW-TEST-GIT-CHECKPOINTS rather than solved here" — which also carries the grep and its positive control.
+COMMENT: >>>
+Cited by UID in `MECH-TESTS-AS-CONTRACT`'s COMMENT — "Logged as MECH-FLOW-TEST-GIT-CHECKPOINTS rather than solved here" — which also carries the grep and its positive control.
 <<<
 RELATIONS:
 - TYPE: Parent

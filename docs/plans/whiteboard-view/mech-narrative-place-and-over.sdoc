@@ -18,7 +18,7 @@ grows --place, --over and the new widget words from the grammar. The
 fingerprint module's excluded fields gain PLACE, so placement never enters
 a contract; Over is a relation and was never in one.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Landed 2026-08-30. The exclusion is a constant in dev/scripts/sdoc_fp.py, which DEC-FP-FIELDS-CONFIGURABLE says should be an option; noted, not fixed here.
 <<<
 RELATIONS:

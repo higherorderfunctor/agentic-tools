@@ -338,7 +338,7 @@ def read_fp(uid: str) -> list[tuple[str, str]]:
 
 def write_fp(uid: str, entries: list[tuple[str, str]]) -> None:
     """Rewrite the PARENT_FP field: after RATIONALE if present, else after
-    STATEMENT; before NOTES and RELATIONS. Removed when empty."""
+    STATEMENT; before COMMENT and RELATIONS. Removed when empty."""
     p = path_of(uid)
     text = p.read_text()
     text = re.sub(r"^PARENT_FP: >>>\n.*?\n<<<\n", "", text, count=1, flags=re.S | re.M)

@@ -52,7 +52,7 @@ Corpus first, gate second is this repo's own practice from SLICE-FP-DETECTOR. A 
 
 The table belongs to the semantic layer rather than the grammar surface because that is where the operator can see it. Milestone three exists so the lifecycle becomes something to look at instead of guess at, and a target-type table hidden in a Python dict is prose again.
 <<<
-NOTES: >>>
+COMMENT: >>>
 MEASURED 2026-08-27, strictdoc 0.28.3 via the trial venv, against a byte-copy of the corpus in a scratch tree (139 nodes, identical to the live export). Every injection went into the same file at the same anchor and each ran against its own clean output directory.
 
 Silent: SLICE-GRAPH-CHECKS --Crosses--> DEC-SYSTEM-PURPOSE exits 0, and the edge is present in the export's RELATIONS. DEC-VIEWER-BEFORE-BULK --Superseded_By--> MECH-CYCLE-CHECK exits 0 with zero error lines.

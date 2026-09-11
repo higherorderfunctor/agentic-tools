@@ -27,7 +27,7 @@ The header names the failure it is trying to prevent, and the module performs
 the thing the header forbids. Either the rule is wrong and should be relaxed in
 writing, or the module should receive the flake's instantiation.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Surfaced while verifying milestone one. Contested during that review: the
 refutation is that Nix derivation identity makes the duplication invisible, and
 the counter is that invisibility is a property of the arguments currently

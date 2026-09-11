@@ -28,7 +28,7 @@ gate is work with a design question in it (a fixture carrying a deliberately
 unrepresentable pattern has to live somewhere and be kept current), not a
 correction to the node.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 in a scratch copy: one pattern replaced with an inline-group
 form gives exit 2 and the diagnostic; the unmodified copy gives exit 0. Both
 arms present, so a check would only need to pin the fixture.

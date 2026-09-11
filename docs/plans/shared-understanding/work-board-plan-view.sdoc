@@ -16,7 +16,7 @@ node's full card in the right pane like the Graph view
 WORK-PLAN-GRAMMAR-RESHAPE for its vocabulary: the kanban cut under the same
 tab, cluster-versus-detail marking, and rows that respect dependency order.
 <<<
-NOTES: >>>
+COMMENT: >>>
 First cut shipped 2026-09-01 (MECH-SDOC-BOARD-PLAN-TREE): collapsible tree
 grouped by directory, nested by Assumes, right-pane card. Still open from
 the original sketch and the plan-grammar reshape: the kanban cut, cluster

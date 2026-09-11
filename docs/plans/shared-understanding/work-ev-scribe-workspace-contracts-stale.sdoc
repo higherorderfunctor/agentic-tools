@@ -12,10 +12,10 @@ STATEMENT: >>>
 EV-SCRIBE-WORKSPACE-CONTRACTS still says seven contracts pass against an
 isolated copy of the 374-node canon. The suite is at 23 contracts over a
 494-node tracked-tree fixture after 0eeb5cfc and ea4f5d6a. Re-take the
-measurement and record it on the evidence node (a NOTES append; the original
+measurement and record it on the evidence node (a COMMENT append; the original
 observation stays as history).
 <<<
-NOTES: >>>
+COMMENT: >>>
 Found by the dry-run re-review on 2026-09-04.
 <<<
 RELATIONS:

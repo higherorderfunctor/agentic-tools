@@ -58,7 +58,7 @@ table rather than in the renderer keeps
 [LINK: REQ-VIEW-RENDERER-IS-CONTENT-BLIND]: the page knows that a tabs table
 exists, exactly as it knows a systems table exists, and knows none of its words.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's standing
 delegation, on their reading of the render: "the semantic layer is what I was
 expecting just with like more dynamic front end. the sum of all selected

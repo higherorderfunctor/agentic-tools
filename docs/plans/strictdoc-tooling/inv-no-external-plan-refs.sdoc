@@ -63,7 +63,7 @@ terms of what a plan node IS would have had nothing left to say after that
 narrowing. A rule phrased in terms of where a node lives keeps working, and
 keeps working if a retention class is renamed or a fourth one appears.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 over a full clean export, before the one-node-per-file
 carve: 139 nodes in 9 documents. The coordinates below were re-anchored onto the
 carved files, and the edges themselves are unchanged -- the carve moved no
@@ -119,7 +119,7 @@ Positive control for those zero counts: the same scanner that reported no
 inbound edges on the real graph flagged the injected arch-to-plan edge on the
 fourth run, and reported the two plan-to-plan violations on both runs.
 
-The previous NOTES said this needs design because it is unenforced and the
+The previous COMMENT said this needs design because it is unenforced and the
 graph may already violate it. Both facts are true and neither is a design gap:
 enforcement is MECH-PLAN-REFS-CHECK, and the two violations are recorded there.
 What actually needed settling was the scope -- which reference kinds count, and

@@ -59,7 +59,7 @@ moves an axis the payload had into the switches instead of computing a new one.
 It also makes documenting the next part of the repository one row in a table
 rather than a change to a script.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's standing
 delegation, on their reading of the render: "my intent was there are different
 semantic modules (core - cannon, whiteboard - the renderer, beads for future)

@@ -41,7 +41,7 @@ CLOSES_ON, EDGE; DEC-COMMENTARY-IS-THE-FIFTH-FAMILY is open, nothing is one
 yet) moves into the annotations file and either survives as one of its
 types or dissolves into them. Which of the two is undecided.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Verbatim on the open-ended class: "In the past I mentioned a class of nodes
 that may not persist to main. Below covers a subset of what might be
 possible based on semantic rules we come up with."

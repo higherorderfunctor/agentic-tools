@@ -30,7 +30,7 @@ and they are the model for the fix.
 Not scoped to this plan's subject. Recorded here because it was found here and
 there is no other parking lot; move it if the repo grows one.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed as issue #1266, self-contained, on 2026-08-25 -- the parking lot the
 rationale above asks for. That issue is the user-visible tracker; this node is
 the design-graph record of which slice found it. Close both together.

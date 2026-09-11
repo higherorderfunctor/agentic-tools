@@ -46,7 +46,7 @@ An edge also composes where both a file and a directory query did not. A file
 forces exactly one containment, since a node sits in one file; the query forces
 one more, since a node sits in one directory. An edge is additive.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled by the operator 2026-08-27, immediately after the carve, verbatim: "having
 the 99 is fine, but its the lynchpin node. every issue under it parents that.
 issues may parent other nodes that are related, but thats the idea, a web" and

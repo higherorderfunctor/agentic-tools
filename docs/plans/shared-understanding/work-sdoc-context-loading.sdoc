@@ -16,7 +16,7 @@ instructions), or a hook that injects nodes into a session at start or at a
 checkpoint. The open questions are which nodes qualify, how they are selected,
 and whether the projection is generated at build time or read live. Undecided.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The operator, verbatim: "and another sdoc for loading context from sdocs (e.g.,
 sdoc -> steering or some other system like hooks could be on the table)."
 <<<

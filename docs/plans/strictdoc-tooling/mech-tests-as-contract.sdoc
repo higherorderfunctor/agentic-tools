@@ -35,7 +35,7 @@ Declaring the expectation in the model rather than on disk is this repository's 
 
 The per-test positive control is INV-GUARDS-MUST-EXECUTE turned on the tests themselves. Every assertion in a refusal test has the form "this failed", and a broken harness fails everything identically.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Harness precedent: checks/strictdoc-grammar-negative-fixtures.nix. It builds a throwaway project per fixture outside the repository under TMPDIR, gives each export its own --output-dir, reads each fixture's expected layer out of fixtures/README.md rather than restating it, and carries two positive controls because every assertion in it is of the form "this failed". A flow-contract harness is that file with the fixture table replaced by the model's flow tests. The clean output directory is load-bearing rather than tidy: strictdoc export caches under its output dir, and a broken input exits 1 then 0 on re-run against a warm one.
 
 Corpus, measured 2026-08-27 over the JSON export: 139 nodes. Three File relations exist in the whole graph and all three name implementation files -- packages/semble/lib/withGrammars.nix twice and packages/semble/patches/extra-grammars.patch -- none a check. The requirement begins with declared flows; no flow existed when it was written, so the rule started against an empty legacy rather than making unrelated nodes fail, which is the corpus-first order MECH-RELATION-TARGET-TYPE-LINT records.

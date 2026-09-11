@@ -40,7 +40,7 @@ strictdoc virtual environment, and the remaining devenv Python tasks name their
 nixpkgs interpreter by absolute store path. No program in the tree execs a bare
 python3 off PATH.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The operator, verbatim: "we should log a sdoc like a decision or mechanism for
 adding deps (node, py, etc) is via nix. i would approve using like ux if its
 easier to manage some of that but still nix installed."

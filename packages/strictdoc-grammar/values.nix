@@ -84,7 +84,7 @@
   statement = required (str "STATEMENT");
   rationale = str "RATIONALE";
   parentFp = str "PARENT_FP";
-  notes = str "NOTES";
+  comment = str "COMMENT";
 
   # Roles. Every Parent role is a dependency: the node that carries it depends
   # on the target's wording, may fingerprint it in PARENT_FP, and is walked by
@@ -139,7 +139,7 @@ in [
       (required (str "RETIRES_ON"))
       statement
       rationale
-      notes
+      comment
     ];
     relations = [
       (rel.parent "Superseded_By" "Supersedes")
@@ -156,7 +156,7 @@ in [
       statement
       rationale
       parentFp
-      notes
+      comment
     ];
     relations = claimRelations;
   })
@@ -169,7 +169,7 @@ in [
       statement
       rationale
       parentFp
-      notes
+      comment
     ];
     relations = claimRelations;
   })
@@ -186,7 +186,7 @@ in [
       statement
       rationale
       parentFp
-      notes
+      comment
     ];
     relations = claimRelations;
   })
@@ -203,7 +203,7 @@ in [
       statement
       rationale
       parentFp
-      notes
+      comment
     ];
     relations = [
       governedBy
@@ -257,7 +257,7 @@ in [
       statement
       rationale
       parentFp
-      notes
+      comment
     ];
     relations = [
       cites
@@ -279,7 +279,7 @@ in [
       statement
       rationale
       parentFp
-      notes
+      comment
     ];
     relations = [
       governedBy
@@ -331,7 +331,7 @@ in [
       statement
       rationale
       parentFp
-      notes
+      comment
     ];
     relations = [
       remarksOn

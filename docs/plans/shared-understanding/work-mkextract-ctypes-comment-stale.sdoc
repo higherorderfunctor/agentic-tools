@@ -24,7 +24,7 @@ is roughly half wrong.
 The decision it defends may still be right for other reasons. Correct the
 justification, or record what the real delta is.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Surfaced while auditing whether adding pydantic to the scribe RPC layer would
 cost closure size. It would not: pydantic and click are both already resident
 in the interpreter every scribe program execs through, so the same evidence

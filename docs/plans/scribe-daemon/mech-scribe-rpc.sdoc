@@ -56,7 +56,7 @@ choice options that the JSON export flattens. The socket path is derived from
 the client's resolved root. StrictDoc's injected TEXT element is excluded by
 the same one filter that supplies sdoc_model's author-facing tag list.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Retained from the retired RPC-and-service delivery row on 2026-09-10: daemon
 hydration completes before the socket is bound
 (dev/scripts/scribe_daemon.py calls workspace.current() before build_server()).

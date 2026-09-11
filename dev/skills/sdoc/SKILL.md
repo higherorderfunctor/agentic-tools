@@ -79,7 +79,7 @@ grid.
 element tag, and a MECHANISM re-read as a REQUIREMENT keeps `MECH-`. Read the
 tag (`_NODE_TYPE` in the export), never the prefix. `scribe new` requires the
 current prefix on a NEW node; `scribe check` prints a `NOTE` per retyped node
-and never fails on one. A retype records itself in the node's NOTES.
+and never fails on one. A retype records itself in the node's COMMENT.
 
 `COMMENTARY` is new and NOTHING IN THE CORPUS IS ONE YET
 (`DEC-COMMENTARY-IS-THE-FIFTH-FAMILY`, open). It carries `STANDING` (open /
@@ -145,7 +145,7 @@ and prints the socket plus the command that starts one.
 scribe new MECHANISM --help          # the flags MECHANISM actually declares
 scribe new MECHANISM --uid MECH-THING --title "..." \
      --statement @statement.md --path docs/plans/<plan>/
-scribe set MECH-THING --notes @notes.md
+scribe set MECH-THING --comment @comment.md
 scribe relate MECH-THING --role Governed_By --target DEC-SOMETHING
 scribe relate EV-THING --role File --target devenv.nix \
      --element function --id 'tasks."strictdoc:bench"'
@@ -257,7 +257,7 @@ takes no `--output-dir`, writes `./output/` unconditionally, and rewrites
 7. **Commit as you go, unprompted.** One commit per unit of work, not one at the
    end and not only when asked — the branch is long-lived and gets restacked
    into pull requests, so commit boundaries are what make that restack legible.
-   Update the node in the same commit: record measured numbers in `NOTES` and
+   Update the node in the same commit: record measured numbers in `COMMENT` and
    file what a probe found as `EVIDENCE`.
 
 ## Gotchas that fail closed

@@ -29,7 +29,7 @@ writes into the sdoc" was already being written. Candidates: scribe, quill,
 sdocw. Scribe won on carrying "writes the record under another's authority",
 which matches identity coming from the environment rather than from the tool.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled by the operator on 2026-08-28. Rewritten IN PLACE on 2026-09-09 on the
 operator's ruling that a wrong accepted decision on this branch is corrected,
 not superseded, because the branch is not in main and supersession semantics

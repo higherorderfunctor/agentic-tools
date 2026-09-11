@@ -23,7 +23,7 @@ The ruled words live once, in the canon's own glossary above. The field names an
 - STATUS: A decision's state: open, accepted, rejected, superseded. Only a decision carries it.
 - AUTHORED_BY: Who wrote a node's statement: a four-rung ladder -- llm, llm-accepted, llm-adopted, human -- that only rises. The writer stamps llm; the other rungs are a human's acts.
 - RETIRES_ON: The condition under which a decision expires. Required, and prose.
-- contract: A node's fingerprinted fields — everything but RATIONALE, NOTES, PARENT_FP and RELATIONS.
+- contract: A node's fingerprinted fields — everything but RATIONALE, COMMENT, PARENT_FP and RELATIONS.
 - fingerprint / PARENT_FP: Seven hex characters hashed from a parent's contract, recorded on the child, one entry per line. 0000000 means never signed, and nothing has ever been signed.
 - dirty edge: A child whose recorded fingerprint no longer matches its parent's current contract, or whose parent is gone.
 - ripple: When a parent's contract changes, every child depending on it becomes dirty.

@@ -129,7 +129,7 @@ small. Nothing was measured at corpus scale except pySHACL. No candidate
 supplies a transaction primitive. Whether a rule library in a second language
 satisfies DEC-LAYER-STACK is a reading of that decision, not a measurement.
 <<<
-NOTES: >>>
+COMMENT: >>>
 This is a completed observation run by its own author, not independently
 re-taken. Each probe WAS
 re-run by a second agent inside the run; that is verification of the

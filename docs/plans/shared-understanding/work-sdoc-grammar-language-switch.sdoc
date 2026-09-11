@@ -14,7 +14,7 @@ given a field embedding another language
 (WORK-SDOC-EMBEDDED-LANGUAGE-FIELDS), it switches to that language's own
 grammar for the embedded span instead of parsing it as sdoc content.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "extend sdoc treesitter grammar to support
 switching lang grammar based on above"
 <<<

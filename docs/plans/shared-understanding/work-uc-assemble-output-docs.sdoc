@@ -15,7 +15,7 @@ across sdoc nodes. Filed as WORK rather than USE_CASE because turning it into
 a USE_CASE node is a spec conversion the operator makes at grooming, once it
 is settled enough to state as a covered path.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "assembling output docs from chunks (e.g.,
 md)."
 <<<

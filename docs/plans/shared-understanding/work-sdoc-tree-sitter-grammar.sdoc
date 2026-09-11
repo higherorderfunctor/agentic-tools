@@ -13,7 +13,7 @@ A dedicated tree-sitter grammar for the sdoc file format itself, derived from
 the sdoc .sgra grammar so the two stay in step rather than being maintained
 as two independent descriptions of the same format.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "sdoc grammars to custom tree-sitter grammar"
 
 A patched upstream grammar already exists at

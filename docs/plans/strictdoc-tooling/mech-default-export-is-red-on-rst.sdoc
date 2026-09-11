@@ -31,7 +31,7 @@ closing asterisk that ENDS a word, and a glob never supplies one. So a pair of
 globs on one line is not a matched pair; it is two unterminated openings.
 
 Three bare sites exist today, all still unfixed and all now one node per file:
-two in SLICE-SDOC-IN-SEMBLE, one in its STATEMENT and one in its NOTES (formerly
+two in SLICE-SDOC-IN-SEMBLE, one in its STATEMENT and one in its COMMENT (formerly
 01-tooling.sdoc:195 and :208), and the unquoted `checks/strictdoc-grammar-*.nix`
 inside MECH-GRAMMAR-GATES-ARE-WRITTEN-TWICE, which this milestone wrote -- all
 three confirmed to warn, by a session with no way to notice. The export aborts at the
@@ -49,7 +49,7 @@ Found by the landing step running the milestone's validation loop literally as
 worded -- "a clean export to a temp dir" -- rather than as the repository's own
 scripts spell it. The two differ, and only one of them is green.
 <<<
-NOTES: >>>
+COMMENT: >>>
 RULED by the operator 2026-08-26: tech debt against this plan, LOW priority, may
 sit unfixed for several milestones. Found during milestone one, which is where
 it should be referenced back to.
@@ -59,7 +59,7 @@ MECH-HTML-RENDER-MUST-PASS: whatever the fix, either repair the prose or make it
 error loudly, but the operator does not want this to become a blocker on work
 that has nothing to do with HTML.
 
-Retyped from MECHANISM to EVIDENCE on 2026-08-30 by the mechanism mood test under DEC-NODE-FAMILIES, with medium confidence after a second opinion: it records what was observed once, not how something always behaves. Noted for a later split: 'an asterisk that opens emphasis needs a closing asterisk that ENDS a word, and a glob never supplies one' (docutils behaviour, universal) and 'Every documented loop in this repository passes --formats=json ... so the RST writer never runs and the breakage is invisible' (repo mechanism); the NOTES' operator ruling (tech debt, LOW priority) is a decision. The UID keeps its prefix: DEC-UID-OUTLIVES-TYPE.
+Retyped from MECHANISM to EVIDENCE on 2026-08-30 by the mechanism mood test under DEC-NODE-FAMILIES, with medium confidence after a second opinion: it records what was observed once, not how something always behaves. Noted for a later split: 'an asterisk that opens emphasis needs a closing asterisk that ENDS a word, and a glob never supplies one' (docutils behaviour, universal) and 'Every documented loop in this repository passes --formats=json ... so the RST writer never runs and the breakage is invisible' (repo mechanism); the COMMENT' operator ruling (tech debt, LOW priority) is a decision. The UID keeps its prefix: DEC-UID-OUTLIVES-TYPE.
 <<<
 RELATIONS:
 - TYPE: Parent

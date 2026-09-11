@@ -21,7 +21,7 @@ edge has to cross a plan boundary to reach it. This plan carries one ungroomed
 item today, which does not make the register optional: an item with nothing to
 attach to is exactly the case the edge exists to prevent.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Created 2026-08-27 alongside the equivalent register in the strictdoc-tooling
 plan. The reasoning behind the shape is recorded there and is deliberately not
 cited across the plan boundary, since INV-NO-EXTERNAL-PLAN-REFS is what keeps a

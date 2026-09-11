@@ -28,7 +28,7 @@ Noticed because the warning path is the one that runs in CI, where the wrapper
 is the whole environment. A CI regeneration would silently produce a file that
 the repository's own formatter immediately changes.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The FILE moved 2026-08-27 and the finding did not. The wrapper is now
 packages/strictdoc-grammar/lib/mkExtract.nix, the overlay having been deleted
 outright (MECH-GRAMMAR-EXTRACT-SOURCE-BOUNDARY); alejandra is still deliberately

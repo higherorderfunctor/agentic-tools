@@ -49,7 +49,7 @@ alike; server.py reads that variable to back the two /assets/vendor/elkjs/
 routes and refuses to start without it. The route paths are unchanged, because
 layout.js resolves them relative to its own URL.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The ELK.js layout replaced the reference implementation's custom SCC,
 barycentric, and orthogonal router on 2026-09-02. elkjs 0.12.0 is EPL-2.0 OR
 GPL-3.0-or-later. It was vendored in the tree until 2026-09-08, when its Nix

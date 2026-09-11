@@ -98,7 +98,7 @@ DEC-EXECUTABLE-RULES-ROADMAP:0000000
 DEC-FINGERPRINT-IN-NODE:0000000
 DEC-FP-ACCEPT-AUTHORITY:0000000
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured on this branch at bc646f12, 2026-08-27. The graph holds 139 nodes:
 21 DECISION, 95 MECHANISM, 11 SLICE, 8 SPIKE, 4 INVARIANT. Twenty-four nodes
 carry a PARENT_FP field, 31 entries between them, and none of the 31 is
@@ -145,12 +145,12 @@ LEFT TO THE OPERATOR, deliberately. This milestone settles the plumbing;
 each of these is a rule about how this instance works and milestone five is
 where they get written.
 
-- Which fields are contract-bearing. The current selection excludes RATIONALE, NOTES and PARENT_FP (dev/scripts/sdoc_fp.py:32) and its own comment calls that a prototype. DEC-FP-FIELDS-CONFIGURABLE and MECH-FP-FIELD-TUNING own the answer; the slice only moves the selection into the option surface.
+- Which fields are contract-bearing. The current selection excludes RATIONALE, COMMENT and PARENT_FP (dev/scripts/sdoc_fp.py:32) and its own comment calls that a prototype. DEC-FP-FIELDS-CONFIGURABLE and MECH-FP-FIELD-TUNING own the answer; the slice only moves the selection into the option surface.
 
 - Which STATUS transitions are legal and who may make them. The slice fixes
   that STATUS is a declared machine, not what it contains.
 
-- Who may sign a fingerprint, and whether the deciding field is the parent's AUTHORED_BY, the child's, or either end being human. DEC-FP-ACCEPT-AUTHORITY is open and its own NOTES say both readings are defensible and want a real drift event.
+- Who may sign a fingerprint, and whether the deciding field is the parent's AUTHORED_BY, the child's, or either end being human. DEC-FP-ACCEPT-AUTHORITY is open and its own COMMENT say both readings are defensible and want a real drift event.
 
 - Whether the ripple propagates across every relation role or only some. The slice declares it as a relation contract; which relations carry staleness is the rule.
 

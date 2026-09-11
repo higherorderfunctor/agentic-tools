@@ -16,7 +16,7 @@ RATIONALE: >>>
 Validation currently runs only when someone remembers to run it. The export is
 a few seconds on a corpus this size.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The check must use a clean output directory. Incremental generation produces a
 false green: the same broken input exits 1, then 0 on re-run against a warm
 output directory.

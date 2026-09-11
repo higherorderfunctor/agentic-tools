@@ -18,7 +18,7 @@ with no trigger. A concrete child of the lifecycle redesign tracked in
 WORK-GRAMMAR-TAB-LIFECYCLE-VIEW, and a natural consumer of the model shape
 recorded by [LINK: DEC-SEMANTICS-MODEL-IS-DATA].
 <<<
-NOTES: >>>
+COMMENT: >>>
 first cut landed 46cd3cf; events labelled; external events beyond the machine triggers still open.
 <<<
 RELATIONS:

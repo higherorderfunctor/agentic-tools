@@ -33,7 +33,7 @@ AND carry Governed_By, Assumes or Crosses to whatever it actually relates to,
 which is the web the graph is for. A file forced one containment and a directory
 query forces one more.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Created 2026-08-27 on the operator's instruction, after the carve: "having the
 99 is fine, but its the lynchpin node. every issue under it parents that. issues
 may parent other nodes that are related, but thats the idea, a web."

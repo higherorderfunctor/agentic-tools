@@ -23,7 +23,7 @@ highlighting, and extracting inner sdocs found in code comments -- are filed
 as their own WORK-UC-* children rather than folded into the build items, since
 the operator raised them as open uses to weigh, not requirements.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "two more sdocs from my drive home. - sdoc
 grammars to custom tree-sitter grammar - allow fields to contain other
 languages embedded, maybe with another field for the language. - extend sdoc

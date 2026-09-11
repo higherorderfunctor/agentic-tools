@@ -29,10 +29,10 @@ The enumeration is worth settling now even though the handling stays deferred, b
 
 The handling still waits, and that part of the original deferral holds. What is settled here is which operations are hazards, which are already detected by the checker, and which node owns each one. That is routing, not policy.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 in the strictdoc-trial worktree unless stated otherwise.
 
-The fingerprint is a function of file content only. contract_hash hashes the JSON export's node fields, and PARENT_FP is in EXCLUDED_FIELDS beside RATIONALE and NOTES (dev/scripts/sdoc_fp.py:32). That is simultaneously why squash is safe for the hash and why a rewritten PARENT_FP block is invisible to the checker.
+The fingerprint is a function of file content only. contract_hash hashes the JSON export's node fields, and PARENT_FP is in EXCLUDED_FIELDS beside RATIONALE and COMMENT (dev/scripts/sdoc_fp.py:32). That is simultaneously why squash is safe for the hash and why a rewritten PARENT_FP block is invisible to the checker.
 
 rerere.enabled and rerere.autoupdate are both true in file:/home/caubut/.config/git/config -- global, so they apply in every worktree of every clone -- with 35 resolutions already cached in the shared rr-cache. rebase.updateRefs is true there too. 24 worktrees share one common git dir, git-branchless is initialized (.git/branchless exists) and git-absorb is on PATH, so the absorb-routing hazard is a live path rather than a hypothetical.
 
@@ -46,7 +46,7 @@ Not measured: whether rerere's conflict-hash keying makes cross-node replay like
 
 MECH-FP-MAIN-LINEAGE should stay a separate node. It specifies two checks; this one enumerates and routes, and the consumers differ -- SLICE-RESTACK-TO-PRS and MECH-FP-PREMERGE-GC read the enumeration, SLICE-INSTANCE-SEMANTICS-MIGRATION crosses the checks. Merging would give one node that both analyses and specifies. The condition under which merging becomes right is that node's own open question: if merge-time-only signing subsumes both of its checks, it collapses, and its residue is this node's first paragraph.
 
-Correction to what this node used to say. "Costs diagnostics rather than correctness" is right about the hash and understates the attribution loss. DEC-FINGERPRINT-IN-NODE's rationale rests on acceptance being "a reviewable git diff, attributable to a commit"; the commit carrying a signature does not survive squash, restack or absorb. That does not contradict the decision, it fixes the granularity. The earlier NOTES also filed the auto-re-accept question as wanting "a real merge to look at"; it is not a measurement question at all, it is signing authority, and DEC-FP-ACCEPT-AUTHORITY already owns it.
+Correction to what this node used to say. "Costs diagnostics rather than correctness" is right about the hash and understates the attribution loss. DEC-FINGERPRINT-IN-NODE's rationale rests on acceptance being "a reviewable git diff, attributable to a commit"; the commit carrying a signature does not survive squash, restack or absorb. That does not contradict the decision, it fixes the granularity. The earlier COMMENT also filed the auto-re-accept question as wanting "a real merge to look at"; it is not a measurement question at all, it is signing authority, and DEC-FP-ACCEPT-AUTHORITY already owns it.
 
 LEFT TO THE OPERATOR, deliberately. This milestone settles the plumbing;
 each of these is a rule about how this instance works and milestone five is
@@ -56,7 +56,7 @@ where they get written.
 
 - Whether a drifted-on-rebase report blocks the operation or only warns. The mechanism that detects it exists; the severity is policy.
 
-- Whether acceptance is permitted only as the last step before merge. MECH-FP-MAIN-LINEAGE's NOTES treats this as the discipline that might subsume its two checks; it is a rule about when a signature may be turned, so it is the operator's, and whether the checks survive it follows from the answer rather than the other way round.
+- Whether acceptance is permitted only as the last step before merge. MECH-FP-MAIN-LINEAGE's COMMENT treats this as the discipline that might subsume its two checks; it is a rule about when a signature may be turned, so it is the operator's, and whether the checks survive it follows from the answer rather than the other way round.
 
 - Who may re-sign after a conflict resolution, given that the resolver is often the same agent that authored one side. Named but not answered.
 

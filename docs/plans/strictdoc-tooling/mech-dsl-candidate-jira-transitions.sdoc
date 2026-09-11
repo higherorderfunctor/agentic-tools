@@ -48,7 +48,7 @@ transitions.accept -> one PRE hook on scribe.change.set for DECISION.STATUS, pyt
 relations.X.ripple -> POST hook on scribe.change.set of onFields (re-stamps neighbours' stored hash to stale) plus a PRE hook on the re-stamp field checking actor.class in clearedBy.
 gates.merge -> the `scribe check --gate merge` command, also wired as a PRE hook on git.push.
 <<<
-NOTES: >>>
+COMMENT: >>>
 STRENGTHS.
 - Reads like the operator's own sentence: who may, what must hold, what it says when it fails.
 - Nix checks the lifecycle at eval: from/to values in the grammar enum, every state reachable, initial and terminal present, no two transitions on one (from, to).

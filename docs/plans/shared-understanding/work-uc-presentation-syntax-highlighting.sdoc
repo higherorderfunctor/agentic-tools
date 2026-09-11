@@ -14,7 +14,7 @@ which the embedded-language grammar work could enable. Filed as WORK rather
 than USE_CASE for the same reason as its siblings -- a USE_CASE node is a
 spec conversion the operator makes at grooming, once settled.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "presentation nodes with like syntax
 highlighting"
 <<<

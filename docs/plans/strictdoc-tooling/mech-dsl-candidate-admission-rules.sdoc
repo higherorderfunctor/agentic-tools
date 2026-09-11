@@ -50,7 +50,7 @@ Each rule -> one hook per key in actions: deny -> PRE handler (stop), warn/audit
 match -> the hook's filter (node type, field, to) evaluated by the generic evaluator before when.
 ripple and actors -> as in the other candidates; there is nothing else to compile.
 <<<
-NOTES: >>>
+COMMENT: >>>
 STRENGTHS.
 - One construct, and each rule is literally one hook; the DSL-to-L2 mapping is a table, not a compiler.
 - Site tiering the operator asked for (dirty allowed, warn at commit, deny at merge) is written on the rule itself, in the runtime's own words.

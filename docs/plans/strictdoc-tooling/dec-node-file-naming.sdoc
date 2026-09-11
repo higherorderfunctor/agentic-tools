@@ -46,7 +46,7 @@ reintroduce, one level up, the grouping the numbered documents used to carry: a
 containment decision the graph does not address and edges do not follow. The UID
 prefix already sorts a listing by node type.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Written open, not accepted, deliberately. The operator reserved three questions
 for themselves in docs/sdoc/README.md -- the naming convention, the fate of the
 numbered-document convention, and what a per-plan backlog becomes -- and the

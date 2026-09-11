@@ -22,7 +22,7 @@ paraphrased. This is a NARRATIVE by the grid, filed as a MECHANISM because the
 grammar has no NARRATIVE yet. Re-cut it rather than edit it: it is a snapshot.
 
 NODE STRUCT
-- grammar = values.nix -> generated .sgra; DECISION|MECHANISM|SLICE|INVARIANT|SPIKE; all: UID, TITLE, AUTHORED_BY: llm|human, STATEMENT; RATIONALE, NOTES optional; field order enforced [WORKS]
+- grammar = values.nix -> generated .sgra; DECISION|MECHANISM|SLICE|INVARIANT|SPIKE; all: UID, TITLE, AUTHORED_BY: llm|human, STATEMENT; RATIONALE, COMMENT optional; field order enforced [WORKS]
 - DECISION (41): +STATUS: open|accepted|rejected|superseded, +RETIRES_ON; no PARENT_FP; rels Superseded_By, Backlogged_In [WORKS]
 - MECHANISM (129): +PARENT_FP?; rels Governed_By|Guarantees|Serialized_By|Proven_By|Assumes|File|Backlogged_In; grid cell descriptive x universal [WORKS]
 - MECHANISM per-node mood test ("can it be violated?") over 129 nodes: unwritten; the two check-backed Guarantees sources are normative, not MECHANISM [GAP]
@@ -35,7 +35,7 @@ NODE STRUCT
 - AUTHORED_BY ladder llm < llm-accepted < llm-adopted < human, rises only; governs undo by the writer's class: FREE | SOFT (report the undo) | HARD (stop, ask) [WORKS]
 - identity:human | identity:llm = the class read off the ssh key that makes a write; ladder spelling: values.nix has llm|human, scribe stamps llm, no raise move [GAP]
 - identity:llm rewrote 10 of 31 identity:human STATEMENTs, key unchanged; hash-into-key | drop | forbid unpicked; the ladder forecloses drop [UNADDRESSED]
-- PARENT_FP: entries UID:hash7 (fingerprint = 7 hex of the parent's contract fields = all but RATIONALE|NOTES|PARENT_FP|RELATIONS); 0000000 = unsigned; 31 live, all 0000000 [UNADDRESSED]
+- PARENT_FP: entries UID:hash7 (fingerprint = 7 hex of the parent's contract fields = all but RATIONALE|COMMENT|PARENT_FP|RELATIONS); 0000000 = unsigned; 31 live, all 0000000 [UNADDRESSED]
 - contract-field list and owner-only list (PARENT_FP, AUTHORED_BY) are Python lists inside scribe [FALLS OUT: DEC-LAYER-STACK, L3 (semantic-layer) data; DEC-FP-FIELDS-CONFIGURABLE]
 - RETIRES_ON (DECISION, SPIKE): prose, time-based, so unevaluable at a joint (a place logic can attach); SPIKE's copy homeless under the pipeline reading [UNADDRESSED]
 - backlog register (one MECHANISM node per plan; ungroomed items point at it; holds no list) asserts nothing, so the grid gives it no cell [UNADDRESSED]
@@ -152,7 +152,7 @@ PLANS IN REFS
 
 MULTI-STEP WORK
 - SLICE = WORK declaring Crosses; slice-ness derived (crosses > 1 layer); slice says BUILD THIS and dies, use case says THIS PATH MUST WORK and outlives it [WORKS]
-- completed work may keep proof in NOTES; no rule moves it to EVIDENCE before collection [GAP]
+- completed work may keep proof in COMMENT; no rule moves it to EVIDENCE before collection [GAP]
 - Proven_By from durable nodes into SPIKE (12): the spike's work half dies -> dangling, fatal; one UID for both halves; which part lands it [GAP]
 - beads readers/writers under identity: private to the llm key, or to the human it acts for? [GAP]
 - milestones 3-5 (SLICE-BEHAVIOUR-MODEL, SLICE-CHECKPOINT-WIRING, SLICE-INSTANCE-SEMANTICS-MIGRATION), gate placement by what a gate "sees" [FALLS OUT: DEC-LAYER-STACK; MECH-HOOK-MIDDLEWARE-INTERFACE]
@@ -184,10 +184,10 @@ TOP GAPS
 - Identity has no carrier: the L2 actor slot, the key->class table and its guard are unbuilt and unowned, so every authority rule (sign, flip AUTHORED_BY, accept a DECISION, groom, delete) has nothing to read; ~10 relayed rulings and the accept flow already write human authority under an llm key.
 - The grammar cannot spell the ruled vocabulary: REQUIREMENT|USE CASE|EVIDENCE|WORK|NARRATIVE|PLAN absent, SLICE|INVARIANT|SPIKE dissolved, UID prefixes carry type so every retype re-mints UIDs; the migration is uncosted, has no WORK node, and is gated on DEC-PLAN-LIFECYCLE-OPEN, which retires only after a plan finishes under a beads that does not run.
 - The merge boundary is not a joint: nix flake check is the only unbypassable gate and appears in neither joint list, git.merge|rewrite are post-only, so every merge-time rule (fp-check on the merge ref, plan refs, flip detection, per-joint severity) has nowhere to attach.
-- Plan membership and collection contradict: retention is keyed on directory while DEC-ONE-GRAMMAR says membership is an edge that 112 groomed nodes lack; WORK 'dies with its plan' yet 6 SLICE hold their proof in NOTES and 12 Proven_By edges point into SPIKE whose work half would die, so collecting a plan today either breaks the export or deletes evidence.
+- Plan membership and collection contradict: retention is keyed on directory while DEC-ONE-GRAMMAR says membership is an edge that 112 groomed nodes lack; WORK 'dies with its plan' yet 6 SLICE hold their proof in COMMENT and 12 Proven_By edges point into SPIKE whose work half would die, so collecting a plan today either breaks the export or deletes evidence.
 - Semantics still live in tools with no owner: fp-check ripple, fp-accept rules, MECH-PLAN-REFS-CHECK and the layout rules are all L3 rules in Python (MECH-MILESTONE-TWO-SEMANTICS-MISPLACED pending, no WORK node), and DEC-DEFER-LAYER leaves the lane rule -- the one thing DEC-SLICE-DECOMPOSES-TO-WORK gained -- with no LAYER input to check against.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Requested by the operator on 2026-08-29 to reason about the destination from working memory after days at the lower layers. The five top gaps are the last section. A condensed reading was presented in conversation; this node holds the full sheet.
 
 Retyped from MECHANISM to NARRATIVE on 2026-08-30 under DEC-NODE-FAMILIES: this node said of itself that it was a narrative filed as a mechanism for lack of the type. Its Governed_By edges became Cites. The UID keeps its prefix: DEC-UID-OUTLIVES-TYPE.

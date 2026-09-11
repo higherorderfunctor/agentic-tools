@@ -17,7 +17,7 @@ rendering at 48 nodes. The app offers no editor, mutation endpoint or
 write-back path: search, filters, selection, pan, zoom, table queries and
 inspection are reading actions only.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The bounded-neighborhood reference implementation superseded the no-filter
 and whole-canon Graph clauses on 2026-09-02 when the Graph neighborhood delivery landed. Plan and Perspective remain complete-canon
 lenses; this requirement bounds SVG rendering, not the shared payload.

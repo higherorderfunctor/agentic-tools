@@ -29,7 +29,7 @@ Partial handover makes the distinction unavoidable: send part of a plan to the
 engine, learn something while building it, and the plan must be correctable
 while the handed-over scope stays frozen.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Supersedes the earlier framing in MECH-PLAN-BEADS-SNAPSHOT, which said ingest
 freezes the plan outright. That would have caused friction at the first partial
 handover.

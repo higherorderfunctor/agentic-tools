@@ -27,7 +27,7 @@ six-and-three split against the release in the sidecar rather than trusting
 this node -- it was measured against 0.27.1 and the dependency list moved in
 0.28.
 <<<
-NOTES: >>>
+COMMENT: >>>
 CHANGED SHAPE 2026-08-27, by MECH-STRICTDOC-UPSTREAM-FLAKE, and there is no
 sidecar to verify against any more. The measurement was taken against nixpkgs'
 strictdoc expression, and this repository no longer builds from it: the package
@@ -38,7 +38,7 @@ split describes a derivation nothing here evaluates.
 If closure size is still worth chasing it is now a question for upstream's own
 flake, which puts it outside this repository and probably outside this plan.
 
-Retyped from MECHANISM to EVIDENCE on 2026-08-30 by the mechanism mood test under DEC-NODE-FAMILIES, with medium confidence after a second opinion: it records what was observed once, not how something always behaves. Noted for a later split: The proposal half ('Removing the three is a dependencies filter in overlays/dev-tools/strictdoc.nix'; deliberately not done in SLICE-STRICTDOC-OVERLAY) is work, declared dead by NOTES after MECH-STRICTDOC-UPSTREAM-FLAKE; splitting would leave the six-and-three measurement as EVIDENCE and retire the proposal. The UID keeps its prefix: DEC-UID-OUTLIVES-TYPE.
+Retyped from MECHANISM to EVIDENCE on 2026-08-30 by the mechanism mood test under DEC-NODE-FAMILIES, with medium confidence after a second opinion: it records what was observed once, not how something always behaves. Noted for a later split: The proposal half ('Removing the three is a dependencies filter in overlays/dev-tools/strictdoc.nix'; deliberately not done in SLICE-STRICTDOC-OVERLAY) is work, declared dead by COMMENT after MECH-STRICTDOC-UPSTREAM-FLAKE; splitting would leave the six-and-three measurement as EVIDENCE and retire the proposal. The UID keeps its prefix: DEC-UID-OUTLIVES-TYPE.
 <<<
 RELATIONS:
 - TYPE: Parent

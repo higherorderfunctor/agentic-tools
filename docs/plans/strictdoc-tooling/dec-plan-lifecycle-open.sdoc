@@ -40,7 +40,7 @@ sharp opinion, and the observation that would settle it does not exist yet. It
 is the kind of decision that gets made badly if forced early and cheaply if
 left until the evidence arrives.
 <<<
-NOTES: >>>
+COMMENT: >>>
 OPERATOR LEAN, 2026-08-27, recorded but NOT closing this decision: drop garbage
 collection, use supersession, and make collection a separate feature after
 milestone five. "feels nice and what I want but its bloating scope complexity

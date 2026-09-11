@@ -17,7 +17,7 @@ eventually live in the canon as sdoc nodes with the fragment generated from
 them. Doing that needs the projection path in WORK-SDOC-CONTEXT-LOADING, so
 this item waits on it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The operator, verbatim: "we can bake Peer Communication.md into this repo ...
 can use fragment system so it fans to all ecosystems, but log an sdoc to
 eventually convert to sdoc."

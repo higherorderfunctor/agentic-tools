@@ -28,7 +28,7 @@ Raised when a lower-level emitter was about to be named faithful.emit. The name
 was self-documenting only to someone who had read the three-layer design, which
 is exactly the wrong audience test for a published interface.
 <<<
-NOTES: >>>
+COMMENT: >>>
 PARTLY CLOSED 2026-08-27, by the review round on the decomposition and the emit
 split. `lib/default.nix` was still re-exporting `faithful`, so the barrel really
 did publish the attribute path this node rules out; it now wires the layer as a
@@ -43,7 +43,7 @@ side of the line this node puts it on. Whether the FILE should be renamed too,
 and whether this belongs in a repository issue rather than here, are the
 operator's.
 
-Retyped from MECHANISM to REQUIREMENT on 2026-08-30 by the mechanism mood test under DEC-NODE-FAMILIES, with high confidence after a second opinion: it can be violated: a counterexample would be fixed in the world, not in this node. Noted for a later split: The first paragraph is a glossary definition of 'faithful' as a contributor-side methodology term (descriptive); the NOTES are a dated status record (partly closed 2026-08-27 when lib/default.nix stopped re-exporting `faithful`; the file rename is still open) and a register note ('The operator may move this to a repository issue'). The UID keeps its prefix: DEC-UID-OUTLIVES-TYPE.
+Retyped from MECHANISM to REQUIREMENT on 2026-08-30 by the mechanism mood test under DEC-NODE-FAMILIES, with high confidence after a second opinion: it can be violated: a counterexample would be fixed in the world, not in this node. Noted for a later split: The first paragraph is a glossary definition of 'faithful' as a contributor-side methodology term (descriptive); the COMMENT are a dated status record (partly closed 2026-08-27 when lib/default.nix stopped re-exporting `faithful`; the file rename is still open) and a register note ('The operator may move this to a repository issue'). The UID keeps its prefix: DEC-UID-OUTLIVES-TYPE.
 <<<
 RELATIONS:
 - TYPE: Parent

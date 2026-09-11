@@ -25,7 +25,7 @@ added to the grammar is found by sdoc_fp and can be missed by the other two.
 MECH-SIGNATURE-REVOCATION also demonstrates why the parser delimiter must have
 one owner.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 against a clean export of 144 nodes. The revocation
 divergence was confirmed by running both parser forms over the exact string
 MECH-SIGNATURE-REVOCATION specifies.

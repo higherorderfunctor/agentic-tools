@@ -49,7 +49,7 @@ INV-GUARDS-MUST-EXECUTE asks for. Ordering migration last keeps the instance's
 open decisions -- who signs and agent identity -- from
 blocking the plumbing.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Accepted by the operator on 2026-08-25 with one expectation stated: design
 happens inside each step and may reshape that step. The plan was deliberately
 not designed in full up front, to move faster through this part; a step's

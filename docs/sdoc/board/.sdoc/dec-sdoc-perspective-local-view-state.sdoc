@@ -20,7 +20,7 @@ Perspective already serializes its complete view configuration without the
 data. Using that contract preserves a useful reload experience without
 inventing an application state model.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ported 2026-09-01 from the codex spike branch; "one per named table" is the
 merge's only extension, following the second table.
 <<<

@@ -44,7 +44,7 @@ the latter views reporting 48 of 60 and 48 of 206 nearest nodes under the cap.
 The focal hash remained stable and the page reported no runtime, console, or
 network errors.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Taken 2026-09-04 on the reference branch feat/work-graph-neighborhood-reference,
 before the Grammars tab, the lifecycle widget and the Nix-delivered elkjs
 existed on this tree; ported here on 2026-09-08 as commits adf8e8d1..5ee1cc63

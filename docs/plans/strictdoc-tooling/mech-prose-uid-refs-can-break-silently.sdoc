@@ -29,7 +29,7 @@ reference nothing validates. The failure is silent in both directions: the
 citing file loses the pointer, and the cited node loses an inbound mention it
 never knew it had.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Related but distinct from MECH-FILE-RELATION-EXISTENCE, which is about relation
 VALUEs naming paths that do not exist. This is about prose, where there is no
 relation at all. Both are cases of the parser proving structure and nothing

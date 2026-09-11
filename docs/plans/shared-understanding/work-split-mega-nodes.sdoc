@@ -10,7 +10,7 @@ TITLE: Three work items grew into several topics each
 AUTHORED_BY: llm
 STATEMENT: >>>
 WORK-ANNOTATION-NODES, WORK-CODE-LINKAGE-EXTRACTORS
-each grew by appending verbatim paragraphs to NOTES across several sessions, so
+each grew by appending verbatim paragraphs to COMMENT across several sessions, so
 each now covers several topics at once. That is the anti-pattern
 WORK-ONE-NODE-ONE-TOPIC rules against: node count is supposed to carry
 complexity. Cheapest fix: split each into one node per topic, keeping the

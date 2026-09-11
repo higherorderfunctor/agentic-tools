@@ -19,7 +19,7 @@ from pathlib import Path
 PLACEHOLDER = "0000000"
 HASH_LEN = 7
 
-# MECH-FP-CHECK's STATEMENT says only "Excludes RATIONALE and NOTES". PARENT_FP
+# MECH-FP-CHECK's STATEMENT says only "Excludes RATIONALE and COMMENT". PARENT_FP
 # is excluded too: it records what a node has signed onto ITS parents, not
 # what it promises its own dependents, so accepting an unrelated fingerprint
 # must not re-suspect this node's dependents.
@@ -29,7 +29,7 @@ HASH_LEN = 7
 # which is deliberately left for after the Nix option surface in
 # DEC-FP-FIELDS-CONFIGURABLE exists. Do not tune this without reading that
 # node first.
-EXCLUDED_FIELDS = {"RATIONALE", "NOTES", "PARENT_FP", "PLACE"}
+EXCLUDED_FIELDS = {"COMMENT", "PARENT_FP", "PLACE", "RATIONALE"}
 
 # Export-scaffolding keys emitted per node (including this repo's daemon-only
 # path addition) that are not sdoc fields at all.

@@ -36,7 +36,7 @@ the agent can substitute, and one machine under one user offers no principal
 boundary. Bubblewrap-enforced access is what would give this a boundary that
 node found missing. The work here is to assess these options and select.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "assess and select options for auto setting
 id, non exhaustive ideas (this is all one node)
 - daemon, scribe, llm hooks, jail.nix (bubblewrap) to enforce key access, not

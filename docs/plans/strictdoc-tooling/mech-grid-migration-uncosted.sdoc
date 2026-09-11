@@ -55,7 +55,7 @@ state and is not a smaller step.
 RATIONALE: >>>
 The grid was accepted as a description of the target vocabulary and reads as though it were a grammar change. It is not. Recording the distance now keeps a later session from discovering mid-edit that a retype moves every citation, and keeps the three unaddressed types from being decided by whoever happens to touch them first.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Raised 2026-08-28, in the same session that wrote DEC-NODE-TYPE-GRID, on the
 operator asking whether the rulings had been applied. They had not, and the
 question surfaced that the grid is silent on SLICE, INVARIANT and SPIKE. The

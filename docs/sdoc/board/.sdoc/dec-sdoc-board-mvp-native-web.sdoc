@@ -25,7 +25,7 @@ and expects to reshape the result. A zero-build canvas reaches that probe
 directly while keeping the durable boundary: canon source, owned snapshot,
 layout, renderer.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ported 2026-09-01 from the codex spike branch, narrowed from "the MVP browser"
 to the Board canvas when the Perspective view joined the app.
 

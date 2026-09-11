@@ -32,7 +32,7 @@ to node TITLE and found zero exceptions. The check starts
 green, so its first red is a real regression rather than a backlog of existing
 violations.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed 2026-08-27 by the carve session. Not built in that session because adding
 a flake check is implementation work and the carve was a migration.
 

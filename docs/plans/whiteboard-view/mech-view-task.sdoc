@@ -23,7 +23,7 @@ task, never edited.
 RATIONALE: >>>
 The task is the only sanctioned way to regenerate (the repo's generate:* convention); a page nobody can regenerate is the one-off render again.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Built 2026-08-30 in dev/tasks/generate.nix, beside the generate:* tasks.
 The statement first read "-- --root UID"; measured that day, devenv tasks
 run reads a "-- --root X" as a task named "--root" and refuses it, so the

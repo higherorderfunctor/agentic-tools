@@ -43,7 +43,7 @@ shortened pan hint and visible relation summary share the row below it. The
 workspace derives from the taller mobile topbar so every global and graph
 control remains in the viewport and hit-testable.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Added by the Graph neighborhood reference implementation on 2026-09-02 after comparing the beadboard control-strip and inset-legend pattern.
 <<<
 RELATIONS:

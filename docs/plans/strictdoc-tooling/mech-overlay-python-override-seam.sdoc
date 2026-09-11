@@ -34,7 +34,7 @@ overlays/README.md now carries the seam in its source-pattern bullets, which
 is where an overlay author looks; the dev fragment is where an AGENT looks,
 and it is the one still silent.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed as issue #1267, self-contained, on 2026-08-25. That issue is the
 user-visible tracker; this node is the design-graph record of which slice found
 it. Close both together.

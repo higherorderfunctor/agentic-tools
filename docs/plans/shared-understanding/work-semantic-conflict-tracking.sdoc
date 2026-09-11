@@ -15,7 +15,7 @@ the semantic layer. Wanted: a way to record a semantic rule when it is
 stated (a temp semantic node?) so conflicts surface instead of living in
 session memory.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Verbatim, since the shape is undecided: "temp semantic node? until I can
 craft a DSL and you're my semantic layer until then. i can't track semantics
 right now, know when conflicts come up."

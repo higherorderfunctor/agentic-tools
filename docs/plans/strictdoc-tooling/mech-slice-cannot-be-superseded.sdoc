@@ -35,14 +35,14 @@ Kept as a ledger rather than closed because a count is the only thing that
 distinguishes a real gap from a felt one, and this node was filed on a case that
 turned out not to be an instance.
 <<<
-NOTES: >>>
+COMMENT: >>>
 RECLASSIFIED 2026-08-27. This node was filed after SLICE-STRICTDOC-OVERLAY's
 statement was rewritten in place, on the reading that the rewrite lost a
 transition. It did not. The deliverable -- an overlay keeping strictdoc current
 -- still exists and still ships; only the implementation shape changed, from a
 first-party build to a re-export of upstream's flake. The unit of work
 delivered. So the rewrite was correct and the transition it "lost" was of shape,
-not of work, and shape history belongs in NOTES and the commit, where it went.
+not of work, and shape history belongs in COMMENT and the commit, where it went.
 
 That leaves the count at zero, which is the point: the gap is real but
 UNEXERCISED, and building the relation now would be speculative.

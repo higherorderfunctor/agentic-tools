@@ -20,7 +20,7 @@ Filtering occurs before bounded neighborhood traversal, so hidden pairs also
 stop expansion paths. Reset enables every observed pair. The role vocabulary
 remains payload-derived, and filter state remains local to the page.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Added by the Graph neighborhood reference implementation on 2026-09-02.
 <<<
 RELATIONS:

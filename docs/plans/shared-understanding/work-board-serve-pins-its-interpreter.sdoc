@@ -11,7 +11,7 @@ AUTHORED_BY: llm
 STATEMENT: >>>
 Package the board server with the same strictdoc virtual-environment interpreter used by scribe, route the devenv board process through that wrapper, remove the ambient-python launcher, and gate every repository launcher against bare interpreter execution.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed 2026-09-09 from the interpreter provenance audit. The former
 docs/sdoc/board/serve launcher executed a PATH-resolved python3; it was replaced
 by an `sdoc-board` mkScribe wrapper over strictdoc's own virtual environment.

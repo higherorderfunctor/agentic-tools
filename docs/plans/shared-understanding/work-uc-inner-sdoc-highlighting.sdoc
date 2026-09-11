@@ -13,7 +13,7 @@ An unsettled use case, narrower than WORK-UC-INNER-SDOCS-IN-CODE-COMMENTS:
 once an inner sdoc inside a code comment is matched, give it its own syntax
 highlighting rather than rendering as an undifferentiated comment.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "syntax highlighting"
 <<<
 RELATIONS:

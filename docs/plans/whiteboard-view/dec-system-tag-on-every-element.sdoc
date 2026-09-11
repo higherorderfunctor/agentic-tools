@@ -24,7 +24,7 @@ import makes the need concrete.
 RATIONALE: >>>
 Deciding it now would design beads ahead of its import, which the operator ruled out.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Opened 2026-08-30.
 <<<
 RELATIONS:

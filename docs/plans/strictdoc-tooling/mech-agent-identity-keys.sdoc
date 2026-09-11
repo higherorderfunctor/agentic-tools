@@ -28,7 +28,7 @@ The threat is confusion, not forgery. The five signatures were written by an age
 
 The trailer is written by a hook because the convention version has already failed at exactly this. The harness asks the model to add Co-Authored-By, nothing in this repository asks for or checks it, and 41 of the branch's 71 commits carry it while 30 do not -- the 30 including 9958f190 and the rest of the fingerprint incident. A carrier the model writes measured 58% on a branch that is almost entirely model-written.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Probably belongs to the beads work rather than here, and is likely to get lost there. Tracked in this plan so it survives, not because this is its home.
 
 Measured 2026-08-27 on feat/strictdoc-trial from its fork point ec980d15, 71 commits.

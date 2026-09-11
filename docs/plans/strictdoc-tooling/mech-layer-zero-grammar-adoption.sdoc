@@ -70,7 +70,7 @@ Listing them as held rather than settled keeps the sketch useful without
 letting it quietly become the design. It also gives the migration a checklist
 instead of a rediscovery exercise.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Nothing imports either file, no check reads them, and the generation task will
 not render them while the devenv block stays commented. Enabling them is a
 decision, not a formality: neither has a corpus, and neither alias is

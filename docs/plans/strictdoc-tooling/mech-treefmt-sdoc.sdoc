@@ -26,7 +26,7 @@ Both reasons require a width. contract_hash serialises the node's raw field valu
 
 The sandboxed copy is not defensiveness about a hypothetical. Both failures it prevents were reproduced: an in-place wrapper made treefmt report all nine documents changed on a corpus it had just left byte-identical, and an in-place run given a single path reformatted a different, unstaged document while treefmt reported zero changes.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 against strictdoc 0.28.3 and treefmt 2.5.0, on a copy of the corpus outside the repository.
 
 THE MID WARNING DOES NOT REPRODUCE, and the mechanism says why it cannot. strictdoc format . over the whole corpus leaves all nine .sdoc files byte-identical and adds no MID to any of them; no file in the corpus carries one. The writer emits MID only when document.mid_permanent or document.config.enable_mid holds, and mid_permanent is set from `mid is not None` at parse -- that is, only for a document that already declared one in its source. ENABLE_MID is not a lever that could be tripped by accident either: setting it on a probe document made the export fail with "Grammar element 'DECISION' is missing the MID field which contradicts to the DOCUMENT's ENABLE_MID setting", so it additionally requires a MID field on every grammar element. The observation behind the warning most likely came from `manage new`, whose own comment says it sets mid_permanent so the writer persists a MID -- and even there only when enable_mid is set. Positive control that the harness would have seen minting: the same before/after comparison detects a 93-line reflow, and detects a one-word edit under the whitespace-insensitive comparison used below.

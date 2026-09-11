@@ -26,7 +26,7 @@ The sketch offered a history check in CI against main as the alternative. It doe
 
 Keeping the record inside PARENT_FP rather than in a sidecar is the same argument DEC-FINGERPRINT-IN-NODE made for the fingerprint itself: the state transition is a reviewable diff hunk, attributable to a commit and revertable.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 against the JSON export, using fixtures in a scratch copy; the worktree was not touched.
 
 Baseline: 31 fingerprint entries, 0 signed and current, 31 never signed, 0 suspect.

@@ -64,7 +64,7 @@ mutator with no opinion about the value, so a wrapper that only swapped in the
 API would be strictly less safe than the text editor it replaces, which at least
 could not produce an invalid choice by accident.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured on strictdoc 0.28.3 against a scratch copy of this repo's nine
 documents; nothing was written in the checkout.
 
@@ -93,8 +93,8 @@ set-validate-write-reparse-save cycle 0.34 s. Config construction alone is
 0.67-0.81 s of every number here, which is MECH-SDOC-LEAN-FORMATS's lever.
 
 Field order holds under abuse. On a node stripped of RATIONALE, PARENT_FP and
-NOTES, setting them in the order NOTES, PARENT_FP, RATIONALE serialises them
-RATIONALE, PARENT_FP, NOTES. Round trip is byte-stable: loading all nine
+COMMENT, setting them in the order COMMENT, PARENT_FP, RATIONALE serialises them
+RATIONALE, PARENT_FP, COMMENT. Round trip is byte-stable: loading all nine
 documents and writing every one back unmodified changes no file, and a
 single-field edit produces a diff confined to that node.
 
@@ -146,7 +146,7 @@ copy, never in the tree, where fp-accept signed MECH-FP-CHECK and a
 re-export then reported "1 signed and current, 0 suspect".
 
 The delimiter obligation earned a positive control rather than an assertion.
-With check_value_delimiters neutered, a NOTES value whose second line is
+With check_value_delimiters neutered, a COMMENT value whose second line is
 "<<<" at column zero DOES break the parse -- TextXSyntaxError at 18:1 -- the
 write is rolled back, and the file is byte-identical afterwards.
 <<<

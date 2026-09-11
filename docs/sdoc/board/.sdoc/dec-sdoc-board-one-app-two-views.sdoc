@@ -25,7 +25,7 @@ side. The shape follows beadboard: views as lenses over one live dataset, the
 URL as the source of truth for view state, chrome that does not move when the
 view does.
 <<<
-NOTES: >>>
+COMMENT: >>>
 2026-09-08: the count in "the first two views" is now four. The switcher reads
 Grammars, Plan, Graph, Perspective, and the relation canvas is labelled Graph
 rather than Board so a view does not shadow the app's name

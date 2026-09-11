@@ -67,7 +67,7 @@ because both cheaper readings are wrong in measured ways: a line diff cannot
 distinguish a groom from a birth, and main's tip drifts for reasons that have
 nothing to do with the branch.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 on feat/strictdoc-trial at bc646f12, merge base ec980d15.
 
 origin/main carries 0 .sdoc files; the branch carries 9 across three locations.

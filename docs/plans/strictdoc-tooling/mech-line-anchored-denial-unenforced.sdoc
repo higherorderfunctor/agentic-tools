@@ -39,7 +39,7 @@ caret and enforced the rest, and it produced a FieldName type that rejected UID
 -- caught only when values.nix was first checked against the surface. Getting
 it right in one direction should not be mistaken for having a check.
 <<<
-NOTES: >>>
+COMMENT: >>>
 RESOLVED 2026-08-26 with the operator, and the resting state was wrong. The two
 denied words are not the same kind of thing, and a rule read straight off the
 grammar separates them: run each denied word against the SIBLING ALTERNATIVES

@@ -39,7 +39,7 @@ these one at a time. Items 1 and 4 are the dangerous ones, because both present
 as complete and neither is flagged anywhere in the corpus.
 <<<
 PARENT_FP: DEC-CONVERT-IS-ADJUDICATION:0000000
-NOTES: >>>
+COMMENT: >>>
 Retyped from SPIKE to EVIDENCE on 2026-08-30: a probe is work, then evidence, then a decision (MECH-SPIKE-IS-A-PIPELINE-TO-A-DECISION; DEC-NODE-FAMILIES). Its STATUS was 'run'. Its RETIRES_ON read: Each item is confirmed or dismissed by the operator, or the section holding it is converted and the question resolved in the process. The UID keeps its retired prefix: DEC-UID-OUTLIVES-TYPE.
 <<<
 RELATIONS:

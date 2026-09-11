@@ -17,7 +17,7 @@ Present in this repo today: 7 files under `docs/sdoc/board/assets/` (`app.js`, `
 
 Gap: deprioritized. Per the operator, the board app's `.js` is a rewrite target for modern TS (see WORK-LANG-TYPESCRIPT), so this language's extractor support should not be built out as a separate long-lived surface — if anything is built, it should be built to converge on the TypeScript grammar's node types (see the shared node-type names above) so the same item queries survive the rewrite.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "i heavily prefer modern TS over JS. so plan
 ahead for that rewrite with ts grammars." Also, on backlogging generally:
 "we should track these in an sdoc, doesn't mean we have to implement any

@@ -25,7 +25,7 @@ The overlay existed because nobody had checked for a flake. Keeping a
 first-party override alongside an upstream one is two things to maintain for
 one package.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Implemented 2026-08-27. overlays/dev-tools/strictdoc.nix re-exports
 inputs.strictdoc.packages.<system>.default unchanged, on the same plain-attrset-
 update contract as overlays/semble.nix, so pkgs.ai.devTools.strictdoc keeps its
@@ -50,7 +50,7 @@ Two things this cost, both logged rather than fixed here. The version assertion
 is gone -- MECH-STRICTDOC-VERSION-SMOKE. And SLICE-STRICTDOC-OVERLAY's STATEMENT
 now specifies a build that does not exist ("a thin override of the nixpkgs
 derivation ... from a sidecar, with the two dependency adjustments"); only its
-NOTES record the change. Whether that statement is rewritten or the slice is
+COMMENT record the change. Whether that statement is rewritten or the slice is
 closed and superseded is a contract question and so the operator's, not an
 implementing session's. RULED 2026-08-27: rewritten in place, because
 superseding is not expressible for a slice -- `Superseded_By` is declared only

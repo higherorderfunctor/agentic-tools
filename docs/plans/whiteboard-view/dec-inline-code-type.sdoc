@@ -20,7 +20,7 @@ with a widget is open; nothing needs them yet.
 RATIONALE: >>>
 A code sample held in the canon is a second copy of code the repository also holds, which is the drift this repo has been bitten by before; that cost is weighed when the need is real, not before.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Opened 2026-08-30 from the reconciliation of the handoff model with the canon.
 <<<
 RELATIONS:

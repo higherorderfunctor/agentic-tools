@@ -20,7 +20,7 @@ MECH-SEMANTIC-LAYER-WHITEBOARD:0000000
 NAR-TERM-CANON:0000000
 MECH-RENDER-GENERATOR-OUTSIDE-REPO:0000000
 <<<
-NOTES: >>>
+COMMENT: >>>
 Built on 2026-08-30 by migrate_whiteboard.py from the sheet's lines and the reviewed headlines of the 2026-08-29 render, through the scribe. Every PARENT_FP entry is a 0000000 declaration; nothing here is signed.
 <<<
 RELATIONS:

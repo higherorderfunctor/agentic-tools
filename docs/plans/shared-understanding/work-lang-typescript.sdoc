@@ -15,9 +15,9 @@ Candidate items (node type, confirmed against upstream `tree-sitter/tree-sitter-
 
 Present in this repo today: 4 files, `overlays/kiro-memory-distiller/{distiller,distiller.test}.ts` and `overlays/mcp-servers/openmemory-mem/{openmemory-mem,openmemory-mem.test}.ts` — two source/test pairs, both MCP-adjacent overlay update tooling.
 
-Gap: no forcing function today at 4 files, but the operator has named this the target language for a pending JS rewrite (see NOTES), so the grammar and item set above should be treated as ready-to-adopt rather than speculative.
+Gap: no forcing function today at 4 files, but the operator has named this the target language for a pending JS rewrite (see COMMENT), so the grammar and item set above should be treated as ready-to-adopt rather than speculative.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "i heavily prefer modern TS over JS. so plan
 ahead for that rewrite with ts grammars." Also, on backlogging generally:
 "we should track these in an sdoc, doesn't mean we have to implement any

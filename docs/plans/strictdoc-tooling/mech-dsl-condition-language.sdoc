@@ -19,7 +19,7 @@ RECOMMENDED (from SPIKE-DSL-PRIOR-ART, not yet ruled): JsonLogic typed by a recu
 
 WHY. It is the only option Nix can shape-check: an unknown operator or a non-list `and` fails at nix eval naming the option path, and every string language fails first at the hook. It serializes unchanged (the attrset IS the JSON; builtins.toJSON emits it). The evaluator is one import, or about a hundred lines to own if the port goes stale. Lists of conditions merge as AND (augment) and mkForce replaces one (overshadow), so layering costs nothing. Two traps are hidden in the helpers once, not per rule: jsonlogic.com states `none` is true on an empty array while `all` and `some` are false, so c.every is 'none of the counterexamples'; and a missing field reads as null, not an error (CEL would raise no_such_field). Limits to accept: one hop only (scribe pre-resolves each relation's target fields into the data), and whole-canon joins go to Python. Runner-up is CEL if long guards become unreadable as attrsets; keep it out until a rule actually needs it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 OPTIONS WEIGHED.
 - JsonLogic tree as a Nix attribute set, typed with types.attrTag (the NixOS tagged-union type: one key names the operator), built through a handful of pure helper functions, evaluated by panzi-json-logic in Python.
 - CEL string (Google's one-line expression language) evaluated by cel-python; Nix sees only types.str, a flake check can run the parser.

@@ -18,7 +18,7 @@
 #
 # `denormalize` and `sgra` are wired here and NOT re-exported. What the inner
 # emitter is called, and whether it is published at all, is deliberately open
-# (MECH-EMIT-LAYER-BOUNDARY's NOTES) — and an attribute is cheaper to add later
+# (MECH-EMIT-LAYER-BOUNDARY's COMMENT) — and an attribute is cheaper to add later
 # than to remove once someone depends on it.
 #
 # `faithful` is not re-exported either, and that one is settled rather than open:

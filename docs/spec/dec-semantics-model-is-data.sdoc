@@ -80,7 +80,7 @@ graph-query engine: pySHACL needs an RDF projection of the corpus and cannot
 reach a fixed point across shapes; clingo and OPA are a second language with a
 second evaluator.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Open, not accepted. Written 2026-09-03 by the session that ran the assessment.
 The operator delegated the pick ("pick the path or reject a pivot") and
 confirms or rejects it here.

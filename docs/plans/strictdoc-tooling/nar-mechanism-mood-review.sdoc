@@ -22,7 +22,7 @@ proposed retype. 27 were retyped in place, keeping their UIDs
 operator, each wanting a split into a rule and a design rather than a
 retype; 104 stayed mechanisms. The ledger is
 [LINK: EV-GRID-MIGRATION-LEDGER]. Nothing here is signed; a verdict is the
-test's reading, recorded in each node's NOTES.
+test's reading, recorded in each node's COMMENT.
 <<<
 PARENT_FP: >>>
 DEC-NODE-FAMILIES:0000000

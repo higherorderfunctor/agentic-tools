@@ -70,7 +70,7 @@ the branch: **promote a shared understanding between human and LLM.**
   question. Say what they may not have considered. Drill deeper only on the
   topic they picked.
 - **Write what surfaces back into the node in the same session.** The STATEMENT
-  gets sharper; NOTES keeps their words verbatim.
+  gets sharper; COMMENT keeps their words verbatim.
 - **Nodes on this thread are revised in place.** As shape is added, edit the
   STATEMENT. Do not freeze or supersede a WORK item here; supersession belongs
   to accepted decisions (operator ruling 2026-09-01, see
@@ -78,14 +78,14 @@ the branch: **promote a shared understanding between human and LLM.**
 - **One node, one topic.** A node that grows a second subject gets split, not
   extended, and the node COUNT is what carries complexity — a thread with more
   in it has more nodes, not longer ones. Appending the operator's verbatim
-  paragraphs to a node's NOTES is the anti-pattern this replaces: NOTES keeps
-  their words on that node's own topic and nothing else (operator ruling
+  paragraphs to a node's COMMENT is the anti-pattern this replaces: COMMENT
+  keeps their words on that node's own topic and nothing else (operator ruling
   2026-09-01, see `WORK-ONE-NODE-ONE-TOPIC`).
 - **Work items only, until groomed.** Nothing here converts to spec or
   presentation nodes without the operator in the loop. Grooming drops the item's
   `Backlogged_In` edge; it does not change node state.
 - **Ambiguity is preserved, not resolved.** Where the dump was ambiguous, the
-  item's NOTES carries the operator's verbatim (spelling cleaned) so they can
+  item's COMMENT carries the operator's verbatim (spelling cleaned) so they can
   separate intent from the carver's reading. Keep doing that.
 - **Old plans are not superseded by this thread's existence.**
   `WORK-OLD-PLANS-RECONCILE` is the explicit grooming session for that.
@@ -108,7 +108,7 @@ the branch: **promote a shared understanding between human and LLM.**
 - **The plan tracks what changed.** When a session changes something a node
   describes, update that node in the same commit. An outcome that is spec-worthy
   goes where settled things live — `docs/spec/` for the plan model, `**/.sdoc/`
-  beside the package it describes — not only into a WORK node's NOTES.
+  beside the package it describes — not only into a WORK node's COMMENT.
 
 ## Root context
 
@@ -173,7 +173,7 @@ One node, one topic. Split a node that grows a second subject rather than
 appending to it — more complexity means more nodes, not longer ones.
 
 Work items only; nothing converts to spec/presentation without me. Ambiguities
-stay verbatim in NOTES. Decisions come to me as plain-language cards, one per
+stay verbatim in COMMENT. Decisions come to me as plain-language cards, one per
 turn. Never fp-accept, never AUTHORED_BY. Log incidental findings to
 MECH-BACKLOG-SHARED-UNDERSTANDING, don't narrate them; file tech debt your work
 leaves behind as a WORK node assuming both MECH-DEBT-SHARED-UNDERSTANDING and

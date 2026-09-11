@@ -12,7 +12,7 @@ STATEMENT: >>>
 The upstream tree-sitter grammar parses all sdoc documents but fails every
 standalone .sgra grammar file, because its root rule requires a DOCUMENT header.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Run. The DOCUMENT-header fix alone was not sufficient: our own grammar.sgra
 also uses REVERSE_ROLE on every non-File Parent relation, and upstream's
 grammar_relation_parent/child rules had no field for it at all, so it still

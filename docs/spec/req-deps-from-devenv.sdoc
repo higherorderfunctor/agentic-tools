@@ -25,7 +25,7 @@ WORK-BOARD-SERVE-PINS-ITS-INTERPRETER replaced it with a Nix wrapper whose
 interpreter is strictdoc's own virtual environment. True by accident is not
 the property the decision asks for.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-09, verbatim: "every dependency should be coming from
 devenv here, nothing should come from the system. requirement."
 

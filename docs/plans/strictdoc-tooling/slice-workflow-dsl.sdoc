@@ -14,7 +14,7 @@ DEC-DSL-LAYER-COUNT, settle the condition language, then build the option
 surface so that it compiles into MECH-HOOK-MIDDLEWARE-INTERFACE entries. Read
 as WORK under DEC-SLICE-DECOMPOSES-TO-WORK; the prefix is the grammar's.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Retyped from SLICE to WORK on 2026-08-30 under DEC-SLICE-DECOMPOSES-TO-WORK and DEC-NODE-FAMILIES. The UID keeps its retired prefix: DEC-UID-OUTLIVES-TYPE.
 <<<
 RELATIONS:

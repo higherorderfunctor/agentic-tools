@@ -37,7 +37,7 @@ pass that rewrote their contents would have made the diff unreviewable, on a
 branch whose whole review model is the carve-up into pull requests. The carve
 avoided that by moving all 161 nodes and rewriting none of them.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The UID preserves the retired shape and the TITLE no longer does. Renaming
 either was not an option: the filename tracks the UID, the UID is hand-chosen
 and never changes, and that invariant is exactly what let the carve move every

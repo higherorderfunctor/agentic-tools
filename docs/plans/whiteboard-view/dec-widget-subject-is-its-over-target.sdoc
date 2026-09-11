@@ -26,6 +26,6 @@ contract hash: it says where to look, not what is true.
 RATIONALE: >>>
 Drawing a figure over data that lives elsewhere is what v1's Start did four times; a relation that strictdoc refuses to dangle is the cheapest honest way to say it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's delegation ('I don't want to be bothered by the recommendation before implementation'); overrule by superseding. Chosen from three independent designs judged against an 82-element inventory of the v1 page. AUTHORED_BY reads llm because the writer has no flag for the human rungs.
 <<<

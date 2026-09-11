@@ -22,7 +22,7 @@ A contract moved. That is a PARENT_FP hash transition, signed by the operator at
 pull-request review. Not supersession.
 
 A description went wrong or went stale. Rewrite the statement, put the retired
-shape in NOTES and the reason in the commit. Not supersession. This is permitted
+shape in COMMENT and the reason in the commit. Not supersession. This is permitted
 on every node type except an accepted DECISION, whose statement is frozen.
 
 A thing was abandoned and different work replaced it. That is supersession.
@@ -59,7 +59,7 @@ surface now, so adding a relation role is a typed edit and a regeneration rather
 than a hand-edited .sgra. A rule written before that landed would price this
 wrong.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Authorized by the operator on 2026-08-27 -- "i'm fine if you make up a well
 thought out supercede rule for this plan given its friction" -- and written as
 open rather than accepted because they authorized the rule without reading the

@@ -15,7 +15,7 @@ hoc. The keys are the LLM's identity that WORK-ASSESS-AUTO-AUTHORSHIP's
 options -- automatic AUTHORED_BY attribution and GPG commit-signing
 enforcement -- key off.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "add llm ssh/gpg keys, store in secretspec"
 <<<
 RELATIONS:

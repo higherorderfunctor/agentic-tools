@@ -16,7 +16,7 @@ Two facts the board needs. The JSON export carries neither the grammar alias, no
 
 Caveat, recorded as confirmation of a known upstream blindness and not as a new defect: a parent cycle whose relations carry a ROLE passes JSON export with exit 0 and crashes HTML export with a RecursionError in the deep-trace renderer. Upstream parent_cycle_traverse_ (core/traceability_index_builder.py:770-789) queries NODE_TO_PARENT_NODES with the default edge=None, while role-qualified links are stored under edge=<role>; the same cycle written with role-less Parent relations is rejected with "document tree: a cycle detected". This repository's own cycle checker in nix flake check exists for exactly that reason.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The observation is complete and measured, with a positive control behind every negative claim (case 2 for role registration, case 3 for dangling UIDs, case 7b for cycle detection), reproduced under both JSON and HTML export from clean output directories. No independent session has re-run these cases.
 
 Config shape that worked, verbatim:

@@ -17,7 +17,7 @@ Present in this repo today: 1 tracked file, `config/agnix/agnix.toml`.
 
 Gap: well under the ~10-file presence bar this survey used elsewhere, and the operator did not name TOML directly; filed here only because the survey brief pre-scoped it by name (both as one of the languages to check a grammar for and as one of the UIDs to file). At a single file, this is the thinnest node in the set — a strong candidate for pruning at the next grooming pass unless TOML usage grows.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim, on backlogging generally: "we should track
 these in an sdoc, doesn't mean we have to implement any until a forcing
 function. lang, langitem/query can all be backlog items until there is a

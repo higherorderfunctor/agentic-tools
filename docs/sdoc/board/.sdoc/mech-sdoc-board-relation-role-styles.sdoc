@@ -23,7 +23,7 @@ source-to-target direction; there is no focal-relative outgoing, incoming, or
 transit stroke category. Inspecting a card may emphasize or dim relevant paths,
 but it does not change their hue or line pattern.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Added by the Graph neighborhood reference implementation on 2026-09-02.
 <<<
 RELATIONS:

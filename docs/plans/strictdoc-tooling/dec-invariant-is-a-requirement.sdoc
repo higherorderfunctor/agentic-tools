@@ -28,6 +28,6 @@ satisfied -- is a property of its statement, not of its type.
 RATIONALE: >>>
 The third and last of the types DEC-NODE-TYPE-GRID left unsaid, and the cheapest: four nodes, and the axes give one answer with no residue. Settling it now means the migration inherits three rulings rather than three arguments.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled by the operator on 2026-08-28. AUTHORED_BY reads llm because the writer has no flag for it -- MECH-RUNTIME-WRITE-GUARD makes that key the operator's, which is itself recorded as misplaced in MECH-MILESTONE-TWO-SEMANTICS-MISPLACED. The other two types are read, not ruled: MECH-SLICE-IS-WORK-NOT-A-USE-CASE and MECH-SPIKE-IS-A-PIPELINE-TO-A-DECISION.
 <<<

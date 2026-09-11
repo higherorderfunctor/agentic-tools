@@ -41,7 +41,7 @@ kind of thing that stops being noticed once the logic lands on top of it, and
 the choice belongs to whoever owns the overlay taxonomy rather than to the
 session that tripped over it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 RULED by the operator 2026-08-26: the invariant was read the wrong way round.
 It is correct that an overlay should be the faithful conversion of upstream, but
 the conclusion is not that sources must move under overlays/ -- it is that the

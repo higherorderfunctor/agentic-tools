@@ -35,7 +35,7 @@ the empty state, to give each view its own hash key, or to let the Graph
 focus any node type. That choice belongs to a settled node, not to whichever
 view runs last.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Filed by the Graph-tab contract audit, 2026-09-08. Reproduced by reading, not by driving a browser: board.js:927 selects workItems[0] when the hash UID is not a work item and passes updateHash true, and plan.js:137 writes the selected UID to the same hash.
 <<<
 RELATIONS:

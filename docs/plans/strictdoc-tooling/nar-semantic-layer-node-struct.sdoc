@@ -13,8 +13,8 @@ PLACE: screen
 STATEMENT: >>>
 The types, the fields every node carries, and the AUTHORED_BY ladder.
 
-- The grammar is generated from one Nix file. Every node carries a UID, a TITLE, who wrote it (AUTHORED_BY: llm or human) and a STATEMENT; RATIONALE and NOTES are optional, and the parser enforces the field order.
-> grammar = values.nix -> generated .sgra; DECISION|MECHANISM|SLICE|INVARIANT|SPIKE; all: UID, TITLE, AUTHORED_BY: llm|human, STATEMENT; RATIONALE, NOTES optional; field order enforced [WORKS]
+- The grammar is generated from one Nix file. Every node carries a UID, a TITLE, who wrote it (AUTHORED_BY: llm or human) and a STATEMENT; RATIONALE and COMMENT are optional, and the parser enforces the field order.
+> grammar = values.nix -> generated .sgra; DECISION|MECHANISM|SLICE|INVARIANT|SPIKE; all: UID, TITLE, AUTHORED_BY: llm|human, STATEMENT; RATIONALE, COMMENT optional; field order enforced [WORKS]
 - A decision (41 on the sheet's day) carries a STATUS of open, accepted, rejected or superseded, and a RETIRES_ON condition. It has no fingerprint of its own; its only relations are Superseded_By and Backlogged_In.
 [LINK: NAR-SEMANTIC-LAYER-TYPE-DECISION]
 > DECISION (41): +STATUS: open|accepted|rejected|superseded, +RETIRES_ON; no PARENT_FP; rels Superseded_By, Backlogged_In [WORKS]
@@ -50,9 +50,9 @@ The types, the fields every node carries, and the AUTHORED_BY ladder.
 - An agent has rewritten 10 of the 31 statements marked human-authored, and the mark did not change. Three remedies were listed — hash the text into the mark, drop the mark, or forbid the edit — and none was chosen; the ladder rules out dropping it.
 [LINK: NAR-SEMANTIC-LAYER-GAP-IDENTITY-HAS-NO-CARRIER]
 > identity:llm rewrote 10 of 31 identity:human STATEMENTs, key unchanged; hash-into-key | drop | forbid unpicked; the ladder forecloses drop [UNADDRESSED]
-- A fingerprint is seven hex characters hashed from a parent's contract fields (everything but RATIONALE, NOTES, PARENT_FP and RELATIONS), recorded on the child as PARENT_FP. 0000000 means unsigned. All 31 live entries read 0000000: nothing has ever been signed.
+- A fingerprint is seven hex characters hashed from a parent's contract fields (everything but RATIONALE, COMMENT, PARENT_FP and RELATIONS), recorded on the child as PARENT_FP. 0000000 means unsigned. All 31 live entries read 0000000: nothing has ever been signed.
 [LINK: NAR-SEMANTIC-LAYER-TYPE-MECHANISM] [LINK: NAR-SEMANTIC-LAYER-TYPE-WORK] [LINK: NAR-SEMANTIC-LAYER-TYPE-REQUIREMENT]
-> PARENT_FP: entries UID:hash7 (fingerprint = 7 hex of the parent's contract fields = all but RATIONALE|NOTES|PARENT_FP|RELATIONS); 0000000 = unsigned; 31 live, all 0000000 [UNADDRESSED]
+> PARENT_FP: entries UID:hash7 (fingerprint = 7 hex of the parent's contract fields = all but RATIONALE|COMMENT|PARENT_FP|RELATIONS); 0000000 = unsigned; 31 live, all 0000000 [UNADDRESSED]
 - Which fields count toward a fingerprint, and which fields are reserved to their owner (PARENT_FP and AUTHORED_BY), are hard-coded lists inside scribe. Under the layer stack they are semantic-layer data, and a ruling already says they are configuration.
 [LINK: DEC-FP-FIELDS-CONFIGURABLE] [LINK: DEC-LAYER-STACK] [LINK: NAR-SEMANTIC-LAYER-GAP-SEMANTICS-LIVE-IN-TOOLS-WITH-NO-OWNER]
 > contract-field list and owner-only list (PARENT_FP, AUTHORED_BY) are Python lists inside scribe [FALLS OUT: DEC-LAYER-STACK, L3 (semantic-layer) data; DEC-FP-FIELDS-CONFIGURABLE]

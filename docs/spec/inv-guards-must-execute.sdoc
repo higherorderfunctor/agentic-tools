@@ -32,7 +32,7 @@ run. Field-order enforcement, twice, on edits made while writing this.
 The asymmetry is not about diligence. Each failed guard was written by someone
 who believed it and was read by someone who meant to follow it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Drives MECH-RUNTIME-WRITE-GUARD, MECH-AUTHORED-BY-GUARD and MECH-SDOC-CI-CHECK.
 Also explains why the fingerprint mechanism is worth building at all: it is the
 executable form of a review that would otherwise be a instruction to read

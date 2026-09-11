@@ -14,8 +14,8 @@ fp-accept rewrites a node's whole PARENT_FP field from a merge of the existing e
 RATIONALE: >>>
 Spun out of `MECH-SIGNATURE-REVOCATION`, whose sketch statement cited the retention as part of the revocation problem. It is a separate defect and must not be fixed with one rule: for a revoked entry, permanence is the property being bought, so any pruning must skip the revoked case explicitly. Without a retirement path the only way out of a failing gate is the edit the rules forbid, which is how a hard rule gets broken by someone with no other option.
 <<<
-NOTES: >>>
-Inert today — 31 fingerprint entries, all the 0000000 placeholder, 0 suspect — and arms with the first real signature. `MECH-SIGNATURE-REVOCATION`'s NOTES already records the adjacent constraint from the other side: a revoked entry is not collectible lineage.
+COMMENT: >>>
+Inert today — 31 fingerprint entries, all the 0000000 placeholder, 0 suspect — and arms with the first real signature. `MECH-SIGNATURE-REVOCATION`'s COMMENT already records the adjacent constraint from the other side: a revoked entry is not collectible lineage.
 <<<
 RELATIONS:
 - TYPE: Parent

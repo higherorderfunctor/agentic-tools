@@ -23,7 +23,7 @@ Two of its own open items dissolve rather than transfer if it is built host-side
 first, which the corpus already offers as an escape hatch.
 <<<
 PARENT_FP: DEC-CONVERT-IS-ADJUDICATION:0000000
-NOTES: >>>
+COMMENT: >>>
 Retyped from SLICE to WORK on 2026-08-30 under DEC-SLICE-DECOMPOSES-TO-WORK and DEC-NODE-FAMILIES. The UID keeps its retired prefix: DEC-UID-OUTLIVES-TYPE.
 <<<
 RELATIONS:

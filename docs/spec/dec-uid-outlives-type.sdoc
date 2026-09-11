@@ -36,13 +36,13 @@ MECH-GRID-MIGRATION-UNCOSTED said the migration needed a rule for identity
 before it needed a script. This is the rule, and it makes the script one tag
 line per node.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's delegation of
 that day; overrule by superseding. Applied the same day: 6 INVARIANT nodes
 became REQUIREMENT, 2 became EVIDENCE (they record measurements), 14 SLICE
 became WORK, 8 run SPIKE became EVIDENCE and 3 unrun became WORK, and
 MECH-SEMANTIC-LAYER-WHITEBOARD became the first NARRATIVE -- the one retype
-between two live prefixes so far. Each carries the retype in its NOTES.
+between two live prefixes so far. Each carries the retype in its COMMENT.
 <<<
 RELATIONS:
 - TYPE: Parent

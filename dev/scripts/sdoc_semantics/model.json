@@ -185,7 +185,7 @@
     {
       "id": "AUTHORED-BY-WHO-MAY-RAISE-UNDECIDED",
       "lifecycle": "AUTHORED_BY",
-      "text": "No actor is attached to any transition. The decision's own notes say raising to llm-accepted is a human act with no natural place to happen, and the write guard makes the field the operator's, so the machine below is a shape with no hand on it yet.",
+      "text": "No actor is attached to any transition. The decision's own comment says raising to llm-accepted is a human act with no natural place to happen, and the write guard makes the field the operator's, so the machine below is a shape with no hand on it yet.",
       "kind": "open",
       "settled": false,
       "cites": ["DEC-AUTHORSHIP-LADDER", "MECH-RUNTIME-WRITE-GUARD"]

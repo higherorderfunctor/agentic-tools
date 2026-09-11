@@ -25,7 +25,7 @@ target facets. Switching tables via restore({table}) was refused with "Unknown
 column SOURCE_TYPE in field columns"; loading the Table object directly worked
 and logs upstream's deprecation of that path.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Re-measured 2026-09-08 against this tree after the Graph port and the elkjs
 move. The hermetic suite is 16 tests rather than the nine contracts above; it
 grew cases for the static allowlist and the two Nix-backed

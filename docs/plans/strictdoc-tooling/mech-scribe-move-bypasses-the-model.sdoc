@@ -25,7 +25,7 @@ every other write goes -- therefore never sees a move. Re-measured
 the library split has since removed it along with the verb table that was its
 only caller.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Dry-run delivery record retained when its completed WORK row was retired on
 2026-09-10. A move preserves source bytes and previews only its rename. Both
 the real and dry-run paths touch, render, and reparse the source before rename,

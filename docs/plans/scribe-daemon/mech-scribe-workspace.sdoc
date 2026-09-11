@@ -18,7 +18,7 @@ old or the new state and never a half-built one.
 The workspace is the transport-neutral boundary. Neither the socket nor any
 future transport parses anything or owns state; both call this.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Dry-run delivery record retained when its completed WORK row was retired on
 2026-09-10. Workspace.write runs the ordinary mutation, precheck, render, and
 reparse pipeline, captures Graph.pending(), and discards the speculative

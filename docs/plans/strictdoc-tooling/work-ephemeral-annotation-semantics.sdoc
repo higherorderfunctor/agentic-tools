@@ -12,7 +12,7 @@ STATEMENT: >>>
 There is no way to annotate a node with something
 NOT meant to survive to main. Comments, observed gaps, working notes, a
 verdict left for the next session -- none of them are durable claims, and
-today the only places to put them are NOTES on a real node or a new node that
+today the only places to put them are COMMENT on a real node or a new node that
 outlives its usefulness. The corpus grows and nothing prunes it.
 
 COMMENTARY exists as an element and nothing in the corpus is one; whether it

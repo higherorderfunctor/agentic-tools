@@ -21,7 +21,7 @@ Perspective blob module under the initial Content-Security-Policy; the final
 policy admits blob scripts and workers while retaining the remaining
 restrictions.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured on the codex spike branch (feat/strictdoc-trial-codex) before the
 merge; ported 2026-09-01 because two findings still govern the merged app: the
 CSP directive set, kept verbatim in server.py, and the per-request export cost

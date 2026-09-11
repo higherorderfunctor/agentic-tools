@@ -14,8 +14,8 @@ STATEMENT: >>>
 RATIONALE: >>>
 The failure is invisible in both directions: the new hook passes at commit, the Stop hook reports nothing, and neither surface says a check was skipped. This is the same class as `MECH-GRAMMAR-GATES-ARE-WRITTEN-TWICE` — one list written twice with a comment as the enforcement — in a file that every session's hand-back passes through.
 <<<
-NOTES: >>>
-`SLICE-CHECKPOINT-WIRING`'s NOTES already carries the consequence for its own validators: wiring one into the prek suite is two edits, not one. That instruction fixes the instance and leaves the mechanism; this node is the mechanism.
+COMMENT: >>>
+`SLICE-CHECKPOINT-WIRING`'s COMMENT already carries the consequence for its own validators: wiring one into the prek suite is two edits, not one. That instruction fixes the instance and leaves the mechanism; this node is the mechanism.
 <<<
 RELATIONS:
 - TYPE: Parent

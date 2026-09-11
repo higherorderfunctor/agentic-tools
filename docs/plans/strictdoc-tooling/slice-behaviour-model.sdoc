@@ -176,7 +176,7 @@ forcing apply, and the module seam that makes the types unavoidable.
 PARENT_FP: >>>
 DEC-EXECUTABLE-RULES-ROADMAP:0000000
 <<<
-NOTES: >>>
+COMMENT: >>>
 Vocabulary adopted from the outside research: a command is a request and may be refused;
 an event is an accepted fact; a milestone is an achieved fact that can go stale; a
 gate's evidence records what it depended on. The instance's signed edge is carried as

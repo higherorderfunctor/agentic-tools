@@ -14,7 +14,7 @@ STATEMENT: >>>
 RATIONALE: >>>
 The slice settles on the flag and says flipping costs a type edit plus a regenerate, so this is cheap to run late and expensive to skip: an unmeasured alternative recorded as unmeasured is an argument that comes back every time the ripple is touched. Measuring it once ends that, whichever way it lands.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The corpus this runs against is the graph in this repository — 144 nodes, 92 Parent relations, 31 fingerprint entries — and the field catalogue the flag reads is `packages/strictdoc-grammar/values.nix`. State every measurement in this node when it is run; no result may cite a document outside this repository, since a reader of this graph cannot open one.
 
 Retyped from SPIKE to WORK on 2026-08-30: a probe is work, then evidence, then a decision (MECH-SPIKE-IS-A-PIPELINE-TO-A-DECISION; DEC-NODE-FAMILIES). Its STATUS was 'unrun'. Its RETIRES_ON read: Both mechanisms are run over the same instance model and either the AST derives a materially better invalidation set at acceptable cost, or the flag stands and the AST is declined in writing. The UID keeps its retired prefix: DEC-UID-OUTLIVES-TYPE.

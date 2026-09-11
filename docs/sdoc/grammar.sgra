@@ -25,7 +25,7 @@ ELEMENTS:
   - TITLE: RATIONALE
     TYPE: String
     REQUIRED: False
-  - TITLE: NOTES
+  - TITLE: COMMENT
     TYPE: String
     REQUIRED: False
   RELATIONS:
@@ -60,7 +60,7 @@ ELEMENTS:
   - TITLE: PARENT_FP
     TYPE: String
     REQUIRED: False
-  - TITLE: NOTES
+  - TITLE: COMMENT
     TYPE: String
     REQUIRED: False
   RELATIONS:
@@ -105,7 +105,7 @@ ELEMENTS:
   - TITLE: PARENT_FP
     TYPE: String
     REQUIRED: False
-  - TITLE: NOTES
+  - TITLE: COMMENT
     TYPE: String
     REQUIRED: False
   RELATIONS:
@@ -153,7 +153,7 @@ ELEMENTS:
   - TITLE: PARENT_FP
     TYPE: String
     REQUIRED: False
-  - TITLE: NOTES
+  - TITLE: COMMENT
     TYPE: String
     REQUIRED: False
   RELATIONS:
@@ -198,7 +198,7 @@ ELEMENTS:
   - TITLE: PARENT_FP
     TYPE: String
     REQUIRED: False
-  - TITLE: NOTES
+  - TITLE: COMMENT
     TYPE: String
     REQUIRED: False
   RELATIONS:
@@ -245,7 +245,7 @@ ELEMENTS:
   - TITLE: PARENT_FP
     TYPE: String
     REQUIRED: False
-  - TITLE: NOTES
+  - TITLE: COMMENT
     TYPE: String
     REQUIRED: False
   RELATIONS:
@@ -283,7 +283,7 @@ ELEMENTS:
   - TITLE: PARENT_FP
     TYPE: String
     REQUIRED: False
-  - TITLE: NOTES
+  - TITLE: COMMENT
     TYPE: String
     REQUIRED: False
   RELATIONS:
@@ -340,7 +340,7 @@ ELEMENTS:
   - TITLE: PARENT_FP
     TYPE: String
     REQUIRED: False
-  - TITLE: NOTES
+  - TITLE: COMMENT
     TYPE: String
     REQUIRED: False
   RELATIONS:

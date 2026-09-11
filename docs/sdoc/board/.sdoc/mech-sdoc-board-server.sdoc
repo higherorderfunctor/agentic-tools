@@ -41,7 +41,7 @@ carries both, and both lookups stay fail-soft at the adapter boundary: an
 import or lookup failure becomes a named refusal or a null label rather than a
 missing payload key or a dead process.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Updated 2026-09-03 for commits 8823edf1 and 46cd3cf1: the static allowlist grew
 grammar-groups.json and fsm.js, and source.py gained the semantics payload. The
 three JSON routes are unchanged -- semantics rides inside /api/graph rather

@@ -24,11 +24,11 @@ who (authorship).
 
 Worked agile and HITL: no order enforced, the operator pivots to whatever
 they judge the worst gap when a session works this thread. The children are
-concept groups holding work items carved from the dump; each item's NOTES
+concept groups holding work items carved from the dump; each item's COMMENT
 carries the operator's verbatim where meaning or scope is ambiguous.
 Nothing here converts to spec or presentation nodes without a grooming
 session -- REQ-BOARD-GRAMMAR-DRIVEN is the one requirement the operator
-offered, hedged (see its NOTES).
+offered, hedged (see its COMMENT).
 
 Old plans are NOT superseded by this thread's existence: reconciling them
 (WORK-OLD-PLANS-RECONCILE) is an explicit grooming session. Related work

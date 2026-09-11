@@ -67,7 +67,7 @@ missing engine costs one subcommand rather than the whole CLI, and the board
 degrades the same way -- the payload's absence yields a named "unavailable"
 shape rather than a missing key.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The former machine modules were replaced by the transcription in
 `dev/scripts/sdoc_semantics/model.json`.
 <<<

@@ -21,7 +21,7 @@ Instructions below a long list cannot teach undiscovered interactions, and a
 transient control that stays open after the user moves elsewhere obstructs the
 surface it was meant to supplement.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The operator established this rule on 2026-09-02 after the relation-role list
 placed its Shift-click instruction below the fold. The Graph filter popover is
 the first implementation and verification point.

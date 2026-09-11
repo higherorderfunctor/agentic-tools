@@ -13,7 +13,7 @@ An unsettled use case: a WORK item whose content is a literal, executable
 bash script rather than prose describing one, which the embedded-language
 field work could carry.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "work items that are literal bash scripts"
 <<<
 RELATIONS:

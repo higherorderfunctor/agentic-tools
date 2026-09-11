@@ -37,7 +37,7 @@ PARENT_FP: >>>
 DEC-NARRATIVE-DECLARES-ITS-PLACE:0000000
 DEC-WIDGET-SUBJECT-IS-ITS-OVER-TARGET:0000000
 <<<
-NOTES: >>>
+COMMENT: >>>
 Rewritten 2026-08-30 to the PLACE model. The earlier statement described a structure derived from tree depth (one tab per child of the root, sections under a tab, cards under a section), which DEC-NARRATIVE-DECLARES-ITS-PLACE retired the same day.
 <<<
 RELATIONS:

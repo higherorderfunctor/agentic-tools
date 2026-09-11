@@ -27,7 +27,7 @@ Written when item 3 was added and the choice had to be made once. Deferring is
 cheap for a new arm and a rewrite for the existing five, so the existing five
 were left alone and the divergence recorded instead of half-fixed.
 <<<
-NOTES: >>>
+COMMENT: >>>
 The operator asked for a position rather than a question, 2026-08-26. Position:
 the flake check is the gate and the devenv task should defer to it, which one of
 the six arms already does. The duplication is therefore a defect rather than a

@@ -32,7 +32,7 @@ contract file generated changes who owns it, and this milestone was told not to
 edit that file at all. Recorded so the half-wired state is legible as a
 decision rather than read as a missing task.
 <<<
-NOTES: >>>
+COMMENT: >>>
 RULED by the operator 2026-08-26: yes, generate it. In this repository every
 sdoc grammar is generated, by way of the devenv module in
 MECH-STRICTDOC-DEVENV-MODULE. That is a local convention and is explicitly NOT

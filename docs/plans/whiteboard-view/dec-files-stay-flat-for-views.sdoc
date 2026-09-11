@@ -24,7 +24,7 @@ say how with PLACE. One node per file stands.
 RATIONALE: >>>
 Nesting inside a file buys nothing the flat form with PLACE cannot say, and costs the scribe, the checks and one-node-per-file.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Ruled 2026-08-30 as a first-pass decision under the operator's delegation ('I don't want to be bothered by the recommendation before implementation'); overrule by superseding. Chosen from three independent designs judged against an 82-element inventory of the v1 page. AUTHORED_BY reads llm because the writer has no flag for the human rungs.
 <<<
 RELATIONS:

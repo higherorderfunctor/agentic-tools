@@ -23,7 +23,7 @@ This removes a whole class of design work. Locking, merge semantics for a plan
 node, and concurrent-edit conflict resolution are all unnecessary. Two people
 editing the same plan node is rare enough to handle by hand if it ever happens.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Does not extend to the settled architecture nodes, which are shared by
 construction and outlive any one plan.
 <<<

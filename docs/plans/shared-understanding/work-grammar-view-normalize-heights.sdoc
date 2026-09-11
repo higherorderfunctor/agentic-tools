@@ -16,7 +16,7 @@ not text size, because the type ramp carries a 12px floor the operator
 set (see MECH-SDOC-BOARD-GRAMMARS-VIEW), and shrinking text to fit a card would
 break it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim: "grammar view normalize node heights. since
 content drive your call on dynamic height vs dynamic text size."
 <<<

@@ -17,7 +17,7 @@ Present in this repo today: 276 tracked `.md` files; 178 of them carry at least 
 
 Gap: the repo's `markdown-formatting` fragment already documents several formatter/lint interactions specific to this corpus (mid-token code-span breaks, doubled words across a reflow, pipe-in-table-cell) that any markdown-aware tree-sitter tooling here should be aware of before trying to normalize or reflow markdown itself — see `dev/fragments/markdown-formatting/markdown-formatting.md`.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-02, verbatim, on backlogging generally: "we should track
 these in an sdoc, doesn't mean we have to implement any until a forcing
 function. lang, langitem/query can all be backlog items until there is a

@@ -22,7 +22,7 @@ nix flake check, with a runtime check on the page as the safety net for a
 refresh or reload. The first instance is the Grammars tab's groups
 (MECH-SDOC-BOARD-GRAMMARS-VIEW).
 <<<
-NOTES: >>>
+COMMENT: >>>
 Hedged by the operator -- verbatim: "one requirement I have we could add is
 board (app) should contain minimal hard coded info about the system." Filed
 as a REQUIREMENT node rather than parked as a work item; that

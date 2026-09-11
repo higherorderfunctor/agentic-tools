@@ -15,7 +15,7 @@ overlay each other. Work out what the boundary implies: what may cross it,
 and what one file may assume about another. No sequencing against the split
 is implied; ordering is grooming's.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Verbatim: "grammar files represent a sorta boundary, collection of node
 types and semantics. not full blown bounded contexts, as they can overlay,
 but alone they represent some kinda bounded goal." Filed as its own item

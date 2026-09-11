@@ -37,7 +37,7 @@ If the fix is accepted upstream later, a fork created at that point is a contrib
 vehicle rather than a dependency, and a merged fix deletes the patch instead of
 leaving a stale fork to reconcile.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Two build details found by reading the nixpkgs grammar builder. Its generate
 step runs a bare generate command after changing into the path declared in the
 grammar metadata; this grammar declares no path and keeps its definition in a

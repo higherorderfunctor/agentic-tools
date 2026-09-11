@@ -52,7 +52,7 @@ numbering, "you wired semantics into the tool" is a matter of taste and gets
 relitigated every session; with it, the claim is checkable against a boundary
 that was written down first.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Numbering settled 2026-08-28. Earlier sessions in this activity used "layer 0"
 for the grammar SPEC and "layer 1" for node state machines. That numbering
 predates recognising the Nix machinery as a layer of its own and is superseded

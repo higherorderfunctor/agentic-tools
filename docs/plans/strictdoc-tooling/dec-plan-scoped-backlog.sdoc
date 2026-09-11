@@ -31,7 +31,7 @@ make, a SPIKE to run -- and a separate type would throw that away and need
 mapping back on grooming. Containment by document needs no grammar change at
 all.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Deliberately not solved here: a repo-level backlog above plans. That decision
 waits for a plan to actually close with debt on it.
 <<<

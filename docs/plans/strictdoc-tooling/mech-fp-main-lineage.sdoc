@@ -24,7 +24,7 @@ The replacement costs nothing to build because it is already built. fp-check com
 
 Storing the accepted parent state beside its hash was considered and rejected. It would make drift diffs answerable without git, and cost is not the objection -- the twelve parents currently referenced total 7.6 KB of contract payload and all 139 nodes total 120 KB. Redundancy is. A state that passes the gate is already in the merge commit, so the store would duplicate the tree to avoid reading it.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Measured 2026-08-27 against a clean export of the branch tip.
 
 Today the failure has zero instances: fp-check reports 31 fingerprint entries, 0 signed and current, 31 never signed, 0 suspect. Every recorded value is the placeholder 0000000.

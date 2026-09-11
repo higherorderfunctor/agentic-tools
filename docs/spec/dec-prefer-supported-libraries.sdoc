@@ -28,7 +28,7 @@ library this tree has removed, transitions, went for size -- 88 MiB on each
 of two interpreters for three state machines -- not for being a library.
 That is the cost this decision asks to be measured, not avoided.
 <<<
-NOTES: >>>
+COMMENT: >>>
 Operator, 2026-09-09, verbatim: "well supported libraries also prefered
 (DECISION?) like id prefer you didn't hand role parsers or even jsonrpc
 functionality." Earlier the same night, on a docstring that had been read

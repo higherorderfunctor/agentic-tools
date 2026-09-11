@@ -52,7 +52,7 @@ that forces it:
   forced by: "Higher layers may augment lower layers or overshadow them."
   from: The NixOS module system's mkDefault/mkForce priorities and its enable = false idiom (nothing in the ecosystem removes a lower layer's entry).
 <<<
-NOTES: >>>
+COMMENT: >>>
 SCOPE OUT -- what lives outside the DSL, and why:
 
 - Condition evaluation: Python, one generic function shipped with scribe. Nix cannot run at hook time, so Nix emits the rule as JSON and Python runs it; meaning lives in Python, only shape in Nix.
