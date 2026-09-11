@@ -66,7 +66,6 @@
       "quietHours",
       "remoteControl",
       "remoteTools",
-      "secDefault",
       "skipWorkflowUsageWarning",
       "totalTokensReminder",
       "totalTokensReminderAfterUserTurn",
@@ -712,6 +711,12 @@
         "type": "boolean"
       },
       "apiKeyHelper": {
+        "type": "string"
+      },
+      "appendPlugins": {
+        "type": "array"
+      },
+      "appendPlugins[]": {
         "type": "string"
       },
       "askUserQuestionTimeout": {
@@ -1617,6 +1622,12 @@
       "forceRemoteSettingsRefresh": {
         "type": "boolean"
       },
+      "gatewayInternalNetworks": {
+        "type": "array"
+      },
+      "gatewayInternalNetworks[]": {
+        "type": "string"
+      },
       "gcpAuthRefresh": {
         "type": "string"
       },
@@ -2302,6 +2313,12 @@
       "prefersReducedMotion": {
         "type": "boolean"
       },
+      "prependPlugins": {
+        "type": "array"
+      },
+      "prependPlugins[]": {
+        "type": "string"
+      },
       "processWrapper": {
         "type": "string"
       },
@@ -2615,9 +2632,6 @@
       },
       "sandbox.socatPath": {
         "type": "string"
-      },
-      "secDefault": {
-        "type": "boolean"
       },
       "showClearContextOnPlanAccept": {
         "type": "boolean"
@@ -3229,6 +3243,7 @@
       "allowedMcpServers",
       "alwaysThinkingEnabled",
       "apiKeyHelper",
+      "appendPlugins",
       "askUserQuestionTimeout",
       "attribution",
       "autoCompactEnabled",
@@ -3295,6 +3310,7 @@
       "forceLoginMethod",
       "forceLoginOrgUUID",
       "forceRemoteSettingsRefresh",
+      "gatewayInternalNetworks",
       "gcpAuthRefresh",
       "hooks",
       "httpHookAllowedEnvVars",
@@ -3326,6 +3342,7 @@
       "precomputeCompactionEnabled",
       "preferredNotifChannel",
       "prefersReducedMotion",
+      "prependPlugins",
       "processWrapper",
       "promptCacheTtl",
       "promptSuggestionEnabled",
