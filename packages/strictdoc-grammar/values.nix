@@ -52,9 +52,9 @@
 # strictdoc validates the order of the fields a node ACTUALLY HAS, so an
 # absent optional field only advances the grammar pointer. The positive
 # control that makes those two greens mean anything: swapping two fields on
-# one real node fails with "Semantic error: Wrong field order". COMPONENT was
-# therefore appended on the .sgra-diff ground alone,
-# and its position is still free until a migration writes values.
+# one real node fails with "Semantic error: Wrong field order". An optional
+# field with no corpus values therefore has no corpus-order cost until a
+# migration writes values.
 #
 # Rendered with:
 #
@@ -85,15 +85,6 @@
   rationale = str "RATIONALE";
   parentFp = str "PARENT_FP";
   notes = str "NOTES";
-
-  # DEC-COMPONENT-IS-DECLARED (open): what a node is ABOUT, said by the node
-  # rather than computed from where its file sits. Free words rather than a
-  # MultiChoice, because a closed list here would put the vocabulary in two
-  # places and make adding a component a grammar regeneration. Optional, so
-  # the field lands before any corpus carries it. Excluded from the contract
-  # hash in dev/scripts/sdoc_fp.py for the same reason PLACE is: re-filing a
-  # node does not change what it claims.
-  component = tag "COMPONENT";
 
   # Roles. Every Parent role is a dependency: the node that carries it depends
   # on the target's wording, may fingerprint it in PARENT_FP, and is walked by
@@ -149,7 +140,6 @@ in [
       statement
       rationale
       notes
-      component
     ];
     relations = [
       (rel.parent "Superseded_By" "Supersedes")
@@ -167,7 +157,6 @@ in [
       rationale
       parentFp
       notes
-      component
     ];
     relations = claimRelations;
   })
@@ -181,7 +170,6 @@ in [
       rationale
       parentFp
       notes
-      component
     ];
     relations = claimRelations;
   })
@@ -199,7 +187,6 @@ in [
       rationale
       parentFp
       notes
-      component
     ];
     relations = claimRelations;
   })
@@ -217,7 +204,6 @@ in [
       rationale
       parentFp
       notes
-      component
     ];
     relations = [
       governedBy
@@ -239,12 +225,10 @@ in [
   # index, a section stacked on the container's screen, or a card; absent
   # reads section, and a root has none (DEC-NARRATIVE-DECLARES-ITS-PLACE).
   # TAGS are free facet words the VIEW reads: a tab key, a query word, or a
-  # reserved marker such as term, systems, tabs or colours. COMPONENT is a
-  # different axis and deliberately a different field -- TAGS says how a node
-  # is PRESENTED, COMPONENT says what it is ABOUT. A narrative Cites what it presents (dependency, fingerprintable)
-  # and Contains the narratives it is composed of, in RELATIONS order. PLACE
-  # and Over are outside the contract hash: moving a card must not dirty
-  # what cites it.
+  # reserved marker such as term, systems, tabs or colours. A narrative Cites
+  # what it presents (dependency, fingerprintable) and Contains the narratives
+  # it is composed of, in RELATIONS order. PLACE and Over are outside the
+  # contract hash: moving a card must not dirty what cites it.
   (el "NARRATIVE" {prefix = "NAR-";} {
     fields = [
       uid
@@ -274,7 +258,6 @@ in [
       rationale
       parentFp
       notes
-      component
     ];
     relations = [
       cites
@@ -297,7 +280,6 @@ in [
       rationale
       parentFp
       notes
-      component
     ];
     relations = [
       governedBy
@@ -350,7 +332,6 @@ in [
       rationale
       parentFp
       notes
-      component
     ];
     relations = [
       remarksOn

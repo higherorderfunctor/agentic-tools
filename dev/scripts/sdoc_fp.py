@@ -29,7 +29,7 @@ HASH_LEN = 7
 # which is deliberately left for after the Nix option surface in
 # DEC-FP-FIELDS-CONFIGURABLE exists. Do not tune this without reading that
 # node first.
-EXCLUDED_FIELDS = {"RATIONALE", "NOTES", "PARENT_FP", "PLACE", "COMPONENT"}
+EXCLUDED_FIELDS = {"RATIONALE", "NOTES", "PARENT_FP", "PLACE"}
 
 # Export-scaffolding keys emitted per node (including this repo's daemon-only
 # path addition) that are not sdoc fields at all.

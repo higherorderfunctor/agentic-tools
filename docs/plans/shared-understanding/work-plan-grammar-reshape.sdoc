@@ -27,16 +27,15 @@ representations with different goals in one system:
   (pre-beads);
 - organization: epic-like higher-level reasoning;
 - axes, as their own node kind or as fields: milestone = horizontal slice
-  over time, named component = vertical slice -- shaped like nodes/relations
-  so prose can attach to them.
+  over time, with a separately ruled vertical slice -- shaped like
+  nodes/relations so prose can attach to them.
 <<<
 NOTES: >>>
 Operator: "yeah this one needs more unpacking in future session" and
 "pretty much describing the status quo, lol, but no enforced tier levels."
-Axes clause verbatim, since node-kind-vs-field is theirs to pick: "various
-axis (own node kind or fields?). horizontal slice over time: milestone.
-verticle slice of like named components. kinda like node / relations so I
-can attach prose to those."
+Axes direction paraphrased because node-kind-vs-field is theirs to pick:
+horizontal slices over time are milestones; vertical slices should likewise
+be shaped so prose can attach to them.
 
 Details-depth clause verbatim, because "before beads" reads two ways --
 temporal (an interim mechanism until beads adoption) or positional (the
