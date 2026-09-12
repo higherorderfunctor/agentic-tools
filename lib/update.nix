@@ -6,17 +6,13 @@
 # `config.update.targets`, so there is no longer a parallel matrix to keep in
 # sync. Every package contributes its own row:
 #
-# Owner registry.nix files and the remaining legacy config/update-targets.nix
-# rows merge through lib/facets/repository.nix. Native module types realize the
-# values; facet ownership validation rejects competing owners before priority
-# can hide a definition. The pipeline reads the resulting .#updateTargets.
+# Owner registry.nix files and workspace exclusion policy in
+# config/update-targets.nix merge through lib/facets/registry.nix. Native module
+# types realize the values; ownership validation rejects competing owners
+# before priority can hide a definition. The pipeline reads .#updateTargets.
 #
-# Mirrors the authoring style of lib/ai/sharedOptions.nix and the reference
-# submodule shape of the sibling option-merged registries
-# lib/fragments-registry.nix and lib/checks.nix. This line used to cite
-# private/slice-fixture/lib/concerns.nix; /private/ is gitignored local working
-# material, so that pointer resolved for nobody but its author (the fixture is
-# described in docs/package-restructure.md).
+# The sibling lib/fragments-registry.nix uses the same option-submodule style.
+# See docs/repository-layout.md for the settled package/workspace boundary.
 {lib, ...}: let
   inherit (lib) mkOption types;
 in {

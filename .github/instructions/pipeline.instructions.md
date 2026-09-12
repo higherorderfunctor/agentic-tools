@@ -856,7 +856,8 @@ aggregate but skips its dependency leaves.
 ## Update Pipeline Architecture
 
 > **Last verified:** 2026-09-12 — owner registries supply update targets and
-> source paths; the resolver scans owner recipes.
+> source paths; the resolver scans owner recipes. Retired prototype pointers are
+> replaced by the settled ownership reference.
 >
 > **Settled — do not relitigate.** Gating the PR on a passing build was tried
 > and rejected. It parks every later bump of that input behind one broken
@@ -975,12 +976,11 @@ registry every package contributes a row to. It replaced the flat, top-level
   (never a Nix path literal), `null` for binary packages; `git` is the upstream
   URL for main-tracking rev-bump, `null` for binary packages; `dependsOn` names
   DAG predecessors (e.g. `["rust-overlay"]`). For the reference submodule shape,
-  read the sibling option-merged registries `lib/fragments-registry.nix` and
-  `lib/checks.nix` — same `attrsOf (submodule …)` declaration, same
-  central-contribution split. Both are tracked. This bullet used to cite
-  `private/slice-fixture/lib/concerns.nix` instead; `/private/` is gitignored
-  local working material, so that pointer resolves for nobody but its author.
-  The fixture itself is described in `docs/package-restructure.md`.
+  read the sibling registry in `lib/fragments-registry.nix`, which uses the same
+  `attrsOf (submodule …)` shape and separates option declarations from
+  contributions. Owner registries and workspace policy now compose through
+  `lib/facets/registry.nix`; see `docs/repository-layout.md` for the settled
+  ownership boundary.
 - **`config/update-targets.nix`** — workspace exclusion policy only.
 - **`packages/<owner>/registry.nix`** — each owner contributes its update rows.
   `file = repoPath ./packages/<namespace>/<package>/package.nix` derives the
