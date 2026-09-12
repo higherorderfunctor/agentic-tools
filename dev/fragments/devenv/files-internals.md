@@ -34,8 +34,16 @@ source = {
 };
 ```
 
-Whatever path you provide becomes the symlink target verbatim. No recursion, no
-enumeration, no per-file generation.
+Whatever path you provide is passed through verbatim: the format itself never
+walks, enumerates, or expands it.
+
+Keep source GENERATION separate from MATERIALIZATION, because only the second
+one varies. Generation is identity in every mode. Materialization is where
+`copyMode` decides: under the default `symlink` the path becomes the symlink
+target and nothing recurses, while under `copy` or `seed` that same path goes to
+`cp -RL`, so a directory source is copied through as a tree. "No recursion" is
+therefore a property of the symlink branch, not of the `source` format — see the
+dispatcher below.
 
 **The submodule has no recursive field:**
 
