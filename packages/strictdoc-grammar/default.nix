@@ -23,4 +23,5 @@
 {
   docs = ./docs;
   lib.ai.strictdocGrammar = import ./lib;
+  modules.devenv = ./modules/devenv;
 }

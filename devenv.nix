@@ -238,11 +238,8 @@ in {
     ./packages/kimchi/modules/devenv
     ./packages/kiro-cli/modules/devenv
     ./packages/semble/modules/devenv
-    # `ai.strictdoc` (MECH-STRICTDOC-DEVENV-MODULE). Imported by PATH rather
-    # than reached through `flake.devenvModules`: the package barrel
-    # deliberately does not publish this facet, because checks/options-doc.nix
-    # diffs the published devenv option tree against the home-manager one
-    # option for option, and this module has no home-manager half by ruling.
+    # The public barrel exports this same module. Keep local assembly selective,
+    # like the other imports here, so stacked-workflows remains excluded below.
     ./packages/strictdoc-grammar/modules/devenv
     # NOTE: the stacked-workflows devenv module is NOT imported here. Enabling
     # it would fan its skills into `ai.skills` UNPREFIXED (stack-*), which, once

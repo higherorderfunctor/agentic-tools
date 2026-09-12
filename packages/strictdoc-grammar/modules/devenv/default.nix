@@ -15,13 +15,14 @@
 # nothing on the other side of it. If an HM facet lands, the split lands with
 # it.
 #
-# NOT REGISTERED IN THE PACKAGE BARREL, and that is load-bearing rather than an
-# omission. `packages/*/default.nix` exposing `modules.devenv` feeds
-# `flake.devenvModules.nix-agentic-tools`, which `checks/options-doc.nix` diffs
-# option-name for option-name against `flake.homeManagerModules.default`. A
-# devenv-only `ai.*` namespace fails that gate by construction. devenv.nix
-# imports this directory directly instead, which is what "this repository's
-# convention" means here — see MECH-STRICTDOC-DEVENV-MODULE-NOT-PUBLISHED.
+# Published through the package barrel into
+# `devenvModules.nix-agentic-tools`. `checks/options-doc.nix` explicitly excludes
+# this project-only namespace from HM parity while requiring its public docs.
+#
+# Exposure preserves the existing runtime contract: scribe, its daemon/client,
+# and the board launch scripts from the consuming project's working tree. The
+# module does not distribute those scripts or make those launchers portable.
+# Grammar rendering and `generate:sgra` do not require those project scripts.
 #
 # ── `generate:sgra` WRITES the files, and what that does not oblige ─────────
 #
