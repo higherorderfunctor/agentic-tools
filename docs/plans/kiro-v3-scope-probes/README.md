@@ -2,8 +2,9 @@
 
 Preserved, manually-runnable reproducers for **what Kiro v3 actually loads and
 fires** — per surface (hooks, skills, agents), per scope (workspace vs global),
-and, load-bearing for the factory, **real files vs store symlinks**. Verified
-against `kiro-cli 2.13.0` on 2026-07-23.
+and, load-bearing for the factory, **real files vs store symlinks**. Originally
+verified against `kiro-cli 2.13.0` on 2026-07-23; steering re-verified against
+`2.21.4` on 2026-09-12, where the answer CHANGED — see below.
 
 > **Status: knowledge-capture, not the regression fixture.** These scripts drive
 > a live Kiro TUI and spend the operator's real Kiro account, so they are
@@ -30,6 +31,38 @@ against `kiro-cli 2.13.0` on 2026-07-23.
 ```
 
 Requires `tmux` and `kiro-cli` on PATH, plus a logged-in Kiro account.
+
+## These spend real credits — pin the cheap model
+
+Every script here drives a live Kiro TUI against the operator's real account.
+The scripts now pass `--model gpt-5.6-luna` explicitly; **keep that flag on any
+probe you add.** Without it a run inherits `chat.defaultModel` from
+`~/.kiro/settings/cli.json`, which is a per-operator setting and is currently
+the most expensive tier available.
+
+The multipliers move, so this file does not copy them.
+`kiro-cli chat --list-models` prints the live table, and the reference copy
+lives in `dev/references/kiro-workflows.md`. At the time of writing luna is the
+cheapest listed tier and the default in use was 22x its rate, which is the whole
+reason for the flag.
+
+`/context show` and the other slash-command signals are local, so a probe that
+only enumerates should cost little regardless — but the flag costs nothing to
+carry and protects the probes that do take a real turn.
+
+## Steering: the answer changed between 2.13.0 and 2.21.4
+
+`probe-steering.sh` originally recorded that v3 DROPS a symlinked steering file.
+Re-run on `2.21.4` on 2026-09-12, it **FOLLOWS** — both the real control and the
+symlink are listed by `/context show`.
+
+That matters because symlink-vs-copy delivery for Kiro steering rides on it, and
+because the repo moved steering back to a symlink sink after a spike on 2.18.1
+without a recorded re-verification afterwards. This re-run closes that gap for
+workspace scope at 2.21.4.
+
+**Global steering is still unmeasured.** No saved script covers it. Treat the
+workspace result as indicative, not as proof for the global path.
 
 ## Four harness bugs (the expensive part — do not re-hit)
 

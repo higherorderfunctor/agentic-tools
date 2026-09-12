@@ -40,7 +40,7 @@ JSON
 echo "[probe] temp real-file global hook placed at $PROBE (any autoMemory symlink untouched)"
 
 tmux kill-session -t "$S" 2>/dev/null || true
-tmux new-session -d -s "$S" -x 220 -y 60 -c "$TMPCWD" kiro-cli chat
+tmux new-session -d -s "$S" -x 220 -y 60 -c "$TMPCWD" kiro-cli chat --model gpt-5.6-luna
 
 ready=0
 for _ in $(seq 1 60); do
