@@ -811,6 +811,9 @@
       "axScreenReader": {
         "type": "boolean"
       },
+      "bashEditDiffEnabled": {
+        "type": "boolean"
+      },
       "bashOutputMaxChars": {
         "type": "integer"
       },
@@ -3260,6 +3263,7 @@
       "awsAuthRefresh",
       "awsCredentialExport",
       "axScreenReader",
+      "bashEditDiffEnabled",
       "bashOutputMaxChars",
       "blockedMarketplaces",
       "channelsEnabled",
