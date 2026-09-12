@@ -1,9 +1,22 @@
 # Repository ownership and layout
 
-The current implementation follows the native ownership workstream
-[#1019](https://github.com/higherorderfunctor/nix-agentic-tools/issues/1019).
-The earlier [restructure proposal](package-restructure.md) is historical design
-context. The directory layout below is the working structure.
+**Settled baseline:** the package ownership redesign merged in
+[PR #1633](https://github.com/higherorderfunctor/nix-agentic-tools/pull/1633) as
+`3510a5dbc816a1598e0ff0c357c0c237dc78b267` on 2026-09-12. The operator accepted
+this layout as the design to keep until a future redesign is explicitly
+requested.
+
+This guide describes the current structure.
+[Workstream #1019](https://github.com/higherorderfunctor/nix-agentic-tools/issues/1019)
+records the implementation and validation. The
+[retired planning index](package-restructure.md) provides historical provenance
+only.
+
+Further regrouping of owners, reducing the `packages/` nesting, or extracting
+overlays into another repository is not pending work under this redesign. Future
+layout work starts from this baseline and its tests, with a new scope; old plans
+and private fixtures do not reopen it. Package additions, updates, fixes, and
+routine maintenance continue within the settled ownership model.
 
 ```text
 packages/
@@ -14,7 +27,6 @@ packages/
     modules/
       devenv/default.nix            Consumer project configuration
       homeManager/default.nix       Consumer home configuration
-      common.nix                    Private shared module implementation
     lib/
       default.nix                   Public helpers in their native namespace
       mkKiro.nix                    Private implementation helpers

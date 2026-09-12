@@ -1214,5 +1214,10 @@ flake.nix               Public assembly and repo outputs
 devenv.nix              This repository's workspace shell
 ```
 
-See `docs/repository-layout.md` for a worked owner tree and the distinction
+The owner layout merged in PR #1633 is the operator-accepted baseline as of
+2026-09-12. Further regrouping or reducing directory nesting is future design
+work, not an unfinished migration. Old restructure plans and private prototypes
+are historical evidence, not instructions to resume.
+
+See `docs/repository-layout.md` for the settled owner tree and the distinction
 between package and workspace responsibilities.
