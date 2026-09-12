@@ -59,6 +59,7 @@
     "chat.notificationMethod",
     "chat.preserveScrollback",
     "chat.sessionDashboard.groupBy",
+    "chat.sessionDashboard.indexResponses",
     "chat.showTasks",
     "chat.showThinking",
     "chat.showThinkingTips",
