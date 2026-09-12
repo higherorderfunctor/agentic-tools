@@ -61,7 +61,7 @@
 # per-runtime key to null to suppress the root value.
 #
 # Writing the ROOT pool is what this module used to do, and it is banned by
-# the provenance guard in `checks/module-eval.nix`. Root pools belong to
+# the provenance guard in `checks/module-provenance/helpers.nix`. Root pools belong to
 # consumers as portable defaults; a package write there would fan out beyond
 # the package's runtime ownership and force consumers to retract it themselves.
 #

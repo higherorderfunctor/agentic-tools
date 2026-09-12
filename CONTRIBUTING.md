@@ -96,10 +96,10 @@ normalized runtime context/rules enter `ai.<runtime>.files` and lower to
 ordinary backend symlinks. A 2.18.1 live spike confirmed Kiro steering now loads
 through that path. See the devenv files-internals fragment.
 
-`checks/instruction-materialization.nix` runs the exact packaged copier in a
-temporary repository. It covers portability and lifecycle behavior without
-building the full interactive devenv shell, so the on-demand Devenv Diagnostic
-is no longer an automatic CI dependency.
+`checks/instructions/instruction-materialization.nix` runs the exact packaged
+copier in a temporary repository. It covers portability and lifecycle behavior
+without building the full interactive devenv shell, so the on-demand Devenv
+Diagnostic is no longer an automatic CI dependency.
 
 ### Running Generation
 
@@ -187,6 +187,9 @@ See [Packaging](docs/packaging.md) and the scoped architecture routing in
 3. Put consumer modules, helpers, and checks in the same owner directory
 4. Add HM and devenv modules in `packages/<owner>/modules/` when applicable
 5. Run `nix flake check` to verify
+
+See [Repository ownership and layout](docs/repository-layout.md) for a worked
+tree. Register checks through the owner's native `checks.nix` module.
 
 Owner discovery exports native package namespaces, flat flake packages, and
 backend modules automatically. New owners need no root export entry.

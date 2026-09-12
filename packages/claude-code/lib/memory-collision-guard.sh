@@ -60,7 +60,7 @@ set -euETo pipefail
 shopt -s inherit_errexit 2>/dev/null || :
 
 # Baked at nix eval time by memoryCollisionGuard.nix; defaults keep the script
-# runnable standalone (checks/claude-memory-collision-guard.nix drives it directly).
+# runnable standalone (packages/claude-code/checks/claude-memory-collision-guard.nix drives it directly).
 guard_root="${MEMORY_GUARD_ROOT:-${CLAUDE_CONFIG_DIR:-${HOME:-/nonexistent}/.claude}/projects}"
 window_minutes="${MEMORY_GUARD_WINDOW_MINUTES:-10}"
 list_count="${MEMORY_GUARD_LIST_COUNT:-10}"

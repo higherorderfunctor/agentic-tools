@@ -153,7 +153,7 @@ git_diff_quiet() {
 #
 # The rule was documented before it was enforced and then broken twice within
 # two days, so it is now a build-failing gate rather than a comment:
-# checks/target-subshell-shape.nix. shellcheck has no diagnostic for it.
+# checks/shell/target-subshell-shape.nix. shellcheck has no diagnostic for it.
 
 # ── Worktree management ──────────────────────────────────────────────────────
 

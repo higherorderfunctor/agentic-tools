@@ -50,9 +50,9 @@ HM (user-global) and devenv (project-local) contributions are independent.
 
 It writes the per-runtime pools rather than root `ai.skills` because a root pool
 belongs to consumers as a portable default surface — the provenance guard in
-`checks/module-eval.nix` enforces that. **The practical consequence for a
-consumer: override or suppress a package skill at `ai.<runtime>.skills.<name>`
-and, on rule-capable runtimes, the router at
+`checks/module-provenance/module-eval.nix` enforces that. **The practical
+consequence for a consumer: override or suppress a package skill at
+`ai.<runtime>.skills.<name>` and, on rule-capable runtimes, the router at
 `ai.<runtime>.rules.stacked-workflows-router`.** Package values use `mkDefault`,
 so an explicit value or null wins at that runtime scope. A same-key root entry
 is replaced by the package's per-runtime value rather than colliding.

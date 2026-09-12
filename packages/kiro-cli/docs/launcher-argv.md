@@ -124,12 +124,13 @@ Three properties worth knowing before touching it:
   brick the CLI over a cosmetic prompt edit. The stderr line is what keeps it
   from being SILENT.
 
-Because it is an env export rather than a flag, `checks/kiro-wrapper-argv.nix`
-does not cover it. The module-eval tests do:
-`module-kiro-{hm,devenv}-identity-forks-package` assert the wrapper forks when
-the option is set, and `module-kiro-identity-default-is-stock` asserts it stays
-byte-identical to stock when it is not — which is what protects the cache hit.
-Bundle mechanics live in `packages/kiro-cli/lib/identityBundle.nix`.
+Because it is an env export rather than a flag,
+`packages/kiro-cli/checks/kiro-wrapper-argv.nix` does not cover it. The
+module-eval tests do: `module-kiro-{hm,devenv}-identity-forks-package` assert
+the wrapper forks when the option is set, and
+`module-kiro-identity-default-is-stock` asserts it stays byte-identical to stock
+when it is not — which is what protects the cache hit. Bundle mechanics live in
+`packages/kiro-cli/lib/identityBundle.nix`.
 
 The 2.21.1 and 2.21.2 engines minify the identity function: in the measured
 2.21.2 bundle, `xSs(e)` returns a CLI/IDE ternary and `VZ` inserts its result at
@@ -137,9 +138,9 @@ the start of the shared prompt. The splicer matches that complete dispatch,
 including the IDE arm and the shared argument, without pinning either mangled
 name or vendor prose. Older bundles retain the `getIdentity`/`if` path. Multiple
 candidates or an unknown shape fail before writing a patched bundle.
-`checks/kiro-identity-splice.nix` exercises both forms, checks byte preservation
-outside the first sentence, and executes synthetic functions to verify the CLI,
-IDE, and fallback results.
+`packages/kiro-cli/checks/kiro-identity-splice.nix` exercises both forms, checks
+byte preservation outside the first sentence, and executes synthetic functions
+to verify the CLI, IDE, and fallback results.
 
 ### `extraPackages` — a PATH prefix, not an FHS rebuild
 
@@ -160,8 +161,9 @@ supplying missing tools; Darwin has no later FHS reordering.
 
 The empty list is inert and produces no wrapper by itself. A non-empty list
 creates the wrapper even when no env, argv, identity, or secret injection is
-configured. It does not alter argv, and `checks/kiro-wrapper-argv.nix` runs both
-entry points to assert the prefix and inherited tail together.
+configured. It does not alter argv, and
+`packages/kiro-cli/checks/kiro-wrapper-argv.nix` runs both entry points to
+assert the prefix and inherited tail together.
 
 On Linux this crosses the upstream FHS visibility boundary because `/nix` is
 mounted and PATH is preserved; it does not merge packages into the synthesized
@@ -407,10 +409,10 @@ rewrites argv: `kiro-cli --v3 acp` arrives here as an explicit
 
 **The lesson generalizes past this flag.** Each wrapper was individually correct
 and the pair was not, so any new injection has to be reasoned about against what
-the OTHER wrapper adds on the same code path. `checks/kiro-wrapper-argv.nix` now
-covers this with a launcher stub that dispatches through `PATH`; testing the two
-binaries in isolation cannot see it, which is exactly how this reached a
-release.
+the OTHER wrapper adds on the same code path.
+`packages/kiro-cli/checks/kiro-wrapper-argv.nix` now covers this with a launcher
+stub that dispatches through `PATH`; testing the two binaries in isolation
+cannot see it, which is exactly how this reached a release.
 
 ## The v3 + `acp` conflict
 
@@ -523,26 +525,26 @@ parse rejection from an accepted flag.
 
 ## Tests
 
-- `checks/kiro-fhs-contract.nix` — structurally inspects the realized upstream
-  Linux command wrappers, shared launcher, init, dispatcher, and profile. It
-  pins the `/nix` bind and inherited PATH bridge that `extraPackages` depends
-  on, then realizes a configured FHS payload and proves the selected rootfs chat
-  command carries `trustedMcpTools`, without claiming to execute bubblewrap
-  inside the Nix build sandbox.
-- `checks/kiro-wrapper-argv.nix` — the real wrapper against a stub package that
-  prints its argv. Covers which SIDE of the subcommand each flag lands on, the
-  absence of `--tui`, the value-flag skip, `--`, idempotence, and the env/PATH
-  export paths. String-matching the generated bash cannot catch a flag emitted
-  on the wrong side; running it can.
-- `checks/module-eval.nix` (`module-kiro-wrapper-*`) — pins the SHAPE of the
-  generated bash and the wrapper trigger conditions.
+- `packages/kiro-cli/checks/kiro-fhs-contract.nix` — structurally inspects the
+  realized upstream Linux command wrappers, shared launcher, init, dispatcher,
+  and profile. It pins the `/nix` bind and inherited PATH bridge that
+  `extraPackages` depends on, then realizes a configured FHS payload and proves
+  the selected rootfs chat command carries `trustedMcpTools`, without claiming
+  to execute bubblewrap inside the Nix build sandbox.
+- `packages/kiro-cli/checks/kiro-wrapper-argv.nix` — the real wrapper against a
+  stub package that prints its argv. Covers which SIDE of the subcommand each
+  flag lands on, the absence of `--tui`, the value-flag skip, `--`, idempotence,
+  and the env/PATH export paths. String-matching the generated bash cannot catch
+  a flag emitted on the wrong side; running it can.
+- `packages/kiro-cli/checks/module-eval.nix` (`module-kiro-wrapper-*`) — pins
+  the SHAPE of the generated bash and the wrapper trigger conditions.
 
 ## Do not break the exec line
 
 The wrapper ends with `exec -a "$0" <realBin> "$@"`. Keep that shape: recovering
 the real binary by reading the line back out of the generated wrapper is how you
 probe the unwrapped CLI at all (see the re-measure recipe above), and
-`checks/kiro-wrapper-argv.nix` asserts on it.
+`packages/kiro-cli/checks/kiro-wrapper-argv.nix` asserts on it.
 
 This governs THIS module's wrappers only. The darwin OVERLAY shim
 (`packages/kiro-cli/packages/ai/kiro-cli/package.nix`) deliberately ends in

@@ -1,0 +1,1463 @@
+# End-to-end module contracts; the shared harness discovers every backend.
+# cspell:ignore batchmode sembleignore
+{
+  lib,
+  pkgs,
+  harness,
+  ...
+}: let
+  inherit (harness) evalDevenv evalHm mkTest;
+  inherit (import ./helpers.nix {inherit lib pkgs harness;}) claudeAssertionFails claudeAssertionsPass claudeKnownKeysCfg claudeNestedTypoCfg handlerCommands hasClampHook hasGuardHook;
+in {
+  checks = {
+    module-claude-default-disabled = mkTest "claude-default-disabled" (
+      !(evalHm {}).config.ai.claude.enable
+      && !(evalDevenv {}).config.ai.claude.enable
+    );
+
+    module-claude-enable-toggles = mkTest "claude-enable-toggles" (
+      let
+        ev = evalHm {ai.claude.enable = true;};
+      in
+        ev.config.ai.claude.enable
+    );
+
+    # NOTE: this test verifies that the shared ai.mcpServers pool ACCEPTS
+    # an entry when a package module (claude) is also loaded — i.e. no type
+    # conflicts between sharedOptions.nix's mcpServers declaration and the
+    # per-app one contributed by mkAiApp. It does NOT verify the claude
+    # module's internal mergedServers fanout computation. Fanout correctness
+    # is tested in checks/ai-factory/factory-eval.nix via factory-mkAiApp-fanout-*.
+    # A true end-to-end fanout test requires the rendering pipeline landed
+    # in a later milestone (writing mergedServers into home.file output).
+    module-claude-shared-mcp-pool-accepted = mkTest "claude-shared-mcp-pool-accepted" (
+      let
+        evaluated = evalHm {
+          ai.claude.enable = true;
+          ai.mcpServers.testServer = {
+            type = "stdio";
+            package = pkgs.hello;
+            command = "hello";
+          };
+        };
+      in
+        evaluated.config.ai.mcpServers ? testServer
+    );
+
+    module-claude-shared-rule-emits-native-file = mkTest "claude-shared-rule-emits-native-file" (
+      let
+        evaluated = evalHm {
+          ai = {
+            claude.enable = true;
+            rules.search = {
+              text = "Always use rg instead of grep.";
+              description = "Grep replacement";
+            };
+          };
+        };
+        rule = evaluated.config.home.file.".claude/rules/search.md".text;
+      in
+        lib.hasInfix "Always use rg instead of grep." rule
+        && lib.hasInfix "description: Grep replacement" rule
+    );
+
+    module-claude-no-guidance-no-file = mkTest "claude-no-guidance-no-file" (
+      let
+        evaluated = evalHm {ai.claude.enable = true;};
+        # With no rules and no context merged, nothing enters the final file map.
+      in
+        !(evaluated.config.home.file ? ".claude/CLAUDE.md")
+    );
+
+    module-claude-per-app-rule-emits-native-file = mkTest "claude-per-app-rule-emits-native-file" (
+      let
+        evaluated = evalHm {
+          ai.claude = {
+            enable = true;
+            rules.claude-only = {
+              text = "Claude-specific rule.";
+              description = "Claude only";
+            };
+          };
+        };
+        rule = evaluated.config.home.file.".claude/rules/claude-only.md".text;
+      in
+        lib.hasInfix "Claude-specific rule." rule
+    );
+
+    # Claude HM emits context and each keyed rule through ai.claude.files before
+    # the generic backend sink.
+    module-claude-hm-context-and-rules = mkTest "claude-hm-context-and-rules" (
+      let
+        evaluated = evalHm {
+          ai = {
+            claude = {
+              enable = true;
+              context.text = "CONTEXT-BASELINE-TOKEN.";
+            };
+            rules = {
+              named-rule = {
+                text = "NAMED-RULE-BODY-TOKEN.";
+                matcher = ["src/**"];
+              };
+              unnamed = {
+                text = "UNNAMED-INSTR-TOKEN.";
+                description = "unnamed always-on";
+              };
+            };
+          };
+        };
+        aggregate = evaluated.config.home.file.".claude/CLAUDE.md" or null;
+        ruleFile = evaluated.config.home.file.".claude/rules/named-rule.md" or null;
+      in
+        aggregate.text
+        == evaluated.config.ai.claude.files.".claude/CLAUDE.md".text
+        && aggregate.text == "CONTEXT-BASELINE-TOKEN."
+        && ruleFile != null
+        && ruleFile.text == evaluated.config.ai.claude.files.".claude/rules/named-rule.md".text
+        && lib.hasInfix "NAMED-RULE-BODY-TOKEN." (ruleFile.text or "")
+        && evaluated.config.home.file ? ".claude/rules/unnamed.md"
+    );
+
+    # Claude devenv writes context to `.claude/CLAUDE.md` and keeps every rule in
+    # its own native file, without duplicating rule bodies into the context file.
+    module-claude-devenv-context-and-rules = mkTest "claude-devenv-context-and-rules" (
+      let
+        evaluated = evalDevenv {
+          ai = {
+            claude = {
+              enable = true;
+              context.text = "CONTEXT-BASELINE-TOKEN.";
+            };
+            rules = {
+              named-rule = {
+                text = "NAMED-RULE-BODY-TOKEN.";
+                matcher = ["src/**"];
+              };
+              unnamed = {
+                text = "UNNAMED-INSTR-TOKEN.";
+                description = "unnamed always-on";
+              };
+            };
+          };
+        };
+        composed = (evaluated.config.files.".claude/CLAUDE.md" or {}).text or "";
+        ruleFile = evaluated.config.files.".claude/rules/named-rule.md" or null;
+      in
+        lib.hasInfix "CONTEXT-BASELINE-TOKEN." composed
+        && !(lib.hasInfix "UNNAMED-INSTR-TOKEN." composed)
+        && !(lib.hasInfix "NAMED-RULE-BODY-TOKEN." composed)
+        && ruleFile != null
+        && lib.hasInfix "NAMED-RULE-BODY-TOKEN." (ruleFile.text or "")
+        && evaluated.config.files ? ".claude/rules/unnamed.md"
+    );
+
+    # ── Task 3 (A2): Claude HM/devenv fanout absorption ────────────
+    module-claude-hm-delegates-programs-claude-code = mkTest "claude-hm-delegates-programs-claude-code" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+        };
+      in
+        result.config.programs.claude-code.enable or false
+    );
+
+    # HM: ai.claude.nativeSettings.<key> reaches programs.claude-code.settings.<key>
+    # via the transitional raw-inherit in mkClaude.nix. Regression guard for
+    # the inherit; will update to assert translation semantics when HM migrates
+    # to the devenv pattern.
+    module-claude-hm-settings-reach-upstream = mkTest "claude-hm-settings-reach-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            nativeSettings = {
+              effortLevel = "medium";
+              permissions.allow = ["Read"];
+            };
+          };
+        };
+        upstreamSettings = result.config.programs.claude-code.settings or {};
+      in
+        (upstreamSettings.effortLevel or null)
+        == "medium"
+        && ((upstreamSettings.permissions.allow or []) == ["Read"])
+    );
+
+    # Strict enum: an invalid effortLevel must throw at eval.
+    module-claude-hm-effort-level-rejects-invalid = mkTest "claude-hm-effort-level-rejects-invalid" (
+      let
+        attempt = builtins.tryEval (
+          let
+            ev = evalHm {
+              ai.claude = {
+                enable = true;
+                nativeSettings.effortLevel = "ultra";
+              };
+            };
+          in
+            builtins.deepSeq ev.config.ai.claude.nativeSettings.effortLevel
+            ev.config.ai.claude.nativeSettings.effortLevel
+        );
+      in
+        attempt.success == false
+    );
+
+    # Valid effortLevel reaches upstream.
+    module-claude-hm-effort-level-valid-reaches-upstream = mkTest "claude-hm-effort-level-valid-reaches-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            nativeSettings.effortLevel = "xhigh";
+          };
+        };
+      in
+        (result.config.programs.claude-code.settings.effortLevel or null) == "xhigh"
+    );
+
+    # Strict enum: an invalid tui renderer must throw at eval.
+    module-claude-hm-tui-rejects-invalid = mkTest "claude-hm-tui-rejects-invalid" (
+      let
+        attempt = builtins.tryEval (
+          let
+            ev = evalHm {
+              ai.claude = {
+                enable = true;
+                nativeSettings.tui = "curses";
+              };
+            };
+          in
+            builtins.deepSeq ev.config.ai.claude.nativeSettings.tui
+            ev.config.ai.claude.nativeSettings.tui
+        );
+      in
+        attempt.success == false
+    );
+
+    # Valid tui renderer reaches upstream (typed nullOr enum).
+    module-claude-hm-tui-valid-reaches-upstream = mkTest "claude-hm-tui-valid-reaches-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            nativeSettings.tui = "fullscreen";
+          };
+        };
+      in
+        (result.config.programs.claude-code.settings.tui or null) == "fullscreen"
+    );
+
+    # Attribution: `false` coerces to "" at the type layer (disables the
+    # commit trailer) and survives the null-filter (filterNulls keeps "").
+    module-claude-hm-attribution-false-disables-reaches-upstream = mkTest "claude-hm-attribution-false-disables-reaches-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            nativeSettings.attribution.commit = false;
+          };
+        };
+      in
+        (result.config.programs.claude-code.settings.attribution.commit or null) == ""
+    );
+
+    # Attribution: a custom string passes through unchanged.
+    module-claude-hm-attribution-string-reaches-upstream = mkTest "claude-hm-attribution-string-reaches-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            nativeSettings.attribution.pr = "Reviewed-by: me";
+          };
+        };
+      in
+        (result.config.programs.claude-code.settings.attribution.pr or null) == "Reviewed-by: me"
+    );
+
+    # Attribution: `true` coerces to null -> filtered; the attribution block
+    # collapses to empty and is dropped entirely (Claude keeps its defaults).
+    module-claude-hm-attribution-true-filtered = mkTest "claude-hm-attribution-true-filtered" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            nativeSettings.attribution.commit = true;
+          };
+        };
+        s = result.config.programs.claude-code.settings or {};
+      in
+        !(s ? attribution)
+    );
+
+    # Null typed keys are filtered out — upstream never sees the typed keys
+    # when unset, and the undocumented `ultracode` key is never written unless
+    # ultracodeOnLaunch is set.
+    module-claude-hm-null-settings-filtered = mkTest "claude-hm-null-settings-filtered" (
+      let
+        result = evalHm {ai.claude.enable = true;};
+        s = result.config.programs.claude-code.settings or {};
+      in
+        !(s ? attribution)
+        && !(s ? effortLevel)
+        && !(s ? model)
+        && !(s ? tui)
+        && !(s ? enableWorkflows)
+        && !(s ? workflowKeywordTriggerEnabled)
+        && !(s ? ultracode)
+    );
+
+    # Valid enableWorkflows reaches upstream (typed nullOr bool).
+    module-claude-hm-enable-workflows-valid-reaches-upstream = mkTest "claude-hm-enable-workflows-valid-reaches-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            nativeSettings.enableWorkflows = true;
+          };
+        };
+      in
+        (result.config.programs.claude-code.settings.enableWorkflows or null) == true
+    );
+
+    # Valid workflowKeywordTriggerEnabled reaches upstream (typed nullOr bool);
+    # `false` survives the null-filter (filterNulls drops null, keeps false).
+    module-claude-hm-workflow-keyword-trigger-valid-reaches-upstream = mkTest "claude-hm-workflow-keyword-trigger-valid-reaches-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            nativeSettings.workflowKeywordTriggerEnabled = false;
+          };
+        };
+        s = result.config.programs.claude-code.settings or {};
+      in
+        (s ? workflowKeywordTriggerEnabled)
+        && s.workflowKeywordTriggerEnabled == false
+    );
+
+    # Meta option: ultracodeOnLaunch = true writes both the undocumented
+    # `ultracode` key and the `enableWorkflows` master toggle to upstream.
+    module-claude-hm-ultracode-on-launch-writes-settings = mkTest "claude-hm-ultracode-on-launch-writes-settings" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            ultracodeOnLaunch = true;
+          };
+        };
+        s = result.config.programs.claude-code.settings or {};
+      in
+        (s.ultracode or null) == true && (s.enableWorkflows or null) == true
+    );
+
+    # Meta option uses mkDefault, so an explicit nativeSettings.ultracode = false
+    # wins over ultracodeOnLaunch, and the false survives the null-filter.
+    module-claude-hm-ultracode-on-launch-explicit-false-wins = mkTest "claude-hm-ultracode-on-launch-explicit-false-wins" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            ultracodeOnLaunch = true;
+            nativeSettings.ultracode = false;
+          };
+        };
+        s = result.config.programs.claude-code.settings or {};
+      in
+        (s ? ultracode) && s.ultracode == false
+    );
+
+    # Negative invariant: ultracodeOnLaunch writes ONLY ultracode +
+    # enableWorkflows. It must NOT set effortLevel (ultracode implies xhigh) or
+    # workflowKeywordTriggerEnabled (orthogonal per-turn key). Guards against a
+    # future fan-out accidentally over-reaching.
+    module-claude-hm-ultracode-on-launch-omits-orthogonal-keys = mkTest "claude-hm-ultracode-on-launch-omits-orthogonal-keys" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            ultracodeOnLaunch = true;
+          };
+        };
+        s = result.config.programs.claude-code.settings or {};
+      in
+        !(s ? effortLevel) && !(s ? workflowKeywordTriggerEnabled)
+    );
+
+    # Soft-enum model: an arbitrary (unknown) id is accepted and reaches upstream.
+    module-claude-hm-model-soft-enum-accepts-arbitrary = mkTest "claude-hm-model-soft-enum-accepts-arbitrary" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            nativeSettings.model = "some-future-model";
+          };
+        };
+      in
+        (result.config.programs.claude-code.settings.model or null) == "some-future-model"
+    );
+
+    module-claude-hm-writes-rule-file = mkTest "claude-hm-writes-rule-file" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+          ai.rules.my-rule = {
+            matcher = ["src/**"];
+            text = "Always use strict mode.";
+          };
+        };
+        ruleFile = result.config.home.file.".claude/rules/my-rule.md" or null;
+      in
+        ruleFile
+        != null
+        && lib.hasInfix "Always use strict mode" (ruleFile.text or "")
+    );
+
+    module-claude-hm-delegates-skills-to-upstream = mkTest "claude-hm-delegates-skills-to-upstream" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+          ai.skills.stack-fix = ../../stacked-workflows/skills/stack-fix;
+        };
+      in
+        result.config.programs.claude-code.skills ? stack-fix
+    );
+
+    module-claude-devenv-delegates-claude-code = mkTest "claude-devenv-delegates-claude-code" (
+      let
+        result = evalDevenv {
+          ai.claude.enable = true;
+        };
+      in
+        result.config.claude.code.enable or false
+    );
+
+    # Devenv: cfg.nativeSettings gap write — non-hook/non-mcpServers keys land
+    # in files.".claude/settings.json".json. Module-system attrs merge with
+    # upstream's hook write (not exercised here; upstream claude.code is
+    # stubbed to `attrsOf anything`) produces a single settings.json on
+    # disk in production.
+    module-claude-devenv-settings-gap-writes-effort-level = mkTest "claude-devenv-settings-gap-writes-effort-level" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            nativeSettings.effortLevel = "medium";
+          };
+        };
+        settingsFile = result.config.files.".claude/settings.json" or null;
+      in
+        settingsFile
+        != null
+        && (settingsFile.json.effortLevel or null) == "medium"
+    );
+
+    # Devenv: `env` flows through the gap write (no longer short-circuited
+    # to a non-existent claude.code.env option).
+    module-claude-devenv-settings-gap-writes-env = mkTest "claude-devenv-settings-gap-writes-env" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            nativeSettings.env.FOO = "bar";
+          };
+        };
+        settingsFile = result.config.files.".claude/settings.json" or null;
+      in
+        settingsFile
+        != null
+        && (settingsFile.json.env.FOO or null) == "bar"
+    );
+
+    # Devenv: typed enableWorkflows flows through the gap write into
+    # files.".claude/settings.json".json (parity with the HM typed key).
+    module-claude-devenv-settings-gap-writes-enable-workflows = mkTest "claude-devenv-settings-gap-writes-enable-workflows" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            nativeSettings.enableWorkflows = true;
+          };
+        };
+        settingsFile = result.config.files.".claude/settings.json" or null;
+      in
+        settingsFile
+        != null
+        && (settingsFile.json.enableWorkflows or null) == true
+    );
+
+    # Devenv: attribution `false` flows through the gap write as "" into
+    # files.".claude/settings.json".json.attribution (parity with HM).
+    module-claude-devenv-settings-gap-writes-attribution = mkTest "claude-devenv-settings-gap-writes-attribution" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            nativeSettings.attribution.commit = false;
+          };
+        };
+        settingsFile = result.config.files.".claude/settings.json" or null;
+      in
+        settingsFile
+        != null
+        && (settingsFile.json.attribution.commit or null) == ""
+    );
+
+    # Devenv: ultracodeOnLaunch = true writes both ultracode and
+    # enableWorkflows into the gap-written settings.json (parity with HM).
+    module-claude-devenv-ultracode-on-launch-writes-settings = mkTest "claude-devenv-ultracode-on-launch-writes-settings" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            ultracodeOnLaunch = true;
+          };
+        };
+        settingsFile = result.config.files.".claude/settings.json" or null;
+      in
+        settingsFile
+        != null
+        && (settingsFile.json.ultracode or null) == true
+        && (settingsFile.json.enableWorkflows or null) == true
+    );
+
+    # Devenv parity for the mkDefault override: an explicit nativeSettings.ultracode =
+    # false wins over ultracodeOnLaunch and survives the gap-write null-filter.
+    module-claude-devenv-ultracode-on-launch-explicit-false-wins = mkTest "claude-devenv-ultracode-on-launch-explicit-false-wins" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            ultracodeOnLaunch = true;
+            nativeSettings.ultracode = false;
+          };
+        };
+        settingsFile = result.config.files.".claude/settings.json" or null;
+      in
+        settingsFile
+        != null
+        && (settingsFile.json ? ultracode)
+        && settingsFile.json.ultracode == false
+    );
+
+    # Devenv: the legacy `nativeSettings.hooks` escape hatch lowers verbatim into
+    # files.".claude/settings.json".json.hooks — NOT claude.code.hooks anymore
+    # (approach B). Composes with the typed event map via the formats.json merge.
+    module-claude-devenv-settings-hooks-escape-hatch = mkTest "claude-devenv-settings-hooks-escape-hatch" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            nativeSettings.hooks.PreToolUse = [{matcher = "Bash";}];
+          };
+        };
+        settingsHooks = ((result.config.files.".claude/settings.json" or {}).json or {}).hooks or {};
+        upstreamHooks = result.config.claude.code.hooks or {};
+      in
+        ((builtins.head (settingsHooks.PreToolUse or [])).matcher or null)
+        == "Bash"
+        && !(upstreamHooks ? PreToolUse)
+    );
+
+    # Devenv: empty ai.claude.nativeSettings produces no gap file (lib.mkIf
+    # gate on hasGapSettings).
+    #
+    # The heron_brook mitigation writes hooks into the same settings.json through
+    # a DIFFERENT writer, so it must stay off here for this test to be about the
+    # gap writer's own mkIf gate. That is now the default, so no explicit opt-out
+    # is needed — but if delegationClamp ever becomes default-on again, this test
+    # will start failing for a reason that has nothing to do with the gap writer.
+    # `gitSshConfigWorkaround` is the second such writer and it IS default-on:
+    # devenv has no `programs.git`, so the sandbox-safe SSH command reaches
+    # Claude through `settings.env.GIT_SSH_COMMAND` — which makes settings
+    # non-empty and would fail this test for a reason that has nothing to do
+    # with the gap writer. Opted out here so the assertion stays about the
+    # writer's own gate. The workaround's own delivery is covered by
+    # `module-ai-git-ssh-default-follows-harnesses`.
+    module-claude-devenv-settings-empty-no-gap-file = mkTest "claude-devenv-settings-empty-no-gap-file" (
+      let
+        result = evalDevenv {
+          ai.claude.enable = true;
+          ai.gitSshConfigWorkaround = false;
+        };
+      in
+        !(result.config.files ? ".claude/settings.json")
+    );
+
+    # Devenv: typed ai.claude.mcpServers entries are RENDERED before they
+    # reach upstream `claude.code.mcpServers` (parity with the HM branch).
+    # Upstream's devenv server submodule has no `package` option, so a raw
+    # typed entry fails its strict type in a real devenv eval ("The option
+    # 'claude.code.mcpServers.<name>.package' does not exist") — the stub
+    # here is `attrsOf anything`, so the load-bearing assertion is that the
+    # rendered shape carries NO raw `package` key and the derived
+    # command/args. Uses a real server name (context7-mcp) so renderServer's
+    # package branch (loadServer + mode-string args) is exercised end-to-end.
+    module-claude-devenv-mcp-servers-rendered = mkTest "claude-devenv-mcp-servers-rendered" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            mcpServers.context7-mcp.package = pkgs.hello;
+          };
+        };
+        rendered = (result.config.claude.code.mcpServers or {})."context7-mcp" or null;
+      in
+        rendered
+        != null
+        && !(rendered ? package)
+        && rendered.type == "stdio"
+        && lib.hasSuffix "/bin/hello" rendered.command
+        && lib.take 2 rendered.args == ["--transport" "stdio"]
+    );
+
+    # Devenv/HM parity: the SAME typed config yields the SAME rendered
+    # server attrset on both backends (programs.claude-code.mcpServers vs
+    # claude.code.mcpServers) — the render is shared (lib.ai.renderServer),
+    # so any divergence is a factory regression. `==` is decidable over
+    # context-carrying strings (store paths in command/env).
+    module-claude-devenv-mcp-servers-hm-parity = mkTest "claude-devenv-mcp-servers-hm-parity" (
+      let
+        cfg = {
+          ai.claude = {
+            enable = true;
+            mcpServers.context7-mcp.package = pkgs.hello;
+          };
+        };
+        hmServers = (evalHm cfg).config.programs.claude-code.mcpServers or {};
+        dvServers = (evalDevenv cfg).config.claude.code.mcpServers or {};
+      in
+        hmServers
+        != {}
+        && hmServers == dvServers
+    );
+
+    module-claude-hm-sets-lsp-env-when-servers-present = mkTest "claude-hm-sets-lsp-env-when-servers-present" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+          ai.mcpServers.test-server = {
+            type = "stdio";
+            package = pkgs.hello;
+            command = "hello";
+          };
+        };
+      in
+        (result.config.programs.claude-code.settings.env.ENABLE_LSP_TOOL or null) == "1"
+    );
+
+    # ── Task 5 (A4b): Claude launch-effort unpin reconciler ────────
+
+    # Default reconciler: flags from the committed sidecar are merged into
+    # ~/.claude.json through the shared helper.
+    module-claude-hm-reconciles-unpin-launch-effort = mkTest "claude-hm-reconciles-unpin-launch-effort" (
+      let
+        result = evalHm {ai.claude.enable = true;};
+        activation = result.config.home.activation.claudeUnpinLaunchEffort or null;
+      in
+        activation
+        != null
+        && lib.hasInfix "unpinOpus48LaunchEffort" (activation.text or "")
+        && lib.hasInfix ".claude.json" (activation.text or "")
+        && lib.hasInfix "jq" (activation.text or "")
+    );
+
+    # Emptied flag map: merge body omitted, but the applied-0 log still fires.
+    module-claude-hm-unpin-empty-logs-zero = mkTest "claude-hm-unpin-empty-logs-zero" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+          ai.claude.unpinLaunchEffort = lib.mkForce {};
+        };
+        activation = result.config.home.activation.claudeUnpinLaunchEffort or null;
+      in
+        activation
+        != null
+        && lib.hasInfix "reconciling 0" (activation.text or "")
+        && !(lib.hasInfix "unpinOpus48LaunchEffort" (activation.text or ""))
+    );
+
+    # A key set false is still written (re-pins that model deliberately).
+    module-claude-hm-unpin-false-key-written = mkTest "claude-hm-unpin-false-key-written" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+          ai.claude.unpinLaunchEffort.unpinOpus48LaunchEffort = false;
+        };
+        activation = result.config.home.activation.claudeUnpinLaunchEffort or null;
+      in
+        activation != null && lib.hasInfix "false" (activation.text or "")
+    );
+
+    # ── Attrs-shape ai.rules / ai.<cli>.rules (unified transformer) ───
+
+    # Claude HM: top-level ai.rules → .claude/rules/<name>.md with paths frontmatter.
+    module-claude-hm-writes-rules-from-top-level = mkTest "claude-hm-writes-rules-from-top-level" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+          ai.rules.code-style = {
+            matcher = ["src/**"];
+            text = "Use consistent formatting.";
+          };
+        };
+        ruleFile = result.config.home.file.".claude/rules/code-style.md" or null;
+      in
+        ruleFile
+        != null
+        && lib.hasInfix "Use consistent formatting" (ruleFile.text or "")
+        && lib.hasInfix "paths:" (ruleFile.text or "")
+        && lib.hasInfix "src/**" (ruleFile.text or "")
+    );
+
+    # Rules with null paths → unconditional (no frontmatter scoping).
+    module-claude-hm-rules-null-paths-no-frontmatter = mkTest "claude-hm-rules-null-paths-no-frontmatter" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+          ai.rules.always-on.text = "Loaded unconditionally.";
+        };
+        ruleFile = result.config.home.file.".claude/rules/always-on.md" or null;
+      in
+        ruleFile != null && !(lib.hasInfix "paths:" (ruleFile.text or ""))
+    );
+
+    # HM: ai.claude.plugins routes to programs.claude-code.plugins as an
+    # ATTRSET, key and value intact. The per-entry mkDefault in mkClaude
+    # must resolve away, leaving the bare source.
+    module-claude-hm-plugins-route-to-upstream = mkTest "claude-hm-plugins-route-to-upstream" (
+      let
+        src = ../../stacked-workflows/skills/stack-fix;
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            plugins.my-plugin = src;
+          };
+        };
+        upstream = result.config.programs.claude-code.plugins or {};
+      in
+        lib.attrNames upstream == ["my-plugin"] && upstream.my-plugin == src
+    );
+
+    # HM: the ATTRIBUTE NAME — not the source's base name — is what becomes
+    # the plugin's on-disk directory name. This is the whole point of the
+    # list → attrset conversion: upstream's list form derives each name from
+    # `baseNameOf` the entry, so a bare flake-input store path yields an
+    # unstable `<hash>-source` that is renamed by every unrelated input bump.
+    #
+    # Upstream (home-manager modules/programs/claude-code, verified at rev
+    # cbb77679) consumes the attrset via `lib.mapAttrsToList mkPluginEntry`
+    # and links each entry at `<configDir>/skills/<name>`, so the key here IS
+    # the delivered directory name. Our boundary is the key handed to
+    # upstream; this asserts a key that shares nothing with its value's store
+    # base name still arrives verbatim, and that no name is derived from the
+    # source.
+    module-claude-hm-plugins-key-is-directory-name = mkTest "claude-hm-plugins-key-is-directory-name" (
+      let
+        # A package whose store base name (…-hello-<version>) is nothing like
+        # the key, standing in for a flake-input root.
+        pluginPkg = pkgs.hello;
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            plugins.remember = pluginPkg;
+          };
+        };
+        upstream = result.config.programs.claude-code.plugins or {};
+        # `unsafeDiscardStringContext` mirrors upstream's own
+        # `derivePluginName`; without it the store-path context makes this
+        # illegal to use as an attribute name.
+        derivedName =
+          builtins.unsafeDiscardStringContext (baseNameOf (toString pluginPkg));
+      in
+        lib.attrNames upstream
+        == ["remember"]
+        && upstream.remember == pluginPkg
+        && !(upstream ? ${derivedName})
+    );
+
+    # HM: ai.claude.marketplaces routes to programs.claude-code.marketplaces
+    # via identity translation. Regression guard.
+    module-claude-hm-marketplaces-route-to-upstream = mkTest "claude-hm-marketplaces-route-to-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            marketplaces.my-shelf = ../../stacked-workflows/skills/stack-fix;
+          };
+        };
+        upstream = result.config.programs.claude-code.marketplaces or {};
+      in
+        upstream ? my-shelf
+    );
+
+    # HM: ai.claude.outputStyles routes to programs.claude-code.outputStyles.
+    module-claude-hm-output-styles-route-to-upstream = mkTest "claude-hm-output-styles-route-to-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            outputStyles.concise = "Keep answers under 3 sentences.";
+          };
+        };
+        upstream = result.config.programs.claude-code.outputStyles or {};
+      in
+        (upstream.concise or null) == "Keep answers under 3 sentences."
+    );
+
+    # HM: top-level ai.lspServers fans out to Claude's programs.claude-code.lspServers.
+    # Closes the LSP fanout story — Claude now receives the merged pool via
+    # upstream HM's own surface (upstream writes into ~/.claude/settings.json).
+    module-claude-hm-top-level-lsp-fanout = mkTest "claude-hm-top-level-lsp-fanout" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+          ai.lspServers.nixd = {
+            command = "nixd";
+            args = [];
+          };
+        };
+        upstream = result.config.programs.claude-code.lspServers or {};
+      in
+        (upstream.nixd.command or null) == "nixd"
+    );
+
+    # HM: ai.claude.lspServers per-CLI overrides top-level ai.lspServers on
+    # name collision. Claude-specific override wins.
+    module-claude-hm-per-cli-lsp-overrides-top-level = mkTest "claude-hm-per-cli-lsp-overrides-top-level" (
+      let
+        result = evalHm {
+          ai = {
+            claude.enable = true;
+            lspServers.nixd = {
+              command = "nixd-top-level";
+            };
+            claude.lspServers.nixd = {
+              command = "nixd-claude-specific";
+            };
+          };
+        };
+        upstream = result.config.programs.claude-code.lspServers or {};
+      in
+        (upstream.nixd.command or null) == "nixd-claude-specific"
+    );
+
+    # Claude HM: typed LSP with `extensions` emits extensionToLanguage
+    # mapping via mkClaudeLspConfig.
+    module-claude-hm-lsp-extension-to-language = mkTest "claude-hm-lsp-extension-to-language" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            lspServers.go = {
+              command = "gopls";
+              args = ["serve"];
+              extensions = ["go"];
+            };
+          };
+        };
+        upstream = result.config.programs.claude-code.lspServers or {};
+        entry = upstream.go or {};
+      in
+        (entry.command or null)
+        == "gopls"
+        && ((entry.extensionToLanguage or {}).".go" or null)
+        == "go"
+    );
+
+    # HM: top-level ai.agents fans out to Claude's programs.claude-code.agents.
+    module-claude-hm-top-level-agents-fanout = mkTest "claude-hm-top-level-agents-fanout" (
+      let
+        result = evalHm {
+          ai.claude.enable = true;
+          ai.agents.reviewer = "# Reviewer\n\nReview carefully.";
+        };
+        upstream = result.config.programs.claude-code.agents or {};
+      in
+        (upstream.reviewer or null)
+        == "# Reviewer\n\nReview carefully."
+    );
+
+    # Precedence: ai.claude.agents wins over ai.agents on name collision.
+    module-claude-hm-per-cli-agents-wins = mkTest "claude-hm-per-cli-agents-wins" (
+      let
+        result = evalHm {
+          ai = {
+            claude.enable = true;
+            agents.reviewer = "# Top-level";
+            claude.agents.reviewer = "# Claude-specific";
+          };
+        };
+        upstream = result.config.programs.claude-code.agents or {};
+      in
+        (upstream.reviewer or null) == "# Claude-specific"
+    );
+
+    # HM: ai.claude.commands routes to programs.claude-code.commands via
+    # identity translation. Claude-only — Kiro and Copilot have no
+    # commands concept, so no top-level fanout.
+    module-claude-hm-commands-route-to-upstream = mkTest "claude-hm-commands-route-to-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            commands.fix-issue = "# Fix issue\n\nSteps…";
+          };
+        };
+        upstream = result.config.programs.claude-code.commands or {};
+      in
+        (upstream.fix-issue or null) == "# Fix issue\n\nSteps…"
+    );
+
+    # HM: ai.claude.hookScripts (inline script bodies) routes to
+    # programs.claude-code.hooks via identity translation.
+    module-claude-hm-hookscripts-route-to-upstream = mkTest "claude-hm-hookscripts-route-to-upstream" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            hookScripts.pre-edit = "#!/usr/bin/env bash\necho edit\n";
+          };
+        };
+        upstream = result.config.programs.claude-code.hooks or {};
+      in
+        (upstream.pre-edit or null) == "#!/usr/bin/env bash\necho edit\n"
+    );
+
+    # HM: the typed ai.claude.hooks event map lowers into
+    # programs.claude-code.settings.hooks via the shared helper.
+    module-claude-hm-hooks-lower-to-settings = mkTest "claude-hm-hooks-lower-to-settings" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            hooks.PreToolUse = [
+              {
+                matcher = "Bash";
+                hooks = [{command = "validate";}];
+              }
+            ];
+          };
+        };
+        settingsHooks = (result.config.programs.claude-code.settings or {}).hooks or {};
+        block = builtins.head (settingsHooks.PreToolUse or []);
+        handler = builtins.head (block.hooks or []);
+      in
+        block.matcher == "Bash" && handler.command == "validate" && handler.type == "command"
+    );
+
+    # ── heron_brook delegation clamp (ai.claude.delegationClamp) ──────
+    # OPT-IN is the requirement: a bare `enable = true` must carry NEITHER hook.
+    # Asserting both are absent also pins the all-or-nothing property — emitting
+    # only the PreCompact half would leave a hook clearing a marker nothing ever
+    # writes, inert but confusing to find in a settings.json you never asked to
+    # be modified.
+    module-claude-hm-delegation-clamp-default-off = mkTest "claude-hm-delegation-clamp-default-off" (
+      let
+        result = evalHm {ai.claude.enable = true;};
+        settingsHooks = (result.config.programs.claude-code.settings or {}).hooks or {};
+      in
+        (settingsHooks.UserPromptSubmit or [])
+        == []
+        && (settingsHooks.PreCompact or []) == []
+    );
+
+    # Opting in must produce BOTH hooks: the injector and the PreCompact re-arm.
+    # Compaction is the one event that erases the injected context, so an injector
+    # without the re-arm silently loses the mitigation on the first compaction.
+    module-claude-hm-delegation-clamp-opt-in = mkTest "claude-hm-delegation-clamp-opt-in" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            delegationClamp.mitigate = true;
+          };
+        };
+        settingsHooks = (result.config.programs.claude-code.settings or {}).hooks or {};
+      in
+        hasClampHook (settingsHooks.UserPromptSubmit or [])
+        && hasClampHook (settingsHooks.PreCompact or [])
+    );
+
+    # Devenv parity — same two hooks behind the same flag, per the config-parity rule.
+    module-claude-devenv-delegation-clamp-opt-in = mkTest "claude-devenv-delegation-clamp-opt-in" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            delegationClamp.mitigate = true;
+          };
+        };
+        settingsJson = (result.config.files.".claude/settings.json" or {}).json or {};
+      in
+        hasClampHook (settingsJson.hooks.UserPromptSubmit or [])
+        && hasClampHook (settingsJson.hooks.PreCompact or [])
+    );
+
+    # Compose-not-clobber. The mitigation is emitted as a DEFINITION of
+    # ai.claude.hooks, never as that option's `default` — a default is discarded
+    # wholesale the moment a consumer defines the option at all, which would have
+    # silently disabled the mitigation for exactly the consumers who use hooks most.
+    # This test is what pins that choice down.
+    module-claude-delegation-clamp-composes-with-consumer-hook = mkTest "claude-delegation-clamp-composes-with-consumer-hook" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            delegationClamp.mitigate = true;
+            hooks.UserPromptSubmit = [{hooks = [{command = "consumer-hook";}];}];
+          };
+        };
+        blocks = ((result.config.programs.claude-code.settings or {}).hooks or {}).UserPromptSubmit or [];
+        cmds = handlerCommands blocks;
+      in
+        builtins.elem "consumer-hook" cmds
+        && builtins.any (lib.hasInfix "claude-delegation-clamp") cmds
+    );
+
+    # ── memory-collision guard (ai.claude.memoryCollisionGuard) ───────
+    # Default-OFF is the requirement here, and it is the exact inverse of the
+    # delegation clamp's above. This hook DENIES a tool call, so shipping it on by
+    # default would block writes for every consumer who never asked for it.
+    module-claude-hm-memory-collision-guard-default-off = mkTest "claude-hm-memory-collision-guard-default-off" (
+      let
+        result = evalHm {ai.claude.enable = true;};
+        settingsHooks = (result.config.programs.claude-code.settings or {}).hooks or {};
+      in
+        hasGuardHook (settingsHooks.PreToolUse or []) == false
+    );
+
+    # Opting in must produce a PreToolUse entry matching the write-shaped tools. The
+    # matcher is asserted because it is half the filter: the script's path test is the
+    # other half, and a matcher regression would spawn the hook on every tool call.
+    module-claude-hm-memory-collision-guard-opt-in = mkTest "claude-hm-memory-collision-guard-opt-in" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            memoryCollisionGuard.enable = true;
+          };
+        };
+        blocks = ((result.config.programs.claude-code.settings or {}).hooks or {}).PreToolUse or [];
+        guardBlocks = builtins.filter (b: hasGuardHook [b]) blocks;
+      in
+        builtins.length guardBlocks
+        == 1
+        && (builtins.head guardBlocks).matcher == "Write|Edit"
+    );
+
+    # Devenv parity — same hook, same default, per the repo's config-parity rule.
+    module-claude-devenv-memory-collision-guard-opt-in = mkTest "claude-devenv-memory-collision-guard-opt-in" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            memoryCollisionGuard.enable = true;
+          };
+        };
+        settingsJson = (result.config.files.".claude/settings.json" or {}).json or {};
+        offResult = evalDevenv {ai.claude.enable = true;};
+        offJson = (offResult.config.files.".claude/settings.json" or {}).json or {};
+      in
+        hasGuardHook (settingsJson.hooks.PreToolUse or [])
+        && hasGuardHook (offJson.hooks.PreToolUse or []) == false
+    );
+
+    # Compose-not-clobber, same reasoning as the clamp's: emitted as a DEFINITION of
+    # ai.claude.hooks rather than as that option's `default`, so a consumer who
+    # defines PreToolUse for their own reasons keeps both.
+    module-claude-memory-collision-guard-composes-with-consumer-hook = mkTest "claude-memory-collision-guard-composes-with-consumer-hook" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            memoryCollisionGuard.enable = true;
+            hooks.PreToolUse = [
+              {
+                matcher = "Bash";
+                hooks = [{command = "consumer-hook";}];
+              }
+            ];
+          };
+        };
+        blocks = ((result.config.programs.claude-code.settings or {}).hooks or {}).PreToolUse or [];
+        cmds = handlerCommands blocks;
+      in
+        builtins.elem "consumer-hook" cmds
+        && builtins.any (lib.hasInfix "claude-memory-collision-guard") cmds
+    );
+
+    # Compose-not-clobber invariant (decision #3): settings.json's formats.json
+    # merge CONCATENATES same-event hook lists across writers, so the typed event
+    # map and the legacy settings.hooks escape hatch coexist. Asserted against the
+    # REAL type — the module-eval `attrsOf anything` stub throws on this merge where
+    # formats.json concatenates, so it cannot model it. Mirrors the factory pattern:
+    # a whole `settings =` write plus a nested `settings.hooks =` write (both
+    # backends lower this way).
+    module-claude-hooks-settings-json-compose = mkTest "claude-hooks-settings-json-compose" (
+      let
+        jsonType = (pkgs.formats.json {}).type;
+        ev = lib.evalModules {
+          modules = [
+            {options.settings = lib.mkOption {type = jsonType;};}
+            {config.settings = {hooks.PreToolUse = [{matcher = "legacy";}];};}
+            {config.settings.hooks.PreToolUse = [{matcher = "typed";}];}
+          ];
+        };
+        matchers = map (b: b.matcher or null) ev.config.settings.hooks.PreToolUse;
+      in
+        builtins.length matchers == 2 && builtins.elem "legacy" matchers && builtins.elem "typed" matchers
+    );
+
+    # Devenv: hookScripts → a `.claude/hooks/<name>` file; the legacy
+    # nativeSettings.hooks escape hatch → settings.json.hooks (verbatim). Neither feeds
+    # claude.code.hooks anymore (approach B — the old type-invalid mis-feed is gone).
+    module-claude-devenv-hookscripts-and-settings-split = mkTest "claude-devenv-hookscripts-and-settings-split" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            nativeSettings.hooks.from-settings = [{matcher = "X";}];
+            hookScripts.from-top = "#!/usr/bin/env bash\necho from-top\n";
+          };
+        };
+        settingsHooks = ((result.config.files.".claude/settings.json" or {}).json or {}).hooks or {};
+        scriptFile = result.config.files.".claude/hooks/from-top" or null;
+        upstream = result.config.claude.code.hooks or {};
+      in
+        (settingsHooks.from-settings or null)
+        != null
+        && scriptFile != null
+        && (scriptFile.text or null) == "#!/usr/bin/env bash\necho from-top\n"
+        && !(upstream ? from-top)
+    );
+
+    # Typed ai.claude.hooks event map: accepts the settings.json-shaped
+    # per-event structure (soft-enum event key → list of matcher blocks →
+    # list of typed handlers) and carries it through. No lowering asserted
+    # here — that is Commit 3/4.
+    module-claude-hooks-typed-event-map = mkTest "claude-hooks-typed-event-map" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            hooks.PreToolUse = [
+              {
+                matcher = "Bash";
+                hooks = [{command = "true";}];
+              }
+            ];
+          };
+        };
+        block = builtins.head (result.config.ai.claude.hooks.PreToolUse or []);
+        handler = builtins.head (block.hooks or []);
+      in
+        block.matcher == "Bash" && handler.command == "true" && handler.type == "command"
+    );
+
+    # S1: a handler `command` accepts a package and coerces to its getExe path
+    # (its supporting files ride the /nix/store closure at absolute paths).
+    module-claude-hooks-command-accepts-package = mkTest "claude-hooks-command-accepts-package" (
+      let
+        pkg = pkgs.writeShellApplication {
+          name = "demo-hook";
+          text = "exit 0";
+        };
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            hooks.PostToolUse = [{hooks = [{command = pkg;}];}];
+          };
+        };
+        handler = builtins.head (builtins.head result.config.ai.claude.hooks.PostToolUse).hooks;
+      in
+        builtins.isString handler.command && lib.hasSuffix "/bin/demo-hook" handler.command
+    );
+
+    module-claude-hooks-command-resolves-package-pname = mkTest "claude-hooks-command-resolves-package-pname" (
+      let
+        pkg = pkgs.runCommand "demo-hook-no-main-program" {pname = "demo-hook";} ''
+          mkdir -p "$out/bin"
+          touch "$out/bin/demo-hook"
+        '';
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            hooks.PostToolUse = [{hooks = [{command = pkg;}];}];
+          };
+        };
+        handler = builtins.head (builtins.head result.config.ai.claude.hooks.PostToolUse).hooks;
+      in
+        builtins.isString handler.command && lib.hasSuffix "/bin/demo-hook" handler.command
+    );
+
+    # Devenv: the typed ai.claude.hooks event map lowers into
+    # files.".claude/settings.json".json.hooks via the shared helper
+    # (approach B — no claude.code.hooks records).
+    module-claude-devenv-hooks-lower-to-settings = mkTest "claude-devenv-hooks-lower-to-settings" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            hooks.PreToolUse = [
+              {
+                matcher = "Bash";
+                hooks = [{command = "validate";}];
+              }
+            ];
+          };
+        };
+        settingsJson = (result.config.files.".claude/settings.json" or {}).json or {};
+        block = builtins.head (settingsJson.hooks.PreToolUse or []);
+        handler = builtins.head (block.hooks or []);
+      in
+        block.matcher == "Bash" && handler.command == "validate" && handler.type == "command"
+    );
+
+    # Devenv: hookScripts (inline bodies) become standalone
+    # .claude/hooks/<name> files (greenfield; NOT claude.code.hooks).
+    module-claude-devenv-hookscripts-write-files = mkTest "claude-devenv-hookscripts-write-files" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            hookScripts.my-hook = "#!/usr/bin/env bash\nexit 0\n";
+          };
+        };
+        f = result.config.files.".claude/hooks/my-hook" or null;
+      in
+        f != null && (f.text or null) == "#!/usr/bin/env bash\nexit 0\n"
+    );
+
+    # ── ai.*.skillsDir Dir helper ──────────────────────────────
+    # Directory-of-directories; each immediate subdir becomes a
+    # skill. See lib/ai/dir-helpers.nix:skillsFromDir.
+
+    # Path-only form fans every subdir into ai.claude.skills.
+    module-claude-skillsdir-path-form = mkTest "claude-skillsdir-path-form" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            skillsDir = ./fixtures/claude-skills;
+          };
+        };
+        upstream = result.config.programs.claude-code.skills or {};
+      in
+        upstream ? skill-a && upstream ? skill-b
+    );
+
+    # Submodule form with a filter that excludes skill-b.
+    module-claude-skillsdir-filter = mkTest "claude-skillsdir-filter" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            skillsDir = {
+              path = ./fixtures/claude-skills;
+              filter = name: name == "skill-a";
+            };
+          };
+        };
+        upstream = result.config.programs.claude-code.skills or {};
+      in
+        upstream ? skill-a && !(upstream ? skill-b)
+    );
+
+    # A per-runtime directory-generated entry replaces the same-key root entry.
+    module-claude-skillsdir-entry-replaces-root-single = mkTest "claude-skillsdir-entry-replaces-root-single" (
+      let
+        result = evalHm {
+          ai.skills.skill-a = ./fixtures/claude-skills/skill-b;
+          ai.claude = {
+            enable = true;
+            skillsDir = ./fixtures/claude-skills;
+          };
+        };
+        upstream = result.config.programs.claude-code.skills or {};
+      in
+        upstream.skill-a == ./fixtures/claude-skills/skill-a
+    );
+
+    # ── ai.*.agentsDir Dir helper ──────────────────────────────
+    # Legacy Markdown directories are Claude + Copilot only. Codex is excluded
+    # because its agents are semantic records rendered to standalone TOML; Kiro
+    # is excluded because these are Markdown while Kiro's agents are JSON, and
+    # its tool tags are a different vocabulary (separate `ai.kiro.agents` /
+    # `ai.kiro.agentsDir` surfaces handle that).
+
+    # Path-only form: `ai.claude.agentsDir = ./fixtures/claude-agents;`
+    # expands to two entries (agent-one, agent-two). Emission lands
+    # at `.claude/agents/<name>.md` via the existing per-agent file
+    # emission in mkClaude.
+    module-claude-agentsdir-path-form = mkTest "claude-agentsdir-path-form" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            agentsDir = ./fixtures/claude-agents;
+          };
+        };
+        upstream = result.config.programs.claude-code.agents or {};
+      in
+        upstream ? agent-one && upstream ? agent-two
+    );
+
+    # Submodule form with filter.
+    module-claude-agentsdir-filter = mkTest "claude-agentsdir-filter" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            agentsDir = {
+              path = ./fixtures/claude-agents;
+              filter = name: name == "agent-one.md";
+            };
+          };
+        };
+        upstream = result.config.programs.claude-code.agents or {};
+      in
+        upstream ? agent-one && !(upstream ? agent-two)
+    );
+
+    # A per-runtime directory-generated entry replaces the same-key root entry.
+    module-claude-agentsdir-entry-replaces-root-single = mkTest "claude-agentsdir-entry-replaces-root-single" (
+      let
+        result = evalHm {
+          ai.agents.agent-one = "Explicit top-level agent";
+          ai.claude = {
+            enable = true;
+            agentsDir = ./fixtures/claude-agents;
+          };
+        };
+        upstream = result.config.programs.claude-code.agents or {};
+      in
+        upstream.agent-one == ./fixtures/claude-agents/agent-one.md
+    );
+
+    # ── ai.claude.hookScriptsDir Dir helper ────────────────────
+    # Claude-only per plan §5 (hook scripts are a Claude-specific
+    # concept). See lib/ai/dir-helpers.nix:hooksFromDir. Default
+    # filter is always-true — hook files are typically
+    # extensionless shell scripts, so no `.md`-like suffix strip.
+
+    module-claude-hookscriptsdir-path-form = mkTest "claude-hookscriptsdir-path-form" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            hookScriptsDir = ./fixtures/claude-hooks;
+          };
+        };
+        upstream = result.config.programs.claude-code.hooks or {};
+      in
+        upstream ? pre-edit && upstream ? post-edit
+    );
+
+    # Filter excludes post-edit.
+    module-claude-hookscriptsdir-filter = mkTest "claude-hookscriptsdir-filter" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            hookScriptsDir = {
+              path = ./fixtures/claude-hooks;
+              filter = name: name == "pre-edit";
+            };
+          };
+        };
+        upstream = result.config.programs.claude-code.hooks or {};
+      in
+        upstream ? pre-edit && !(upstream ? post-edit)
+    );
+
+    # Collision: Dir-generated vs explicit `ai.claude.hookScripts.<name>`
+    # is NOT a shared-pool collision (hook scripts have no top-level pool),
+    # so the module system handles it via the `attrsOf lines` merge.
+    # The Dir expansion uses mkDefault so explicit entries win.
+    module-claude-hookscriptsdir-explicit-wins-within-layer = mkTest "claude-hookscriptsdir-explicit-wins-within-layer" (
+      let
+        result = evalHm {
+          ai.claude = {
+            enable = true;
+            hookScripts.pre-edit = "explicit override";
+            hookScriptsDir = ./fixtures/claude-hooks;
+          };
+        };
+        upstream = result.config.programs.claude-code.hooks or {};
+      in
+        upstream.pre-edit == "explicit override"
+    );
+
+    # Devenv parity — hookScriptsDir feeds the greenfield .claude/hooks/<name>
+    # files (approach B; devenv has no programs.claude-code.hooks equivalent).
+    module-claude-devenv-hookscriptsdir-path-form = mkTest "claude-devenv-hookscriptsdir-path-form" (
+      let
+        result = evalDevenv {
+          ai.claude = {
+            enable = true;
+            hookScriptsDir = ./fixtures/claude-hooks;
+          };
+        };
+        files = result.config.files or {};
+      in
+        files ? ".claude/hooks/pre-edit" && files ? ".claude/hooks/post-edit"
+    );
+
+    module-claude-hm-rule-sourcepath-rejected = mkTest "claude-hm-rule-sourcepath-rejected" (
+      let
+        attempt = builtins.tryEval (let
+          r = evalHm {
+            ai.claude = {
+              enable = true;
+              rules.my-rule = {
+                text = "body";
+                sourcePath = "/abs/path/to/my-rule.md";
+              };
+            };
+          };
+        in
+          builtins.deepSeq r.config.ai.claude.rules.my-rule true);
+      in
+        !attempt.success
+    );
+
+    module-claude-unrecognized-settings-known-keys-accepted = mkTest "claude-unrecognized-settings-known-keys-accepted" (
+      claudeAssertionsPass (evalHm claudeKnownKeysCfg)
+      && claudeAssertionsPass (evalDevenv claudeKnownKeysCfg)
+    );
+
+    module-claude-unrecognized-settings-nested-typo-rejected = mkTest "claude-unrecognized-settings-nested-typo-rejected" (
+      claudeAssertionFails "permissions.alow" (evalHm claudeNestedTypoCfg)
+      && claudeAssertionFails "permissions.alow" (evalDevenv claudeNestedTypoCfg)
+    );
+
+    # The allowlist is a per-key opt-out, and an entry is a full dotted path —
+    # so the same nested typo passes once it is named.
+    module-claude-unrecognized-settings-allowlist-rescues-typo = mkTest "claude-unrecognized-settings-allowlist-rescues-typo" (
+      let
+        cfg =
+          lib.recursiveUpdate claudeNestedTypoCfg
+          {ai.claude.allowUnrecognizedSettings = ["permissions.alow"];};
+      in
+        claudeAssertionsPass (evalHm cfg) && claudeAssertionsPass (evalDevenv cfg)
+    );
+
+    # A redundant entry is a HARD FAILURE, not a warning: `ultracode` is declared
+    # by the packaged binary, so the entry suppresses nothing — and left in place
+    # it is a standing opt-out that silently re-opens the typo hole for that one
+    # key the day upstream renames it.
+    module-claude-unrecognized-settings-redundant-allowlist-rejected = mkTest "claude-unrecognized-settings-redundant-allowlist-rejected" (
+      let
+        cfg = {
+          ai.claude = {
+            enable = true;
+            allowUnrecognizedSettings = ["ultracode"];
+          };
+        };
+      in
+        claudeAssertionFails "allowUnrecognizedSettings" (evalHm cfg)
+        && claudeAssertionFails "allowUnrecognizedSettings" (evalDevenv cfg)
+    );
+  };
+}

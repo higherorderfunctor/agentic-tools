@@ -10,10 +10,10 @@
 #     no flake context — in particular no `self`. That is what rules out the
 #     `cacheHitParityTargets` shape
 #     (owner registry.nix files + lib/checks.nix merged by
-#     `lib.evalModules` in flake.nix), which is reachable only as
+#     the native repository registry), which is reachable only as
 #     `self.cacheHitParityTargets`.
-#   - checks/options-doc.nix needs it inside a derivation's shell string.
-#   - checks/module-eval.nix needs it in a plain `let`.
+#   - checks/modules/options-doc.nix needs it inside a derivation's shell string.
+#   - lib/testing/module-harness.nix needs it in a plain `let`.
 #
 # (Both modules DO receive `pkgs` as a module argument; the missing thing is
 # flake context, not package set. An earlier draft of this comment said "no
@@ -30,7 +30,7 @@
 # Change this list and all four consumers follow. None of them holds a
 # narrower view, and none needs a per-consumer filter.
 #
-# That was an open question rather than an assumption. checks/options-doc.nix
+# That was an open question rather than an assumption. checks/modules/options-doc.nix
 # previously hardcoded a FOUR-element list without kimchi, and whether adding
 # kimchi would pass its two new CommonMark grep assertions was unmeasured. It
 # was then measured, both renderings, with a negative control to prove the
@@ -49,7 +49,7 @@
 #   packages/semble/modules/common.nix:22       — ["claude" "codex" "kiro"]
 #
 # Widening those to five would newly fan semble into ai.copilot.* and
-# ai.kimchi.*. The `semble-umbrella-fanout` test in `checks/module-eval.nix`
+# ai.kimchi.*. The `semble-umbrella-fanout` test in `packages/semble/checks/module-eval.nix`
 # asserts directly against the COPILOT half (`!(cfg.ai.copilot.mcpServers ?
 # semble)` and the matching `agents` assertion), so that arm fails loudly; the
 # kimchi arm has no such assertion and would simply start emitting. Ask if a list

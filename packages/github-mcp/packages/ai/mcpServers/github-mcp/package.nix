@@ -34,7 +34,7 @@
   # (a `git` target in the owner registry.nix), not by a repo-owned
   # update script there would be anywhere to hook a rewrite into.
   #
-  # Hand-written but NOT hand-trusted: `checks/go-floor-drift.nix` reads
+  # Hand-written but NOT hand-trusted: `checks/packaging/go-floor-drift.nix` reads
   # `passthru.goFloor` back, compares it against this exact `src`'s
   # go.mod, and fails naming the value to write. A rev bump that raises
   # the floor turns that check red instead of silently building against

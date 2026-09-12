@@ -176,7 +176,7 @@ in
         goFloor = beadsGoFloor;
         # BEADS' OWN chain, not the pair wrapper. `fixVendorHash` below
         # is deliberately the pair script (it repairs both sidecars in
-        # one run), but `checks/go-floor-extract-order.nix` has to read a
+        # one run), but `checks/packaging/go-floor-extract-order.nix` has to read a
         # FLAT chain — a pair wrapper only contains the sub-script paths
         # and would hide the ordering it exists to gate.
         goUpdateExtract = beadsGoUpdate.extract;

@@ -82,7 +82,7 @@
 
   # DERIVED from the pinned source's go.mod by `fixGoFloor`, never
   # hand-written. See `vu.mkGoFloorFix` for why, and
-  # `checks/go-floor-drift.nix` for the gate that keeps it honest.
+  # `checks/packaging/go-floor-drift.nix` for the gate that keeps it honest.
   goFloor = sources.goFloor or vu.goFloorUnknown;
 in
   # TWO override seams, and they are not interchangeable. The toolchain is

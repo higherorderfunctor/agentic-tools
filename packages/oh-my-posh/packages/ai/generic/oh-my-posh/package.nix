@@ -78,9 +78,9 @@
 #
 # This project keeps its module under `src/`, so it is the one package
 # passing a non-default `goModPath`. No version literals here on purpose —
-# the sidecar holds the current floor and `checks/go-floor-drift.nix`
+# the sidecar holds the current floor and `checks/packaging/go-floor-drift.nix`
 # asserts it still matches source. See lib/packaging.nix, and
-# checks/go-toolchain-floor.nix for the selector's branch coverage.
+# checks/packaging/go-toolchain-floor.nix for the selector's branch coverage.
 #
 # vendorHash lives in the SIDECAR rather than inline: `mkUpdateScript`
 # rebuilds the sidecar from scratch on every write, so any key it does not
@@ -144,7 +144,7 @@
   # This project keeps its Go module under `src/`, NOT at the repo root —
   # the one place the floor mechanism is not uniform across the seven Go
   # packages, and the reason `goModPath` is a parameter rather than a
-  # constant. Both the fixer and `checks/go-floor-drift.nix` read it from
+  # constant. Both the fixer and `checks/packaging/go-floor-drift.nix` read it from
   # `passthru.goModPath` below, so they cannot disagree.
   goModPath = "src/go.mod";
 

@@ -1,9 +1,11 @@
 # Package / module restructure — canonical plan
 
-> **Status:** canonical restructure plan, promoted to `docs/` on 2026-07-24; the
-> design decisions are **locked**. The restructure **execution itself has not
-> started** on the real tree (Track A/B — see §12). This document replaces the
-> 8-document restructure cluster, now archived under `docs/archive/`.
+> **Status:** historical design proposal. The native ownership implementation is
+> tracked by
+> [#1019](https://github.com/higherorderfunctor/nix-agentic-tools/issues/1019).
+> See [Repository ownership and layout](repository-layout.md) for the current
+> structure. Paths and execution status in the proposal below describe its
+> original planning snapshots.
 >
 > **Last verified:** 2026-08-15 (commit pending — §3.5 and every action item
 > derived from it now record the shipped shared backend transformer and the

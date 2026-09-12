@@ -21,8 +21,9 @@ you author are discarded, and hand-wrapping is what created the defect below.
 A break landing MID-TOKEN is the one markdown defect in this repo that **no
 check can catch**, so it has to be prevented at authoring time. Read the
 qualifier: a break landing between two copies of the same word is a different
-defect and IS caught — see `checks/doubled-words.nix` below. The unqualified
-claim was true when written and became a trap once that check existed.
+defect and IS caught — see `checks/markdown/doubled-words.nix` below. The
+unqualified claim was true when written and became a trap once that check
+existed.
 
 CommonMark replaces a newline inside an inline code span with a SPACE. Where the
 break falls at a natural space that is harmless. Where it falls MID-TOKEN the
@@ -49,19 +50,19 @@ while `repo- wide` and `cross- slice` are not. A "glue character followed by a
 space" heuristic was measured across the tree: 96 hits, roughly 90% of them
 legitimate. Shipping it would have been a check that cries wolf.
 
-`checks/split-code-spans.nix` covers the adjacent case that IS decidable — a
-span whose content still contains a newline. Its `.py` carries the CommonMark
-backtick rule and why the obvious one-line regex is wrong.
+`checks/markdown/split-code-spans.nix` covers the adjacent case that IS
+decidable — a span whose content still contains a newline. Its `.py` carries the
+CommonMark backtick rule and why the obvious one-line regex is wrong.
 
 #### The formatter launders new instances
 
 Know this before trusting the guardrail: `proseWrap = "always"` joins a split
 span by printing the span's CommonMark _value_, space included. It therefore
-converts a newline `checks/split-code-spans.nix` would catch into a space that
-nothing can. The window is narrow — nobody hand-wraps now that the formatter
-owns wrapping — but it is not closed.
+converts a newline `checks/markdown/split-code-spans.nix` would catch into a
+space that nothing can. The window is narrow — nobody hand-wraps now that the
+formatter owns wrapping — but it is not closed.
 
-### The reflow also splits a doubled word — `checks/doubled-words.nix`
+### The reflow also splits a doubled word — `checks/markdown/doubled-words.nix`
 
 Same 80-column reflow, a different defect, and this one IS decidable. A word
 repeated back to back (`is the the rootfs top level`, shipped in #878) is
@@ -85,8 +86,8 @@ Two things to know before touching it:
   precision decays, fix the tokenization — a stopword list would hide the next
   such bug instead of reporting it, and `and and` and `in in` are function words
   that would have survived one anyway. The measured hit counts behind all of
-  that live in `checks/doubled-words.py`'s module docstring and nowhere else;
-  read them there rather than trusting a number quoted in prose.
+  that live in `checks/markdown/doubled-words.py`'s module docstring and nowhere
+  else; read them there rather than trusting a number quoted in prose.
 - **Suppression is per-file and visible in the source**, for the legitimate
   English cases (`had had`, `that that`) that this corpus happens not to contain
   yet:
@@ -111,12 +112,12 @@ fence recognition. If you touch `strip_code_blocks`, that is the invariant to
 preserve; the measured cost of getting it wrong is in its docstring.
 
 Both scans share their file set, exclusions and empty-set guard via
-`checks/markdown-scan.nix`, and both scanners are assembled into one store
-directory so the newer imports the CommonMark rule from the older. An empty file
-set is a hard failure in both the Nix wrapper and each scanner's `main()`:
-`find -print0 | xargs -0 -r` exits 0 on an empty tree, so a scan that received
-nothing used to be indistinguishable from a passing one, and a guard living only
-in one caller does not survive a second caller being added.
+`checks/markdown/markdown-scan.nix`, and both scanners are assembled into one
+store directory so the newer imports the CommonMark rule from the older. An
+empty file set is a hard failure in both the Nix wrapper and each scanner's
+`main()`: `find -print0 | xargs -0 -r` exits 0 on an empty tree, so a scan that
+received nothing used to be indistinguishable from a passing one, and a guard
+living only in one caller does not survive a second caller being added.
 
 ### A pipe in a table cell — `markdown-table-cells`
 

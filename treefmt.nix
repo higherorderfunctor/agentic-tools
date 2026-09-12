@@ -30,7 +30,7 @@
       # over-long span onto its own line and lets it overflow rather than
       # splitting it, and it JOINS any span that already straddles a
       # newline. So this setting makes `a `split\nspan`` structurally
-      # impossible, and checks/formatting.nix turns that into a CI gate for
+      # impossible, and checks/repository/formatting.nix turns that into a CI gate for
       # free. Under `preserve` the same defect merely persists — measured
       # at 369 spans across 66 files when this was flipped.
       #
@@ -39,7 +39,7 @@
       # `.kiro/steering/`, never as rendered HTML. CommonMark does render a
       # split span correctly in the general case (the newline becomes a
       # space) — except where the break lands mid-token, which silently
-      # corrupts the span. See checks/split-code-spans.py, the backstop for
+      # corrupts the span. See checks/markdown/split-code-spans.py, the backstop for
       # the pathological cases a reflow cannot reach.
       #
       # KNOWN LIMIT — this setting LAUNDERS a mid-token break. Prettier
@@ -48,7 +48,7 @@
       # newline was. So `programs.claude-code.\nmarketplaces` comes out as
       # `programs.claude-code. marketplaces`: one line, space intact,
       # defect preserved — and now with no newline for
-      # checks/split-code-spans.nix to find. That class is NOT lintable
+      # checks/markdown/split-code-spans.nix to find. That class is NOT lintable
       # (measured: a glue-char-plus-space heuristic gives 96 hits, ~90%
       # legitimate), so it is prevented at authoring time by the
       # markdown-formatting fragment instead. 10 code-span and 22 prose
@@ -124,19 +124,19 @@
     # identifiers when it repairs them (measured: `KIRO_KAS_NODE_PATH`
     # came out `KIRO*KAS_NODE_PATH`), which breaks exact-identifier
     # search — the directory's whole purpose. cspell already ignores
-    # `docs/**`; checks/markdown-scan.nix carries the matching scan
+    # `docs/**`; checks/markdown/markdown-scan.nix carries the matching scan
     # exclusion for BOTH prose scanners (split-code-spans and
-    # doubled-words) — it used to live in checks/split-code-spans.nix
+    # doubled-words) — it used to live in checks/markdown/split-code-spans.nix
     # and moved when the second scanner started sharing the file set.
     "docs/plans/kiro-v3-research-raw/**"
     # Steering probe fixtures whose YAML SHAPE is the experiment. Two of
     # them carry a multi-line flow sequence that kiro's frontmatter parser
     # rejects — the rejection is the finding — and prettier normalizes both
     # into a shape that parses, silently deleting it. cspell already ignores
-    # the sentinel markers via project terms; checks/markdown-scan.nix
+    # the sentinel markers via project terms; checks/markdown/markdown-scan.nix
     # carries the matching scan exclusion, and the probe README states why.
     # Renaming this directory touches THREE surfaces: this list,
-    # checks/markdown-scan.nix, and dev/probes/kiro-steering/README.md. The
+    # checks/markdown/markdown-scan.nix, and dev/probes/kiro-steering/README.md. The
     # cspell terms are keyed on the sentinel words rather than the path, so a
     # rename deliberately does NOT touch them.
     "dev/probes/kiro-steering/fixture/**"

@@ -30,10 +30,10 @@ _: {
     ai-clis = {
       scopes = [
         # The behavioral wrapper check belongs here for the same reason
-        # `checks/kiro-wrapper-argv.nix` sits in `kiro-wrapper`: editing it
+        # `packages/kiro-cli/checks/kiro-wrapper-argv.nix` sits in `kiro-wrapper`: editing it
         # means reasoning about how Copilot discovers config, which is exactly
         # what `copilot-config-delivery` documents.
-        "checks/copilot-wrapper-argv.nix"
+        "packages/copilot-cli/checks/copilot-wrapper-argv.nix"
         "packages/chatgpt-codex/packages/ai/chatgpt-codex/package.nix"
         "packages/claude-code/packages/ai/claude-code/package.nix"
         "packages/copilot-cli/packages/ai/copilot-cli/package.nix"
@@ -78,7 +78,8 @@ _: {
         # Home of the provenance guard enforcing the root-write prohibition
         # (`rootPoolViolations`). Editing it without the fanout and collision
         # fragments loaded is how the rule gets "simplified" back out.
-        "checks/module-eval.nix"
+        "checks/*/module-eval.nix"
+        "checks/module-provenance/**"
         "lib/ai/agent.nix"
         # Home of both merge helpers these fragments describe (`mergePool`,
         # `resolveOverride`) — previously
@@ -97,23 +98,25 @@ _: {
         # Portable program option-tree factory. Like `mkAiApp`, it declares
         # capability-gated runtime paths and resolves root/runtime values.
         "lib/ai/program.nix"
-        # The runtime registry that file and sharedOptions.nix share.
-        "lib/ai/runtimes.nix"
         # Final B7 static-file registry and generic backend lowering.
         "lib/ai/runtime-files.nix"
+        # The runtime registry that file and sharedOptions.nix share.
+        "lib/ai/runtimes.nix"
         "lib/ai/sharedOptions.nix"
+        "lib/testing/module-harness.nix"
+        "packages/*/checks/module-eval.nix"
         # The five AI CLI factories, listed explicitly. `packages/*/lib/mk*.nix`
         # used to stand here and matched 24 files — every MCP server factory,
         # glab, beads and semble included — so editing an unrelated `mk*.nix`
         # pulled this whole category for nothing.
         "packages/chatgpt-codex/lib/mkCodex.nix"
+        "packages/chatgpt-codex/modules/**"
         "packages/claude-code/lib/mkClaude.nix"
+        "packages/claude-code/modules/**"
         "packages/copilot-cli/lib/mkCopilot.nix"
+        "packages/copilot-cli/modules/**"
         "packages/kimchi/lib/mkKimchi.nix"
         "packages/kiro-cli/lib/mkKiro.nix"
-        "packages/chatgpt-codex/modules/**"
-        "packages/claude-code/modules/**"
-        "packages/copilot-cli/modules/**"
         "packages/kiro-cli/modules/**"
         # `ai-module-fanout.md` discusses this file as the repo's only
         # `mkProgram` consumer; the retired glob caught `lib/mkSemble.nix`
@@ -162,10 +165,12 @@ _: {
     };
     facets = {
       scopes = [
-        "checks/facet-*.nix"
+        "checks/*/default.nix"
+        "checks/facets/**"
         "flake.nix"
         "lib/facets.nix"
         "lib/facets/**"
+        "lib/testing/**"
         "packages/*/checks.nix"
         "packages/*/packages/**"
         "packages/*/registry.nix"
@@ -211,6 +216,7 @@ _: {
         ".github/workflows/devenv-test.yml"
         ".github/workflows/update.yml"
         "lib/facets/**"
+        "lib/testing/**"
         "lib/packaging.nix"
         "packages/*/lib/packaging.nix"
         "packages/*/packages/**/*.nix"
@@ -237,15 +243,15 @@ _: {
     markdown-formatting = {
       scopes = [
         "**/*.md"
-        "checks/doubled-words-fixtures.nix"
-        "checks/doubled-words-fixtures.py"
-        "checks/doubled-words.nix"
-        "checks/doubled-words.py"
-        "checks/fixtures/doubled-words/**"
-        "checks/markdown-scan.nix"
-        "checks/markdown-scanners.nix"
-        "checks/split-code-spans.nix"
-        "checks/split-code-spans.py"
+        "checks/markdown/doubled-words-fixtures.nix"
+        "checks/markdown/doubled-words-fixtures.py"
+        "checks/markdown/doubled-words.nix"
+        "checks/markdown/doubled-words.py"
+        "checks/markdown/fixtures/doubled-words/**"
+        "checks/markdown/markdown-scan.nix"
+        "checks/markdown/markdown-scanners.nix"
+        "checks/markdown/split-code-spans.nix"
+        "checks/markdown/split-code-spans.py"
         "treefmt.nix"
       ];
       sources = ["markdown-formatting"];
@@ -257,13 +263,17 @@ _: {
     # launcher wrapper that exports the decrypted values at runtime.
     mcp-secrets = {
       scopes = [
-        "checks/factory-eval.nix"
-        "checks/module-eval.nix"
+        "checks/*/factory-eval.nix"
+        "checks/*/module-eval.nix"
         "lib/ai/app/mkBackendTransform.nix"
         "lib/ai/mcpProxy.nix"
         "lib/ai/mcpServer/**"
         "lib/ai/sharedOptions.nix"
         "lib/mcp.nix"
+        "lib/testing/factory-harness.nix"
+        "lib/testing/module-harness.nix"
+        "packages/*/checks/factory-eval.nix"
+        "packages/*/checks/module-eval.nix"
         "packages/kiro-cli/lib/mcpSecrets.nix"
         "packages/kiro-cli/lib/mkKiro.nix"
         "packages/kiro-cli/lib/wrapPackage.nix"
@@ -283,10 +293,14 @@ _: {
     # bind-address contract shared by native servers and the mcp-proxy bridge.
     mcp-services = {
       scopes = [
-        "checks/factory-eval.nix"
-        "checks/module-eval.nix"
+        "checks/*/factory-eval.nix"
+        "checks/*/module-eval.nix"
         "lib/ai/mcpServer/mkServiceModule.nix"
         "lib/ai/mcpServer/serviceSchema.nix"
+        "lib/testing/factory-harness.nix"
+        "lib/testing/module-harness.nix"
+        "packages/*/checks/factory-eval.nix"
+        "packages/*/checks/module-eval.nix"
         "packages/*/modules/mcp-server.nix"
         "packages/mcp-services/modules/homeManager/default.nix"
       ];
@@ -326,6 +340,7 @@ _: {
     overlays = {
       scopes = [
         "lib/facets/**"
+        "lib/testing/**"
         "lib/packaging.nix"
         "packages/*/lib/packaging.nix"
         "packages/*/packages/**/*.nix"

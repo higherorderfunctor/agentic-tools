@@ -21,7 +21,7 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
 `.github/instructions/`, or `.kiro/steering/` projections directly.
 
 - **`ai-clis`**
-  - Match: `checks/copilot-wrapper-argv.nix`,
+  - Match: `packages/copilot-cli/checks/copilot-wrapper-argv.nix`,
     `packages/chatgpt-codex/packages/ai/chatgpt-codex/package.nix`,
     `packages/claude-code/packages/ai/claude-code/package.nix`,
     `packages/copilot-cli/packages/ai/copilot-cli/package.nix`,
@@ -44,17 +44,19 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`dev/fragments/ai-config-scope/host-config-merge.md`](dev/fragments/ai-config-scope/host-config-merge.md)
 
 - **`ai-module`**
-  - Match: `checks/module-eval.nix`, `lib/ai/agent.nix`, `lib/ai/ai-common.nix`,
-    `lib/ai/app/**`, `lib/ai/default.nix`, `lib/ai/hooks.nix`,
-    `lib/ai/materialize.nix`, `lib/ai/mkSkillPackageModule.nix`,
-    `lib/ai/program.nix`, `lib/ai/runtimes.nix`, `lib/ai/runtime-files.nix`,
-    `lib/ai/sharedOptions.nix`, `packages/chatgpt-codex/lib/mkCodex.nix`,
-    `packages/claude-code/lib/mkClaude.nix`,
-    `packages/copilot-cli/lib/mkCopilot.nix`,
+  - Match: `checks/*/module-eval.nix`, `checks/module-provenance/**`,
+    `lib/ai/agent.nix`, `lib/ai/ai-common.nix`, `lib/ai/app/**`,
+    `lib/ai/default.nix`, `lib/ai/hooks.nix`, `lib/ai/materialize.nix`,
+    `lib/ai/mkSkillPackageModule.nix`, `lib/ai/program.nix`,
+    `lib/ai/runtime-files.nix`, `lib/ai/runtimes.nix`,
+    `lib/ai/sharedOptions.nix`, `lib/testing/module-harness.nix`,
+    `packages/*/checks/module-eval.nix`,
+    `packages/chatgpt-codex/lib/mkCodex.nix`,
+    `packages/chatgpt-codex/modules/**`,
+    `packages/claude-code/lib/mkClaude.nix`, `packages/claude-code/modules/**`,
+    `packages/copilot-cli/lib/mkCopilot.nix`, `packages/copilot-cli/modules/**`,
     `packages/kimchi/lib/mkKimchi.nix`, `packages/kiro-cli/lib/mkKiro.nix`,
-    `packages/chatgpt-codex/modules/**`, `packages/claude-code/modules/**`,
-    `packages/copilot-cli/modules/**`, `packages/kiro-cli/modules/**`,
-    `packages/semble/modules/common.nix`
+    `packages/kiro-cli/modules/**`, `packages/semble/modules/common.nix`
   - Read:
     [`dev/fragments/ai-module/ai-module-fanout.md`](dev/fragments/ai-module/ai-module-fanout.md),
     [`dev/fragments/ai-module/collision-semantics.md`](dev/fragments/ai-module/collision-semantics.md),
@@ -75,9 +77,7 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`dev/fragments/ai-skills/skills-fanout-pattern.md`](dev/fragments/ai-skills/skills-fanout-pattern.md)
 
 - **`beads`**
-  - Match: `checks/beads-lifecycle.nix`, `checks/module-eval.nix`,
-    `docs/beads/bd-reference.md`, `docs/beads/dolt-git-remotes.md`,
-    `packages/beads/packages/ai/devTools/beads/package.nix`, `packages/beads/**`
+  - Match: `packages/beads/**`
   - Read:
     [`packages/beads/docs/beads-lifecycle.md`](packages/beads/docs/beads-lifecycle.md)
 
@@ -96,7 +96,8 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`dev/fragments/devenv/files-internals.md`](dev/fragments/devenv/files-internals.md)
 
 - **`facets`**
-  - Match: `checks/facet-*.nix`, `flake.nix`, `lib/facets.nix`, `lib/facets/**`,
+  - Match: `checks/*/default.nix`, `checks/facets/**`, `flake.nix`,
+    `lib/facets.nix`, `lib/facets/**`, `lib/testing/**`,
     `packages/*/checks.nix`, `packages/*/packages/**`, `packages/*/registry.nix`
   - Read:
     [`dev/fragments/facets/package-ownership.md`](dev/fragments/facets/package-ownership.md)
@@ -114,8 +115,9 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
 - **`ifd`**
   - Match: `.github/actions/warm-ifd/**`, `.github/workflows/ci.yml`,
     `.github/workflows/devenv-test.yml`, `.github/workflows/update.yml`,
-    `lib/facets/**`, `lib/packaging.nix`, `packages/*/lib/packaging.nix`,
-    `packages/*/packages/**/*.nix`, `packages/*/packages/**`
+    `lib/facets/**`, `lib/testing/**`, `lib/packaging.nix`,
+    `packages/*/lib/packaging.nix`, `packages/*/packages/**/*.nix`,
+    `packages/*/packages/**`
   - Read:
     [`dev/fragments/overlays/ifd-patterns.md`](dev/fragments/overlays/ifd-patterns.md)
 
@@ -143,8 +145,8 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`packages/kiro-cli/docs/workflow-gating.md`](packages/kiro-cli/docs/workflow-gating.md)
 
 - **`kiro-wrapper`**
-  - Match: `checks/kiro-fhs-contract.nix`, `checks/kiro-wrapper-argv.nix`,
-    `lib/idempotentFlags.nix`,
+  - Match: `packages/kiro-cli/checks/kiro-fhs-contract.nix`,
+    `packages/kiro-cli/checks/kiro-wrapper-argv.nix`, `lib/idempotentFlags.nix`,
     `packages/kiro-cli/packages/ai/kiro-cli/package.nix`,
     `packages/kiro-cli/lib/**`
   - Read:
@@ -152,18 +154,23 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`packages/kiro-cli/docs/launcher-argv.md`](packages/kiro-cli/docs/launcher-argv.md)
 
 - **`markdown-formatting`**
-  - Match: `**/*.md`, `checks/doubled-words-fixtures.nix`,
-    `checks/doubled-words-fixtures.py`, `checks/doubled-words.nix`,
-    `checks/doubled-words.py`, `checks/fixtures/doubled-words/**`,
-    `checks/markdown-scan.nix`, `checks/markdown-scanners.nix`,
-    `checks/split-code-spans.nix`, `checks/split-code-spans.py`, `treefmt.nix`
+  - Match: `**/*.md`, `checks/markdown/doubled-words-fixtures.nix`,
+    `checks/markdown/doubled-words-fixtures.py`,
+    `checks/markdown/doubled-words.nix`, `checks/markdown/doubled-words.py`,
+    `checks/markdown/fixtures/doubled-words/**`,
+    `checks/markdown/markdown-scan.nix`,
+    `checks/markdown/markdown-scanners.nix`,
+    `checks/markdown/split-code-spans.nix`,
+    `checks/markdown/split-code-spans.py`, `treefmt.nix`
   - Read:
     [`dev/fragments/markdown-formatting/markdown-formatting.md`](dev/fragments/markdown-formatting/markdown-formatting.md)
 
 - **`mcp-secrets`**
-  - Match: `checks/factory-eval.nix`, `checks/module-eval.nix`,
+  - Match: `checks/*/factory-eval.nix`, `checks/*/module-eval.nix`,
     `lib/ai/app/mkBackendTransform.nix`, `lib/ai/mcpProxy.nix`,
     `lib/ai/mcpServer/**`, `lib/ai/sharedOptions.nix`, `lib/mcp.nix`,
+    `lib/testing/factory-harness.nix`, `lib/testing/module-harness.nix`,
+    `packages/*/checks/factory-eval.nix`, `packages/*/checks/module-eval.nix`,
     `packages/kiro-cli/lib/mcpSecrets.nix`, `packages/kiro-cli/lib/mkKiro.nix`,
     `packages/kiro-cli/lib/wrapPackage.nix`
   - Read:
@@ -176,9 +183,11 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`dev/fragments/mcp-servers/overlay-guide.md`](dev/fragments/mcp-servers/overlay-guide.md)
 
 - **`mcp-services`**
-  - Match: `checks/factory-eval.nix`, `checks/module-eval.nix`,
+  - Match: `checks/*/factory-eval.nix`, `checks/*/module-eval.nix`,
     `lib/ai/mcpServer/mkServiceModule.nix`,
-    `lib/ai/mcpServer/serviceSchema.nix`, `packages/*/modules/mcp-server.nix`,
+    `lib/ai/mcpServer/serviceSchema.nix`, `lib/testing/factory-harness.nix`,
+    `lib/testing/module-harness.nix`, `packages/*/checks/factory-eval.nix`,
+    `packages/*/checks/module-eval.nix`, `packages/*/modules/mcp-server.nix`,
     `packages/mcp-services/modules/homeManager/default.nix`
   - Read:
     [`dev/fragments/mcp-services/service-host-contract.md`](dev/fragments/mcp-services/service-host-contract.md)
@@ -189,8 +198,9 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`dev/fragments/nix-standards/nix-standards.md`](dev/fragments/nix-standards/nix-standards.md)
 
 - **`overlays`**
-  - Match: `lib/facets/**`, `lib/packaging.nix`, `packages/*/lib/packaging.nix`,
-    `packages/*/packages/**/*.nix`, `packages/*/packages/**`
+  - Match: `lib/facets/**`, `lib/testing/**`, `lib/packaging.nix`,
+    `packages/*/lib/packaging.nix`, `packages/*/packages/**/*.nix`,
+    `packages/*/packages/**`
   - Read:
     [`dev/fragments/overlays/cache-hit-parity.md`](dev/fragments/overlays/cache-hit-parity.md),
     [`dev/fragments/overlays/overlay-pattern.md`](dev/fragments/overlays/overlay-pattern.md),
@@ -1426,10 +1436,14 @@ packages/<owner>/
   docs/, patches/, src/ Documentation and build support files
   fragments/, skills/  Published content (when applicable)
 lib/                    Shared composition, AI module engines, packaging helpers
-checks/                 Workspace validation and cross-owner integration
+lib/testing/            Shared test harnesses with discovered backend imports
+checks/<concern>/       Native workspace checks and cross-owner integration
 config/                 Workspace policy and shared option declarations/data
 dev/                    Repo-only generation, tasks, scripts, skills, and guidance
 devshell/               Standalone shell integration (mkAgenticShell)
 flake.nix               Public assembly and repo outputs
 devenv.nix              This repository's workspace shell
 ```
+
+See `docs/repository-layout.md` for a worked owner tree and the distinction
+between package and workspace responsibilities.

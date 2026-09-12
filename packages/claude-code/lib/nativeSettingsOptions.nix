@@ -22,7 +22,7 @@
 # hand declaration aimed at a key the binary has since dropped surfaces as
 # `report.staleExternalPaths` rather than sitting there rotting.
 #
-# `report` is exported for `checks/claude-settings-schema.nix`, which is what
+# `report` is exported for `packages/claude-code/checks/claude-settings-schema.nix`, which is what
 # makes the exception tables above self-policing in CI rather than by review.
 {
   lib,

@@ -8,14 +8,7 @@
   # beads: the contained devenv lifecycle, serialized checkpoint protocol,
   # and sole raw-Dolt publication boundary.
   fragments.categories.beads = {
-    scopes = [
-      "checks/beads-lifecycle.nix"
-      "checks/module-eval.nix"
-      "docs/beads/bd-reference.md"
-      "docs/beads/dolt-git-remotes.md"
-      "packages/${facetOwner}/packages/ai/devTools/beads/package.nix"
-      "packages/${facetOwner}/**"
-    ];
+    scopes = ["packages/${facetOwner}/**"];
     sources = [
       {
         location = "package";

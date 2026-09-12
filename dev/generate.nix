@@ -962,6 +962,9 @@
     4. Add HM and devenv modules in `packages/<owner>/modules/` when applicable
     5. Run `nix flake check` to verify
 
+    See [Repository ownership and layout](docs/repository-layout.md) for a
+    worked tree. Register checks through the owner's native `checks.nix` module.
+
     Owner discovery exports native package namespaces, flat flake packages,
     and backend modules automatically. New owners need no root export entry.
 

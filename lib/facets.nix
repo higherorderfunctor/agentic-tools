@@ -553,50 +553,59 @@ in rec {
   realizeChecks = {
     context,
     index,
-    rootChecks ? {},
+    rootModules ? [],
     rootSource ? "<root checks>",
   }: let
-    sourceClaims = contributionsFor index "checks";
-    rootClaims = map (name: {
-      keyPath = [name];
-      owner = "<root>";
-      source = rootSource;
-      value = rootChecks.${name};
-    }) (attrNames rootChecks);
-    checkClaims =
-      rootClaims
-      ++ concatMap (
-        claim: let
-          factory = import claim.source;
-          checks =
-            if isFunction factory
-            then factory context
-            else throw "facet error: owner '${claim.owner}' check at '${toString claim.source}' must be a context factory";
-          checkNames =
-            if isAttrs checks
-            then sortNames (attrNames checks)
-            else throw "facet error: owner '${claim.owner}' check factory at '${toString claim.source}' must return an attribute set";
-        in
-          map (name: {
-            keyPath = [name];
-            inherit (claim) owner source;
-            value = checks.${name};
-          })
-          checkNames
-      )
-      sourceClaims;
+    ownerModules = map (claim:
+      claim
+      // {
+        module = args: callOwnerModule claim args;
+      }) (contributionsFor index "checks");
+    workspaceModules =
+      lib.imap0 (position: module: {
+        owner = "<root>";
+        source =
+          if builtins.isPath module
+          then module
+          else "${toString rootSource}#${toString position}";
+        inherit module;
+      })
+      rootModules;
+    contributions = workspaceModules ++ ownerModules;
+    evaluate = specialArgs: modules:
+      lib.evalModules {
+        inherit specialArgs;
+        modules = [./testing/check-options.nix] ++ modules;
+      };
+    evaluated = evaluate context (map (claim: claim.module) contributions);
+    # Isolate definitions, not their module context: conditions and imported
+    # function arguments must see the same fixed point as the combined result.
+    # evalModules removes _module from config in its public result, but module
+    # argument resolution still needs it for arguments supplied by other owners.
+    claimContext =
+      context
+      // {
+        config = evaluated.config // {inherit (evaluated) _module;};
+        inherit (evaluated) options;
+      };
+    checkClaims = concatMap (claim: let
+      isolated = evaluate claimContext [claim.module];
+    in
+      map (name: {
+        keyPath = [name];
+        inherit (claim) owner source;
+        value = isolated.config.checks.${name};
+      }) (attrNames isolated.config.checks))
+    contributions;
     exclusive = mergeExclusiveClaims "checks" checkClaims;
-    nonDerivations = filter (claim: !isDerivation claim.value) checkClaims;
-    validations = [
-      (ensure (nonDerivations == []) "owner '${(builtins.head nonDerivations).owner}' check '${builtins.head (builtins.head nonDerivations).keyPath}' at '${toString (builtins.head nonDerivations).source}' returned a non-derivation")
-    ];
-    checksByName = listToAttrs (map (
-        claim:
-          nameValuePair (builtins.head claim.keyPath) {
-            inherit (claim) owner source value;
-          }
-      )
-      checkClaims);
-  in
-    deepSeq [(attrNames exclusive) validations] checksByName;
+    byName = listToAttrs (map (claim:
+      nameValuePair (builtins.head claim.keyPath) claim)
+    checkClaims);
+  in {
+    # Testing inputs stay lazy and independently accessible: the harness uses
+    # them while the check modules construct their derivations.
+    inherit (evaluated.config) testing;
+    claims = deepSeq (attrNames exclusive) byName;
+    checks = deepSeq (attrNames exclusive) evaluated.config.checks;
+  };
 }

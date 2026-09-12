@@ -1,0 +1,4 @@
+{
+  imports = [./checks/module-eval.nix ./checks/semble-templates.nix];
+  testing.moduleProbes = [{ai.programs.semble.enable = true;}];
+}

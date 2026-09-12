@@ -1,16 +1,14 @@
 ## HM Module Conventions
 
-> **Last verified:** 2026-08-19 — the retired generated skill and its two module
-> facets are gone. Stacked Workflows is the sole remaining skill-package program
-> example, and generated store-path strings stay a supported helper input with
-> no first-party producer today.
+> **Last verified:** 2026-09-12 — package modules own consumer checks; the
+> shared harness discovers backend imports and owner activation probes.
 >
 > Full lineage:
 > `git show 25ec0738:dev/fragments/hm-modules/module-conventions.md`.
 
-These conventions are enforced by code review and the `checks/module-eval.nix`
-evaluation tests, not by the module system itself. Follow them when adding or
-modifying any HM module under `modules/**`.
+These conventions are enforced by code review and owner-local module evaluation
+tests, not by the module system itself. Follow them when adding or modifying any
+HM module under `modules/**`.
 
 ### Option shape conventions
 
@@ -301,9 +299,9 @@ about runtime state dirs for Claude's `~/.claude/projects`, which would need it.
 **Every option on an HM module under `modules/<subdir>/` MUST have a matching
 option on the corresponding devenv module under `modules/devenv/<subdir>.nix`**
 — same types, same semantics, same fanout behavior. If you add an option to one,
-add it to the other in the same commit. `checks/options-doc.nix` enforces exact
-flattened option-name and type parity across the full generated `ai.*` trees;
-module-eval tests cover backend-specific lowering and diagnostics.
+add it to the other in the same commit. `checks/modules/options-doc.nix`
+enforces exact flattened option-name and type parity across the full generated
+`ai.*` trees; module-eval tests cover backend-specific lowering and diagnostics.
 
 **Shared types live in `lib/`.** Both HM and devenv modules import types from
 `lib/ai-common.nix` (`ruleModule`, `lspServerModule`, `mkCopilotLspConfig`,
@@ -315,9 +313,9 @@ facets `imports` it, so the two surfaces are the same expression rather than two
 that currently agree. Prefer this when the declaration is shared even if backend
 lowering differs: glab's HM file owns package installation and optional keyring
 lifecycle, while devenv installs the package and explicitly rejects that
-user-session lifecycle. `checks/module-eval.nix` asserts the two option trees
-are equal (`module-glab-hm-devenv-option-parity`), which is a real test rather
-than a code-review convention.
+user-session lifecycle. `packages/glab/checks/module-eval.nix` asserts the two
+option trees are equal (`module-glab-hm-devenv-option-parity`), which is a real
+test rather than a code-review convention.
 
 Note this is NOT free for every module: it only works when the options carry no
 facet-specific defaults or `defaultText`. Modules whose options reference
@@ -386,13 +384,15 @@ commit message. If the mismatch is accidental, it's a bug.
 
 ### Validation
 
-`checks/module-eval.nix` runs module evaluation tests via `evalModule` with the
-full `homeManagerModules.default` set. Add a case in the SAME commit whenever it
-(a) adds or removes an option under `modules/**` or `lib/ai/**`, (b) changes
-what an existing option's `mkIf` writes into `config`, or (c) adds, removes or
-changes the condition of an assertion. A commit that touches `modules/**` but
-does none of those — a rename, a comment, formatting, a refactor with identical
-evaluated `config` — needs no new case. The three map onto:
+Owner-local module tests use `lib/testing/module-harness.nix`, which evaluates
+the same discovered Home Manager and devenv module sets as production. Root
+check concerns own cross-package contracts. Add a case in the SAME commit
+whenever it (a) adds or removes an option under `modules/**` or `lib/ai/**`, (b)
+changes what an existing option's `mkIf` writes into `config`, or (c) adds,
+removes or changes the condition of an assertion. A commit that touches
+`modules/**` but does none of those — a rename, a comment, formatting, a
+refactor with identical evaluated `config` — needs no new case. The three map
+onto:
 
 - Option discoverability (set an option, verify it evaluates)
 - Fanout correctness (set an option, verify it propagates)

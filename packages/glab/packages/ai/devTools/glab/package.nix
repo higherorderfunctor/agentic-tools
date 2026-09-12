@@ -85,7 +85,7 @@
 
   # DERIVED from the pinned source's go.mod by `fixGoFloor` below, never
   # hand-written. See `vu.mkGoFloorFix` for why, and
-  # `checks/go-floor-drift.nix` for the gate that keeps it honest.
+  # `checks/packaging/go-floor-drift.nix` for the gate that keeps it honest.
   goFloor = sources.goFloor or vu.goFloorUnknown;
 
   # Bound once and shared: the package builder AND the schema-dump extract

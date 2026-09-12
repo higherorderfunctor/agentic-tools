@@ -9,9 +9,9 @@
 >
 > - **The wrapper lives in one place, not duplicated per backend.** Both
 >   backends now share `packages/copilot-cli/lib/wrapPackage.nix`, exercised by
->   `checks/copilot-wrapper-argv.nix`. Inlining it once per backend is what let
->   the identical pair of defects — builder-expanded `$HOME`, missing `@` prefix
->   — ship twice, as #767 and then #769.
+>   `packages/copilot-cli/checks/copilot-wrapper-argv.nix`. Inlining it once per
+>   backend is what let the identical pair of defects — builder-expanded
+>   `$HOME`, missing `@` prefix — ship twice, as #767 and then #769.
 
 ### The trap: "Copilot" is two different consumers here
 

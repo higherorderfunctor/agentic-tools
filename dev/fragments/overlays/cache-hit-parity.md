@@ -112,9 +112,9 @@ is visible in the consumer's lock as
 where our own locked node would otherwise be.
 
 **Do not treat this as a hole to plug.** It is already encoded as unsupported:
-the `followsControl` in `checks/cache-hit-parity.nix` constructs exactly this
-scenario and asserts the output **drifts**. The check fails if `follows` ever
-stops breaking parity.
+the `followsControl` in `checks/packaging/cache-hit-parity.nix` constructs
+exactly this scenario and asserts the output **drifts**. The check fails if
+`follows` ever stops breaking parity.
 
 **The cost is worse than the cache miss this fragment used to describe.**
 Measured 2026-08-05 against a real consumer following an April 2026 nixpkgs

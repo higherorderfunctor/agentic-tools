@@ -449,7 +449,7 @@ in {
     {
       # THE one sanctioned root-pool write in this repo. Every other module
       # writes `ai.<runtime>.<pool>`, enforced by the provenance guard in
-      # `checks/module-eval.nix` (`rootPoolViolations`), which allowlists this
+      # `checks/module-provenance/helpers.nix` (`rootPoolViolations`), which allowlists this
       # FILE — see `rootPoolAllowedFiles` there.
       #
       # It is legitimate because the DESTINATION is the root pool by

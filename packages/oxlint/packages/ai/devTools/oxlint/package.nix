@@ -126,7 +126,7 @@ in
     # needs a `NIX_NPM_REGISTRY` default supplied here in the same change.
     # Replace nixpkgs Oxlint's own pnpm in BOTH places — the dependency fetcher
     # above and the build input here — so both phases use the same major.
-    # checks/pnpm-fetcher-parity.nix asserts those two are the same store path,
+    # checks/packaging/pnpm-fetcher-parity.nix asserts those two are the same store path,
     # so they can never drift apart silently.
     nativeBuildInputs =
       map

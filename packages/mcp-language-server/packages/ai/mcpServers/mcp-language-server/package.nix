@@ -32,7 +32,7 @@
   # TRUNK-TRACKED — literal rather than a sidecar key, for the same
   # reason github-mcp.nix carries one: no sidecar, and `nix-update` owns
   # the rev bump, so there is no repo-owned script to hook a rewrite
-  # into. `checks/go-floor-drift.nix` verifies it against this `src`.
+  # into. `checks/packaging/go-floor-drift.nix` verifies it against this `src`.
   goFloor = "1.24.0";
 in
   # The toolchain is a BUILDER argument, so `.override` is the only seam

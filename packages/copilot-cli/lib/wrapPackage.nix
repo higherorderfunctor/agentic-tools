@@ -44,7 +44,7 @@
 # a "does it start?" check missed both.
 #
 # Neither is visible from the Nix side; the generated script is well-formed
-# either way. So checks/copilot-wrapper-argv.nix RUNS this wrapper against a
+# either way. So packages/copilot-cli/checks/copilot-wrapper-argv.nix RUNS this wrapper against a
 # stub that prints its argv, under a CONTROLLED HOME / DEVENV_ROOT, instead of
 # string-matching the emitted bash. A grep proves the text is present; only
 # running it proves the root var still expands at launch and that the value

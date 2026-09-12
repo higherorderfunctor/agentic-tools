@@ -476,8 +476,9 @@ preference for landing on the dev branch without PR overhead):
   closed as superseded by this fix.
 
 - **Gap 4 structural guard** in commit `1d864d3`. Adds
-  `checks/pnpm-fetcher-parity.nix` asserting fetcher pnpm == buildPhase pnpm for
-  every overlay package using `fetchPnpmDeps`. Positive test:
+  `checks/packaging/pnpm-fetcher-parity.nix` asserting fetcher pnpm ==
+  buildPhase pnpm for every overlay package using `fetchPnpmDeps`. Positive
+  test:
   `ok — every pnpmDeps fetcher uses the same pnpm as its consuming buildPhase`.
   Negative test (content fix reverted):
   `FAIL: context7-mcp: fetcher pnpm: pnpm-11.1.1, build pnpm: pnpm-10.33.4`. PR

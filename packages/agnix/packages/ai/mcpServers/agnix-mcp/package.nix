@@ -10,7 +10,7 @@
 # recompile. `//` overrides only the eval-time meta that `lib.getExe`
 # reads, leaving the build untouched, so agnix/agnix-lsp/agnix-mcp all
 # share ONE derivation and ONE compile. Guarded by the agnix sibling
-# drvPath assertion in checks/cache-hit-parity.nix.
+# drvPath assertion in checks/packaging/cache-hit-parity.nix.
 {agnix}:
 agnix
 // {

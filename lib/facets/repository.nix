@@ -81,11 +81,23 @@ in {
       packageWorlds.${system}.eligibleClaims) (world.overlay final prev);
   in
     lib.genAttrs (lib.unique (packageRoots ++ ordinaryRoots)) (name: guarded.${name} or (prev.${name} or {}));
-  checksFor = {rootChecks ? {}, ...} @ context:
-    lib.mapAttrs (_: claim: claim.value) (facets.realizeChecks {
-      inherit index rootChecks;
+  checksFor = {rootModules ? [], ...} @ context: let
+    world = facets.realizeChecks {
+      inherit index rootModules;
       rootSource = root + "/checks";
-      context = builtins.removeAttrs context ["rootChecks"] // {inherit inputs lib;};
-    });
+      context =
+        builtins.removeAttrs context ["rootModules"]
+        // {
+          inherit inputs lib;
+          harness = import ../testing/module-harness.nix {
+            inherit lib;
+            inherit (context) pkgs;
+            inherit (world) testing;
+            moduleImports = backend: facets.moduleImports {inherit backend index;};
+          };
+        };
+    };
+  in
+    world.checks;
   moduleImports = backend: facets.moduleImports {inherit backend index;};
 }

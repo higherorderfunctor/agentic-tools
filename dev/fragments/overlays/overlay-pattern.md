@@ -517,9 +517,9 @@ ran. glab 1.116.0 and oh-my-posh 31.1.x (both `go 1.27.0`, against `pkgs.go`
 Note what is NOT a fix: preserving `goFloor` across the sidecar rewrite. The
 committed floors were 1.26.5 and 1.26.0 and **both still select 1.26.7**. Only
 deriving the floor from the fresh source before the vendor build changes the
-outcome. `checks/go-floor-extract-order.nix` gates the order, with a positive
-control, and fails a package that carries `fixGoFloor` but no `goUpdateExtract`
-— i.e. one that went back to hand-rolling the chain.
+outcome. `checks/packaging/go-floor-extract-order.nix` gates the order, with a
+positive control, and fails a package that carries `fixGoFloor` but no
+`goUpdateExtract` — i.e. one that went back to hand-rolling the chain.
 
 `glab` is the one Go package where the SRC hash goes in the sidecar too, so it
 is the only `srcFromSidecar = true` caller. The reason is the one that also
@@ -589,9 +589,9 @@ caught up and this is now a DOWNGRADE". The sibling repo demonstrates the
 failure — it pins oh-my-posh to Go 1.26.0, a gap-filler when written and a
 downgrade against our pin's 1.26.5. Prereleases are filtered out of the
 candidate set on purpose: `go-bin.latest` is currently a prerelease, and Nix
-sorts `1.27rc1` ABOVE `1.27.0`. `checks/go-toolchain-floor.nix` exercises all
-three branches plus two positive controls, which is also what keeps the input
-from shipping dormant.
+sorts `1.27rc1` ABOVE `1.27.0`. `checks/packaging/go-toolchain-floor.nix`
+exercises all three branches plus two positive controls, which is also what
+keeps the input from shipping dormant.
 
 **ALL EIGHT exported Go packages carry the seam**, not just the two that once
 needed it — `beads`, `gh`, `glab`, `github-mcp`, `gluetun`,
@@ -647,9 +647,9 @@ Reading the floor is **silent by construction** — overlays read
 `sources.goFloor or vu.goFloorUnknown`, and `goFloorUnknown` (`"0"`) is
 satisfied by everything. That is deliberate and not a hole: `mkGoFloorFix` must
 evaluate the package to build its `.src`, so a `throw` on the missing key would
-deadlock the fixer that repairs it. `checks/go-floor-drift.nix` is the loud half
-— it compares every recorded floor against the real go.mod and fails naming the
-package, the actual requirement, and the remedy (fixer vs. literal).
+deadlock the fixer that repairs it. `checks/packaging/go-floor-drift.nix` is the
+loud half — it compares every recorded floor against the real go.mod and fails
+naming the package, the actual requirement, and the remedy (fixer vs. literal).
 
 That check takes **NO REGISTRY**: it filters `self.packages.<system>` for
 `passthru.goFloor`. A list of Go packages would be a second source of truth a

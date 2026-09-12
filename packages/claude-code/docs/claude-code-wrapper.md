@@ -78,9 +78,9 @@ Three things follow, and each of them is a trap if you assume the old shape:
   nothing for those paths rather than being overwritten by a merge. Adding a
   typed option for a key upstream already declares is usually the WRONG move;
   the generator has it.
-- **`checks/claude-settings-schema.nix` polices the tables.** A row aimed at a
-  key upstream renamed, or a row present in both tables, fails `nix flake check`
-  instead of quietly doing nothing.
+- **`packages/claude-code/checks/claude-settings-schema.nix` polices the
+  tables.** A row aimed at a key upstream renamed, or a row present in both
+  tables, fails `nix flake check` instead of quietly doing nothing.
 - **A key the binary does NOT declare is a hard failure**, not a freeform
   passthrough, unless `ai.claude.allowUnrecognizedSettings` names it — Claude
   ignores an unknown settings key silently, so a typo otherwise looks applied

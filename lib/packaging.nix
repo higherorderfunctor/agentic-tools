@@ -254,7 +254,7 @@ rec {
   #
   # Absolute store paths throughout: this string is interpolated into a
   # PATH-less writeShellScript by mkUpdateScript, and the
-  # `versionCheck.cmd` scan in checks/bare-commands.nix carries no
+  # `versionCheck.cmd` scan in checks/shell/bare-commands.nix carries no
   # `/bin/` exclusion for exactly that reason.
   glLatestVersionCmd = {
     pkgs,
@@ -360,7 +360,7 @@ rec {
   # deadlock the very fixer that repairs it.
   #
   # Reading it is therefore SILENT by construction. That is deliberate,
-  # and `checks/go-floor-drift.nix` is the loud half: it compares every
+  # and `checks/packaging/go-floor-drift.nix` is the loud half: it compares every
   # recorded floor against the package's real go.mod and fails naming the
   # package and the expected value. Same division of labour as the
   # extracted sidecars — permissive at eval, gated by a check.
@@ -370,7 +370,7 @@ rec {
   # higher of its `go` and `toolchain` directives.
   #
   # ONE definition, consumed by BOTH `mkGoFloorFix` (writes the floor at
-  # bump time) and `checks/go-floor-drift.nix` (asserts it still matches
+  # bump time) and `checks/packaging/go-floor-drift.nix` (asserts it still matches
   # source). A second copy of this parse is precisely how the writer and
   # the gate would come to disagree about what the floor is, and the
   # disagreement would present as a drift check that cannot be made green.
@@ -679,7 +679,7 @@ rec {
     inherit fixGoFloor fixSrcHash fixVendorHash;
 
     # A single writeShellScript rather than a concatenated snippet, so
-    # `checks/go-floor-extract-order.nix` has ONE flat file to read the
+    # `checks/packaging/go-floor-extract-order.nix` has ONE flat file to read the
     # order out of. A package that composes its updateScript from
     # sub-scripts (beads runs two) would otherwise hide the ordering
     # behind a wrapper the check cannot see through.

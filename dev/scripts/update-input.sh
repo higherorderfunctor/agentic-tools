@@ -21,7 +21,7 @@ log_info "Updating flake input..."
 # STANDALONE subshell, NOT an `if !` condition — bash disables errexit for
 # anything whose status it tests, and that reaches inside the subshell and
 # overrides its own `set -e`. See "Target subshell shape" in
-# update-common.sh; checks/target-subshell-shape.nix fails the build if this
+# update-common.sh; checks/shell/target-subshell-shape.nix fails the build if this
 # regresses.
 target_rc=0
 set +e

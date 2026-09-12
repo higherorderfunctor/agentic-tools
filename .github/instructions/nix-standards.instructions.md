@@ -58,15 +58,15 @@ before root-causing.
 
 The heading above these two lists used to read "defensive but still required"
 over a bullet saying "optional but acceptable", so the file could be cited for
-opposite verdicts on the same bare `cp`. `checks/bare-commands.nix` is the
+opposite verdicts on the same bare `cp`. `checks/shell/bare-commands.nix` is the
 authority and has always exempted the phases; this list now matches it. When an
 exempt body lives in a file the whole-line scan reads (`lib/`,
 `packages/*/lib/`, `lib/packaging.nix`), silence it with a `# bare-commands: ok`
 marker on the line, as `mkClaudeExtract` does — never by adding a store path the
 phase does not need.
 
-**Enforcement:** `checks/bare-commands.nix` (part of `nix flake check`) runs two
-scans.
+**Enforcement:** `checks/shell/bare-commands.nix` (part of `nix flake check`)
+runs two scans.
 
 The **whole-line scan** covers `lib/`, `packages/*/lib/`, and the single file
 `lib/packaging.nix`, looking for a coreutils command in any of four

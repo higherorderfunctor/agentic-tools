@@ -14,7 +14,7 @@
   # New nixpkgs makes the default `pnpm` be pnpm_11, which dropped
   # fetchPnpmDeps `fetcherVersion = 3`. Pin pnpm_10 for BOTH the deps
   # fetch and the build so they stay in lockstep
-  # (see checks/pnpm-fetcher-parity.nix). Mirrors the context7-mcp owner recipe.
+  # (see checks/packaging/pnpm-fetcher-parity.nix). Mirrors the context7-mcp owner recipe.
   pnpm = ourPkgs.pnpm_10;
   vu = packageLib;
 

@@ -5,7 +5,7 @@
 # (`hmOptionsDoc`) and one for devenv (`devenvOptionsDoc`).
 #
 # The former mdbook/NuschtOS site was removed, so these renderings are no longer
-# published as flake packages. checks/options-doc.nix still builds both outputs
+# published as flake packages. checks/modules/options-doc.nix still builds both outputs
 # as the consumer-facing option contract and verifies backend parity.
 {
   lib,

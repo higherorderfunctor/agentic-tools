@@ -175,74 +175,13 @@
     in
       repository.libraryFor baseLib;
 
-    checks = forAllSystems (system: let
-      pkgs = pkgsFor system;
-      instr = instructionsFor system;
-      instructionMaterializer = import ./lib/materialize-repo-instructions.nix {inherit instr pkgs;};
-      isolatePrekHooks = import ./lib/isolate-prek-hooks.nix {inherit pkgs;};
-      repoValidation = import ./config/repo-validation.nix {inherit lib pkgs;};
-      bareCommandsCheck = {bare-commands = import ./checks/bare-commands.nix {inherit pkgs;};};
-      targetSubshellShapeCheck = {target-subshell-shape = import ./checks/target-subshell-shape.nix {inherit pkgs;};};
-      beadsContractsCheck = {beads-contracts = import ./checks/beads-contracts.nix {inherit pkgs;};};
-      beadsLifecycleCheck = {beads-lifecycle = import ./checks/beads-lifecycle.nix {inherit lib pkgs self;};};
-      cacheHitParityCheck = import ./checks/cache-hit-parity.nix {inherit inputs lib pkgs self;};
-      codexCoverageCheck = import ./checks/chatgpt-codex-coverage.nix {inherit lib pkgs;};
-      codexExtractedCheck = import ./checks/chatgpt-codex-extracted.nix {inherit pkgs self;};
-      copilotWrapperArgvCheck = {copilot-wrapper-argv = import ./checks/copilot-wrapper-argv.nix {inherit lib pkgs;};};
-      claudeDelegationClampCheck = {claude-delegation-clamp = import ./checks/claude-delegation-clamp.nix {inherit pkgs;};};
-      claudeDevenvHooksRealTypeCheck = import ./checks/claude-devenv-hooks-real-type.nix {inherit pkgs inputs;};
-      claudeExtractedCheck = import ./checks/claude-code-extracted.nix {inherit pkgs self;};
-      claudeHeronBrookCheck = import ./checks/claude-heron-brook.nix {inherit lib pkgs self;};
-      claudeMemoryCollisionGuardCheck = {claude-memory-collision-guard = import ./checks/claude-memory-collision-guard.nix {inherit pkgs;};};
-      claudeSettingsSchemaCheck = import ./checks/claude-settings-schema.nix {inherit lib pkgs;};
-      doubledWordsCheck = {doubled-words = import ./checks/doubled-words.nix {inherit pkgs;};};
-      doubledWordsFixturesCheck = {doubled-words-fixtures = import ./checks/doubled-words-fixtures.nix {inherit pkgs;};};
-      # #1019 mock-pilot bootstrap: evaluate the prospective facet composer
-      # here while live package, overlay, and module aggregation stays unchanged.
-      facetMockChecks = import ./checks/facet-mock.nix {inherit lib pkgs self;};
-      facetProductionCheck = {facet-owner-relocation = import ./checks/facet-production.nix {inherit pkgs;};};
-      factoryChecks = import ./checks/factory-eval.nix {inherit lib pkgs;};
-      formattingCheck = import ./checks/formatting.nix {inherit inputs pkgs self;};
-      fragmentsChecks = import ./checks/fragments-eval.nix {inherit lib pkgs;};
-      glabExtractedCheck = import ./checks/glab-extracted.nix {inherit pkgs self;};
-      goFloorDriftChecks = import ./checks/go-floor-drift.nix {inherit lib pkgs self;};
-      goFloorExtractOrderChecks = import ./checks/go-floor-extract-order.nix {inherit lib pkgs self;};
-      goToolchainFloorChecks = import ./checks/go-toolchain-floor.nix {inherit inputs lib pkgs;};
-      instructionsDriftCheck = import ./checks/instructions-drift.nix {inherit pkgs self;};
-      instructionMaterializationCheck = {
-        instruction-materialization = import ./checks/instruction-materialization.nix {
-          inherit instr pkgs;
-          materializer = instructionMaterializer;
-        };
-      };
-      isolatePrekHooksCheck = {
-        isolate-prek-hooks = import ./checks/isolate-prek-hooks.nix {
-          inherit pkgs;
-          isolator = isolatePrekHooks;
-        };
-      };
-      kiroExtractedCheck = import ./checks/kiro-cli-extracted.nix {inherit pkgs self;};
-      kiroFhsContractCheck = {kiro-fhs-contract = import ./checks/kiro-fhs-contract.nix {inherit pkgs;};};
-      kiroIdentitySpliceCheck = {kiro-identity-splice = import ./checks/kiro-identity-splice.nix {inherit pkgs;};};
-      kiroWorkspaceSettingsFixturesCheck = {kiro-workspace-settings-fixtures = import ./checks/kiro-workspace-settings-fixtures.nix {inherit pkgs;};};
-      kiroWrapperArgvCheck = {kiro-wrapper-argv = import ./checks/kiro-wrapper-argv.nix {inherit lib pkgs;};};
-      markdownTableCellsFixturesCheck = {markdown-table-cells-fixtures = import ./checks/markdown-table-cells-fixtures.nix {inherit pkgs;};};
-      moduleChecks = import ./checks/module-eval.nix {inherit lib pkgs;};
-      optionsDocsCheck = import ./checks/options-doc.nix {inherit lib pkgs self;};
-      pnpmFetcherParityCheck = import ./checks/pnpm-fetcher-parity.nix {inherit lib pkgs self;};
-      pnpmFetcherContractCheck = import ./checks/pnpm-fetcher-contract.nix {inherit lib pkgs self;};
-      sembleTemplatesCheck = import ./checks/semble-templates.nix {inherit lib pkgs self;};
-      repoValidationChecks = repoValidation.mkCiChecks {
-        gitHooksRun = inputs.git-hooks.lib.${system}.run;
-        src = ./.;
-      };
-      splitCodeSpansCheck = {split-code-spans = import ./checks/split-code-spans.nix {inherit pkgs;};};
-      updateTargetsParityCheck = {update-targets-parity = import ./checks/update-targets-parity.nix {inherit inputs lib pkgs self updateRegistry;};};
-      prWatchAtStopCheck = {pr-watch-at-stop = import ./checks/pr-watch-at-stop.nix {inherit pkgs;};};
-      validateAtStopCheck = {validate-at-stop = import ./checks/validate-at-stop.nix {inherit pkgs;};};
-      rootChecks = facetProductionCheck // bareCommandsCheck // beadsContractsCheck // beadsLifecycleCheck // cacheHitParityCheck // claudeDelegationClampCheck // claudeDevenvHooksRealTypeCheck // claudeExtractedCheck // claudeHeronBrookCheck // claudeMemoryCollisionGuardCheck // claudeSettingsSchemaCheck // codexCoverageCheck // codexExtractedCheck // copilotWrapperArgvCheck // doubledWordsCheck // doubledWordsFixturesCheck // markdownTableCellsFixturesCheck // facetMockChecks // factoryChecks // formattingCheck // fragmentsChecks // glabExtractedCheck // goFloorDriftChecks // goFloorExtractOrderChecks // goToolchainFloorChecks // instructionMaterializationCheck // instructionsDriftCheck // isolatePrekHooksCheck // kiroExtractedCheck // kiroFhsContractCheck // kiroIdentitySpliceCheck // kiroWorkspaceSettingsFixturesCheck // kiroWrapperArgvCheck // moduleChecks // optionsDocsCheck // pnpmFetcherContractCheck // pnpmFetcherParityCheck // repoValidationChecks // sembleTemplatesCheck // splitCodeSpansCheck // targetSubshellShapeCheck // updateTargetsParityCheck // prWatchAtStopCheck // validateAtStopCheck;
-    in
-      repository.checksFor {inherit pkgs rootChecks self;});
+    checks = forAllSystems (system:
+      repository.checksFor {
+        inherit self updateRegistry;
+        instr = instructionsFor system;
+        pkgs = pkgsFor system;
+        rootModules = (import ./lib/testing/discover.nix {inherit lib;}) ./checks;
+      });
 
     # devShells.default provided by devenv CLI (devenv shell / devenv test)
     # from devenv.nix; nothing in this flake constructs it.

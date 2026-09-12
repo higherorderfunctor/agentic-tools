@@ -73,7 +73,7 @@ composed registry and ninja DAG:
   while our pin satisfies the floor, otherwise the lowest `go-bin`
   (purpleclay/go-overlay) release that does, and a throw if nothing does. Never
   pin a toolchain version; a pin cannot tell a live gap from a rotted downgrade.
-  `checks/go-toolchain-floor.nix` covers all three branches.
+  `checks/packaging/go-toolchain-floor.nix` covers all three branches.
 - **Version-independent URLs** (`dns-root-hints`): the version-equality early
   exit is not a valid change signal, so pass `alwaysPrefetch = true` to
   `mkUpdateScript`. It prefetches every run and decides whether to write by

@@ -1,7 +1,7 @@
 # Human-reviewed disposition for every vocabulary currently emitted by
 # packages/chatgpt-codex/extracted.json. This is deliberately separate from the
 # generated sidecar: an update may regenerate facts, but it must not decide how
-# Nix should own a new upstream surface. checks/chatgpt-codex-coverage.nix keeps
+# Nix should own a new upstream surface. packages/chatgpt-codex/checks/chatgpt-codex-coverage.nix keeps
 # every categorical union exact, so an upstream command, flag, field, or
 # maturity cannot slip through merely because extraction itself stayed green.
 # cspell:words rollouts
@@ -166,7 +166,7 @@
       # disposition — though NOT for want of a counterpart on the bypass's
       # side. That bypass decomposes just as cleanly onto
       # `approval_policy = "never"` plus `sandbox_mode = "danger-full-access"`,
-      # and checks/module-eval.nix asserts both settings accept every value the
+      # and packages/chatgpt-codex/checks/module-eval.nix asserts both settings accept every value the
       # extractor publishes for `--ask-for-approval` and `--sandbox`. It is
       # sessionOnly under this category's own "dangerous bypasses" clause: an
       # escape hatch that disables the sandbox boundary must stay on the

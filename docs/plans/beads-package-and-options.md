@@ -3,10 +3,11 @@
 > **Status: IN PROGRESS** — phase 2 is implemented and held in #1011; phase 3
 > remains gated. Created 2026-08-14; updated 2026-08-16 after the normalized
 > program factory landed in #1024. Companion references, synthesized from prior
-> research sessions and re-verified where marked: `docs/beads/bd-reference.md`
-> (the tool), `docs/beads/dolt-git-remotes.md` (sync/remote mechanics),
-> `docs/beads/ecosystem.md` (integrations and prior art). Facts in this plan
-> that duplicate a companion are deliberate summaries — the companion is
+> research sessions and re-verified where marked:
+> `packages/beads/docs/bd-reference.md` (the tool),
+> `packages/beads/docs/dolt-git-remotes.md` (sync/remote mechanics),
+> `packages/beads/docs/ecosystem.md` (integrations and prior art). Facts in this
+> plan that duplicate a companion are deliberate summaries — the companion is
 > authoritative; update both in the same commit.
 
 ## Goal
@@ -27,8 +28,8 @@ first-class citizen of this repo:
 **Out of scope here:** the protocol design of any specific consumer (for
 example, using bd as the task store behind a particular planning workflow —
 nothing in this plan depends on such a consumer), and the semantic
-dedup/indexing layer (recorded in `docs/beads/ecosystem.md`; its decisions are
-deferred below).
+dedup/indexing layer (recorded in `packages/beads/docs/ecosystem.md`; its
+decisions are deferred below).
 
 ## The consumption discipline: pure data engine
 
@@ -48,7 +49,7 @@ Concretely:
   discovery only when the env var is present in an invocation, and `bd` runs
   with cwd = repo root, so the config must live where `bd` reads it _without_
   the env var (project-local `.beads/config.yaml` or the user-global config).
-  Details in `docs/beads/bd-reference.md`.
+  Details in `packages/beads/docs/bd-reference.md`.
 - Telemetry off is a hard requirement. `BD_DISABLE_EVENT_FLUSH=1` and
   `BD_DISABLE_METRICS=1` disable Beads' flush and metrics paths;
   `DOLT_DISABLE_EVENT_FLUSH=1` disables Dolt's network flush, while the stateful
@@ -143,8 +144,9 @@ the mcp-servers group spellings
 (`consumerPath = ["ai" "mcpServers" "beads-mcp"]`, `mcpServerDrvs`,
 `mcpServerDescriptions`). bd-version skew is bounded by bd's own schema guard
 (PB12 verifies). Its env surface (`BEADS_DIR` supported, `BEADS_DB` deprecated —
-note this _refutes_ older research; see `docs/beads/bd-reference.md`) must be
-re-verified at the pinned version when the module wires the env block (PB12).
+note this _refutes_ older research; see `packages/beads/docs/bd-reference.md`)
+must be re-verified at the pinned version when the module wires the env block
+(PB12).
 
 ## Phase 3 — the option surface (gated)
 
@@ -210,12 +212,12 @@ Cross-cutting invariants the modules must encode:
 Beads can target a Dolt remote riding an ordinary git remote on the custom ref
 `refs/dolt/data` — one remote and credential for code and work-state, invisible
 to normal git operations (mechanics and CAS guarantees:
-`docs/beads/dolt-git-remotes.md`). The qualified option boundary declares the
-remote URL and enough policy for one module-owned raw-Dolt pusher to publish a
-clean validated HEAD under the same repository gate as mutations. Agents and
-operators do not publish imperatively. Remote divergence fails closed; the
-module never pulls, merges, rebases, resolves ledger conflicts, or force-pushes.
-Two facts shape the design:
+`packages/beads/docs/dolt-git-remotes.md`). The qualified option boundary
+declares the remote URL and enough policy for one module-owned raw-Dolt pusher
+to publish a clean validated HEAD under the same repository gate as mutations.
+Agents and operators do not publish imperatively. Remote divergence fails
+closed; the module never pulls, merges, rebases, resolves ledger conflicts, or
+force-pushes. Two facts shape the design:
 
 - Issue state on a git ref is **not** branch-visible — no issue diffs in code
   review, ever. The options must not pretend otherwise.
@@ -225,12 +227,13 @@ Two facts shape the design:
   commit-if-needed normalization rather than the source of safety.
 
 Encrypted remote variants (gcrypt, crypt-mounts, self-hosted) are researched in
-`docs/beads/dolt-git-remotes.md` but **deferred** behind the threat-model
-decision (OD-D1) and the CAS experiments listed there — the gcrypt path in
-particular is plausibly incompatible with Dolt's concurrency guarantee and must
-not be offered as an option until proven. **Until OD-D1 is answered, configuring
-any third-party remote means plaintext work-state on that host — that is the
-recorded pre-OD-D1 default, a conscious accept and not an oversight.**
+`packages/beads/docs/dolt-git-remotes.md` but **deferred** behind the
+threat-model decision (OD-D1) and the CAS experiments listed there — the gcrypt
+path in particular is plausibly incompatible with Dolt's concurrency guarantee
+and must not be offered as an option until proven. **Until OD-D1 is answered,
+configuring any third-party remote means plaintext work-state on that host —
+that is the recorded pre-OD-D1 default, a conscious accept and not an
+oversight.**
 
 ## Resolved — do not re-derive
 
@@ -248,9 +251,10 @@ recorded pre-OD-D1 default, a conscious accept and not an oversight.**
   directly — llm-agents currently pins a prerelease, which is its own reason not
   to inherit it.
 - **R3 — beads-mcp does read `BEADS_DIR`** (with `BEADS_DB` deprecated),
-  contrary to 2026-07 research. Recorded in `docs/beads/bd-reference.md` with a
-  re-verify probe (PB12); the durable lesson — per-tool MCP env surfaces must be
-  confirmed, never assumed — stands.
+  contrary to 2026-07 research. Recorded in
+  `packages/beads/docs/bd-reference.md` with a re-verify probe (PB12); the
+  durable lesson — per-tool MCP env surfaces must be confirmed, never assumed —
+  stands.
 
 ## Open decision register
 
@@ -348,7 +352,7 @@ session against the phase 2 package. Feeds noted.
 
 - **PB1** — metadata bag: arbitrary key settable via CLI? values readable back
   via `bd show --json` / JSONL round-trip? → OD-D2, and the metadata filter-only
-  rule in `docs/beads/bd-reference.md`.
+  rule in `packages/beads/docs/bd-reference.md`.
 - **PB2** — shared-server duplicate-prefix connect: confirm documented refusal,
   capture the error shape. → OD-M3, module assertion text.
 - **PB3 — complete:** the durable contract confirms `bd where` from a linked
@@ -378,7 +382,7 @@ session against the phase 2 package. Feeds noted.
   whether `bd init --skip-hooks` really still runs `git init` + commit +
   `git config beads.role`; timer-gate batch semantics; Dolt session-branches as
   an isolation mechanism; the FULLTEXT ID-tokenization hazard. →
-  `docs/beads/bd-reference.md` unverified tags.
+  `packages/beads/docs/bd-reference.md` unverified tags.
 - **PB11 — complete, no longer enforced:** packaged bd 1.0.3 refuses a
   1.2.2-schema database. The durable contract recorded that failure until
   2026-09, when nixpkgs moved its own `beads` to 1.2.2 and left no tracked input
@@ -399,9 +403,9 @@ session against the phase 2 package. Feeds noted.
   skew remains unqualified. The wrapper and server unit must share one Dolt
   provenance either way. → the shared-server unit design.
 - **Remote experiments** — the CAS/encryption experiments in
-  `docs/beads/dolt-git-remotes.md` (the cheap URL-passthrough check first — it
-  is a prerequisite of the gcrypt race — then the race, then the rest). → phase
-  3b.
+  `packages/beads/docs/dolt-git-remotes.md` (the cheap URL-passthrough check
+  first — it is a prerequisite of the gcrypt race — then the race, then the
+  rest). → phase 3b.
 
 ## Validation (phases 2–3)
 

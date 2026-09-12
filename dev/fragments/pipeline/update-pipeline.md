@@ -144,24 +144,24 @@ registry every package contributes a row to. It replaced the flat, top-level
   the ninja DAG (flags space-joined, git, and `dependsOn` → `update-<dep>`
   edges); `update-pkg.sh` reads `.#updateTargets.<name>.file` for the rev-bump
   target.
-- **`checks/update-targets-parity.nix`** — the permanent bidirectional CI gate
-  (and sole update-target check; the former `overlay-target-resolution.nix`
-  folded into it). Packages → targets: every versioned flake package must have a
-  same-name row, share a derivation, source, or update script with a targeted
-  package, declare an existing flake input through `passthru.updateFlakeInput`,
-  carry a non-empty `passthru.updateTargetExempt` reason, or match an explicit
-  `excludePatterns` exemption. The first CI run proved the reverse direction by
-  finding two previously unrecorded cases: `git-branchless` is owned by its
-  flake input. (The other historical exemption, the repository-local
-  `kiro-memory-distiller`, was removed on 2026-09-01 — the shape it illustrated,
-  an in-repo package with no upstream release to sweep, has no current
-  instance.) Targets → overlays: every main-tracking target (with a `git` URL)
-  must declare a non-null `file` equal to
-  `resolve_recipe_file(<git>, overlays, packages)`, and the resolved overlay
-  must carry an inline 40-hex `rev`. A positive control removes the real,
-  uniquely sourced `context7-mcp` row in memory and requires that its package
-  become uncovered; this proves the reverse direction can fail without mutating
-  the registry on disk.
+- **`checks/packaging/update-targets-parity.nix`** — the permanent bidirectional
+  CI gate (and sole update-target check; the former
+  `overlay-target-resolution.nix` folded into it). Packages → targets: every
+  versioned flake package must have a same-name row, share a derivation, source,
+  or update script with a targeted package, declare an existing flake input
+  through `passthru.updateFlakeInput`, carry a non-empty
+  `passthru.updateTargetExempt` reason, or match an explicit `excludePatterns`
+  exemption. The first CI run proved the reverse direction by finding two
+  previously unrecorded cases: `git-branchless` is owned by its flake input.
+  (The other historical exemption, the repository-local `kiro-memory-distiller`,
+  was removed on 2026-09-01 — the shape it illustrated, an in-repo package with
+  no upstream release to sweep, has no current instance.) Targets → overlays:
+  every main-tracking target (with a `git` URL) must declare a non-null `file`
+  equal to `resolve_recipe_file(<git>, overlays, packages)`, and the resolved
+  overlay must carry an inline 40-hex `rev`. A positive control removes the
+  real, uniquely sourced `context7-mcp` row in memory and requires that its
+  package become uncovered; this proves the reverse direction can fail without
+  mutating the registry on disk.
 
 ### Report format
 
@@ -218,27 +218,27 @@ A nixpkgs bump whose build verification FAILED therefore shipped as `UPDATED` �
 sweep 34351134945 logged exactly that, with zero `HELD BACK:` lines in 12,274
 lines of log, and it had been doing so since at least 69c00ef2 (2026-04-13).
 
-`checks/target-subshell-shape.nix` fails the build if the shape regresses, and
-carries a positive control so it cannot pass vacuously when a body is renamed or
-removed. **That gate is the rule; this paragraph only explains it.** The rule
-lived as prose first and was broken twice within two days of being written, each
-time caught by a reviewer rather than by a tool — shellcheck has no diagnostic
-for it. The explicit `exit` calls still in those bodies are now belt-and-braces,
-not the mechanism.
+`checks/shell/target-subshell-shape.nix` fails the build if the shape regresses,
+and carries a positive control so it cannot pass vacuously when a body is
+renamed or removed. **That gate is the rule; this paragraph only explains it.**
+The rule lived as prose first and was broken twice within two days of being
+written, each time caught by a reviewer rather than by a tool — shellcheck has
+no diagnostic for it. The explicit `exit` calls still in those bodies are now
+belt-and-braces, not the mechanism.
 
 ### Key files
 
-| File                                 | Role                                                           |
-| ------------------------------------ | -------------------------------------------------------------- |
-| `checks/update-targets-parity.nix`   | Flake check: declared `file` == resolver output + inline rev   |
-| `config/generate-update-ninja.nix`   | Generates `.update.ninja` DAG from flake.lock + updateTargets  |
-| `config/update-targets.nix`          | Workspace update exclusions                                    |
-| `dev/scripts/resolve-recipe-file.sh` | Deterministic recipe resolution (fetch-block identity + guard) |
-| `dev/scripts/update-common.sh`       | Shared functions (worktree, version, report, colors)           |
-| `dev/scripts/update-init.sh`         | Pipeline initialization (clean stale state)                    |
-| `dev/scripts/update-input.sh`        | Per-input update script                                        |
-| `dev/scripts/update-pkg.sh`          | Per-package update script (rev bump + nix-update)              |
-| `dev/scripts/update-report.sh`       | Report printer                                                 |
-| `lib/update.nix`                     | Declares `config.update.targets` (the option declaration)      |
-| `packages/<owner>/registry.nix`      | Owner update targets, source paths, and cache metadata         |
-| `.github/workflows/update.yml`       | CI workflow (Renovate-style per-dependency PRs)                |
+| File                                         | Role                                                           |
+| -------------------------------------------- | -------------------------------------------------------------- |
+| `checks/packaging/update-targets-parity.nix` | Flake check: declared `file` == resolver output + inline rev   |
+| `config/generate-update-ninja.nix`           | Generates `.update.ninja` DAG from flake.lock + updateTargets  |
+| `config/update-targets.nix`                  | Workspace update exclusions                                    |
+| `dev/scripts/resolve-recipe-file.sh`         | Deterministic recipe resolution (fetch-block identity + guard) |
+| `dev/scripts/update-common.sh`               | Shared functions (worktree, version, report, colors)           |
+| `dev/scripts/update-init.sh`                 | Pipeline initialization (clean stale state)                    |
+| `dev/scripts/update-input.sh`                | Per-input update script                                        |
+| `dev/scripts/update-pkg.sh`                  | Per-package update script (rev bump + nix-update)              |
+| `dev/scripts/update-report.sh`               | Report printer                                                 |
+| `lib/update.nix`                             | Declares `config.update.targets` (the option declaration)      |
+| `packages/<owner>/registry.nix`              | Owner update targets, source paths, and cache metadata         |
+| `.github/workflows/update.yml`               | CI workflow (Renovate-style per-dependency PRs)                |

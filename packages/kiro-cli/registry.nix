@@ -38,7 +38,7 @@
     # to `always` silently. Scoped to the transformer that EMITS the
     # frontmatter, the option that types it, and the kiro package, because a
     # change to any of those is a change to what the engine will be handed.
-    # Deliberately NOT scoped to `checks/module-eval.nix`: it holds the
+    # Deliberately not scoped to all owner module tests: those also hold the
     # inclusion assertions, but it is edited constantly for unrelated reasons
     # and loading this fragment on every one of those edits is pure context
     # tax.
@@ -86,8 +86,8 @@
     # behavioral check, since all three have to move together.
     kiro-wrapper = {
       scopes = [
-        "checks/kiro-fhs-contract.nix"
-        "checks/kiro-wrapper-argv.nix"
+        "packages/kiro-cli/checks/kiro-fhs-contract.nix"
+        "packages/kiro-cli/checks/kiro-wrapper-argv.nix"
         "lib/idempotentFlags.nix"
         # The overlay's wrapProgram calls carry the darwin argv0
         # bundle-discovery fix, which is part of this argv contract.

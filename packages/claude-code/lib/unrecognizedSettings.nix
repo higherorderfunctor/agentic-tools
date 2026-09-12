@@ -1,7 +1,7 @@
 # Unrecognized-key check for a runtime's freeform native-settings tree.
 #
 # Destined for `lib/ai/unrecognizedSettings.nix`. Pure `lib` — no `pkgs`, no
-# IFD, no derivations — so it evaluates in `checks/module-eval.nix` and in the
+# IFD, no derivations — so it evaluates in `packages/claude-code/checks/module-eval.nix` and in the
 # options-doc eval unchanged.
 #
 # WHY THIS EXISTS

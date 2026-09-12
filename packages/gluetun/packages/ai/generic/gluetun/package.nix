@@ -44,11 +44,11 @@
 # So `goFloor` is EXTRACTED from the pinned source's go.mod into the
 # sidecar by `vu.mkGoFloorFix`, and `vu.mkGoBuilder` turns it into a
 # builder. No version literals here on purpose — the sidecar holds the
-# current value and `checks/go-floor-drift.nix` asserts it still matches
+# current value and `checks/packaging/go-floor-drift.nix` asserts it still matches
 # source. `goToolchainForFloor` returns `ourPkgs.go` whenever our pin
 # satisfies the floor, reaching for a prebuilt `go-bin` only when upstream
 # outruns nixpkgs-unstable, and self-clearing the moment nixpkgs catches
-# up. See lib/packaging.nix, and checks/go-toolchain-floor.nix for the
+# up. See lib/packaging.nix, and checks/packaging/go-toolchain-floor.nix for the
 # selector's branch coverage.
 #
 # vendorHash lives in the SIDECAR rather than inline: `mkUpdateScript`
@@ -99,7 +99,7 @@
   # correct only for as long as someone kept re-checking it — the update
   # pipeline bumps this package 4x/day and never touched it. See
   # `vu.goFloorUnknown` for why the missing-key fallback is silent and
-  # `checks/go-floor-drift.nix` for the loud half.
+  # `checks/packaging/go-floor-drift.nix` for the loud half.
   goFloor = sources.goFloor or vu.goFloorUnknown;
 
   buildGoModule = vu.mkGoBuilder {

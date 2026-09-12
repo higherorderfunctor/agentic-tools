@@ -37,7 +37,7 @@ in {
             STRING (never a Nix path literal). For main-tracking packages it
             must equal the tail that resolve_overlay_file prints for this
             package's upstream, so the declared path and the resolver stay
-            byte-identical — enforced by checks/update-targets-parity.nix.
+            byte-identical — enforced by checks/packaging/update-targets-parity.nix.
             `null` for binary (--use-update-script) packages, which self-manage
             their sources and have no single overlay file to sed-bump.
           '';

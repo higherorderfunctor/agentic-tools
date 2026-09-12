@@ -1,10 +1,7 @@
 ## ai.\* Layered Fanout Pattern
 
-> **Last verified:** 2026-08-16 — L4 splits into routing/rendering, a public
-> per-runtime file registry, and one generic L5 sink. Context and rule outputs
-> cannot bypass the registry, and shared AGENTS.md arbitrates public runtime
-> entries in one owner before L5; the layer location map below reflects the
-> current L2b/L4/B7/L5 ownership split.
+> **Last verified:** 2026-09-12 — package modules own consumer checks; the
+> shared harness discovers backend imports and owner activation probes.
 >
 > Full lineage: `git show ce31eaaa:dev/fragments/ai-module/layered-fanout.md`.
 
@@ -111,7 +108,7 @@
 - L2↔L3 replacement/null filtering → transform (`aiCommon.mergePool`)
 - managed MCP proxy ownership, validation, and systemd unit aggregation →
   `lib/ai/sharedOptions.nix` + `lib/ai/mcpProxy.nix`
-- per-scope package ownership guard → `checks/module-eval.nix`
+- per-scope package ownership guard → `checks/module-provenance/helpers.nix`
 - L4 per-runtime routing/rendering into `ai.<runtime>.files` →
   `packages/<pkg>/lib/mk<Cli>.nix`
 - L4 shared AGENTS.md rendering and public-entry arbitration into the hidden
@@ -141,8 +138,9 @@
    (hooks append per-event lists).
 7. (Optional) Add L1 option `ai.<X>Dir` + L1→L2 expansion.
 8. (Optional) Add per-CLI L2b option `ai.<cli>.<X>Dir` + L2b→L3 expansion.
-9. Add tests in `checks/module-eval.nix` for every new surface and at least one
-   unsupported-runtime unknown-option control.
+9. Add tests beside the owning package, or under the relevant root check concern
+   for shared behavior, with an unsupported-runtime unknown-option control.
+   Register package tests through the owner's `checks.nix` module.
 
 ### Pitfall
 

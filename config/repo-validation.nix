@@ -184,7 +184,7 @@
         entry = lib.getExe markdownTableCells;
         files = "\\.md$";
         # Same file set the other markdown scanners walk, for the reason
-        # checks/markdown-scan.nix exists: one exclusion list, not three.
+        # checks/markdown/markdown-scan.nix exists: one exclusion list, not three.
         excludes = ["^docs/plans/kiro-v3-research-raw/" "^docs/plan\\.md$"];
         stages = ["pre-commit"];
       };
@@ -353,13 +353,13 @@ in
       };
     in {
       repo-lints = repoLints;
-      repo-validation-policy = import ../checks/repo-validation-policy.nix {
+      repo-validation-policy = import ../checks/repository/repo-validation-policy.nix {
         inherit definitionNames formatterHookIds judgmentHookIds pkgs;
         ciConfig = repoLints.config.configFile;
         ciHookIds = gitHooksCiIds;
         localConfig = localProjection.config.configFile;
         rejectEntry = definitions.reject-default-branch-commit.hook.entry;
       };
-      shellcheck-corpus = import ../checks/shellcheck-corpus.nix {inherit lib pkgs;};
+      shellcheck-corpus = import ../checks/shell/shellcheck-corpus.nix {inherit lib pkgs;};
     };
   }

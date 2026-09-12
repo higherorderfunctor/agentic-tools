@@ -22,7 +22,7 @@
 
   # The `nativeSettings` option surface: one option per path in the packaged
   # binary's own settings schema, merged with the hand-authored exceptions.
-  # `.report` is what checks/claude-settings-schema.nix asserts on, so an
+  # `.report` is what packages/claude-code/checks/claude-settings-schema.nix asserts on, so an
   # exception aimed at a key the binary no longer declares fails CI rather than
   # sitting here unnoticed.
   nativeSettingsSurface = import ./nativeSettingsOptions.nix {

@@ -41,7 +41,7 @@
 
   # Eval-pure read of the committed hook-trigger sidecar (no IFD) — the source of
   # the `trigger` soft-enum. Regenerated on bump + drift-checked
-  # (checks/kiro-cli-extracted.nix). See overlays.md § IFD Patterns.
+  # (packages/kiro-cli/checks/kiro-cli-extracted.nix). See overlays.md § IFD Patterns.
   kiroExtracted =
     builtins.fromJSON (builtins.readFile ../extracted.json);
 

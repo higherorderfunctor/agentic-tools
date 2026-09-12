@@ -59,10 +59,10 @@ normalized runtime context/rules enter `ai.<runtime>.files` and lower to
 ordinary backend symlinks. A 2.18.1 live spike confirmed Kiro steering now loads
 through that path. See the devenv files-internals fragment.
 
-`checks/instruction-materialization.nix` runs the exact packaged copier in a
-temporary repository. It covers portability and lifecycle behavior without
-building the full interactive devenv shell, so the on-demand Devenv Diagnostic
-is no longer an automatic CI dependency.
+`checks/instructions/instruction-materialization.nix` runs the exact packaged
+copier in a temporary repository. It covers portability and lifecycle behavior
+without building the full interactive devenv shell, so the on-demand Devenv
+Diagnostic is no longer an automatic CI dependency.
 
 ### Running Generation
 

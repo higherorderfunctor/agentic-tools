@@ -29,10 +29,14 @@ packages/<owner>/
   docs/, patches/, src/ Documentation and build support files
   fragments/, skills/  Published content (when applicable)
 lib/                    Shared composition, AI module engines, packaging helpers
-checks/                 Workspace validation and cross-owner integration
+lib/testing/            Shared test harnesses with discovered backend imports
+checks/<concern>/       Native workspace checks and cross-owner integration
 config/                 Workspace policy and shared option declarations/data
 dev/                    Repo-only generation, tasks, scripts, skills, and guidance
 devshell/               Standalone shell integration (mkAgenticShell)
 flake.nix               Public assembly and repo outputs
 devenv.nix              This repository's workspace shell
 ```
+
+See `docs/repository-layout.md` for a worked owner tree and the distinction
+between package and workspace responsibilities.

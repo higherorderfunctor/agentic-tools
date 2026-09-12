@@ -1,7 +1,7 @@
 ## Package ownership and native composition
 
 > **Last verified:** 2026-09-12 — all owners use native package, library,
-> module, and registry composition.
+> module, registry, and check composition.
 
 An owner directory groups the implementation, checks, and declarative metadata
 for a package. Public package namespaces come from the directory components
@@ -28,12 +28,34 @@ evaluating conditions and imported arguments against the combined `config`,
 registry key whose presence depends on another owner therefore remains visible
 to collision checks, even when a competing definition uses `mkForce`.
 
-`checks.nix` returns an attribute set of derivations from the supplied context.
-Adding a package check requires only an owner edit. Root and owner check names
-share an exclusive claim boundary, so neither can silently overwrite the other.
-Root checks cover composition and repository invariants, including the
-real-owner relocation control. Keep backend-specific module paths raw so Home
-Manager and devenv evaluate them independently with their own arguments.
+`checks.nix` is a native module. It imports owner-local test modules and defines
+`checks.<name>` derivations. Root check groups expose
+`checks/<concern>/default.nix`; the workspace discovers those entry points one
+directory deep. Supporting files and fixture trees are not recursively
+registered. Adding a package check needs only owner edits; adding a root concern
+needs no flake export-list edit.
+
+Root and owner check names share an exclusive claim boundary. Each contributor
+supplies isolated definitions for claim discovery, while its conditions and
+imported module arguments see the combined `config`, `options`, and
+`_module.args`. This keeps conditional checks visible without letting `mkForce`
+hide another owner's claim. Native package option types reject non-derivation
+check values. Root groups cover workspace policy and genuine cross-owner
+contracts.
+
+The shared harness in `lib/testing/module-harness.nix` discovers backend imports
+from the same owner index as production. Package check modules may contribute
+`testing.homeManagerAiPackages.<name>` to replace expensive binaries in wrapper
+content tests, and `testing.moduleProbes` configurations to activate their pool
+contributions. Probe each integration independently as well as together: native
+option provenance follows priority filtering, so an all-enabled evaluation alone
+can hide a second package's lower-priority claim. Keep each integration's probe
+beside that owner. Runtime enables come from the shared runtime registry.
+
+Keep backend-specific module paths raw so Home Manager and devenv evaluate them
+independently with their own arguments. Consumer tests live under their package;
+shared test infrastructure belongs in `lib/testing/`, while cross-owner
+assertions stay in the appropriate root check concern.
 
 Three evaluation boundaries are easy to break:
 

@@ -1,5 +1,5 @@
 # Shared shell-hardening settings for `pkgs.writeShellApplication` call sites,
-# the prek `shellcheck` hook, and checks/shellcheck-corpus.nix.
+# the prek `shellcheck` hook, and checks/shell/shellcheck-corpus.nix.
 #
 # Single source of truth rather than a copy per call site (DRY) — when adding
 # one, read the flags from here. `grep -rn 'shell-strict.nix' --include='*.nix'`
@@ -42,7 +42,7 @@
   # main for four weeks. The prek hook could not catch it — it is
   # `lib.optionalAttrs (!isCI)` so it never runs in CI, and even locally it
   # only sees STAGED files, so a dirty script that nobody re-lints stays
-  # invisible. checks/shellcheck-corpus.nix is what makes the claim true: it
+  # invisible. checks/shell/shellcheck-corpus.nix is what makes the claim true: it
   # runs these flags over the whole tracked corpus under `nix flake check`.
   # Adding an entry here without running that check is how this rots again.
   #

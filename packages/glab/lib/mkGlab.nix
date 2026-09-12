@@ -267,7 +267,7 @@ in
       ln -s "${wrapper}" "$out/bin/glab"
     '';
 
-    # The script SOURCE, not its store path. checks/module-eval.nix
+    # The script SOURCE, not its store path. packages/glab/checks/module-eval.nix
     # asserts on it, and reading the path back would be import-from-
     # derivation inside `nix flake check` — a string costs nothing.
     passthru = {inherit wrapperText;};

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # dev/scripts/resolve-recipe-file.sh — deterministic recipe-file
 # resolution for the update pipeline. Sourced by update-common.sh (and
-# thus update-pkg.sh) and by checks/update-targets-parity.nix.
+# thus update-pkg.sh) and by checks/packaging/update-targets-parity.nix.
 #
 # Single-function library. It enables the repo-wide strict mode on source
 # (set -euETo pipefail + inherit_errexit, lines below) — a deliberate
