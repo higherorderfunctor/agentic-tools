@@ -1,11 +1,7 @@
 # Diagnostic-lean devenv closure taxonomy
 
-> **Last verified:** 2026-09-02 — the factory-CLI-wrapper bucket now includes
-> `claude-code` (always meant to ride here, but until now installed on neither
-> backend) and `kimchi` (newly enabled, adding roughly 118 MiB of new store to
-> every shell). Both are accepted at full weight; `!isCI` cannot shrink them,
-> since the decision rule below forbids that branch for anything a guard depends
-> on.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > Full lineage: `git show d1c28a21:dev/fragments/devenv/ci-lean-closure.md`.
 
@@ -64,7 +60,7 @@ did not (it installed on neither backend), and `kimchi` was enabled here on
 
 The weight is real and worth stating rather than discovering — but state the
 MARGINAL cost, which is neither the binary size nor the total closure. Measured
-at kimchi 1.0.10, the version `overlays/kimchi-sources.json` currently pins:
+at kimchi 1.0.10, the version `packages/kimchi/sources.json` currently pins:
 
 | figure                   | bytes           | what it means                              |
 | ------------------------ | --------------- | ------------------------------------------ |

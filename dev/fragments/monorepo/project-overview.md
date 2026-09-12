@@ -17,28 +17,26 @@ devshell integration.
 
 ### Key Directories
 
+```text
+packages/<owner>/
+  packages/ai/<namespace>/<name>/package.nix  Native binary recipes and roles
+  lib/                  Public default.nix plus private factories/helpers
+  modules/              Consumer Home Manager and devenv configuration
+  registry.nix          Update, cache, documentation, and architecture metadata
+  checks.nix, checks/   Owner checks and fixtures
+  sources.json          Owner-local release pins (when needed)
+  extracted.json        Measured CLI schemas (when needed)
+  docs/, patches/, src/ Documentation and build support files
+  fragments/, skills/  Published content (when applicable)
+lib/                    Shared composition, AI module engines, packaging helpers
+lib/testing/            Shared test harnesses with discovered backend imports
+checks/<concern>/       Native workspace checks and cross-owner integration
+config/                 Workspace policy and shared option declarations/data
+dev/                    Repo-only generation, tasks, scripts, skills, and guidance
+devshell/               Standalone shell integration (mkAgenticShell)
+flake.nix               Public assembly and repo outputs
+devenv.nix              This repository's workspace shell
 ```
-packages/
-  <pkg>/              Per-package facet barrel: modules/{homeManager,devenv},
-                      lib, docs, and fragments for that package
-  stacked-workflows/  Content package: skills, references, skill-routing fragment
-  coding-standards/   Content package: reusable coding standard fragments
-overlays/     Binary package overlays (all groups under pkgs.ai.*) plus per-package
-              -sources.json / -extracted.json sidecars
-  dev-tools/  Agent-adjacent development utilities (pkgs.ai.devTools.*)
-  generic/    Temporary split-ready bucket for supporting packages that have
-              not yet earned a more specific category
-  git-tools/  Git workflow utilities (pkgs.ai.gitTools.*)
-  lsp-servers/  LSP server packages and role projections
-  mcp-servers/  MCP server packages and role projections
-lib/          Shared library: the ai factory (lib/ai/*), fragments, MCP helpers,
-              credentials, devshell
-devshell/     Standalone devshell modules (mkAgenticShell)
-config/       update-targets.nix (config.update.targets) and shared configuration data
-dev/
-  fragments/    Dev-only instruction fragments (not exported)
-  references/   Dev-only reference docs (not exported)
-  skills/       Dev-only skills (index-repo-docs, repo-review)
-  generate.nix  Fragment to per-ecosystem instruction generator
-checks/       Flake checks
-```
+
+See `docs/repository-layout.md` for a worked owner tree and the distinction
+between package and workspace responsibilities.

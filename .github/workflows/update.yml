@@ -610,7 +610,7 @@ jobs:
       # SEA support for github-copilot-cli. Our overlay is a STANDALONE
       # derivation targeting SEA — if upstream offers it again, we could
       # consider switching back to an overrideAttrs overlay on upstream.
-      # See overlays/copilot-cli.nix for rationale.
+      # See packages/copilot-cli/packages/ai/copilot-cli/package.nix for rationale.
       - name: Detect upstream copilot-cli SEA restoration
         if: always()
         run: |
@@ -625,19 +625,19 @@ jobs:
               echo "copilot-cli: upstream nixos-unstable sourceRoot=\"package\" (expected). No annotation."
               ;;
             ".")
-              echo "::warning::copilot-cli: upstream nixos-unstable HEAD now ships per-platform SEA (github-copilot-cli.sourceRoot=\".\"). Our overlay is a STANDALONE derivation targeting SEA — consider whether overlays/copilot-cli.nix can switch back to an overrideAttrs overlay on upstream."
+              echo "::warning::copilot-cli: upstream nixos-unstable HEAD now ships per-platform SEA (github-copilot-cli.sourceRoot=\".\"). Our overlay is a STANDALONE derivation targeting SEA — consider whether packages/copilot-cli/packages/ai/copilot-cli/package.nix can switch back to an overrideAttrs overlay on upstream."
               ;;
             *)
-              echo "::warning::copilot-cli: upstream nixos-unstable HEAD sourceRoot is unexpected value \"${sr}\". Upstream may have changed packaging mechanism — re-evaluate overlays/copilot-cli.nix."
+              echo "::warning::copilot-cli: upstream nixos-unstable HEAD sourceRoot is unexpected value \"${sr}\". Upstream may have changed packaging mechanism — re-evaluate packages/copilot-cli/packages/ai/copilot-cli/package.nix."
               ;;
           esac
 
       # Detect a pnpm major upstream that this repo does not carry yet.
       # The per-major update rows keep each carried major current; only a
       # HUMAN slides the window (adopt the new major, retire the oldest),
-      # because that is an add/remove across overlays, update-targets,
-      # cache-hit-parity, dev/data.nix and the generated docs. This step
-      # only prompts. See overlays/generic/pnpm-major.nix.
+      # because that changes the pnpm owner recipes, registry metadata,
+      # source sidecars, and generated docs. This step
+      # only prompts. See packages/pnpm/lib/mkMajor.nix.
       - name: Detect a new pnpm major upstream
         if: always()
         run: |
@@ -669,7 +669,7 @@ jobs:
           fi
 
           if [ "$upstream_max" -gt "$ours" ]; then
-            echo "::warning::pnpm: upstream publishes a stable latest-${upstream_max} dist-tag, but this repo carries up to pnpm_${ours}. Add it deliberately — overlays/generic/pnpm_${upstream_max}.nix plus its sidecar, a config/update-targets.nix row, a config/cache-hit-parity-targets.nix row, a dev/data.nix description and an overlays/README.md row. RETIRING an old major is a SEPARATE decision, not part of this: the window is not fixed-width (10, 11 and 12 are all carried today). CHECK FIRST whether the new major is still the same KIND of artifact — pnpm 12 moved its implementation out of the npm package into per-platform native binaries, so it could not use pnpm-major.nix at all and nixpkgs had no pnpm_12 to override. Not auto-bumped and not auto-PRed on purpose."
+            echo "::warning::pnpm: upstream publishes a stable latest-${upstream_max} dist-tag, but this repo carries up to pnpm_${ours}. Add it deliberately — a recipe under packages/pnpm/packages/ai/generic/pnpm_${upstream_max}/, its owner-local sidecar, registry contributions in packages/pnpm/registry.nix, and a docs/packaging.md row. RETIRING an old major is a SEPARATE decision, not part of this: the window is not fixed-width (10, 11 and 12 are all carried today). CHECK FIRST whether the new major is still the same KIND of artifact — pnpm 12 moved its implementation out of the npm package into per-platform native binaries, so it could not use pnpm-major.nix at all and nixpkgs had no pnpm_12 to override. Not auto-bumped and not auto-PRed on purpose."
           else
             echo "pnpm: upstream stable majors top out at ${upstream_max}; this repo carries up to pnpm_${ours}. No annotation."
           fi
@@ -681,7 +681,7 @@ jobs:
       # rewrite. That is about SWEEPABILITY, not about lagging — the repo
       # tracks dist-tags.latest, so this step is normally SILENT and only
       # speaks when a new release lands. It costs one HTTP GET per sweep
-      # and names the human work. See overlays/mcp-servers/aihubmix-mcp.nix.
+      # and names the human work. See packages/aihubmix-mcp/packages/ai/mcpServers/aihubmix-mcp/package.nix.
       - name: Detect a newer @aihubmix/mcp on npm
         if: always()
         run: |
@@ -710,7 +710,7 @@ jobs:
           fi
 
           if [ "$upstream" != "$ours" ]; then
-            echo "::warning::aihubmix-mcp: npm dist-tags.latest is ${upstream}, this repo carries ${ours}. Bumping is HUMAN work, not a hash refresh: re-author overlays/mcp-servers/aihubmix-mcp-save-to-file.patch against the new build/tools/painting-tools.js and confirm it applies with NO fuzz, regenerate aihubmix-mcp-package-lock.json (npm publishes none), re-derive both hashes via lib.fakeHash, and check whether image_generate's model enum or tool set changed. If upstream has grown a native save-to-disk argument, drop the patch instead and convert this package to a real config.update.targets row, deleting this step. Not auto-bumped and not auto-PRed on purpose."
+            echo "::warning::aihubmix-mcp: npm dist-tags.latest is ${upstream}, this repo carries ${ours}. Bumping is HUMAN work, not a hash refresh: re-author packages/aihubmix-mcp/patches/aihubmix-mcp-save-to-file.patch against the new build/tools/painting-tools.js and confirm it applies with NO fuzz, regenerate aihubmix-mcp-package-lock.json (npm publishes none), re-derive both hashes via lib.fakeHash, and check whether image_generate's model enum or tool set changed. If upstream has grown a native save-to-disk argument, drop the patch instead and convert this package to a real config.update.targets row, deleting this step. Not auto-bumped and not auto-PRed on purpose."
           else
             echo "aihubmix-mcp: npm dist-tags.latest is ${upstream}; this repo carries ${ours}. No annotation."
           fi

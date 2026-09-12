@@ -126,7 +126,7 @@
   # Against that, changing it is not free. This code MOVED here from
   # lib/mcp.nix unchanged, and every MCP server wrapper is generated from
   # it — re-quoting churns their store paths, and
-  # `checks/module-eval.nix`'s `module-kimchi-wrapper-builds` asserts the
+  # `packages/kimchi/checks/module-eval.nix`'s `module-kimchi-wrapper-builds` asserts the
   # double-quoted form directly (`grep -q 'cat "/run/secrets/..."'`).
   # Hardening it is a defensible standalone change; it is not a drive-by.
   #

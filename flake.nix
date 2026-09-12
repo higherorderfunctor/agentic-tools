@@ -27,7 +27,7 @@
     # INSIDE a package's `ourPkgs`, the same way rust-overlay is, so the
     # toolchain still comes from this repo's pin and cache-hit parity
     # holds. Only reached when a package's declared go.mod floor outruns
-    # `ourPkgs.go` — see `goToolchainForFloor` in overlays/lib.nix.
+    # `ourPkgs.go` — see `goToolchainForFloor` in lib/packaging.nix.
     go-overlay = {
       url = "github:purpleclay/go-overlay";
       inputs = {
@@ -100,81 +100,29 @@
         pkgs = pkgsFor system;
         inherit (inputs) treefmt-nix;
       };
-    # Bind each overlay once so `overlays.<name>` and the
-    # `overlays.default` composition share the same import.
-    aiOverlay = import ./overlays {inherit inputs;};
-    codingStandardsOverlay = import ./packages/coding-standards {};
-    stackedWorkflowsOverlay = import ./packages/stacked-workflows/overlay.nix {};
-
-    # Barrel walker — collects non-binary facets from packages/*/default.nix.
-    packagesBarrel = import ./packages;
-
-    collectFacet = attrPath:
-      lib.pipe packagesBarrel [
-        (lib.filterAttrs (_: p: lib.hasAttrByPath attrPath p))
-        (lib.mapAttrsToList (_: p: lib.getAttrFromPath attrPath p))
-      ];
-
-    packageLibContributions = lib.foldl' lib.recursiveUpdate {} (
-      lib.mapAttrsToList (_: p: p.lib or {}) packagesBarrel
-    );
-
-    updateRegistry =
-      (lib.evalModules {
-        modules = [
-          ./lib/update.nix
-          ./config/update-targets.nix
-          ./overlays/mcp-servers/effect-mcp.update.nix
-        ];
-      })
-      .config.update;
-  in {
-    overlays = {
-      ai = aiOverlay;
-      coding-standards = codingStandardsOverlay;
-      default = lib.composeManyExtensions [
-        aiOverlay
-        codingStandardsOverlay
-        stackedWorkflowsOverlay
-      ];
-      stacked-workflows = stackedWorkflowsOverlay;
+    repository = import ./lib/facets/repository.nix {
+      inherit inputs;
+      root = ./.;
+      systems = supportedSystems;
     };
+    updateRegistry = repository.update;
+  in {
+    overlays.default = repository.overlay;
 
-    # Merged update-target registry — the single source of truth for
-    # per-package update config (config/update-matrix.nix was dissolved into
-    # this). Explicit 3-module import list (the barrel walker is deferred Track
-    # B): lib/update.nix declares the option, config/update-targets.nix carries
-    # the non-effect-mcp rows, and the co-located effect-mcp.update.nix
-    # contributes its row. Consumed by config/generate-update-ninja.nix
-    # (the ninja DAG) and update-pkg.sh (via
-    # `nix eval --raw .#updateTargets.<name>.file`), and asserted
-    # byte-identical to resolve_overlay_file by checks.update-targets-parity.
+    # Declarative owner contributions and workspace policy share native options.
     updateTargets = updateRegistry.targets;
-
-    # Merged cache-hit-parity registry — the six hardcoded package lists in
-    # checks/cache-hit-parity.nix were dissolved into this. lib/checks.nix
-    # declares the option and config/cache-hit-parity-targets.nix carries the
-    # rows; lib.evalModules merges them. Consumed by checks/cache-hit-parity.nix
-    # via self.cacheHitParityTargets.
-    cacheHitParityTargets =
-      (lib.evalModules {
-        modules = [
-          ./lib/checks.nix
-          ./config/cache-hit-parity-targets.nix
-        ];
-      })
-      .config.checks.cacheHitParity;
+    cacheHitParityTargets = repository.cacheHitParity;
 
     homeManagerModules.default = {
       imports =
         [./lib/ai/sharedOptions.nix]
-        ++ collectFacet ["modules" "homeManager"];
+        ++ repository.moduleImports "homeManager";
     };
 
     devenvModules.nix-agentic-tools = {
       imports =
         [./lib/ai/sharedOptions.nix]
-        ++ collectFacet ["modules" "devenv"];
+        ++ repository.moduleImports "devenv";
     };
 
     lib = let
@@ -187,23 +135,13 @@
       # packages). Individual packages expose their own presets in
       # passthru.presets; these combine across package boundaries.
       #
-      # We invoke the overlay functions with a stub `final` that
-      # provides only `lib` and a fake `runCommand`. The overlay's
-      # `passthru.fragments` attrset doesn't depend on the
-      # derivation itself, only on `final.lib` (for the fragments
-      # library import), so this is enough to extract fragment data
-      # without instantiating a real pkgs set.
-      stubFinal = {
+      fragmentArgs = {
         inherit lib;
-        runCommand = name: _: _: {
-          inherit name;
-          type = "derivation";
-        };
+        inherit (repository) repoPath;
+        fragmentsLib = fragments;
       };
-      codingStdFragments =
-        (codingStandardsOverlay stubFinal {}).coding-standards.passthru.fragments;
-      swsContentFragments =
-        (stackedWorkflowsOverlay stubFinal {}).stacked-workflows-content.passthru.fragments;
+      codingStdFragments = import ./packages/coding-standards/lib/fragments.nix fragmentArgs;
+      swsContentFragments = import ./packages/stacked-workflows/lib/fragments.nix fragmentArgs;
       presets = {
         # Full dev environment — all coding standards + skill routing
         nix-agentic-tools-dev = fragments.compose {
@@ -213,9 +151,7 @@
           description = "Full nix-agentic-tools dev standards";
         };
       };
-      # Every flake-level helper lives under `lib.ai.*`. There are no
-      # top-level `lib.<helper>` exports — consumers access everything
-      # via `inputs.nix-agentic-tools.lib.ai.<helper>`.
+      # Shared AI primitives compose with the namespaces exported by owners.
       baseLib = {
         ai =
           aiBase
@@ -237,74 +173,15 @@
           };
       };
     in
-      lib.recursiveUpdate baseLib packageLibContributions;
+      repository.libraryFor baseLib;
 
-    checks = forAllSystems (system: let
-      pkgs = pkgsFor system;
-      instr = instructionsFor system;
-      instructionMaterializer = import ./lib/materialize-repo-instructions.nix {inherit instr pkgs;};
-      isolatePrekHooks = import ./lib/isolate-prek-hooks.nix {inherit pkgs;};
-      repoValidation = import ./config/repo-validation.nix {inherit lib pkgs;};
-      bareCommandsCheck = {bare-commands = import ./checks/bare-commands.nix {inherit pkgs;};};
-      targetSubshellShapeCheck = {target-subshell-shape = import ./checks/target-subshell-shape.nix {inherit pkgs;};};
-      beadsContractsCheck = {beads-contracts = import ./checks/beads-contracts.nix {inherit pkgs;};};
-      beadsLifecycleCheck = {beads-lifecycle = import ./checks/beads-lifecycle.nix {inherit lib pkgs self;};};
-      cacheHitParityCheck = import ./checks/cache-hit-parity.nix {inherit inputs lib pkgs self;};
-      codexCoverageCheck = import ./checks/chatgpt-codex-coverage.nix {inherit lib pkgs;};
-      codexExtractedCheck = import ./checks/chatgpt-codex-extracted.nix {inherit pkgs self;};
-      copilotWrapperArgvCheck = {copilot-wrapper-argv = import ./checks/copilot-wrapper-argv.nix {inherit lib pkgs;};};
-      claudeDelegationClampCheck = {claude-delegation-clamp = import ./checks/claude-delegation-clamp.nix {inherit pkgs;};};
-      claudeDevenvHooksRealTypeCheck = import ./checks/claude-devenv-hooks-real-type.nix {inherit pkgs inputs;};
-      claudeExtractedCheck = import ./checks/claude-code-extracted.nix {inherit pkgs self;};
-      claudeHeronBrookCheck = import ./checks/claude-heron-brook.nix {inherit lib pkgs self;};
-      claudeMemoryCollisionGuardCheck = {claude-memory-collision-guard = import ./checks/claude-memory-collision-guard.nix {inherit pkgs;};};
-      claudeSettingsSchemaCheck = import ./checks/claude-settings-schema.nix {inherit lib pkgs;};
-      doubledWordsCheck = {doubled-words = import ./checks/doubled-words.nix {inherit pkgs;};};
-      doubledWordsFixturesCheck = {doubled-words-fixtures = import ./checks/doubled-words-fixtures.nix {inherit pkgs;};};
-      # #1019 mock-pilot bootstrap: evaluate the prospective facet composer
-      # here while live package, overlay, and module aggregation stays unchanged.
-      facetMockChecks = import ./checks/facet-mock.nix {inherit lib pkgs self;};
-      factoryChecks = import ./checks/factory-eval.nix {inherit lib pkgs;};
-      formattingCheck = import ./checks/formatting.nix {inherit inputs pkgs self;};
-      fragmentsChecks = import ./checks/fragments-eval.nix {inherit lib pkgs;};
-      glabExtractedCheck = import ./checks/glab-extracted.nix {inherit pkgs self;};
-      goFloorDriftChecks = import ./checks/go-floor-drift.nix {inherit lib pkgs self;};
-      goFloorExtractOrderChecks = import ./checks/go-floor-extract-order.nix {inherit lib pkgs self;};
-      goToolchainFloorChecks = import ./checks/go-toolchain-floor.nix {inherit inputs lib pkgs;};
-      instructionsDriftCheck = import ./checks/instructions-drift.nix {inherit pkgs self;};
-      instructionMaterializationCheck = {
-        instruction-materialization = import ./checks/instruction-materialization.nix {
-          inherit instr pkgs;
-          materializer = instructionMaterializer;
-        };
-      };
-      isolatePrekHooksCheck = {
-        isolate-prek-hooks = import ./checks/isolate-prek-hooks.nix {
-          inherit pkgs;
-          isolator = isolatePrekHooks;
-        };
-      };
-      kiroExtractedCheck = import ./checks/kiro-cli-extracted.nix {inherit pkgs self;};
-      kiroFhsContractCheck = {kiro-fhs-contract = import ./checks/kiro-fhs-contract.nix {inherit pkgs;};};
-      kiroIdentitySpliceCheck = {kiro-identity-splice = import ./checks/kiro-identity-splice.nix {inherit pkgs;};};
-      kiroWorkspaceSettingsFixturesCheck = {kiro-workspace-settings-fixtures = import ./checks/kiro-workspace-settings-fixtures.nix {inherit pkgs;};};
-      kiroWrapperArgvCheck = {kiro-wrapper-argv = import ./checks/kiro-wrapper-argv.nix {inherit lib pkgs;};};
-      markdownTableCellsFixturesCheck = {markdown-table-cells-fixtures = import ./checks/markdown-table-cells-fixtures.nix {inherit pkgs;};};
-      moduleChecks = import ./checks/module-eval.nix {inherit lib pkgs;};
-      optionsDocsCheck = import ./checks/options-doc.nix {inherit lib pkgs self;};
-      pnpmFetcherParityCheck = import ./checks/pnpm-fetcher-parity.nix {inherit lib pkgs self;};
-      pnpmFetcherContractCheck = import ./checks/pnpm-fetcher-contract.nix {inherit lib pkgs self;};
-      sembleTemplatesCheck = import ./checks/semble-templates.nix {inherit lib pkgs self;};
-      repoValidationChecks = repoValidation.mkCiChecks {
-        gitHooksRun = inputs.git-hooks.lib.${system}.run;
-        src = ./.;
-      };
-      splitCodeSpansCheck = {split-code-spans = import ./checks/split-code-spans.nix {inherit pkgs;};};
-      updateTargetsParityCheck = {update-targets-parity = import ./checks/update-targets-parity.nix {inherit inputs lib pkgs self updateRegistry;};};
-      prWatchAtStopCheck = {pr-watch-at-stop = import ./checks/pr-watch-at-stop.nix {inherit pkgs;};};
-      validateAtStopCheck = {validate-at-stop = import ./checks/validate-at-stop.nix {inherit pkgs;};};
-    in
-      bareCommandsCheck // beadsContractsCheck // beadsLifecycleCheck // cacheHitParityCheck // claudeDelegationClampCheck // claudeDevenvHooksRealTypeCheck // claudeExtractedCheck // claudeHeronBrookCheck // claudeMemoryCollisionGuardCheck // claudeSettingsSchemaCheck // codexCoverageCheck // codexExtractedCheck // copilotWrapperArgvCheck // doubledWordsCheck // doubledWordsFixturesCheck // markdownTableCellsFixturesCheck // facetMockChecks // factoryChecks // formattingCheck // fragmentsChecks // glabExtractedCheck // goFloorDriftChecks // goFloorExtractOrderChecks // goToolchainFloorChecks // instructionMaterializationCheck // instructionsDriftCheck // isolatePrekHooksCheck // kiroExtractedCheck // kiroFhsContractCheck // kiroIdentitySpliceCheck // kiroWorkspaceSettingsFixturesCheck // kiroWrapperArgvCheck // moduleChecks // optionsDocsCheck // pnpmFetcherContractCheck // pnpmFetcherParityCheck // repoValidationChecks // sembleTemplatesCheck // splitCodeSpansCheck // targetSubshellShapeCheck // updateTargetsParityCheck // prWatchAtStopCheck // validateAtStopCheck);
+    checks = forAllSystems (system:
+      repository.checksFor {
+        inherit self updateRegistry;
+        instr = instructionsFor system;
+        pkgs = pkgsFor system;
+        rootModules = (import ./lib/testing/discover.nix {inherit lib;}) ./checks;
+      });
 
     # devShells.default provided by devenv CLI (devenv shell / devenv test)
     # from devenv.nix; nothing in this flake constructs it.
@@ -321,43 +198,22 @@
       # shell entry, so a second rendering here would flip-flop the tree.
       instr = instructionsFor system;
     in
-      # Grouped namespaces under pkgs.ai are flattened here for CLI ergonomics so
-      # `nix build .#context7-mcp` works without knowing the group.
-      # Adding a new package to the overlay automatically adds it
-      # here; no flake.nix edit needed for new binaries.
-      #
-      # Legacy notes preserved for history:
-      # - pkgs.nix-mcp-servers namespace dissolved in Milestone 5
-      # - pkgs.{agnix,git-*} flat entries moved to pkgs.ai.* in Milestone 6
-      # - github-copilot-cli renamed to copilot-cli in Milestone 4
-      # - pkgs.ai.* grouped into mcpServers/lspServers/gitTools (factory arch)
-      # Flat AI CLIs (strip nested groups which aren't derivations)
-      builtins.removeAttrs pkgs.ai ["devTools" "generic" "gitTools" "lspServers" "mcpServers"]
-      // pkgs.ai.devTools
-      // pkgs.ai.generic
-      // pkgs.ai.gitTools
-      // builtins.removeAttrs pkgs.ai.mcpServers ["modelContextProtocol"]
-      // pkgs.ai.lspServers
-      // {
-        # mono-repo combined package (nix-update target)
-        modelcontextprotocol-all-mcps = pkgs.ai.mcpServers.modelContextProtocol.all-mcps;
-        modelcontextprotocol-filesystem-mcp = pkgs.ai.mcpServers.modelContextProtocol.filesystem-mcp;
-        # Future custom Semble grammars that are not already in nixpkgs must be
-        # exposed here so the authenticated package sweep publishes them to
-        # Cachix. Do not expose nixpkgs grammars again; the nixpkgs follow
-        # already supplies those store paths. Keep patched Semble check-only.
-        # Instruction file derivations (from dev/generate.nix).
-        # Each ecosystem produces a content directory consumed by the
-        # `generate:instructions:*` devenv tasks.
-        instructions-agents = instr.agents;
-        instructions-claude = instr.claude;
-        instructions-copilot = instr.copilot;
-        instructions-kiro = instr.kiro;
-        # Repo-root documents, same pipeline. The `generate:repo:*` tasks
-        # build these by name; without them the tasks fail with
-        # "attribute missing" and both files fall back to hand-editing.
-        repo-contributing = instr.repoContributing;
-        repo-readme = instr.repoReadme;
+      repository.packagesFor {
+        inherit pkgs system;
+        rootPackages = {
+          # Instruction file derivations (from dev/generate.nix).
+          # Each ecosystem produces a content directory consumed by the
+          # `generate:instructions:*` devenv tasks.
+          instructions-agents = instr.agents;
+          instructions-claude = instr.claude;
+          instructions-copilot = instr.copilot;
+          instructions-kiro = instr.kiro;
+          # Repo-root documents, same pipeline. The `generate:repo:*` tasks
+          # build these by name; without them the tasks fail with
+          # "attribute missing" and both files fall back to hand-editing.
+          repo-contributing = instr.repoContributing;
+          repo-readme = instr.repoReadme;
+        };
       });
 
     # devShells.default provided by devenv CLI (devenv shell / devenv test)

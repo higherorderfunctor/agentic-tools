@@ -6,12 +6,10 @@
 # `config.update.targets`, so there is no longer a parallel matrix to keep in
 # sync. Every package contributes its own row:
 #
-#   - the 20 non-effect-mcp packages via config/update-targets.nix
-#   - effect-mcp via its co-located overlays/mcp-servers/effect-mcp.update.nix
-#
-# `lib.evalModules` merges those contributions and does the collision-checking;
-# the result is exposed as the `.#updateTargets` flake output, read by both the
-# ninja generator (config/generate-update-ninja.nix) and update-pkg.sh.
+# Owner registry.nix files and the remaining legacy config/update-targets.nix
+# rows merge through lib/facets/repository.nix. Native module types realize the
+# values; facet ownership validation rejects competing owners before priority
+# can hide a definition. The pipeline reads the resulting .#updateTargets.
 #
 # Mirrors the authoring style of lib/ai/sharedOptions.nix and the reference
 # submodule shape of the sibling option-merged registries
@@ -39,7 +37,7 @@ in {
             STRING (never a Nix path literal). For main-tracking packages it
             must equal the tail that resolve_overlay_file prints for this
             package's upstream, so the declared path and the resolver stay
-            byte-identical — enforced by checks/update-targets-parity.nix.
+            byte-identical — enforced by checks/packaging/update-targets-parity.nix.
             `null` for binary (--use-update-script) packages, which self-manage
             their sources and have no single overlay file to sed-bump.
           '';

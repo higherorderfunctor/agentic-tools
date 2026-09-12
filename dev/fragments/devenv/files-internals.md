@@ -200,10 +200,10 @@ The materializer is idempotent (same bytes, real-file type, and mode leave the
 mtime alone), atomic (`mktemp` + `mv`, so a concurrent agent session never reads
 a partial file), and prunes generated files whose fragment was renamed or
 removed — including dangling symlinks. It refuses to prune when a generated
-source directory is unexpectedly empty. `checks/instruction-materialization.nix`
-runs this exact executable against a temporary repository and gates all of those
-properties under `nix flake check`; CI does not need a full devenv shell to test
-them.
+source directory is unexpectedly empty.
+`checks/instructions/instruction-materialization.nix` runs this exact executable
+against a temporary repository and gates all of those properties under
+`nix flake check`; CI does not need a full devenv shell to test them.
 
 `devenv`'s own `files.<name>.copyMode = "copy"` was considered and rejected: it
 `rm -rf`s and re-`cp`s unconditionally on every entry (a read race plus mtime

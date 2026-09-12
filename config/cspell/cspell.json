@@ -18,10 +18,9 @@
     "docs/**",
     "fixtures/kiro-primitives/evidence/**",
     "fixtures/kiro-primitives/records/**",
-    "overlays/chatgpt-codex-extracted.json",
-    "overlays/claude-code-extracted.json",
-    "overlays/dev-tools/glab-extracted.json",
-    "overlays/sources",
+    "packages/chatgpt-codex/extracted.json",
+    "packages/claude-code/extracted.json",
+    "packages/glab/extracted.json",
     "result"
   ],
   "language": "en",

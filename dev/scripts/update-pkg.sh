@@ -34,30 +34,30 @@ if [ -n "$git_url" ]; then
   log_info "Fetching latest rev from $git_url..."
   new_rev=$(git ls-remote "$git_url" HEAD | cut -f1)
   if [ -n "$new_rev" ]; then
-    # Deterministic overlay resolution + exactly-one-match guard.
+    # Deterministic recipe resolution + exactly-one-match guard.
     # Replaces the old `grep -rl "$repo_name" | head -1`, which matched any
     # file merely naming the repo basename (e.g. effect-mcp.nix's "Mirrors
     # context7-mcp.nix." comment) and raced on head -1's early pipe close,
     # silently rewriting the wrong overlay — context7's HEAD rev landed in
     # effect-mcp's fetch block → nonexistent commit → source 404 → red CI.
-    # See dev/scripts/resolve-overlay-file.sh.
+    # See dev/scripts/resolve-recipe-file.sh.
     # config.update.targets is the single source of truth (config/update-matrix
-    # .nix was dissolved): read the declared overlay file for this package via
-    # `nix eval --raw .#updateTargets.<name>.file` (lib/update.nix +
-    # config/update-targets.nix + the co-located <pkg>.update.nix). Every
-    # main-tracking package declares one, so resolve_overlay_file below is a
+    # .nix was dissolved): read the declared recipe file for this package via
+    # `nix eval --raw .#updateTargets.<name>.file` (owner registry.nix
+    # contributions plus workspace policy). Every
+    # main-tracking package declares one, so resolve_recipe_file below is a
     # retained safety-net fallback. Only `file` is consumed here; `flags`/`git`
     # flow positionally from the same registry via the ninja DAG.
     # checks.update-targets-parity asserts the declared `file` is byte-identical
-    # to resolve_overlay_file's output, so the two paths agree.
+    # to resolve_recipe_file's output, so the two paths agree.
     # cwd is still the main tree here (before the Phase 1 subshell `cd`), so
     # `.#updateTargets` resolves against the checked-out flake.
     declared_file=$(nix eval --raw ".#updateTargets.${name}.file" 2>/dev/null || true)
     if [ -n "$declared_file" ]; then
       target_file="$wt/$declared_file"
       log_info "Target from config.update.targets: $declared_file"
-    elif ! target_file=$(resolve_overlay_file "$git_url" "$wt/overlays"); then
-      report_held_back "$name" "could not uniquely resolve overlay file"
+    elif ! target_file=$(resolve_recipe_file "$git_url" "$wt/packages"); then
+      report_held_back "$name" "could not uniquely resolve recipe file"
       exit 0
     fi
     if [ -n "$target_file" ]; then
@@ -151,7 +151,7 @@ if [ -n "$git_url" ]; then
             while IFS='|' read -r lineno kind manifest_rel; do
               [ -z "$lineno" ] && continue
               new_upstream=$(nix eval --impure --raw --expr "
-                let vu = import (toString $PWD/overlays/lib.nix);
+                let vu = import (toString $PWD/lib/packaging.nix);
                 in vu.$kind ($storePath + \"/$manifest_rel\")
               " 2>/dev/null || true)
               # A marker names a manifest the maintainer asserts exists.
@@ -221,7 +221,7 @@ PY
         # Commit rev + src hash + upstream version so nix-update has a
         # clean tree to evaluate
         git -C "$wt" add -A
-        git -C "$wt" commit -m "chore(overlays): update $name"
+        git -C "$wt" commit -m "chore(packages): update $name"
       fi
     fi
   fi
@@ -232,7 +232,7 @@ log_info "Running nix-update..."
 # STANDALONE subshell, NOT an `if !` condition — bash disables errexit for
 # anything whose status it tests, and that reaches inside the subshell and
 # overrides its own `set -e`. See "Target subshell shape" in
-# update-common.sh; checks/target-subshell-shape.nix fails the build if this
+# update-common.sh; checks/shell/target-subshell-shape.nix fails the build if this
 # regresses.
 target_rc=0
 set +e
@@ -324,7 +324,7 @@ set +e
         exit 1
       }
     else
-      git -C "$wt" commit -m "chore(overlays): update $name" || {
+      git -C "$wt" commit -m "chore(packages): update $name" || {
         log_failure "git commit failed"
         exit 1
       }

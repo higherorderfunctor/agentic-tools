@@ -9,8 +9,8 @@
 # rejects that user-session lifecycle explicitly.
 #
 # ── The settings surface is GENERATED, not curated ──────────────────
-# `overlays/dev-tools/glab-extracted.json` is built from glab's own
-# `internal/config.KeySchema` (see overlays/dev-tools/glab.nix) and
+# `packages/glab/extracted.json` is built from glab's own
+# `internal/config.KeySchema` (see packages/glab/packages/ai/devTools/glab/package.nix) and
 # committed. Every user-settable, non-list key becomes a typed option
 # here, carrying upstream's own description.
 #

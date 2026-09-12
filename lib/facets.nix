@@ -13,7 +13,6 @@
     hasSuffix
     isDerivation
     listToAttrs
-    makeScope
     nameValuePair
     optional
     sort
@@ -29,7 +28,7 @@
 
   collision = registry: keyPath: left: right:
     throw ''
-      facet ownership collision in ${registry} at '${concatStringsSep "." keyPath}':
+      facet ownership collision in ${registry} at '${lib.showAttrPath keyPath}':
         ${left.owner} (${toString left.source})
         ${right.owner} (${toString right.source})
     '';
@@ -45,10 +44,16 @@
     foldl' (
       merged: claim: let
         id = builtins.toJSON claim.keyPath;
+        contains = parent: child:
+          (parent.kind or "")
+          == "namespace"
+          && pathIsPrefix parent.keyPath child.keyPath
+          && (parent.keyPath != child.keyPath || (child.kind or "") == "namespace");
         conflicts = filter (
           existing:
-            pathIsPrefix existing.keyPath claim.keyPath
-            || pathIsPrefix claim.keyPath existing.keyPath
+            (pathIsPrefix existing.keyPath claim.keyPath
+              || pathIsPrefix claim.keyPath existing.keyPath)
+            && !(contains existing claim || contains claim existing)
         ) (attrValues merged);
       in
         if conflicts != []
@@ -56,6 +61,10 @@
         else merged // {${id} = claim;}
     ) {}
     claims;
+
+  packageTree = import ./facets/packages.nix {
+    inherit lib ensure mergeExclusiveClaims;
+  };
 
   ordinaryAttrs = value: isAttrs value && !isDerivation value;
 
@@ -126,6 +135,36 @@
   in
     module // {_file = toString claim.source;};
 in rec {
+  # Flake packages must be flat derivations. Validate the lossy projection
+  # before constructing its attrset so equal basenames cannot overwrite.
+  flattenPackages = {
+    packageWorld,
+    pkgs,
+    rootPackages ? {},
+    rootSource ? "<workspace>",
+  }: let
+    claims = map (claim:
+      claim
+      // {
+        keyPath = [(lib.last claim.keyPath)];
+        value = lib.getAttrFromPath claim.keyPath pkgs;
+      })
+    packageWorld.eligibleClaims;
+    rootClaims =
+      lib.mapAttrsToList (name: value: {
+        keyPath = [name];
+        owner = "<workspace>";
+        source = rootSource;
+        inherit value;
+      })
+      rootPackages;
+    exclusive = mergeExclusiveClaims "flat packages" (claims ++ rootClaims);
+  in
+    builtins.listToAttrs (map (claim: {
+      name = builtins.head claim.keyPath;
+      inherit (claim) value;
+    }) (builtins.attrValues exclusive));
+
   index = {facetsDir}: let
     rootEntries =
       if pathExists facetsDir
@@ -134,6 +173,7 @@ in rec {
     ownerNames = sortNames (attrNames rootEntries);
     contributionEntryNames = [
       "checks.nix"
+      "lib"
       "modules"
       "overlay.nix"
       "packages"
@@ -153,39 +193,21 @@ in rec {
         then contributionFor owner entry (pathFor entry)
         else null;
 
-      packagesPath = pathFor "packages";
-      packageEntries =
-        if present "packages" && entries.packages == "directory"
-        then readDir packagesPath
+      libraryPath = pathFor "lib";
+      libraryEntries =
+        if present "lib" && entries.lib == "directory"
+        then readDir libraryPath
         else {};
-      packageNames = sortNames (attrNames packageEntries);
+      libraryContribution =
+        if libraryEntries ? "default.nix"
+        then contributionFor owner "library" (libraryPath + "/default.nix")
+        else null;
+
+      packagesPath = pathFor "packages";
       packageClaims =
-        map (
-          packageName: let
-            directory = packagesPath + "/${packageName}";
-            packageFiles =
-              if packageEntries.${packageName} == "directory"
-              then readDir directory
-              else {};
-            source = directory + "/package.nix";
-            platformsSource = directory + "/platforms.nix";
-          in {
-            inherit directory packageName source;
-            keyPath = [packageName];
-            owner = name;
-            platforms =
-              if packageFiles ? "platforms.nix"
-              then platformsSource
-              else null;
-            validations = [
-              (ensure (validName packageName) "owner '${name}' has invalid package name '${packageName}' at '${toString directory}'; expected lowercase kebab-case")
-              (ensure (packageEntries.${packageName} == "directory") "owner '${name}' package '${packageName}' at '${toString directory}' must be a directory")
-              (ensure (packageFiles ? "package.nix" && packageFiles."package.nix" == "regular") "owner '${name}' package '${packageName}' is missing regular recipe '${toString source}'")
-              (ensure (!(packageFiles ? "platforms.nix") || packageFiles."platforms.nix" == "regular") "owner '${name}' package '${packageName}' has non-regular platform metadata '${toString platformsSource}'")
-            ];
-          }
-        )
-        packageNames;
+        if present "packages" && entries.packages == "directory"
+        then packageTree.scan owner packagesPath []
+        else [];
 
       modulesPath = pathFor "modules";
       moduleEntries =
@@ -193,7 +215,10 @@ in rec {
         then readDir modulesPath
         else {};
       moduleNames = sortNames (attrNames moduleEntries);
-      unknownModules = filter (moduleName: !elem moduleName ["devenv" "homeManager"]) moduleNames;
+      unknownModules = filter (moduleName:
+        !elem moduleName ["devenv" "homeManager"]
+        && !(moduleEntries.${moduleName} == "regular" && hasSuffix ".nix" moduleName))
+      moduleNames;
       invalidModules = filter (
         moduleName: let
           modulePath = modulesPath + "/${moduleName}";
@@ -216,7 +241,7 @@ in rec {
       ) (filter (entry: elem entry ["checks.nix" "overlay.nix" "registry.nix"]) entryNames);
       invalidContributionDirectories = filter (
         entry: entries.${entry} != "directory"
-      ) (filter (entry: elem entry ["modules" "packages"]) entryNames);
+      ) (filter (entry: elem entry ["lib" "modules" "packages"]) entryNames);
 
       metadataEntries = filter (entry: !elem entry contributionEntryNames) entryNames;
       classifyMetadata = entry: let
@@ -247,30 +272,25 @@ in rec {
 
       contributions = {
         checks = regularContribution "checks.nix";
+        library = libraryContribution;
         modules = moduleContributions;
         overlay = regularContribution "overlay.nix";
-        packages =
-          map (
-            claim:
-              builtins.removeAttrs claim ["packageName" "validations"]
-          )
-          packageClaims;
+        packages = packageClaims;
         registry = regularContribution "registry.nix";
       };
       contributionCount =
         length contributions.packages
         + length (attrNames contributions.modules)
-        + length (filter (value: value != null) [contributions.checks contributions.overlay contributions.registry]);
-      validations =
-        [
-          (ensure (invalidContributionFiles == []) "owner '${name}' has non-regular contribution '${toString (pathFor (builtins.head invalidContributionFiles))}'")
-          (ensure (invalidContributionDirectories == []) "owner '${name}' has non-directory contribution container '${toString (pathFor (builtins.head invalidContributionDirectories))}'")
-          (ensure (unknownModules == []) "owner '${name}' has unknown module entry '${toString (modulesPath + "/${builtins.head unknownModules}")}'; expected directory-shaped devenv or homeManager modules")
-          (ensure (invalidModules == []) "owner '${name}' module '${toString (modulesPath + "/${builtins.head invalidModules}")}' must be a directory with regular default.nix")
-          (ensure (unsupportedMetadata == []) "owner '${name}' has unclassified metadata '${toString (builtins.head unsupportedMetadata).source}'")
-          (ensure (contributionCount > 0) "owner '${name}' at '${toString root}' is metadata-only; at least one exported contribution is required")
-        ]
-        ++ concatMap (claim: claim.validations) packageClaims;
+        + length (filter (value: value != null) [contributions.checks contributions.library contributions.overlay contributions.registry]);
+      validations = [
+        (ensure (invalidContributionFiles == []) "owner '${name}' has non-regular contribution '${toString (pathFor (builtins.head invalidContributionFiles))}'")
+        (ensure (invalidContributionDirectories == []) "owner '${name}' has non-directory contribution container '${toString (pathFor (builtins.head invalidContributionDirectories))}'")
+        (ensure (!(libraryEntries ? "default.nix") || libraryEntries."default.nix" == "regular") "owner '${name}' library '${toString (libraryPath + "/default.nix")}' must be regular")
+        (ensure (unknownModules == []) "owner '${name}' has unknown module entry '${toString (modulesPath + "/${builtins.head unknownModules}")}'; expected directory-shaped devenv or homeManager modules")
+        (ensure (invalidModules == []) "owner '${name}' module '${toString (modulesPath + "/${builtins.head invalidModules}")}' must be a directory with regular default.nix")
+        (ensure (unsupportedMetadata == []) "owner '${name}' has unclassified metadata '${toString (builtins.head unsupportedMetadata).source}'")
+        (ensure (contributionCount > 0) "owner '${name}' at '${toString root}' is metadata-only; at least one exported contribution is required")
+      ];
     in
       deepSeq validations {
         inherit contributions metadata name;
@@ -298,59 +318,80 @@ in rec {
       owner: owner.contributions.modules.${backend}.source
     ) (filter (owner: owner.contributions.modules ? ${backend}) index.owners);
 
-  realizePackages = {
+  realizePackages = packageTree.realize;
+
+  # Native module options merge library namespaces while raw leaf options keep
+  # function identity (including functionArgs) intact. types.anything would wrap
+  # function values in a merging lambda and erase their argument interface.
+  realizeLibrary = {
+    context,
     index,
-    inputs,
-    pkgs,
-    scopeArgs ? {},
-    system,
+    rootLibrary ? {},
+    rootSource ? "<root library>",
   }: let
-    claims = contributionsFor index "packages";
-    injectedArgs =
-      scopeArgs
-      // {
-        inherit inputs pkgs system;
-      };
-    nativeScopeMembers = attrNames (makeScope pkgs.newScope (_: {}));
-    reservedNames = unique (nativeScopeMembers ++ attrNames injectedArgs);
-    reservedClaims = filter (claim: elem (builtins.head claim.keyPath) reservedNames) claims;
-    exclusive = mergeExclusiveClaims "packages" claims;
-    eligibleClaims =
-      filter (
+    # Option types, option declarations and callable attrsets are values, not
+    # namespaces. Walking their internals forces deliberately lazy module
+    # evaluations (for example a submodule's required, unset options).
+    libraryPaths = prefix: value:
+      if ordinaryAttrs value && !lib.isOption value && !lib.isOptionType value && !(value ? __functor)
+      then let
+        names = attrNames value;
+      in
+        if names == []
+        then [prefix]
+        else concatMap (name: libraryPaths (prefix ++ [name]) value.${name}) names
+      else [prefix];
+    sources =
+      [
+        {
+          owner = "<root>";
+          source = rootSource;
+          value = rootLibrary;
+        }
+      ]
+      ++ map (claim: let
+        imported = import claim.source;
+      in
+        claim
+        // {
+          value =
+            if isFunction imported
+            then imported context
+            else imported;
+        }) (contributionsFor index "library");
+    claims = concatMap (claim:
+      assert ensure (ordinaryAttrs claim.value) "owner '${claim.owner}' library at '${toString claim.source}' must return an attribute set";
+        map (keyPath: {
+          inherit keyPath;
+          inherit (claim) owner source;
+        })
+        (
+          if claim.value == {}
+          then []
+          else libraryPaths [] claim.value
+        ))
+    sources;
+    exclusive = mergeExclusiveClaims "library" claims;
+    options = foldl' lib.recursiveUpdate {} (map (
         claim:
-          claim.platforms
-          == null
-          || elem system (import claim.platforms)
+          lib.setAttrByPath (["exports"] ++ claim.keyPath) (lib.mkOption {type = lib.types.raw;})
       )
-      claims;
-    scope = makeScope pkgs.newScope (
-      self:
-        injectedArgs
-        // listToAttrs (map (
-            claim:
-              nameValuePair (builtins.head claim.keyPath) (
-                lib.filesystem.packagesFromDirectoryRecursive {
-                  inherit (claim) directory;
-                  inherit (self) callPackage;
-                }
-              )
-          )
-          eligibleClaims)
-    );
-    packageNames = map (claim: builtins.head claim.keyPath) eligibleClaims;
-    validations = [
-      (ensure (reservedClaims == []) "reserved package name '${builtins.head (builtins.head reservedClaims).keyPath}' from owner '${(builtins.head reservedClaims).owner}' at '${toString (builtins.head reservedClaims).source}' would overwrite a native or injected scope member")
-    ];
-  in
-    deepSeq [exclusive validations] {
-      inherit claims scope;
-      omitted = map (claim: builtins.head claim.keyPath) (filter (claim: !elem claim eligibleClaims) claims);
-      packages = genAttrs packageNames (name: scope.${name});
+      claims);
+    evaluated = lib.evalModules {
+      modules =
+        [{inherit options;}]
+        ++ map (claim: {
+          _file = toString claim.source;
+          config.exports = claim.value;
+        }) (filter (claim: claim.value != {}) sources);
     };
+  in
+    deepSeq exclusive (evaluated.config.exports or {});
 
   realizeOverlay = {
     context,
     index,
+    packageWorld ? null,
   }: let
     sourceClaims = contributionsFor index "overlay";
     loaded =
@@ -384,8 +425,13 @@ in rec {
           }
       )
       sourceClaims;
+    packageClaims =
+      if packageWorld == null
+      then []
+      else packageWorld.eligibleClaims;
     ownershipClaims =
-      concatMap (
+      packageClaims
+      ++ concatMap (
         loadedClaim:
           map (keyPath: {
             inherit keyPath;
@@ -419,11 +465,19 @@ in rec {
   in
     deepSeq exclusive {
       inherit ownershipClaims;
-      overlay = lib.composeManyExtensions checkedOverlays;
+      overlay = lib.composeManyExtensions (
+        optional (packageWorld != null) (_final: prev:
+          lib.intersectAttrs packageWorld.packages (
+            lib.recursiveUpdateUntil (_: before: after: !(ordinaryAttrs before && ordinaryAttrs after))
+            prev
+            packageWorld.packages
+          ))
+        ++ checkedOverlays
+      );
     };
 
   realizeRegistry = {
-    claimPath,
+    claimPaths,
     index,
     modules,
     specialArgs ? {},
@@ -434,51 +488,62 @@ in rec {
         claim: args: callOwnerModule claim args
       )
       sourceClaims;
-    evaluate = extraModules:
+    evaluate = args: extraModules:
       lib.evalModules {
-        inherit specialArgs;
+        specialArgs = args;
         modules = modules ++ extraModules;
       };
-    definitionsFor = evaluated:
+    evaluated = evaluate specialArgs ownerModules;
+    # Keep contributor definitions separate while their conditions and imported
+    # arguments observe the combined fixed point. Otherwise a conditional key
+    # can appear only in the final merge and escape ownership validation.
+    claimArgs =
+      specialArgs
+      // {
+        config = evaluated.config // {inherit (evaluated) _module;};
+        inherit (evaluated) options;
+      };
+    definitionsFor = claimPath: evaluated:
       (attrByPath claimPath {} evaluated.options).definitionsWithLocations or [];
-    rootDefinitions = definitionsFor (evaluate []);
-    rootKeys = unique (concatMap (definition: attrNames definition.value) rootDefinitions);
-    rootOwnershipClaims =
-      map (
-        key: let
-          definition = builtins.head (filter (candidate: candidate.value ? ${key}) rootDefinitions);
-        in {
+    rootEvaluation = evaluate claimArgs [];
+    rootOwnershipClaims = concatMap (claimPath: let
+      definitions = definitionsFor claimPath rootEvaluation;
+      keys = unique (concatMap (definition: attrNames definition.value) definitions);
+    in
+      map (key: let
+        definition = builtins.head (filter (candidate: candidate.value ? ${key}) definitions);
+      in {
+        keyPath = claimPath ++ [key];
+        owner = "root policy";
+        source = definition.file;
+      })
+      keys)
+    claimPaths;
+    ownershipClaims = concatMap (claim: let
+      isolated = evaluate claimArgs [(args: callOwnerModule claim args)];
+    in
+      concatMap (claimPath: let
+        rootDefinitions = definitionsFor claimPath rootEvaluation;
+        ownerDefinitions = filter (
+          definition:
+            !builtins.any (
+              rootDefinition:
+                definition.file
+                == rootDefinition.file
+                && valuesEqual definition.value rootDefinition.value
+            )
+            rootDefinitions
+        ) (definitionsFor claimPath isolated);
+        keys = unique (concatMap (definition: attrNames definition.value) ownerDefinitions);
+      in
+        map (key: {
           keyPath = claimPath ++ [key];
-          owner = "root policy";
-          source = definition.file;
-        }
-      )
-      rootKeys;
-    ownershipClaims =
-      concatMap (
-        claim: let
-          evaluated = evaluate [(args: callOwnerModule claim args)];
-          ownerDefinitions = filter (
-            definition:
-              !builtins.any (
-                rootDefinition:
-                  definition.file
-                  == rootDefinition.file
-                  && valuesEqual definition.value rootDefinition.value
-              )
-              rootDefinitions
-          ) (definitionsFor evaluated);
-          keys = unique (concatMap (definition: attrNames definition.value) ownerDefinitions);
-        in
-          map (key: {
-            keyPath = claimPath ++ [key];
-            inherit (claim) owner source;
-          })
-          keys
-      )
-      sourceClaims;
+          inherit (claim) owner source;
+        })
+        keys)
+      claimPaths)
+    sourceClaims;
     exclusive = mergeExclusiveClaims "registry" (rootOwnershipClaims ++ ownershipClaims);
-    evaluated = evaluate ownerModules;
   in
     deepSeq exclusive {
       inherit (evaluated) config;
@@ -488,41 +553,59 @@ in rec {
   realizeChecks = {
     context,
     index,
+    rootModules ? [],
+    rootSource ? "<root checks>",
   }: let
-    sourceClaims = contributionsFor index "checks";
-    checkClaims =
-      concatMap (
-        claim: let
-          factory = import claim.source;
-          checks =
-            if isFunction factory
-            then factory context
-            else throw "facet error: owner '${claim.owner}' check at '${toString claim.source}' must be a context factory";
-          checkNames =
-            if isAttrs checks
-            then sortNames (attrNames checks)
-            else throw "facet error: owner '${claim.owner}' check factory at '${toString claim.source}' must return an attribute set";
-        in
-          map (name: {
-            keyPath = [name];
-            inherit (claim) owner source;
-            value = checks.${name};
-          })
-          checkNames
-      )
-      sourceClaims;
+    ownerModules = map (claim:
+      claim
+      // {
+        module = args: callOwnerModule claim args;
+      }) (contributionsFor index "checks");
+    workspaceModules =
+      lib.imap0 (position: module: {
+        owner = "<root>";
+        source =
+          if builtins.isPath module
+          then module
+          else "${toString rootSource}#${toString position}";
+        inherit module;
+      })
+      rootModules;
+    contributions = workspaceModules ++ ownerModules;
+    evaluate = specialArgs: modules:
+      lib.evalModules {
+        inherit specialArgs;
+        modules = [./testing/check-options.nix] ++ modules;
+      };
+    evaluated = evaluate context (map (claim: claim.module) contributions);
+    # Isolate definitions, not their module context: conditions and imported
+    # function arguments must see the same fixed point as the combined result.
+    # evalModules removes _module from config in its public result, but module
+    # argument resolution still needs it for arguments supplied by other owners.
+    claimContext =
+      context
+      // {
+        config = evaluated.config // {inherit (evaluated) _module;};
+        inherit (evaluated) options;
+      };
+    checkClaims = concatMap (claim: let
+      isolated = evaluate claimContext [claim.module];
+    in
+      map (name: {
+        keyPath = [name];
+        inherit (claim) owner source;
+        value = isolated.config.checks.${name};
+      }) (attrNames isolated.config.checks))
+    contributions;
     exclusive = mergeExclusiveClaims "checks" checkClaims;
-    nonDerivations = filter (claim: !isDerivation claim.value) checkClaims;
-    validations = [
-      (ensure (nonDerivations == []) "owner '${(builtins.head nonDerivations).owner}' check '${builtins.head (builtins.head nonDerivations).keyPath}' at '${toString (builtins.head nonDerivations).source}' returned a non-derivation")
-    ];
-    checksByName = listToAttrs (map (
-        claim:
-          nameValuePair (builtins.head claim.keyPath) {
-            inherit (claim) owner source value;
-          }
-      )
-      checkClaims);
-  in
-    deepSeq [(attrNames exclusive) validations] checksByName;
+    byName = listToAttrs (map (claim:
+      nameValuePair (builtins.head claim.keyPath) claim)
+    checkClaims);
+  in {
+    # Testing inputs stay lazy and independently accessible: the harness uses
+    # them while the check modules construct their derivations.
+    inherit (evaluated.config) testing;
+    claims = deepSeq (attrNames exclusive) byName;
+    checks = deepSeq (attrNames exclusive) evaluated.config.checks;
+  };
 }

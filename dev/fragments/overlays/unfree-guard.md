@@ -1,8 +1,7 @@
 ## Unfree Package Guard (`ensureUnfreeCheck`)
 
-> **Last verified:** 2026-08-03 — every guarded binary group nests under
-> `pkgs.ai` behind one universal output-boundary guard. Full lineage:
-> `git show 47d0367b:dev/fragments/overlays/unfree-guard.md`.
+> **Last verified:** 2026-09-12 — one composer guards only owned package leaves,
+> preserving inherited neighbors.
 
 ### The problem
 
@@ -15,42 +14,16 @@ gets the pre-evaluated result with no check.
 
 ### The solution
 
-`overlays/default.nix` defines `ensureUnfreeCheck`:
+`lib/facets/unfree-guard.nix` implements the shared guard. It inspects
+`meta.license.free` (including lists of licenses), passes free derivations
+through unchanged, and wraps unfree derivations with the consumer's
+`final.symlinkJoin`. The wrapper carries the original metadata, passthru, name,
+and version, with the pinned derivation as its sole `paths` entry.
 
-```nix
-isUnfree = drv: let
-  license = drv.meta.license or {};
-in
-  if builtins.isList license
-  then builtins.any (l: !(l.free or true)) license
-  else !(license.free or true);
-
-ensureUnfreeCheck = drv:
-  if isUnfree drv
-  then
-    final.symlinkJoin {
-      inherit (drv) name version;
-      paths = [drv];
-      meta = drv.meta or {};
-      passthru = drv.passthru or {};
-    }
-  else drv;
-
-guard = builtins.mapAttrs (_: ensureUnfreeCheck);
-```
-
-Applied universally at the output level:
-
-```nix
-{ ai = guard flatDrvs // {
-    devTools = guard devToolDrvs;
-    generic = guard genericDrvs;
-    gitTools = guard gitToolDrvs;
-    lspServers = guard {agnix-lsp = agnixLsp;};
-    mcpServers = guard (mcpServerDrvs // {agnix-mcp = agnixMcp;});
-  };
-}
-```
+Repository facet assembly applies it to indexed, supported package leaves after
+overlay composition. It must not traverse namespace neighbors inherited from
+`prev`: those packages may already carry a guard and would acquire a second
+wrapper.
 
 ### How it works
 
@@ -61,7 +34,8 @@ Applied universally at the output level:
    consumer's `check-meta.nix` fires on the wrapper — standard error if they
    haven't set `allowUnfree`.
 3. If free, returns the derivation unwrapped (zero overhead).
-4. Applied via `builtins.mapAttrs` — new packages are automatically guarded.
+4. Applied at assembly — newly discovered package leaves are automatically
+   guarded.
 
 ### Cache-hit parity is preserved
 

@@ -21,7 +21,7 @@
 # dirs from `pkgs.stacked-workflows-content.passthru.skills` (real reference
 # files bundled inside each, so they resolve in every scope).
 #
-# Picked up by `collectFacet ["modules" "homeManager"]` in flake.nix.
+# Picked up by `native Home Manager module discovery` in flake.nix.
 {
   config,
   lib,

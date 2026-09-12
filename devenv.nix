@@ -75,7 +75,7 @@
   # ── ai.shell test vector ───────────────────────────────────────────────
   # Proves, per runtime, that the configured shell actually ARRIVES — against
   # the real artifacts on PATH in this worktree, not against module eval.
-  # `checks/module-eval.nix` already covers the option's semantics; what it
+  # `checks/ai-shell/module-eval.nix` already covers the option's semantics; what it
   # cannot see is whether the thing a developer's `$PATH` resolves to carries
   # the value. Three runtimes, three different delivery mechanisms, so three
   # different places to look.
@@ -177,11 +177,11 @@ in {
   # pkgs.stacked-workflows-content are available everywhere. No manual
   # overlay composition needed.
   overlays = [
-    # Unified AI overlay (all binary-package groups under pkgs.ai.*)
-    (import ./overlays {inherit inputs;})
-    # Content packages (pkgs.coding-standards, pkgs.stacked-workflows-content)
-    (import ./packages/coding-standards {})
-    (import ./packages/stacked-workflows/overlay.nix {})
+    (import ./lib/facets/repository.nix {
+      inherit inputs;
+      root = ./.;
+      systems = [pkgs.stdenv.hostPlatform.system];
+    }).overlay
   ];
 
   # ── Binary Cache ──────────────────────────────────────────────────────
@@ -271,8 +271,8 @@ in {
             language = "bash";
             patterns = [
               ".envrc"
-              "checks/fixtures/claude-hooks/post-edit"
-              "checks/fixtures/claude-hooks/pre-edit"
+              "packages/claude-code/checks/fixtures/claude-hooks/post-edit"
+              "packages/claude-code/checks/fixtures/claude-hooks/pre-edit"
             ];
           }
           {
@@ -340,7 +340,7 @@ in {
       # commands are only populated when the resolved engine is `kas` —
       # patching the binary alone is not enough, and the failure is silent.
       #
-      # Names come from `overlays/kiro-cli-extracted.json` (`rolloutFeatures`),
+      # Names come from `packages/kiro-cli/extracted.json` (`rolloutFeatures`),
       # extracted from the binary rather than curated. UNCERTIFIED upstream:
       # `workflows` is documented as "Dark-shipped at 0% until release
       # certification is complete".
@@ -693,7 +693,7 @@ in {
           set -euETo pipefail
           shopt -s inherit_errexit 2>/dev/null || :
           cd "$DEVENV_ROOT"
-          ${pkgs.python3}/bin/python3 checks/gradeability.py .
+          ${pkgs.python3}/bin/python3 checks/repository/gradeability.py .
         '';
       };
 

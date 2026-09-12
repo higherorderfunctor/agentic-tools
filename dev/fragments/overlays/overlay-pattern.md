@@ -1,48 +1,28 @@
 ## Overlay Grouping under `pkgs.ai`
 
-> **Last verified:** 2026-09-01 — `pnpm_12` is a standalone prebuilt-binary
-> derivation, not a `pnpm-major.nix` caller: pnpm 12 moved its implementation
-> out of the npm package and into per-platform native binaries, so the
-> several-majors section's shared-builder shape no longer applies to every major
-> of one package.
+> **Last verified:** 2026-09-12 — native owner recipes replace grouped overlay
+> barrels; pinned build identity and consumer guards are preserved.
 >
 > Full lineage: `git show 4705317b:dev/fragments/overlays/overlay-pattern.md`.
 
-`overlays/default.nix` aggregates every binary package under the single
-`pkgs.ai` namespace. Flat AI CLIs live directly below it; supporting categories
-are `devTools`, `generic`, `gitTools`, `lspServers`, and `mcpServers`. Every
-group is built the same way — an attrset of
-`import ./<dir>/<name>.nix {inherit inputs final;}` entries, passed through
-`guard` (the unfree wrapper) in the output set, and flattened into
-`packages.<system>` in `flake.nix` for CLI ergonomics. The overlay never writes
-a bare `pkgs.<name>` attribute.
+`lib/facets/repository.nix` discovers native package trees below
+`packages/<owner>/packages/` and exposes them through `overlays.default`. AI
+CLIs live directly below `pkgs.ai`; supporting categories are `devTools`,
+`generic`, `gitTools`, `lspServers`, and `mcpServers`. Content packages keep
+their existing top-level names. Flat flake outputs come from leaf basenames with
+collision validation; adding a recipe requires no root import entry.
 
-Keeping every group below `pkgs.ai` is deliberate while this repository is the
-only consumer. Whether selected packages should eventually merge into the plain
-nixpkgs namespace is a later policy decision, not something individual package
-moves decide implicitly.
+The outer directory is ownership; the inner tree is the public namespace.
+`generic` remains a temporary category for supporting packages awaiting a
+clearer role. A later namespace change should move the inner recipe path, while
+renaming the outer owner leaves the public namespace unchanged.
 
-`generic` is a temporary category for supporting packages that have not yet
-earned a clearer role. It is not a claim that they belong in a permanent
-"non-agentic" product namespace. The physical `overlays/generic/` subtree stays
-split-ready: it must not acquire dependencies on the rest of the repo beyond
-`overlays/lib.nix`, so it can be regrouped or extracted without archaeology.
-Obvious classifications should move out incrementally; `gh` and `glab` are the
-worked example, living together under `overlays/dev-tools/` and
-`pkgs.ai.devTools`.
-
-Repo-local implementation sources consumed by an overlay derivation belong
-beside that derivation under `overlays/`, even when a package module is their
-only runtime consumer. An overlay must not import build sources from
-`packages/`: that outbound edge prevents lifting the overlay tree as a clean
-directory move.
-
-The worked examples were `overlays/kiro-memory-distiller/` and
-`overlays/mcp-servers/openmemory-mem/`, both removed on 2026-09-01. NO OVERLAY
-CARRIES REPO-LOCAL BUILD SOURCES TODAY, so the rule is currently unillustrated —
-which is exactly when it is easiest to violate by accident. The next overlay
-that needs a repo-local `.ts`/`.py`/`.sh` implementation file puts it beside the
-overlay under `overlays/`, not under `packages/`.
+Recipes receive this flake's pinned `pkgs`, `inputs`, shared `packageLib`, and
+`repoPath`. Keep source sidecars, patches, extraction helpers, and declarative
+registrations with the owner. `registry.nix` declares update/cache/doc entries;
+`repoPath ./relative/path` derives mutable paths from their actual location. The
+shared composer owns consumer unfree policy. See the package-ownership fragment
+for the native composition boundaries.
 
 ### Absorption is about CADENCE. Never re-open it on a version comparison
 
@@ -82,10 +62,10 @@ Corollaries, each learned the hard way:
 - **Build it, do not note it.** Write the overlay in the same change when the
   package is already CONSUMED here — it appears in `devenv.nix` `packages`, in a
   module's or wrapper's package / `runtimeInputs` list, as an `ai.*` option
-  default, or in `config/update-targets.nix` — or when the operator named it.
-  Being a transitive dependency alone does not qualify. If it fails all of
-  those, say which one it fails and stop. A version or store-path comparison
-  against nixpkgs is never a ground to decline, defer or drop an overlay.
+  default, or in owner `registry.nix` — or when the operator named it. Being a
+  transitive dependency alone does not qualify. If it fails all of those, say
+  which one it fails and stop. A version or store-path comparison against
+  nixpkgs is never a ground to decline, defer or drop an overlay.
 
 `pnpm_10` / `pnpm_11` are the worked example: one sat at exact nixpkgs parity at
 landing and was absorbed anyway, precisely so the pair is carried the same way
@@ -95,7 +75,7 @@ for majors of one package; this is the general form.
 ### Direct external-flake derivations
 
 Semble is the external pinned-package exception to the local-build patterns
-below. `overlays/semble.nix` returns
+below. `packages/semble/packages/ai/semble/package.nix` returns
 `inputs.llm-agents.packages.${system}.semble` directly. It does not apply the
 input's `overlays.shared-nixpkgs`, rebuild with this repository's `ourPkgs`, or
 call `overrideAttrs`; any of those would replace the upstream cache identity
@@ -110,13 +90,10 @@ roles with a plain attrset/meta overlay. `semble-mcp` changes only
 `outPath` remain identical to the CLI and upstream output. The cache-hit-parity
 check locks all three identities.
 
-Two mechanical consequences of living in a subdirectory rather than at the
-`overlays/` root:
-
-- `vu = import ../lib.nix` (one level up), not `./lib.nix`.
-- The update helpers default `sourcesFile` to `overlays/<pname>-sources.json`,
-  which is wrong here, so grouped packages pass `sourcesFile` explicitly. The
-  sidecar lives beside the package file.
+Shared update helpers require an explicit `sourcesFile`. Pass
+`sourcesFile = repoPath ./relative/sources.json`; there is no
+directory-dependent default. Use the injected `packageLib` rather than importing
+a root-relative helper path from a deeply nested recipe.
 
 Nothing else is relaxed: cache-hit parity applies in full (see that fragment —
 shipping data files is NOT the same as being content-only), each package gets a
@@ -237,10 +214,11 @@ both `attrs` and `finalAttrs: attrs` flavors, and it normalizes them.
 
 Two worked examples in this tree, both moving an INPUT hash — cite either:
 
-- `overlays/git-tools/git-absorb.nix` — `cargoHash`, via
+- `packages/git-absorb/packages/ai/gitTools/git-absorb/package.nix` —
+  `cargoHash`, via
   `ourPkgs.git-absorb.override (_: { rustPlatform.buildRustPackage = … })`. It
   PREDATES bruno.
-- `overlays/generic/bruno.nix` — `npmDepsHash`, via
+- `packages/bruno/packages/ai/generic/bruno/package.nix` — `npmDepsHash`, via
   `ourPkgs.bruno.override (_: { buildNpmPackage = … })`.
 
 Bruno 4.1.0 adds a second builder-ordering constraint to that same wrapper. Its
@@ -261,10 +239,11 @@ proof that the base adaptation works. The threshold also keeps 4.0.0's builder
 inputs unchanged; the update script, not this compatibility shim, continues to
 derive both hashes.
 
-`overlays/git-tools/git-branchless.nix` is a plain `overrideAttrs` and is
-CORRECT as one: it sets `cargoDeps` — an `ourPkgs.rustPlatform.importCargoLock`
-over the pinned src, i.e. the derived OUTPUT — and never `cargoHash`. Do not
-cite it as a builder-wrap example, and do not "fix" it into one.
+`packages/git-branchless/packages/ai/gitTools/git-branchless/package.nix` is a
+plain `overrideAttrs` and is CORRECT as one: it sets `cargoDeps` — an
+`ourPkgs.rustPlatform.importCargoLock` over the pinned src, i.e. the derived
+OUTPUT — and never `cargoHash`. Do not cite it as a builder-wrap example, and do
+not "fix" it into one.
 
 One trap in the git-absorb spelling:
 `.override (_: { rustPlatform.buildRustPackage = … })` REPLACES the whole
@@ -301,7 +280,7 @@ unwrapped derivation's attrs, and `overrideAttrs` reaches a derivation that has
 nothing we wanted to change. The fix is to re-point the BASE:
 
 ```nix
-# overlays/kiro-cli.nix
+# packages/kiro-cli/packages/ai/kiro-cli/package.nix
 hasUnwrapped = ourPkgs ? kiro-cli-unwrapped;
 basePackage =
   if hasUnwrapped then ourPkgs.kiro-cli-unwrapped else ourPkgs.kiro-cli;
@@ -350,7 +329,7 @@ matching its sidecar. Two cheap probes:
 ```bash
 # Does the exported version still match the pin we wrote?
 nix eval --raw .#kiro-cli.version
-jq -r .version overlays/kiro-cli-sources.json
+jq -r .version packages/kiro-cli/sources.json
 
 # Did our postFixup actually run? (no wrappers => fixupPhase never happened)
 ls -a "$(nix build .#kiro-cli --no-link --print-out-paths)/bin"
@@ -421,11 +400,10 @@ build.
 `pkgs.ai.generic.pnpm_11`, `pkgs.ai.generic.pnpm_12`) and the shape generalizes
 to any versioned attribute family:
 
-- One shared builder (`overlays/generic/pnpm-major.nix`) takes the major as an
+- One shared builder (`packages/pnpm/lib/mkMajor.nix`) takes the major as an
   argument; the per-major files are two-line delegations. They exist because
-  each major needs its own path for `--override-filename` in
-  `config/update-targets.nix` and its own sidecar beside it — not because the
-  logic differs.
+  each major needs its own path for `--override-filename` in owner
+  `registry.nix` and its own sidecar beside it — not because the logic differs.
 - The version check reads the registry's PER-MAJOR channel (npm's `latest-<N>`
   dist-tag), not the global latest, so a major never bumps itself out of its own
   attribute.
@@ -448,8 +426,10 @@ to any versioned attribute family:
   replaces it at install time. The implementation now ships as eight
   per-platform npm packages (`@pnpm/exe.linux-x64`, `@pnpm/exe.darwin-arm64`, …)
   pinned in `optionalDependencies`, so `pnpm_12` is a standalone prebuilt-binary
-  derivation on the `overlays/chatgpt-codex.nix` shape with a per-platform
-  sidecar like `overlays/generic/bun.nix`'s.
+  derivation on the
+  `packages/chatgpt-codex/packages/ai/chatgpt-codex/package.nix` shape with a
+  per-platform sidecar like
+  `packages/bun/packages/ai/generic/bun/package.nix`'s.
 - **Two signals say the family has to split, and the second one is the trap.**
   The first is that nixpkgs has no attribute for the new major to override —
   easy to spot, since the overlay simply fails to evaluate. The second is that
@@ -498,7 +478,7 @@ inline, and the mechanism is worth understanding before touching it:
   across `packages.<system>` and runs it when an input bump's build verification
   fails, so that case self-heals into the same commit instead of parking the
   input update as HELD BACK. Until 2026-07-25 the standalone had NO caller and
-  `overlays/lib.nix` claimed a re-run that did not exist; if you unwire it, fix
+  `lib/packaging.nix` claimed a re-run that did not exist; if you unwire it, fix
   both.
 - `passthru` must be MERGED. `buildGoModule` hangs `goModules` and
   `overrideModAttrs` there, `build-support/go/module.nix` warns loudly when an
@@ -537,9 +517,9 @@ ran. glab 1.116.0 and oh-my-posh 31.1.x (both `go 1.27.0`, against `pkgs.go`
 Note what is NOT a fix: preserving `goFloor` across the sidecar rewrite. The
 committed floors were 1.26.5 and 1.26.0 and **both still select 1.26.7**. Only
 deriving the floor from the fresh source before the vendor build changes the
-outcome. `checks/go-floor-extract-order.nix` gates the order, with a positive
-control, and fails a package that carries `fixGoFloor` but no `goUpdateExtract`
-— i.e. one that went back to hand-rolling the chain.
+outcome. `checks/packaging/go-floor-extract-order.nix` gates the order, with a
+positive control, and fails a package that carries `fixGoFloor` but no
+`goUpdateExtract` — i.e. one that went back to hand-rolling the chain.
 
 `glab` is the one Go package where the SRC hash goes in the sidecar too, so it
 is the only `srcFromSidecar = true` caller. The reason is the one that also
@@ -609,9 +589,9 @@ caught up and this is now a DOWNGRADE". The sibling repo demonstrates the
 failure — it pins oh-my-posh to Go 1.26.0, a gap-filler when written and a
 downgrade against our pin's 1.26.5. Prereleases are filtered out of the
 candidate set on purpose: `go-bin.latest` is currently a prerelease, and Nix
-sorts `1.27rc1` ABOVE `1.27.0`. `checks/go-toolchain-floor.nix` exercises all
-three branches plus two positive controls, which is also what keeps the input
-from shipping dormant.
+sorts `1.27rc1` ABOVE `1.27.0`. `checks/packaging/go-toolchain-floor.nix`
+exercises all three branches plus two positive controls, which is also what
+keeps the input from shipping dormant.
 
 **ALL EIGHT exported Go packages carry the seam**, not just the two that once
 needed it — `beads`, `gh`, `glab`, `github-mcp`, `gluetun`,
@@ -655,8 +635,8 @@ So the floor is extracted from the pinned source's go.mod, by mechanism:
   therefore also needs a standalone `passthru` escape hatch.
 - **Trunk mode (rev-pinned: `github-mcp`, `mcp-language-server`)** — a literal
   in the overlay. These have no sidecar and are bumped by `nix-update` (`git`
-  targets in `config/update-targets.nix`), so there is no repo-owned update
-  script to hook a rewrite into.
+  targets in owner `registry.nix`), so there is no repo-owned update script to
+  hook a rewrite into.
 
 **ORDER: hash fixers first, then the floor.** `mkGoFloorFix` builds `.src`, so a
 package whose `srcHash` also lives in the sidecar (`glab`) must have that
@@ -667,9 +647,9 @@ Reading the floor is **silent by construction** — overlays read
 `sources.goFloor or vu.goFloorUnknown`, and `goFloorUnknown` (`"0"`) is
 satisfied by everything. That is deliberate and not a hole: `mkGoFloorFix` must
 evaluate the package to build its `.src`, so a `throw` on the missing key would
-deadlock the fixer that repairs it. `checks/go-floor-drift.nix` is the loud half
-— it compares every recorded floor against the real go.mod and fails naming the
-package, the actual requirement, and the remedy (fixer vs. literal).
+deadlock the fixer that repairs it. `checks/packaging/go-floor-drift.nix` is the
+loud half — it compares every recorded floor against the real go.mod and fails
+naming the package, the actual requirement, and the remedy (fixer vs. literal).
 
 That check takes **NO REGISTRY**: it filters `self.packages.<system>` for
 `passthru.goFloor`. A list of Go packages would be a second source of truth a
@@ -685,20 +665,19 @@ constant — `oh-my-posh` keeps its module under `src/`.
 `GOOS=darwin GOARCH=arm64`). A restrictive `meta.platforms` is NOT sufficient —
 the attribute still exists on darwin and forcing its `drvPath` throws "not
 available on the requested hostPlatform", which both `nix flake check` (it
-evaluates every system) and the required darwin CI leg do. So
-`overlays/default.nix` wraps the entry in
-`lib.optionalAttrs final.stdenv.hostPlatform.isLinux`, and the package is simply
-absent elsewhere.
+evaluates every system) and the required darwin CI leg do. So the recipe's
+sibling `platforms.nix` declares `["x86_64-linux"]`. Native discovery excludes
+the leaf on other systems, from both scopes and outputs.
 
 Two registries have to agree with that:
 `config.checks.cacheHitParity.<name>.platforms` (or the check aborts on darwin
 looking up a package that is not there) and, if a future case needs it, anything
 else that enumerates packages per system. This is the exception, not a licence
-to platform-gate anything inconvenient. Before wrapping an entry in
-`lib.optionalAttrs`, prove the package genuinely cannot build on the excluded
-system, as `gluetun` was proved by cross-compiling `GOOS=darwin GOARCH=arm64`. A
-sidecar whose per-system keys omit a system the upstream release actually ships
-for is a STALE SIDECAR: add the missing `{url, hash}` entry and the matching
+to platform-gate anything inconvenient. Before adding a `platforms.nix`
+restriction, prove the package genuinely cannot build on the excluded system, as
+`gluetun` was proved by cross-compiling `GOOS=darwin GOARCH=arm64`. A sidecar
+whose per-system keys omit a system the upstream release actually ships for is a
+STALE SIDECAR: add the missing `{url, hash}` entry and the matching
 `config.checks.cacheHitParity.<name>.platforms` row, do not gate the attribute.
 
 **The CI IFD warm step DOES cover that kind of IFD — since it started forcing
@@ -719,72 +698,16 @@ was NOT warmed merely by being in `packages`. See the ifd-patterns fragment for
 the measured cost of the wider forcing and for why the `or` chain does not
 swallow a throw.
 
-## Overlay Lambda Signature
+## Recipe and overlay signatures
 
-All overlays in this repo use a **three-argument signature** with the first
-argument typically discarded:
+Native package recipes take named arguments, for example
+`{pkgs, packageLib, repoPath, ...}: ...`, and return one derivation. Named
+formals matter: native `callPackage` discovers dependencies with `functionArgs`;
+a bare `args:` lambda receives no implicit dependencies. A multi-role owner can
+use one native package as the source build and sibling recipes as selectors.
 
-```nix
-_: final: _prev: { ... }
-```
-
-This is **deliberate**, not a typo. Reviewers (especially automated ones)
-frequently flag this as "atypical" because the standard nixpkgs overlay
-convention is `final: prev:` (two arguments). Both forms work, but the
-three-argument form is the convention here.
-
-### Why three arguments
-
-The first argument is reserved for an **inputs blob** that some overlays may
-need (e.g., a future AI CLI overlay that consumes `inputs.rust-overlay` for Rust
-toolchain pinning, or a git-tools overlay that pulls version data from external
-inputs). To keep all overlays uniformly callable from `flake.nix`, every overlay
-takes the same three-argument shape regardless of whether it actually uses the
-inputs.
-
-After the factory rollout (Milestones 1–10), the overlays at the flake level are
-split between the unified binary-package overlay (`./overlays`, which consumes
-`inputs` for cache-hit parity via per-package `ourPkgs`) and the content-only
-overlays under `packages/` (which don't need extra flake inputs and are called
-with an empty `{}`). All keep the same three-argument shape so all overlays
-remain uniformly callable from `flake.nix`'s `bind-once → reuse` composition
-pattern:
-
-```nix
-# flake.nix
-aiOverlay = import ./overlays {inherit inputs;};           # every grouped drv namespace
-codingStandardsOverlay = import ./packages/coding-standards {};
-stackedWorkflowsOverlay = import ./packages/stacked-workflows {};
-
-overlays.default = lib.composeManyExtensions [
-  aiOverlay                 # every binary-package group under pkgs.ai.*
-  codingStandardsOverlay    # content package
-  stackedWorkflowsOverlay   # content package
-];
-```
-
-The content overlays (`codingStandardsOverlay`, `stackedWorkflowsOverlay`) are
-called with an empty `{}` first argument because they don't need flake inputs.
-The binary overlay (`aiOverlay`) consumes `{inherit inputs;}` because its
-per-package files in `overlays/<name>.nix` need `inputs.nixpkgs` for cache-hit
-parity and `inputs.rust-overlay` for Rust toolchain pinning. The first `_:` (or
-`{...}:`) swallows the import-time argument so the resulting function is the
-standard `final: prev:` shape `composeManyExtensions` expects regardless.
-Without this, overlays that need inputs would have a different binding pattern
-at the call site than overlays that don't, breaking the DRY composition.
-
-### Why `_prev`
-
-The vast majority of overlays in this repo only **add** packages (via
-`passthru`-rich derivations) and never **modify** existing ones. When you don't
-read from `prev`, leading-underscore-prefix it as `_prev` so deadnix and human
-reviewers see at a glance "this overlay doesn't depend on the previous overlay's
-state". The few overlays that DO read from `prev` (e.g., to wrap an upstream
-package) drop the underscore prefix and inherit from `prev` explicitly.
-
-### Don't "fix" the signature
-
-If you see a Copilot or human reviewer suggest changing `_: final: _prev:` →
-`final: prev:`, **decline**. The three-argument form is the established
-convention and is required for the bind-once overlay composition pattern in
-`flake.nix`.
+An ordinary overlay contribution is different: `overlay.nix` declares static
+`claims` and an `overlay = final: prev: ...` extension. Keep claim discovery
+independent of package evaluation, and let the shared composer handle ordering,
+exclusive ownership, and consumer policy. Package recipes do not use the former
+three-argument overlay curry.

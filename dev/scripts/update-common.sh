@@ -4,9 +4,9 @@
 set -euETo pipefail
 shopt -s inherit_errexit 2>/dev/null || :
 
-# Deterministic overlay-file resolution (resolve_overlay_file).
-# shellcheck source=dev/scripts/resolve-overlay-file.sh
-source "$(dirname "${BASH_SOURCE[0]}")/resolve-overlay-file.sh"
+# Deterministic recipe-file resolution (resolve_recipe_file).
+# shellcheck source=dev/scripts/resolve-recipe-file.sh
+source "$(dirname "${BASH_SOURCE[0]}")/resolve-recipe-file.sh"
 
 # Ephemeral worktree root, binned under one dir OUTSIDE the flake root.
 # devenv/Nix enumerates ALL untracked + gitignored files under the flake
@@ -153,7 +153,7 @@ git_diff_quiet() {
 #
 # The rule was documented before it was enforced and then broken twice within
 # two days, so it is now a build-failing gate rather than a comment:
-# checks/target-subshell-shape.nix. shellcheck has no diagnostic for it.
+# checks/shell/target-subshell-shape.nix. shellcheck has no diagnostic for it.
 
 # ── Worktree management ──────────────────────────────────────────────────────
 
@@ -478,7 +478,7 @@ fix_sidecar_hashes() {
   #   2. A FIXER EXISTS BUT IS NOT DISCOVERED. The expression below
   #      collects `fixVendorHash` and `fixNpmDepsHash` only, so glab's
   #      `passthru.fixSrcHash` has no caller at all — see the note on
-  #      `mkGoUpdateExtract` in overlays/lib.nix, which also explains why
+  #      `mkGoUpdateExtract` in lib/packaging.nix, which also explains why
   #      that case presents as a CONFUSING `fixVendorHash` failure
   #      ("goModules build failed without a '-go-modules' hash
   #      mismatch") rather than as a src problem.

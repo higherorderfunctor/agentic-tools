@@ -1,12 +1,10 @@
 # config/fragment-categories.nix — central config.fragments.categories
 # contribution.
 #
-# Declares every fragment category's row: the `scopes` path globs its generated
-# instruction file is scoped to, and the `sources` markdown fragments composed
-# into it. Merged with lib/fragments-registry.nix (the option declaration) by
-# lib.evalModules and read by dev/generate.nix — the single source of truth
-# that replaced the two parallel category-keyed registries that used to live
-# there (`packagePaths` for the globs, `devFragmentNames` for the sources).
+# Declares shared/workspace categories. Owner-specific category rows live in
+# packages/<owner>/registry.nix. lib/facets/registry.nix evaluates both through
+# the options in lib/fragments-registry.nix; dev/generate.nix reads that result.
+# Each row pairs scope globs with the markdown sources composed into it.
 #
 # Order within a `scopes` list is load-bearing: the globs are emitted verbatim
 # into the generated per-ecosystem frontmatter, so reordering them churns every
@@ -25,30 +23,23 @@
 # dev/fragments/<category>/) or an attrset selecting a co-located fragment
 # under packages/<dir>/docs/ or devshell/<dir>/docs/.
 #
-# Per-package co-location (each package carrying its own category row alongside
-# its fragments) is deferred; for now add rows here.
+# Put package-specific rows beside their owner; keep cross-owner policy here.
 _: {
   config.fragments.categories = {
-    # ai-clis: how the AI coding-CLI binaries are packaged. The guide
-    # documents six overlay files by name, so it is scoped to those six
-    # explicitly. It used to lean on `packages/ai-clis/**`, a directory that
-    # no longer exists — nothing else in this row covered those overlays, so
-    # the glob was RE-POINTED at them rather than deleted. Do not collapse it
-    # to `overlays/*.nix`: that would also load this AI-CLI-specific guide for
-    # unrelated overlays such as agnix.
+    # Shared packaging guidance covers the AI CLI owners and their recipes.
     ai-clis = {
       scopes = [
         # The behavioral wrapper check belongs here for the same reason
-        # `checks/kiro-wrapper-argv.nix` sits in `kiro-wrapper`: editing it
+        # `packages/kiro-cli/checks/kiro-wrapper-argv.nix` sits in `kiro-wrapper`: editing it
         # means reasoning about how Copilot discovers config, which is exactly
         # what `copilot-config-delivery` documents.
-        "checks/copilot-wrapper-argv.nix"
-        "overlays/chatgpt-codex.nix"
-        "overlays/claude-code.nix"
-        "overlays/copilot-cli.nix"
-        "overlays/kimchi.nix"
-        "overlays/kiro-cli.nix"
-        "overlays/kiro-gateway.nix"
+        "packages/copilot-cli/checks/copilot-wrapper-argv.nix"
+        "packages/chatgpt-codex/packages/ai/chatgpt-codex/package.nix"
+        "packages/claude-code/packages/ai/claude-code/package.nix"
+        "packages/copilot-cli/packages/ai/copilot-cli/package.nix"
+        "packages/kimchi/packages/ai/kimchi/package.nix"
+        "packages/kiro-cli/packages/ai/kiro-cli/package.nix"
+        "packages/kiro-gateway/packages/ai/kiro-gateway/package.nix"
         "packages/chatgpt-codex/**"
         "packages/copilot-cli/**"
         "packages/kiro-cli/**"
@@ -87,7 +78,8 @@ _: {
         # Home of the provenance guard enforcing the root-write prohibition
         # (`rootPoolViolations`). Editing it without the fanout and collision
         # fragments loaded is how the rule gets "simplified" back out.
-        "checks/module-eval.nix"
+        "checks/*/module-eval.nix"
+        "checks/module-provenance/**"
         "lib/ai/agent.nix"
         # Home of both merge helpers these fragments describe (`mergePool`,
         # `resolveOverride`) — previously
@@ -106,23 +98,25 @@ _: {
         # Portable program option-tree factory. Like `mkAiApp`, it declares
         # capability-gated runtime paths and resolves root/runtime values.
         "lib/ai/program.nix"
-        # The runtime registry that file and sharedOptions.nix share.
-        "lib/ai/runtimes.nix"
         # Final B7 static-file registry and generic backend lowering.
         "lib/ai/runtime-files.nix"
+        # The runtime registry that file and sharedOptions.nix share.
+        "lib/ai/runtimes.nix"
         "lib/ai/sharedOptions.nix"
+        "lib/testing/module-harness.nix"
+        "packages/*/checks/module-eval.nix"
         # The five AI CLI factories, listed explicitly. `packages/*/lib/mk*.nix`
         # used to stand here and matched 24 files — every MCP server factory,
         # glab, beads and semble included — so editing an unrelated `mk*.nix`
         # pulled this whole category for nothing.
         "packages/chatgpt-codex/lib/mkCodex.nix"
+        "packages/chatgpt-codex/modules/**"
         "packages/claude-code/lib/mkClaude.nix"
+        "packages/claude-code/modules/**"
         "packages/copilot-cli/lib/mkCopilot.nix"
+        "packages/copilot-cli/modules/**"
         "packages/kimchi/lib/mkKimchi.nix"
         "packages/kiro-cli/lib/mkKiro.nix"
-        "packages/chatgpt-codex/modules/**"
-        "packages/claude-code/modules/**"
-        "packages/copilot-cli/modules/**"
         "packages/kiro-cli/modules/**"
         # `ai-module-fanout.md` discusses this file as the repo's only
         # `mkProgram` consumer; the retired glob caught `lib/mkSemble.nix`
@@ -158,46 +152,6 @@ _: {
       ];
       sources = ["skills-fanout-pattern"];
     };
-    # beads: the contained devenv lifecycle, serialized checkpoint protocol,
-    # and sole raw-Dolt publication boundary.
-    beads = {
-      scopes = [
-        "checks/beads-lifecycle.nix"
-        "checks/module-eval.nix"
-        "docs/beads/bd-reference.md"
-        "docs/beads/dolt-git-remotes.md"
-        "overlays/dev-tools/beads.nix"
-        "packages/beads/**"
-      ];
-      sources = [
-        {
-          location = "package";
-          name = "beads-lifecycle";
-          dir = "beads";
-        }
-      ];
-    };
-    # claude-code: wrapper chain plus the heron_brook delegation-clamp
-    # mitigation. Spans the claude-code overlay package and the
-    # factory-built module.
-    claude-code = {
-      scopes = [
-        "overlays/claude-code.nix"
-        "packages/claude-code/**"
-      ];
-      sources = [
-        {
-          location = "package";
-          name = "claude-code-wrapper";
-          dir = "claude-code";
-        }
-        {
-          location = "package";
-          name = "heron-brook-clamp";
-          dir = "claude-code";
-        }
-      ];
-    };
     # devenv: devenv files.* internals + skills layout walker. Scoped
     # to per-package devenv modules and the helper file.
     devenv = {
@@ -208,6 +162,20 @@ _: {
         "packages/*/modules/devenv/**"
       ];
       sources = ["ci-lean-closure" "files-internals"];
+    };
+    facets = {
+      scopes = [
+        "checks/*/default.nix"
+        "checks/facets/**"
+        "flake.nix"
+        "lib/facets.nix"
+        "lib/facets/**"
+        "lib/testing/**"
+        "packages/*/checks.nix"
+        "packages/*/packages/**"
+        "packages/*/registry.nix"
+      ];
+      sources = ["package-ownership"];
     };
     # flake: binary cache config + flake-level settings. Scoped to
     # files that touch nixConfig or cachix settings so consumers
@@ -247,121 +215,17 @@ _: {
         ".github/workflows/ci.yml"
         ".github/workflows/devenv-test.yml"
         ".github/workflows/update.yml"
-        "overlays/*.nix"
-        "overlays/**/*.nix"
+        "lib/facets/**"
+        "lib/testing/**"
+        "lib/packaging.nix"
+        "packages/*/lib/packaging.nix"
+        "packages/*/packages/**/*.nix"
+        "packages/*/packages/**"
       ];
       sources = [
         {
           name = "ifd-patterns";
           dir = "overlays";
-        }
-      ];
-    };
-    # kimchi: two-tree factory (config.json + harness/), runtime SOPS
-    # credential, wrapProgram separator + flattenDotKeys gotchas.
-    kimchi = {
-      scopes = [
-        "packages/kimchi/**"
-      ];
-      sources = [
-        {
-          location = "package";
-          name = "kimchi-factory";
-          dir = "kimchi";
-        }
-      ];
-    };
-    # kiro-settings: how nested `nativeSettings` lowers into kiro's FLAT
-    # cli.json, and why the flatten boundary has to come from the binary rather
-    # than from attrset shape. Scoped to the flattener, the extractor that
-    # measures the boundary, and the module that applies it — an edit to any of
-    # those decides whether an object-valued setting reaches the file at all.
-    kiro-settings = {
-      scopes = [
-        "lib/ai/ai-common.nix"
-        "overlays/lib.nix"
-        "packages/kiro-cli/lib/mkKiro.nix"
-      ];
-      sources = [
-        {
-          location = "package";
-          name = "settings-shape";
-          dir = "kiro-cli";
-        }
-      ];
-    };
-    # kiro-steering: what kiro-cli ACTUALLY does with each steering
-    # `inclusion` mode, which is not what the vendor's IDE-oriented docs
-    # describe — `manual` is inert in the CLI and a frontmatter fault degrades
-    # to `always` silently. Scoped to the transformer that EMITS the
-    # frontmatter, the option that types it, and the kiro package, because a
-    # change to any of those is a change to what the engine will be handed.
-    # Deliberately NOT scoped to `checks/module-eval.nix`: it holds the
-    # inclusion assertions, but it is edited constantly for unrelated reasons
-    # and loading this fragment on every one of those edits is pure context
-    # tax.
-    kiro-steering = {
-      scopes = [
-        "lib/ai/ai-common.nix"
-        "lib/ai/transformers/kiro.nix"
-        "packages/kiro-cli/**"
-      ];
-      sources = [
-        {
-          location = "package";
-          name = "steering-inclusion";
-          dir = "kiro-cli";
-        }
-      ];
-    };
-    # kiro-workflows: the THREE independent gates on the `workflows` feature,
-    # all of which fail silently, and the extracted workspace-settings allowlist
-    # that makes gate 3 global-only. Scoped to the module that implies the
-    # setting and asserts the allowlist, plus the two overlay files that
-    # extract and patch — a change to any of those changes what a consumer must
-    # set to get a working `/workflow`.
-    kiro-workflows = {
-      scopes = [
-        "overlays/kiro-cli.nix"
-        "overlays/lib.nix"
-        "packages/kiro-cli/lib/mkKiro.nix"
-      ];
-      sources = [
-        {
-          location = "package";
-          name = "workflow-gating";
-          dir = "kiro-cli";
-        }
-      ];
-    };
-    # kiro-wrapper: the argv contract of the generated kiro-cli launcher /
-    # chat wrappers — which subcommands accept `--tui`/`--v3`/`--trust-tools`,
-    # why the appends are gated rather than unconditional, and how to
-    # re-measure on a version bump. Kept OUT of the `kiro-cli` category (whose
-    # fragment is the ~300-line auto-memory map) so an edit to the wrapper
-    # loads the wrapper rule, not the memory pipeline. Scoped to the generic
-    # shell helper, the factory's lib/ directory that consumes it, and the
-    # behavioral check, since all three have to move together.
-    kiro-wrapper = {
-      scopes = [
-        "checks/kiro-fhs-contract.nix"
-        "checks/kiro-wrapper-argv.nix"
-        "lib/idempotentFlags.nix"
-        # The overlay's wrapProgram calls carry the darwin argv0
-        # bundle-discovery fix, which is part of this argv contract.
-        "overlays/kiro-cli.nix"
-        "packages/kiro-cli/lib/**"
-      ];
-      sources = [
-        {
-          location = "package";
-          name = "fhs-sandbox";
-          dir = "kiro-cli";
-        }
-        {
-          location = "package";
-          name = "launcher-argv";
-          dir = "kiro-cli";
         }
       ];
     };
@@ -379,15 +243,15 @@ _: {
     markdown-formatting = {
       scopes = [
         "**/*.md"
-        "checks/doubled-words-fixtures.nix"
-        "checks/doubled-words-fixtures.py"
-        "checks/doubled-words.nix"
-        "checks/doubled-words.py"
-        "checks/fixtures/doubled-words/**"
-        "checks/markdown-scan.nix"
-        "checks/markdown-scanners.nix"
-        "checks/split-code-spans.nix"
-        "checks/split-code-spans.py"
+        "checks/markdown/doubled-words-fixtures.nix"
+        "checks/markdown/doubled-words-fixtures.py"
+        "checks/markdown/doubled-words.nix"
+        "checks/markdown/doubled-words.py"
+        "checks/markdown/fixtures/doubled-words/**"
+        "checks/markdown/markdown-scan.nix"
+        "checks/markdown/markdown-scanners.nix"
+        "checks/markdown/split-code-spans.nix"
+        "checks/markdown/split-code-spans.py"
         "treefmt.nix"
       ];
       sources = ["markdown-formatting"];
@@ -399,13 +263,17 @@ _: {
     # launcher wrapper that exports the decrypted values at runtime.
     mcp-secrets = {
       scopes = [
-        "checks/factory-eval.nix"
-        "checks/module-eval.nix"
+        "checks/*/factory-eval.nix"
+        "checks/*/module-eval.nix"
         "lib/ai/app/mkBackendTransform.nix"
         "lib/ai/mcpProxy.nix"
         "lib/ai/mcpServer/**"
         "lib/ai/sharedOptions.nix"
         "lib/mcp.nix"
+        "lib/testing/factory-harness.nix"
+        "lib/testing/module-harness.nix"
+        "packages/*/checks/factory-eval.nix"
+        "packages/*/checks/module-eval.nix"
         "packages/kiro-cli/lib/mcpSecrets.nix"
         "packages/kiro-cli/lib/mkKiro.nix"
         "packages/kiro-cli/lib/wrapPackage.nix"
@@ -414,7 +282,7 @@ _: {
     };
     mcp-servers = {
       scopes = [
-        "overlays/mcp-servers/**"
+        "packages/*/packages/ai/mcpServers/**"
       ];
       sources = [
         "js-server-packaging"
@@ -425,10 +293,14 @@ _: {
     # bind-address contract shared by native servers and the mcp-proxy bridge.
     mcp-services = {
       scopes = [
-        "checks/factory-eval.nix"
-        "checks/module-eval.nix"
+        "checks/*/factory-eval.nix"
+        "checks/*/module-eval.nix"
         "lib/ai/mcpServer/mkServiceModule.nix"
         "lib/ai/mcpServer/serviceSchema.nix"
+        "lib/testing/factory-harness.nix"
+        "lib/testing/module-harness.nix"
+        "packages/*/checks/factory-eval.nix"
+        "packages/*/checks/module-eval.nix"
         "packages/*/modules/mcp-server.nix"
         "packages/mcp-services/modules/homeManager/default.nix"
       ];
@@ -467,8 +339,12 @@ _: {
     # under `overlays/`, covered by the two globs below.
     overlays = {
       scopes = [
-        "overlays/*.nix"
-        "overlays/**/*.nix"
+        "lib/facets/**"
+        "lib/testing/**"
+        "lib/packaging.nix"
+        "packages/*/lib/packaging.nix"
+        "packages/*/packages/**/*.nix"
+        "packages/*/packages/**"
       ];
       sources = [
         "cache-hit-parity"
@@ -507,35 +383,13 @@ _: {
         "lib/fragments-registry.nix"
         "lib/fragments.nix"
         "lib/update.nix"
-        "overlays/**/*.update.nix"
+        "packages/*/registry.nix"
       ];
       sources = [
         "ci-update-workflow"
         "fragment-pipeline"
         "generation-architecture"
         "update-pipeline"
-      ];
-    };
-    # semble: program-factory integration, customization, cache ownership, and
-    # the shared HM/devenv backend contract.
-    semble = {
-      scopes = ["packages/semble/**"];
-      sources = [
-        {
-          location = "package";
-          name = "semble";
-          dir = "semble";
-        }
-      ];
-    };
-    stacked-workflows = {
-      scopes = ["packages/stacked-workflows/**"];
-      sources = [
-        {
-          location = "package";
-          name = "development";
-          dir = "stacked-workflows";
-        }
       ];
     };
   };

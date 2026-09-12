@@ -84,7 +84,7 @@
   # ordinary HM evaluation, where the wrapper applies the transform to
   # its own args and `pkgs` is externally provided — only through
   # harnesses that call `lib.evalModules` directly, such as
-  # `checks/options-doc.nix`. Passing it as data sidesteps the module
+  # `checks/modules/options-doc.nix`. Passing it as data sidesteps the module
   # argument system entirely.
   #
   # Optional so a record built without it still evaluates; features that

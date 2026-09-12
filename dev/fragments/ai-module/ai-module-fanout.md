@@ -1,8 +1,7 @@
 ## ai Module Fanout Semantics
 
-> **Last verified:** 2026-09-10 — Codex's shared native settings default to
-> GPT-6 Astra with xhigh reasoning effort on both backends. Explicit native
-> values and normalized reasoning effort override these option defaults.
+> **Last verified:** 2026-09-12 — package modules own consumer checks; the
+> shared harness discovers backend imports and owner activation probes.
 >
 > **Settled — do not relitigate.** Each of these records an approach that was
 > TRIED and rejected, or a measurement that would otherwise be re-derived
@@ -35,12 +34,12 @@ a silent no-op bug. Read this fragment before changing the gating.
 
 ### Codex extracted facts need reverse coverage
 
-`overlays/chatgpt-codex-extracted.json` is generated fact from the pinned
+`packages/chatgpt-codex/extracted.json` is generated fact from the pinned
 binary. `packages/chatgpt-codex/lib/extractedCoverage.nix` is the separate,
 human-reviewed ownership decision. Never generate the second from the first:
-`checks/chatgpt-codex-coverage.nix` intentionally fails when a bump introduces a
-command, canonical flag, record field, feature maturity, or config-key seam
-without an explicit Nix disposition.
+`packages/chatgpt-codex/checks/chatgpt-codex-coverage.nix` intentionally fails
+when a bump introduces a command, canonical flag, record field, feature
+maturity, or config-key seam without an explicit Nix disposition.
 
 Dynamic policy is still coverage. Stable feature names become typed directly
 from the sidecar, non-stable names remain available through the boolean freeform
@@ -87,8 +86,8 @@ same omission is inert rather than invisible.
 `claude` on Home Manager is the sole `installPackage = null` in the repo:
 upstream already installs it there, and a second path to the same `bin/claude`
 in one profile fails activation with a `buildEnv` conflicting-subpath error.
-`checks/module-eval.nix`'s `every-runtime-installs-package` pins each runtime's
-delivery channel per backend, so that exemption cannot silently widen.
+`checks/ai-fanout/module-eval.nix`'s `every-runtime-installs-package` pins each
+runtime's delivery channel per backend, so that exemption cannot silently widen.
 
 The one bounded exception is `migrationConfig`: ownership-safe retirement may
 run outside the enable gate when the generation that disables a runtime must
@@ -386,7 +385,7 @@ inline-hook ownership check.
 ### Other boundaries
 
 - The package wrapping (Bun runtime) for claude-code — handled in
-  `overlays/claude-code.nix` at overlay level.
+  `packages/claude-code/packages/ai/claude-code/package.nix` at overlay level.
 
 See the backlog item "ai.claude.\* full passthrough" for the ongoing work to
 expose more `programs.claude-code.*` options via `ai.claude.*`.
@@ -396,11 +395,11 @@ expose more `programs.claude-code.*` options via `ai.claude.*`.
 Every option on the HM ai module must have a matching option on the devenv ai
 module with the same semantics. If you add an option to one, add it to the other
 in the same commit. Codex's exact generated option-name set is compared across
-both backends by `checks/options-doc.nix`. Runtime scope differences belong in
-backend lowering, not divergent declarations: `ai.codex.profiles` is one typed
-surface, with HM linking its user-global files and devenv materializing the same
-whole-file layers from repository declarations into the native user lookup
-location.
+both backends by `checks/modules/options-doc.nix`. Runtime scope differences
+belong in backend lowering, not divergent declarations: `ai.codex.profiles` is
+one typed surface, with HM linking its user-global files and devenv
+materializing the same whole-file layers from repository declarations into the
+native user lookup location.
 
 ### Final literal-file seam
 
@@ -445,12 +444,12 @@ the Claude/Codex lifecycle intersection belongs in portable hooks.
 
 `lib/options-doc.nix` evaluates both complete published module trees and
 produces their CommonMark/JSON references. The old mdbook/NuschtOS site is gone,
-but `checks/options-doc.nix` deliberately builds both renderings so this
+but `checks/modules/options-doc.nix` deliberately builds both renderings so this
 consumer-facing contract cannot become dead code. It compares every `ai.codex.*`
 option name, checks the expected top-level surface, and verifies that
 shared-pool descriptions discuss Codex. README.md remains generated from
-`dev/generate.nix`; `checks/instructions-drift.nix` prevents its checked-in
-capability matrix from diverging from that source.
+`dev/generate.nix`; `checks/instructions/instructions-drift.nix` prevents its
+checked-in capability matrix from diverging from that source.
 
 ### Verifying fanout works
 
@@ -603,8 +602,8 @@ runtime whose module is present in the evaluation, filtered by
 the consumer as a portable default surface. Per-runtime null can now retract an
 inherited key, but packages still do not write root values that fan out beyond
 their runtime ownership. The `rootPoolViolations` provenance guard in
-`checks/module-eval.nix` enforces this by reading each root option's
-`definitionsWithLocations`. The declaring module is exempt, which lets
+`checks/module-provenance/helpers.nix` enforces this by reading each root
+option's `definitionsWithLocations`. The declaring module is exempt, which lets
 `sharedOptions.nix` perform its root L1→L2 Dir reshape.
 
 Two consequences to know before changing it. Consumer override keys are

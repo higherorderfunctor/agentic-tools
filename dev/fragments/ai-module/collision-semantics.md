@@ -1,9 +1,7 @@
 ## ai.\* Pool Composition and Collision Semantics
 
-> **Last verified:** 2026-08-16 — B7 terminates at the atomic
-> `ai.<runtime>.files` registry: generated whole entries use `mkDefault`,
-> ordinary entries replace, null suppresses, and divergent same-priority files
-> fail before backend lowering.
+> **Last verified:** 2026-09-12 — package modules own consumer checks; the
+> shared harness discovers backend imports and owner activation probes.
 >
 > **Settled — do not relitigate.** Full lineage:
 > `git show ce31eaaa:dev/fragments/ai-module/collision-semantics.md`.
@@ -113,16 +111,17 @@ ai.skills.example
 ai.claude.skills.example
 ```
 
-`checks/module-eval.nix` reads each option's `definitionsWithLocations`, keeps
-repo-origin definitions, groups files under `packages/<name>/` as one package
-owner, and reports keys with more than one owner. Consumer inline config is
-`<unknown-file>` and is not treated as a package claim. Because
-`definitionsWithLocations` is exposed after whole-option priority filtering, the
-production guard aggregates the all-active evaluation with isolated evaluations
-for every pool-contributing integration. A package claim hidden by another
-package's `mkForce` in the combined tree therefore remains visible in its
-isolated probe. Keep that activation inventory aligned when a package starts
-writing a normalized pool.
+`checks/module-provenance/helpers.nix` reads each option's
+`definitionsWithLocations`, keeps repo-origin definitions, groups files under
+`packages/<name>/` as one package owner, and reports keys with more than one
+owner. Consumer inline config is `<unknown-file>` and is not treated as a
+package claim. Because `definitionsWithLocations` is exposed after whole-option
+priority filtering, the production guard aggregates the all-active evaluation
+with isolated evaluations for every pool-contributing integration. A package
+claim hidden by another package's `mkForce` in the combined tree therefore
+remains visible in its isolated probe. Each package that starts writing a
+normalized pool contributes its activation configuration through
+`testing.moduleProbes` in its own `checks.nix` module.
 
 Both production backend trees have clean checks. Fixtures prove every pool fails
 at root and runtime scope, priority-shadowed claims still fail, two files under
@@ -214,8 +213,9 @@ size-checked at eval, avoiding IFD.
 2. Add the capability to each consuming app record's `supportedPools`.
 3. Route root and runtime values through `mergePool` before any translation or
    emission.
-4. Add the pool to `normalizedPoolNames` in `checks/module-eval.nix` so package
-   ownership is checked at root and every runtime scope.
+4. Add the pool to `normalizedPoolNames` in
+   `checks/module-provenance/helpers.nix` so package ownership is checked at
+   root and every runtime scope.
 5. Test null-drop with a second-runtime inheritance control, wholesale same-key
    replacement, package collision diagnostics via `lib.hasInfix`, and a
    different-key package control.

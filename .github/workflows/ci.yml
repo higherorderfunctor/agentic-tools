@@ -335,15 +335,13 @@ jobs:
       - uses: actions/checkout@v6
 
       # Only inputs that can move `kiro-cli-workflows`'s store path. A
-      # context7-mcp bump touches `overlays/mcp-servers/` and cannot, so it
+      # context7-mcp bump touches another owner's recipe tree and cannot, so it
       # should not pay for a 621 MiB build on two runners.
       #
-      # `flake.lock` is the nixpkgs axis (stdenv/bash moving is exactly what
-      # forks these outputs); `overlays/lib.nix` carries mkKiroRolloutPatch,
-      # kiroRolloutVerify and the chat locator; `overlays/default.nix` carries
-      # the unfree guard that wraps the output. Deliberately NOT
-      # `packages/kiro-cli/**` — that is the HM/devenv module, which no flake
-      # package derivation reads.
+      # The raw Kiro recipe, release sidecar, and owner packaging helpers
+      # determine the patched build. Shared facet assembly supplies its pinned
+      # package set and consumer unfree guard. HM/devenv module-only changes do
+      # not alter the raw binary derivation.
       - name: Scope
         id: scope
         env:
@@ -368,9 +366,12 @@ jobs:
                   .github/workflows/ci.yml | \
                   flake.lock | \
                   flake.nix | \
-                  overlays/default.nix | \
-                  overlays/kiro-cli* | \
-                  overlays/lib.nix)
+                  lib/facets.nix | \
+                  lib/facets/* | \
+                  packages/kiro-cli/lib/packaging.nix | \
+                  packages/kiro-cli/packages/* | \
+                  packages/kiro-cli/sources.json | \
+                  lib/packaging.nix)
                   needed=true
                   break
                   ;;
@@ -399,7 +400,7 @@ jobs:
       #
       # Its darwin builds had never run under a multi-user daemon before this
       # change, moving from `runner` to `_nixbld*`, which put the ad-hoc
-      # codesign-then-exec assertion in overlays/lib.nix at risk on a required
+      # codesign-then-exec assertion in lib/packaging.nix at risk on a required
       # check. That is now measured, not inferred: run 31837837510 built
       # kiro-cli-rollout-workflows locally under `_nixbld*` and passed.
       - if: steps.scope.outputs.needed == 'true'
@@ -653,10 +654,10 @@ jobs:
       # derivation is impure and would be cached. It is a STEP in `test` rather
       # than its own job so it needs no new required-context string that a job
       # rename could silently break — the same reasoning
-      # checks/instructions-drift.nix records for living in `nix flake check`.
+      # checks/instructions/instructions-drift.nix records for living in `nix flake check`.
       #
       # The branch name below is generated as `update/<key>` from
-      # config.update.targets. checks/claude-heron-brook.nix reads that name
+      # config.update.targets. packages/claude-code/checks/claude-heron-brook.nix reads that name
       # back out of THIS file and fails if the key is renamed out from under it,
       # so this gate cannot silently stop matching.
       #
@@ -672,7 +673,7 @@ jobs:
       # bundle is minified, so counts drift with no behavior change.
       #
       # Then EITHER bump `reviewBy` ~90 days, OR — if upstream fixed it — delete
-      # ai.claude.delegationClamp, this step, and checks/claude-heron-brook.nix.
+      # ai.claude.delegationClamp, this step, and packages/claude-code/checks/claude-heron-brook.nix.
       - name: Heron-brook mitigation review tripwire
         if: github.head_ref == 'update/claude-code'
         run: |
@@ -684,7 +685,7 @@ jobs:
           today="$(date -u +%F)"
           # Lexicographic compare is correct for ISO-8601 dates.
           if [[ "$today" > "$review_by" ]]; then
-            echo "::error file=${tripwire}::heron_brook mitigation is past its ${review_by} review date (today ${today}). Re-check whether Claude Code still ships the delegation clamp — the grep procedure is in the comment above this step, and ${issue} tracks it upstream. Then EITHER bump reviewBy in ${tripwire}, OR delete ai.claude.delegationClamp, this step, and checks/claude-heron-brook.nix if upstream fixed it. An expired justification is a finding, not a formality."
+            echo "::error file=${tripwire}::heron_brook mitigation is past its ${review_by} review date (today ${today}). Re-check whether Claude Code still ships the delegation clamp — the grep procedure is in the comment above this step, and ${issue} tracks it upstream. Then EITHER bump reviewBy in ${tripwire}, OR delete ai.claude.delegationClamp, this step, and packages/claude-code/checks/claude-heron-brook.nix if upstream fixed it. An expired justification is a finding, not a formality."
             exit 1
           fi
           echo "heron_brook mitigation review due ${review_by} (today ${today}) — OK."
@@ -712,11 +713,11 @@ jobs:
           verified="$(jq -r .verifiedVersion "$tripwire")"
           check="$(jq -r .upstreamCheck "$tripwire")"
           pinned="$(sed -n 's/^[[:space:]]*version = "\(.*\)";$/\1/p' \
-            overlays/dev-tools/oxlint.nix | head -1)"
+            packages/oxlint/packages/ai/devTools/oxlint/package.nix | head -1)"
           today="$(date -u +%F)"
           # Lexicographic compare is correct for ISO-8601 dates.
           if [[ "$today" > "$review_by" ]]; then
-            echo "::error file=${tripwire}::oxlint's @napi-rs/cli patch is past its ${review_by} review date (today ${today}). Re-read ${check} Then EITHER bump reviewBy in ${tripwire}, OR delete the patch, overlays/dev-tools/oxlint-pnpm-patch-meta.awk, the napi attrset and this step if upstream fixed it. An expired justification is a finding, not a formality."
+            echo "::error file=${tripwire}::oxlint's @napi-rs/cli patch is past its ${review_by} review date (today ${today}). Re-read ${check} Then EITHER bump reviewBy in ${tripwire}, OR delete the patch, packages/oxlint/src/oxlint-pnpm-patch-meta.awk, the napi attrset and this step if upstream fixed it. An expired justification is a finding, not a formality."
             exit 1
           fi
           if [[ "$pinned" != "$verified" ]]; then

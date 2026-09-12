@@ -7,12 +7,8 @@ applyTo: ".github/workflows/devenv-test.yml,devenv.nix,lib/ai/hm-helpers.nix,pac
 
 # Diagnostic-lean devenv closure taxonomy
 
-> **Last verified:** 2026-09-02 — the factory-CLI-wrapper bucket now includes
-> `claude-code` (always meant to ride here, but until now installed on neither
-> backend) and `kimchi` (newly enabled, adding roughly 118 MiB of new store to
-> every shell). Both are accepted at full weight; `!isCI` cannot shrink them,
-> since the decision rule below forbids that branch for anything a guard depends
-> on.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > Full lineage: `git show d1c28a21:dev/fragments/devenv/ci-lean-closure.md`.
 
@@ -71,7 +67,7 @@ did not (it installed on neither backend), and `kimchi` was enabled here on
 
 The weight is real and worth stating rather than discovering — but state the
 MARGINAL cost, which is neither the binary size nor the total closure. Measured
-at kimchi 1.0.10, the version `overlays/kimchi-sources.json` currently pins:
+at kimchi 1.0.10, the version `packages/kimchi/sources.json` currently pins:
 
 | figure                   | bytes           | what it means                              |
 | ------------------------ | --------------- | ------------------------------------------ |
@@ -379,10 +375,10 @@ The materializer is idempotent (same bytes, real-file type, and mode leave the
 mtime alone), atomic (`mktemp` + `mv`, so a concurrent agent session never reads
 a partial file), and prunes generated files whose fragment was renamed or
 removed — including dangling symlinks. It refuses to prune when a generated
-source directory is unexpectedly empty. `checks/instruction-materialization.nix`
-runs this exact executable against a temporary repository and gates all of those
-properties under `nix flake check`; CI does not need a full devenv shell to test
-them.
+source directory is unexpectedly empty.
+`checks/instructions/instruction-materialization.nix` runs this exact executable
+against a temporary repository and gates all of those properties under
+`nix flake check`; CI does not need a full devenv shell to test them.
 
 `devenv`'s own `files.<name>.copyMode = "copy"` was considered and rejected: it
 `rm -rf`s and re-`cp`s unconditionally on every entry (a read race plus mtime

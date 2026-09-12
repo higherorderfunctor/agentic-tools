@@ -3,7 +3,7 @@
 # This module declares `options.checks.cacheHitParity`. It is the single
 # source of truth for which overlay packages the cache-hit-parity check
 # compares across nixpkgs pins: the six hardcoded lists that used to live in
-# checks/cache-hit-parity.nix (aiCliPackages, gitToolPackages, devToolPackages,
+# checks/packaging/cache-hit-parity.nix (aiCliPackages, gitToolPackages, devToolPackages,
 # agnixPackages, mcpServerPackages, specialPackages) were dissolved into
 # `config.checks.cacheHitParity`, so there is no longer a parallel set of lists
 # to keep in sync. Every package contributes its own row via
@@ -11,7 +11,7 @@
 #
 # `lib.evalModules` merges those contributions and does the collision-checking;
 # the result is exposed as the `.#cacheHitParityTargets` flake output, read by
-# checks/cache-hit-parity.nix.
+# checks/packaging/cache-hit-parity.nix.
 #
 # Mirrors the authoring style of lib/update.nix.
 {lib, ...}: let
@@ -25,7 +25,7 @@ in {
       names one package; a slice/package declares its own row via
       config.checks.cacheHitParity.<name>. The module system merges the
       contributions and the result is exposed as the `.#cacheHitParityTargets`
-      flake output, consumed by checks/cache-hit-parity.nix.
+      flake output, consumed by checks/packaging/cache-hit-parity.nix.
     '';
     type = types.attrsOf (types.submodule {
       options.consumerPath = mkOption {
@@ -49,13 +49,13 @@ in {
           The cache-hit-parity check SKIPS a row whose `platforms` excludes the
           system being evaluated. That is not a way to silence drift: a
           platform-gated package is absent from `self.packages.<system>`
-          entirely (see the `lib.optionalAttrs` in overlays/default.nix), so
+          entirely (native discovery reads its `platforms.nix` sidecar), so
           looking it up there would abort the whole check with an
           attribute-missing error rather than report anything. Restricting only
           `meta.platforms` and leaving the attribute in place does not help
           either — forcing its `drvPath` throws.
 
-          Set this ONLY alongside an attribute-level gate in the overlay, and
+          Set this ONLY alongside the recipe's `platforms.nix` gate, and
           keep the two in agreement.
         '';
       };

@@ -115,7 +115,7 @@ identical output.
 
 ## Why these files are formatter-excluded
 
-`treefmt.nix` and `checks/markdown-scan.nix` both skip
+`treefmt.nix` and `checks/markdown/markdown-scan.nix` both skip
 `dev/probes/kiro-steering/fixture/`. The YAML shape IS the experiment — prettier
 would normalize `s-fm-clean.md` and `s-fm-trailcomma.md` into a passing shape
 and silently delete the finding. If you move or rename this directory, update

@@ -144,8 +144,8 @@
           # identifier fragments cut mid-token by windowed byte extraction.
           "^fixtures/kiro-primitives/evidence/"
           "^fixtures/kiro-primitives/records/"
-          "^overlays/chatgpt-codex-extracted\\.json$"
-          "^overlays/claude-code-extracted\\.json$"
+          "^packages/chatgpt-codex/extracted\\.json$"
+          "^packages/claude-code/extracted\\.json$"
           # Patch files are verbatim third-party code plus Git blob hashes.
           ".*\\.patch$"
         ];
@@ -157,7 +157,6 @@
       role = "validator";
       hook = {
         enable = true;
-        excludes = ["overlays/sources/.*"];
       };
       stop = "judgment";
       ci.backend = "git-hooks";
@@ -185,7 +184,7 @@
         entry = lib.getExe markdownTableCells;
         files = "\\.md$";
         # Same file set the other markdown scanners walk, for the reason
-        # checks/markdown-scan.nix exists: one exclusion list, not three.
+        # checks/markdown/markdown-scan.nix exists: one exclusion list, not three.
         excludes = ["^docs/plans/kiro-v3-research-raw/" "^docs/plan\\.md$"];
         stages = ["pre-commit"];
       };
@@ -220,7 +219,6 @@
       role = "validator";
       hook = {
         enable = true;
-        excludes = ["overlays/sources/.*"];
       };
       stop = "judgment";
       ci.backend = "git-hooks";
@@ -355,13 +353,13 @@ in
       };
     in {
       repo-lints = repoLints;
-      repo-validation-policy = import ../checks/repo-validation-policy.nix {
+      repo-validation-policy = import ../checks/repository/repo-validation-policy.nix {
         inherit definitionNames formatterHookIds judgmentHookIds pkgs;
         ciConfig = repoLints.config.configFile;
         ciHookIds = gitHooksCiIds;
         localConfig = localProjection.config.configFile;
         rejectEntry = definitions.reject-default-branch-commit.hook.entry;
       };
-      shellcheck-corpus = import ../checks/shellcheck-corpus.nix {inherit lib pkgs;};
+      shellcheck-corpus = import ../checks/shell/shellcheck-corpus.nix {inherit lib pkgs;};
     };
   }

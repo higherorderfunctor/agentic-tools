@@ -6,7 +6,7 @@
 # refactor. Each server's definition is loaded from the per-package
 # `packages/<name>/modules/mcp-server.nix` via lib/mcp.nix:loadServer.
 #
-# Picked up by collectFacet ["modules" "homeManager"] in flake.nix.
+# Picked up by native Home Manager module discovery in flake.nix.
 {
   config,
   lib,

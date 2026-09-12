@@ -157,17 +157,18 @@ shell merely because the FHS root contains bash and may hide a host zsh. Set
 `ai.shell = pkgs.bashInteractive` for a store-backed explicit shell, or opt out
 of FHS when preserving host namespace behavior is the intended tradeoff.
 
-`checks/kiro-fhs-contract.nix` guards the upstream assumptions behind this
-behavior. It verifies that all three public command wrappers select the shared
-FHS launcher, then inspects that launcher and fails if bubblewrap stops binding
-`/nix`, adds a known PATH-clearing or replacement argument, changes how the
-generated `/etc` is mounted, moves `/etc/profile` sourcing after Kiro's exec,
-changes the shared command dispatcher, adds another init/profile/dispatcher PATH
-mutation, or removes the incoming PATH from the profile assignment. It also
-builds a `trustedMcpTools` configuration and proves the synthesized
-`/usr/bin/kiro-cli-chat` resolves to the trust wrapper. Those structural changes
-therefore force this document and the implementation to be re-measured instead
-of silently invalidating `extraPackages` or the devenv trust grant.
+`packages/kiro-cli/checks/kiro-fhs-contract.nix` guards the upstream assumptions
+behind this behavior. It verifies that all three public command wrappers select
+the shared FHS launcher, then inspects that launcher and fails if bubblewrap
+stops binding `/nix`, adds a known PATH-clearing or replacement argument,
+changes how the generated `/etc` is mounted, moves `/etc/profile` sourcing after
+Kiro's exec, changes the shared command dispatcher, adds another
+init/profile/dispatcher PATH mutation, or removes the incoming PATH from the
+profile assignment. It also builds a `trustedMcpTools` configuration and proves
+the synthesized `/usr/bin/kiro-cli-chat` resolves to the trust wrapper. Those
+structural changes therefore force this document and the implementation to be
+re-measured instead of silently invalidating `extraPackages` or the devenv trust
+grant.
 
 The check is deliberately structural. It does not execute bubblewrap inside a
 Nix build sandbox, where nested user-namespace support is not portable. The

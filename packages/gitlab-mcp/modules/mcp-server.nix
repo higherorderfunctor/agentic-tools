@@ -330,7 +330,7 @@ in {
   # but never confirmed to fire. Deferred: this pattern likely wants
   # a more principled design (e.g. discriminated union so the
   # invalid state can't be constructed, or an eval test in
-  # checks/factory-eval.nix) rather than a runtime throw. Revisit
+  # checks/mcp-server/factory-eval.nix) rather than a runtime throw. Revisit
   # when the credential-naming normalization sweep happens — both
   # are cross-MCP design questions, not gitlab-mcp-specific.
   settingsToEnv = cfg: _mode: let

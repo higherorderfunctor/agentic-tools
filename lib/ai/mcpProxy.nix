@@ -29,7 +29,7 @@
 #                                    before execve(), so the kernel stores
 #                                    the literal value. Measured. (Spelled
 #                                    without the two-word form on purpose —
-#                                    checks/bare-commands.nix scans comments
+#                                    checks/shell/bare-commands.nix scans comments
 #                                    too and would read it as a bare call.)
 #   * NOT in the Caddyfile         — it holds `{$VAR}` placeholders only
 #   * NOT in mcp.json              — no header reaches any client

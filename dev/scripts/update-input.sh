@@ -21,7 +21,7 @@ log_info "Updating flake input..."
 # STANDALONE subshell, NOT an `if !` condition — bash disables errexit for
 # anything whose status it tests, and that reaches inside the subshell and
 # overrides its own `set -e`. See "Target subshell shape" in
-# update-common.sh; checks/target-subshell-shape.nix fails the build if this
+# update-common.sh; checks/shell/target-subshell-shape.nix fails the build if this
 # regresses.
 target_rc=0
 set +e
@@ -171,7 +171,7 @@ set +e
     # paths return non-zero for other reasons: the roster expression
     # forces every attr in `packages.<system>`, so ONE package throwing
     # at eval fails the whole resolve; and a fixer whose FOD build breaks
-    # with no hash mismatch to scrape exits 1 too (overlays/lib.nix,
+    # with no hash mismatch to scrape exits 1 too (lib/packaging.nix,
     # `fix_fod_hash`) — that is "the recorded hash was already right and
     # something else broke".
     #

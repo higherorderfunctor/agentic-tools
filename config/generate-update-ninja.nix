@@ -3,26 +3,11 @@
 # Reads flake.lock for input follows relationships and config.update.targets
 # for package update flags. Outputs a ninja build file with the full DAG.
 #
-# The flake passes `updateTargets = self.updateTargets`; the standalone doc
-# path below self-evaluates the registry so it works without the flake:
-#   nix eval --raw --impure --expr 'import ./config/generate-update-ninja.nix {}'
+# The flake passes the complete composed registry as `self.updateTargets`.
+# Run the public `generate-update-ninja` app to include all owner contributions.
 {
   flakeLock ? builtins.fromJSON (builtins.readFile ../flake.lock),
-  updateTargets ? (
-    let
-      inherit (import <nixpkgs> {}) lib;
-    in
-      (lib.evalModules {
-        modules = [
-          ./../lib/update.nix
-          ./update-targets.nix
-          ./../overlays/mcp-servers/effect-mcp.update.nix
-        ];
-      })
-      .config
-      .update
-      .targets
-  ),
+  updateTargets,
 }: let
   inherit (flakeLock) nodes;
   rootInputs = nodes.root.inputs;

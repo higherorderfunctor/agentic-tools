@@ -230,7 +230,8 @@ nix build .#oxlint
 <summary><strong>Generic Packages</strong></summary>
 
 Temporarily unclassified supporting packages live in the split-ready
-`overlays/generic/` subtree and are exposed as `pkgs.ai.generic.*`.
+`packages/<owner>/packages/ai/generic/` trees and are exposed as
+`pkgs.ai.generic.*`.
 
 <!-- prettier-ignore -->
 | Package | Description |
@@ -263,7 +264,7 @@ nix build .#dns-root-hints
 |---------|-------------|
 | `chatgpt-codex` | OpenAI Codex CLI |
 | `claude-code` | Claude Code CLI |
-| `github-copilot-cli` | GitHub Copilot CLI |
+| `copilot-cli` | GitHub Copilot CLI |
 | `kimchi` | Kimchi CLI |
 | `kiro-cli` | Kiro CLI |
 | `kiro-gateway` | Python proxy API for Kiro |

@@ -1,9 +1,7 @@
 ## Update Pipeline Architecture
 
-> **Last verified:** 2026-09-09 — a target is HELD BACK only when the PR cannot
-> be WRITTEN; a failing build ships as a red PR instead. Target bodies are
-> standalone subshells so `errexit` is genuinely armed, gated by
-> `checks/target-subshell-shape.nix`.
+> **Last verified:** 2026-09-12 — owner registries supply update targets and
+> source paths; the resolver scans owner recipes.
 >
 > **Settled — do not relitigate.** Gating the PR on a passing build was tried
 > and rejected. It parks every later bump of that input behind one broken
@@ -75,19 +73,20 @@ For packages that track a git repo's HEAD (no tagged releases), `update-pkg.sh`
 receives the repo URL as a trailing argument:
 
 1. `git ls-remote <url> HEAD` fetches the latest commit SHA.
-2. The overlay file to bump comes from the package's declared
+2. The recipe file to bump comes from the package's declared
    `config.update.targets.<name>.file`, read via
    `nix eval --raw .#updateTargets.<name>.file`. Every main-tracking package
-   declares one, so this is the live path; `resolve_overlay_file`
-   (`dev/scripts/resolve-overlay-file.sh`) is a retained safety-net fallback
-   that deterministically locates the single overlay `.nix` pinning this
+   declares one, so this is the live path; `resolve_recipe_file`
+   (`dev/scripts/resolve-recipe-file.sh`) is a retained safety-net fallback that
+   searches owner package trees for the single `.nix` recipe pinning this
    upstream by matching the fetch block's identity — either
    `fetchFromGitHub { owner = "<owner>"; repo = "<repo>"; }` or
-   `fetchgit { url = "…github.com/<owner>/<repo>.git"; }` — and requiring
-   **exactly one** match. 0 or >1 matches ⇒ the target is reported `HELD BACK`
-   (never a silent guess). `checks.update-targets-parity` asserts the declared
-   `file` is byte-identical to what the resolver would print, so the two paths
-   can never diverge. `sed` then replaces the old `rev` in that resolved file.
+   `fetchgit { url = "…github.com/<owner>/<repo>.git"; }` — and requiring an
+   inline 40-hex revision and **exactly one** match. 0 or >1 matches ⇒ the
+   target is reported `HELD BACK` (never a silent guess).
+   `checks.update-targets-parity` asserts the declared `file` is byte-identical
+   to what the resolver would print, so the two paths can never diverge. `sed`
+   then replaces the old `rev` in that resolved file.
 3. `nix flake prefetch github:<owner>/<repo>/<new-rev>` fetches the new source
    hash.
 4. `sed` replaces the old `hash` in the overlay `.nix` file.
@@ -127,66 +126,42 @@ registry every package contributes a row to. It replaced the flat, top-level
   `private/slice-fixture/lib/concerns.nix` instead; `/private/` is gitignored
   local working material, so that pointer resolves for nobody but its author.
   The fixture itself is described in `docs/package-restructure.md`.
-- **`config/update-targets.nix`** — the central contribution: every package's
-  row EXCEPT effect-mcp, plus the `excludePatterns` list carried over from the
-  dissolved matrix. Rows split into main-tracking (a `git` URL and a non-null
-  `file`) and binary (`git = null`, `file = null`). **No total is written here
-  on purpose.** A hardcoded one rots by construction — this bullet carried "29
-  packages — 16 main-tracking + 13 binary" long after the sweep had grown past
-  it. Derive it instead:
-
-  ```bash
-  nix eval --json .#updateTargets --apply 'ts: with builtins;
-    let n = attrNames ts; in {
-      total = length n;
-      mainTracking = length (filter (k: ts.${k}.git != null) n);
-    }'
-  ```
-
-  `.#updateTargets` is the merged registry, so that count includes effect-mcp's
-  co-located row; this file carries one fewer. It is not the size of a sweep
-  either — the ninja DAG adds one Inputs target per root flake input, read from
-  `flake.lock`, so a sweep's PR ceiling is targets PLUS inputs. The binary rows
-  all pass `--use-update-script`, optionally with `--override-filename <path>`;
-  that second flag is what lets several attributes of one upstream (`pnpm_10`,
-  `pnpm_11`) each own a file and a sidecar.
-
-- **`overlays/mcp-servers/effect-mcp.update.nix`** — effect-mcp's own row,
-  co-located with the overlay it bumps:
-  `config.update.targets.effect-mcp = { file = "overlays/mcp-servers/effect-mcp.nix"; flags = ["--version" "skip"]; git = "https://github.com/tim-smart/effect-mcp.git"; }`.
-  The sidecar carries its own `git` URL; `resolve_overlay_file` skips
-  `*.update.nix` files (update metadata, never source-pinning overlays), so the
-  URL does not make it a second match for `tim-smart/effect-mcp`.
-- **`.#updateTargets`** — a top-level flake output selected from an internal
-  `updateRegistry` built from an explicit 3-module `lib.evalModules` list
-  (`./lib/update.nix` + `./config/update-targets.nix` +
-  `./overlays/mcp-servers/effect-mcp.update.nix`). Keeping the merged sibling
-  `excludePatterns` in that internal binding lets the completeness check consume
-  both halves without evaluating the modules twice. The barrel walker that would
-  `readDir` every `<pkg>.update.nix` is deferred Track B — new contributions are
-  added to that list by hand for now.
+- **`config/update-targets.nix`** — workspace exclusion policy only.
+- **`packages/<owner>/registry.nix`** — each owner contributes its update rows.
+  `file = repoPath ./packages/<namespace>/<package>/package.nix` derives the
+  mutable repository-relative path from the module's actual location. Binary
+  rows use `--use-update-script`, with `--override-filename` when needed.
+  Multiple roles sharing a source have one update target; Python source slices
+  can declare `passthru.updateSource` so completeness follows their common pin.
+  Derive counts from `nix eval --json .#updateTargets`; the sweep also includes
+  root input targets, so that count is not the sweep's PR ceiling.
+- **`.#updateTargets`** — selected from `lib/facets/repository.nix`'s native
+  module evaluation. It merges discovered owner registries with workspace policy
+  ; ownership validation rejects competing package keys before priorities can
+  hide them. `excludePatterns` remains available to the completeness check
+  through the same result.
 - **Consumers** — `config/generate-update-ninja.nix` reads `updateTargets` for
   the ninja DAG (flags space-joined, git, and `dependsOn` → `update-<dep>`
   edges); `update-pkg.sh` reads `.#updateTargets.<name>.file` for the rev-bump
   target.
-- **`checks/update-targets-parity.nix`** — the permanent bidirectional CI gate
-  (and sole update-target check; the former `overlay-target-resolution.nix`
-  folded into it). Packages → targets: every versioned flake package must have a
-  same-name row, share a derivation, source, or update script with a targeted
-  package, declare an existing flake input through `passthru.updateFlakeInput`,
-  carry a non-empty `passthru.updateTargetExempt` reason, or match an explicit
-  `excludePatterns` exemption. The first CI run proved the reverse direction by
-  finding two previously unrecorded cases: `git-branchless` is owned by its
-  flake input. (The other historical exemption, the repository-local
-  `kiro-memory-distiller`, was removed on 2026-09-01 — the shape it illustrated,
-  an in-repo package with no upstream release to sweep, has no current
-  instance.) Targets → overlays: every main-tracking target (with a `git` URL)
-  must declare a non-null `file` equal to
-  `resolve_overlay_file(<git>, overlays)`, and the resolved overlay must carry
-  an inline 40-hex `rev`. A positive control removes the real, uniquely sourced
-  `context7-mcp` row in memory and requires that its package become uncovered;
-  this proves the reverse direction can fail without mutating the registry on
-  disk.
+- **`checks/packaging/update-targets-parity.nix`** — the permanent bidirectional
+  CI gate (and sole update-target check; the former
+  `overlay-target-resolution.nix` folded into it). Packages → targets: every
+  versioned flake package must have a same-name row, share a derivation, source,
+  or update script with a targeted package, declare an existing flake input
+  through `passthru.updateFlakeInput`, carry a non-empty
+  `passthru.updateTargetExempt` reason, or match an explicit `excludePatterns`
+  exemption. The first CI run proved the reverse direction by finding two
+  previously unrecorded cases: `git-branchless` is owned by its flake input.
+  (The other historical exemption, the repository-local `kiro-memory-distiller`,
+  was removed on 2026-09-01 — the shape it illustrated, an in-repo package with
+  no upstream release to sweep, has no current instance.) Targets → overlays:
+  every main-tracking target (with a `git` URL) must declare a non-null `file`
+  equal to `resolve_recipe_file(<git>, overlays, packages)`, and the resolved
+  overlay must carry an inline 40-hex `rev`. A positive control removes the
+  real, uniquely sourced `context7-mcp` row in memory and requires that its
+  package become uncovered; this proves the reverse direction can fail without
+  mutating the registry on disk.
 
 ### Report format
 
@@ -243,27 +218,27 @@ A nixpkgs bump whose build verification FAILED therefore shipped as `UPDATED` �
 sweep 34351134945 logged exactly that, with zero `HELD BACK:` lines in 12,274
 lines of log, and it had been doing so since at least 69c00ef2 (2026-04-13).
 
-`checks/target-subshell-shape.nix` fails the build if the shape regresses, and
-carries a positive control so it cannot pass vacuously when a body is renamed or
-removed. **That gate is the rule; this paragraph only explains it.** The rule
-lived as prose first and was broken twice within two days of being written, each
-time caught by a reviewer rather than by a tool — shellcheck has no diagnostic
-for it. The explicit `exit` calls still in those bodies are now belt-and-braces,
-not the mechanism.
+`checks/shell/target-subshell-shape.nix` fails the build if the shape regresses,
+and carries a positive control so it cannot pass vacuously when a body is
+renamed or removed. **That gate is the rule; this paragraph only explains it.**
+The rule lived as prose first and was broken twice within two days of being
+written, each time caught by a reviewer rather than by a tool — shellcheck has
+no diagnostic for it. The explicit `exit` calls still in those bodies are now
+belt-and-braces, not the mechanism.
 
 ### Key files
 
-| File                                         | Role                                                               |
-| -------------------------------------------- | ------------------------------------------------------------------ |
-| `checks/update-targets-parity.nix`           | Flake check: declared `file` == resolver output + inline rev       |
-| `config/generate-update-ninja.nix`           | Generates `.update.ninja` DAG from flake.lock + updateTargets      |
-| `config/update-targets.nix`                  | Central `config.update.targets` rows (all packages but effect-mcp) |
-| `dev/scripts/resolve-overlay-file.sh`        | Deterministic overlay resolution (fetch-block identity + guard)    |
-| `dev/scripts/update-common.sh`               | Shared functions (worktree, version, report, colors)               |
-| `dev/scripts/update-init.sh`                 | Pipeline initialization (clean stale state)                        |
-| `dev/scripts/update-input.sh`                | Per-input update script                                            |
-| `dev/scripts/update-pkg.sh`                  | Per-package update script (rev bump + nix-update)                  |
-| `dev/scripts/update-report.sh`               | Report printer                                                     |
-| `lib/update.nix`                             | Declares `config.update.targets` (the option declaration)          |
-| `overlays/mcp-servers/effect-mcp.update.nix` | effect-mcp's co-located update-target contribution row             |
-| `.github/workflows/update.yml`               | CI workflow (Renovate-style per-dependency PRs)                    |
+| File                                         | Role                                                           |
+| -------------------------------------------- | -------------------------------------------------------------- |
+| `checks/packaging/update-targets-parity.nix` | Flake check: declared `file` == resolver output + inline rev   |
+| `config/generate-update-ninja.nix`           | Generates `.update.ninja` DAG from flake.lock + updateTargets  |
+| `config/update-targets.nix`                  | Workspace update exclusions                                    |
+| `dev/scripts/resolve-recipe-file.sh`         | Deterministic recipe resolution (fetch-block identity + guard) |
+| `dev/scripts/update-common.sh`               | Shared functions (worktree, version, report, colors)           |
+| `dev/scripts/update-init.sh`                 | Pipeline initialization (clean stale state)                    |
+| `dev/scripts/update-input.sh`                | Per-input update script                                        |
+| `dev/scripts/update-pkg.sh`                  | Per-package update script (rev bump + nix-update)              |
+| `dev/scripts/update-report.sh`               | Report printer                                                 |
+| `lib/update.nix`                             | Declares `config.update.targets` (the option declaration)      |
+| `packages/<owner>/registry.nix`              | Owner update targets, source paths, and cache metadata         |
+| `.github/workflows/update.yml`               | CI workflow (Renovate-style per-dependency PRs)                |

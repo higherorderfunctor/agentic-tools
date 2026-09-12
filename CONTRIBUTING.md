@@ -37,10 +37,8 @@ nix flake check       # linters + evaluation (does NOT build packages)
 
 ## Generation Architecture
 
-> **Last verified:** 2026-08-29 — instruction tasks and the merge-blocking
-> materialization check now execute the same packaged real-file copier
-> (`lib/materialize-repo-instructions.nix`). Full lineage:
-> `git show 2ac8d522:dev/fragments/pipeline/generation-architecture.md`.
+> **Last verified:** 2026-09-12 — document generation reads the same owner
+> metadata registry as flake assembly.
 
 Content is generated via Nix derivations wrapped in devenv tasks, organized by
 scope:
@@ -59,9 +57,11 @@ are a no-op.
 
 ### Source Layout
 
-- `config/fragment-categories.nix` — the fragment-category registry: each
-  category's scope globs and fragment sources. Option declared in
-  `lib/fragments-registry.nix`.
+- `lib/facets/registry.nix` — native metadata assembly shared by flake and
+  document generation. Workspace categories come from
+  `config/fragment-categories.nix`; package categories and descriptions come
+  from owner `registry.nix` files. Options live in `lib/fragments-registry.nix`
+  and `lib/documentation.nix`.
 - `dev/fragments/` — dev-only instruction fragments. Composed into instruction
   files and CLAUDE.md.
 - `dev/generate.nix` — shared fragment composition logic consumed by both devenv
@@ -96,10 +96,10 @@ normalized runtime context/rules enter `ai.<runtime>.files` and lower to
 ordinary backend symlinks. A 2.18.1 live spike confirmed Kiro steering now loads
 through that path. See the devenv files-internals fragment.
 
-`checks/instruction-materialization.nix` runs the exact packaged copier in a
-temporary repository. It covers portability and lifecycle behavior without
-building the full interactive devenv shell, so the on-demand Devenv Diagnostic
-is no longer an automatic CI dependency.
+`checks/instructions/instruction-materialization.nix` runs the exact packaged
+copier in a temporary repository. It covers portability and lifecycle behavior
+without building the full interactive devenv shell, so the on-demand Devenv
+Diagnostic is no longer an automatic CI dependency.
 
 ### Running Generation
 
@@ -176,19 +176,23 @@ Keep descriptions lowercase, imperative mood, no trailing period.
 
 ### AI CLI or MCP Server
 
-See the **AI CLI Packages** and **MCP Server Packages** sections in
-[AGENTS.md](AGENTS.md) for the full overlay pattern and step-by-step
-instructions.
+See [Packaging](docs/packaging.md) and the scoped architecture routing in
+[AGENTS.md](AGENTS.md) for recipe patterns and package-specific guidance.
 
 ### General pattern
 
-1. Create `overlays/<name>.nix` with inline `rev` + `hash`
-2. Register in `overlays/default.nix`
-3. Add a `config.update.targets.<name>` row in `config/update-targets.nix` with
-   appropriate flags
-4. Export in `flake.nix` under `packages`
-5. Add HM and devenv modules in `packages/<name>/modules/`
-6. Run `nix flake check` to verify
+1. Create `packages/<owner>/packages/<namespace>/<name>/package.nix` with inline
+   `rev` + `hash`
+2. Add update, cache, and documentation entries to the owner's `registry.nix`
+3. Put consumer modules, helpers, and checks in the same owner directory
+4. Add HM and devenv modules in `packages/<owner>/modules/` when applicable
+5. Run `nix flake check` to verify
+
+See [Repository ownership and layout](docs/repository-layout.md) for a worked
+tree. Register checks through the owner's native `checks.nix` module.
+
+Owner discovery exports native package namespaces, flat flake packages, and
+backend modules automatically. New owners need no root export entry.
 
 See [Change Propagation](AGENTS.md#change-propagation) — when removing or
 renaming a concept, all surfaces must be updated in the same commit.
@@ -216,9 +220,14 @@ To add a dev-only fragment:
 
 To add a published fragment (consumed by external users):
 
-1. Create `packages/<pkg>/fragments/<name>.md`
-2. Register it in `packages/<pkg>/default.nix` under `passthru.fragments`
-3. Run `devenv tasks run --mode before generate:all` to regenerate everything
+1. Create `packages/<owner>/fragments/<name>.md`
+2. Use the owner's `lib/fragments.nix` directory discovery to expose the
+   fragment through its native content recipe and public library. Existing
+   content owners discover markdown files automatically.
+3. If the fragment also belongs in this repository's generated instructions, add
+   it to the relevant owner `registry.nix` category or workspace category in
+   `config/fragment-categories.nix`
+4. Run `devenv tasks run --mode before generate:all` to regenerate everything
 
 ## Pull Requests
 

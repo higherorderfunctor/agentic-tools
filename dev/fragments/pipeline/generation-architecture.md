@@ -1,9 +1,7 @@
 ## Generation Architecture
 
-> **Last verified:** 2026-08-29 — instruction tasks and the merge-blocking
-> materialization check now execute the same packaged real-file copier
-> (`lib/materialize-repo-instructions.nix`). Full lineage:
-> `git show 2ac8d522:dev/fragments/pipeline/generation-architecture.md`.
+> **Last verified:** 2026-09-12 — document generation reads the same owner
+> metadata registry as flake assembly.
 
 Content is generated via Nix derivations wrapped in devenv tasks, organized by
 scope:
@@ -22,9 +20,11 @@ are a no-op.
 
 ### Source Layout
 
-- `config/fragment-categories.nix` — the fragment-category registry: each
-  category's scope globs and fragment sources. Option declared in
-  `lib/fragments-registry.nix`.
+- `lib/facets/registry.nix` — native metadata assembly shared by flake and
+  document generation. Workspace categories come from
+  `config/fragment-categories.nix`; package categories and descriptions come
+  from owner `registry.nix` files. Options live in `lib/fragments-registry.nix`
+  and `lib/documentation.nix`.
 - `dev/fragments/` — dev-only instruction fragments. Composed into instruction
   files and CLAUDE.md.
 - `dev/generate.nix` — shared fragment composition logic consumed by both devenv
@@ -59,10 +59,10 @@ normalized runtime context/rules enter `ai.<runtime>.files` and lower to
 ordinary backend symlinks. A 2.18.1 live spike confirmed Kiro steering now loads
 through that path. See the devenv files-internals fragment.
 
-`checks/instruction-materialization.nix` runs the exact packaged copier in a
-temporary repository. It covers portability and lifecycle behavior without
-building the full interactive devenv shell, so the on-demand Devenv Diagnostic
-is no longer an automatic CI dependency.
+`checks/instructions/instruction-materialization.nix` runs the exact packaged
+copier in a temporary repository. It covers portability and lifecycle behavior
+without building the full interactive devenv shell, so the on-demand Devenv
+Diagnostic is no longer an automatic CI dependency.
 
 ### Running Generation
 

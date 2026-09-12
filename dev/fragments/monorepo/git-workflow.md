@@ -1,10 +1,7 @@
 ## Git Workflow — trunk-based, worktree-per-branch
 
-> **Last verified:** 2026-09-01 — the fix-and-re-review loop is ONE round, not
-> five. Round one is the free automatic review; a second is earned only by a
-> significant change in what there is to review, never by having applied round
-> one's findings. Operator instruction, after the five-round rule exhausted a
-> usage allowance in about ten days.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > **Settled — do not relitigate.** Each of these records an approach that was
 > TRIED and rejected, so the reasoning is not re-derived from scratch. Full
@@ -142,8 +139,8 @@ scoped to the disputed findings only.
 
 **(b) The diff touches a shared abstraction.**
 `git diff --name-only origin/main...HEAD` matches `lib/**`, `packages/*/lib/**`
-or `overlays/*.nix`; or a hunk under `modules/**` or `lib/ai/**` adds, removes
-or retypes a `mkOption`.
+or `packages/*/packages/**/*.nix`; or a hunk under `packages/*/modules/**` or
+`lib/ai/**` adds, removes or retypes a `mkOption`.
 
 Everything else uses the single-reviewer default. Run the three-role protocol:
 an agent that prosecutes, a separate agent that defends, and a third that judges

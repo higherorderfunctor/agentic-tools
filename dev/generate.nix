@@ -18,28 +18,12 @@
 }: let
   fragments = import ../lib/fragments.nix {inherit lib;};
 
-  # ── Fragment category registry ───────────────────────────────────────
-  # The per-category scope globs + fragment sources, merged from
-  # config/fragment-categories.nix against the option declaration in
-  # lib/fragments-registry.nix. Replaces the two parallel hand-maintained
-  # attrsets (`packagePaths` and `devFragmentNames`) that used to sit
-  # inline here.
-  #
-  # This is an internal lib.evalModules rather than a flake output like
-  # `.#updateTargets` / `.#cacheHitParityTargets` because this file is
-  # imported directly as a bare `{lib, pkgs}` function by BOTH flake.nix
-  # (via dev/instructions.nix) and the standalone devenv path, neither of
-  # which passes `self` — so it structurally cannot read a flake output,
-  # and an output with no consumer would be dead surface. It already
-  # direct-imports ../lib/fragments.nix and ./data.nix the same way.
-  fragmentCategories =
-    (lib.evalModules {
-      modules = [
-        ../config/fragment-categories.nix
-        ../lib/fragments-registry.nix
-      ];
-    })
-    .config.fragments.categories;
+  # Owner metadata uses the same registry as the public flake assembly.
+  registry = import ../lib/facets/registry.nix {
+    inherit lib;
+    root = ../.;
+  };
+  fragmentCategories = registry.config.fragments.categories;
 
   # ── Fragments from content packages (via overlay) ────────────────────
   commonFragments = builtins.attrValues pkgs.coding-standards.passthru.fragments;
@@ -300,10 +284,10 @@
   '';
   # ── README.md generation ─────────────────────────────────────────────
 
-  # ── Shared description mappings (from dev/data.nix) ──────────────────
-  data = import ./data.nix {inherit lib;};
+  # Descriptions are authored alongside their packages.
+  data = registry.config.documentation;
   inherit (data) aiCliDescriptions devToolDescriptions genericDescriptions gitToolDescriptions mcpServerMeta skillDescriptions;
-  inherit (data) mcpServerCount;
+  mcpServerCount = builtins.length (builtins.attrNames mcpServerMeta);
 
   # ── Table generators ─────────────────────────────────────────────────
   # Four of the README package tables are the same two-column
@@ -547,7 +531,7 @@
     <summary><strong>Generic Packages</strong></summary>
 
     Temporarily unclassified supporting packages live in the split-ready
-    `overlays/generic/` subtree and are exposed as `pkgs.ai.generic.*`.
+    `packages/<owner>/packages/ai/generic/` trees and are exposed as `pkgs.ai.generic.*`.
 
     <!-- prettier-ignore -->
     | Package | Description |
@@ -967,18 +951,22 @@
 
     ### AI CLI or MCP Server
 
-    See the **AI CLI Packages** and **MCP Server Packages** sections in
-    [AGENTS.md](AGENTS.md) for the full overlay pattern and step-by-step
-    instructions.
+    See [Packaging](docs/packaging.md) and the scoped architecture routing
+    in [AGENTS.md](AGENTS.md) for recipe patterns and package-specific guidance.
 
     ### General pattern
 
-    1. Create `overlays/<name>.nix` with inline `rev` + `hash`
-    2. Register in `overlays/default.nix`
-    3. Add a `config.update.targets.<name>` row in `config/update-targets.nix` with appropriate flags
-    4. Export in `flake.nix` under `packages`
-    5. Add HM and devenv modules in `packages/<name>/modules/`
-    6. Run `nix flake check` to verify
+    1. Create `packages/<owner>/packages/<namespace>/<name>/package.nix` with inline `rev` + `hash`
+    2. Add update, cache, and documentation entries to the owner's `registry.nix`
+    3. Put consumer modules, helpers, and checks in the same owner directory
+    4. Add HM and devenv modules in `packages/<owner>/modules/` when applicable
+    5. Run `nix flake check` to verify
+
+    See [Repository ownership and layout](docs/repository-layout.md) for a
+    worked tree. Register checks through the owner's native `checks.nix` module.
+
+    Owner discovery exports native package namespaces, flat flake packages,
+    and backend modules automatically. New owners need no root export entry.
 
     See [Change Propagation](AGENTS.md#change-propagation) — when removing
     or renaming a concept, all surfaces must be updated in the same commit.
@@ -1006,9 +994,14 @@
 
     To add a published fragment (consumed by external users):
 
-    1. Create `packages/<pkg>/fragments/<name>.md`
-    2. Register it in `packages/<pkg>/default.nix` under `passthru.fragments`
-    3. Run `devenv tasks run --mode before generate:all` to regenerate everything
+    1. Create `packages/<owner>/fragments/<name>.md`
+    2. Use the owner's `lib/fragments.nix` directory discovery to expose the
+       fragment through its native content recipe and public library. Existing
+       content owners discover markdown files automatically.
+    3. If the fragment also belongs in this repository's generated instructions,
+       add it to the relevant owner `registry.nix` category or workspace category
+       in `config/fragment-categories.nix`
+    4. Run `devenv tasks run --mode before generate:all` to regenerate everything
 
     ## Pull Requests
 

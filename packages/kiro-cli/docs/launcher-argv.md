@@ -1,8 +1,7 @@
 # kiro-cli wrapper: the argv contract
 
-> **Last verified:** 2026-09-09 — identity extraction now handles the minified
-> CLI/IDE ternary function in the installed 2.21.2 engine, alongside the older
-> named function.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > **Settled — do not relitigate.** Full lineage:
 > `git show 0057d8ed:packages/kiro-cli/docs/launcher-argv.md`.
@@ -125,12 +124,13 @@ Three properties worth knowing before touching it:
   brick the CLI over a cosmetic prompt edit. The stderr line is what keeps it
   from being SILENT.
 
-Because it is an env export rather than a flag, `checks/kiro-wrapper-argv.nix`
-does not cover it. The module-eval tests do:
-`module-kiro-{hm,devenv}-identity-forks-package` assert the wrapper forks when
-the option is set, and `module-kiro-identity-default-is-stock` asserts it stays
-byte-identical to stock when it is not — which is what protects the cache hit.
-Bundle mechanics live in `packages/kiro-cli/lib/identityBundle.nix`.
+Because it is an env export rather than a flag,
+`packages/kiro-cli/checks/kiro-wrapper-argv.nix` does not cover it. The
+module-eval tests do: `module-kiro-{hm,devenv}-identity-forks-package` assert
+the wrapper forks when the option is set, and
+`module-kiro-identity-default-is-stock` asserts it stays byte-identical to stock
+when it is not — which is what protects the cache hit. Bundle mechanics live in
+`packages/kiro-cli/lib/identityBundle.nix`.
 
 The 2.21.1 and 2.21.2 engines minify the identity function: in the measured
 2.21.2 bundle, `xSs(e)` returns a CLI/IDE ternary and `VZ` inserts its result at
@@ -138,9 +138,9 @@ the start of the shared prompt. The splicer matches that complete dispatch,
 including the IDE arm and the shared argument, without pinning either mangled
 name or vendor prose. Older bundles retain the `getIdentity`/`if` path. Multiple
 candidates or an unknown shape fail before writing a patched bundle.
-`checks/kiro-identity-splice.nix` exercises both forms, checks byte preservation
-outside the first sentence, and executes synthetic functions to verify the CLI,
-IDE, and fallback results.
+`packages/kiro-cli/checks/kiro-identity-splice.nix` exercises both forms, checks
+byte preservation outside the first sentence, and executes synthetic functions
+to verify the CLI, IDE, and fallback results.
 
 ### `extraPackages` — a PATH prefix, not an FHS rebuild
 
@@ -161,8 +161,9 @@ supplying missing tools; Darwin has no later FHS reordering.
 
 The empty list is inert and produces no wrapper by itself. A non-empty list
 creates the wrapper even when no env, argv, identity, or secret injection is
-configured. It does not alter argv, and `checks/kiro-wrapper-argv.nix` runs both
-entry points to assert the prefix and inherited tail together.
+configured. It does not alter argv, and
+`packages/kiro-cli/checks/kiro-wrapper-argv.nix` runs both entry points to
+assert the prefix and inherited tail together.
 
 On Linux this crosses the upstream FHS visibility boundary because `/nix` is
 mounted and PATH is preserved; it does not merge packages into the synthesized
@@ -217,7 +218,8 @@ Measured on one machine, `--v3`, all `KIRO_*` stripped (store 2.16.0, DMG
 
 Row 3 is the trap: **removing wrapProgram does not fix it** — argv[0] is not
 canonicalized, so a symlink is not enough; the string itself must be the bundle
-path. The fix is therefore in `overlays/kiro-cli.nix`: a darwin-only trailing
+path. The fix is therefore in
+`packages/kiro-cli/packages/ai/kiro-cli/package.nix`: a darwin-only trailing
 `--argv0` on the launcher's wrapProgram call naming the bundle path (makeWrapper
 documents that whichever of `--argv0`/`--inherit-argv0` comes LAST wins, and
 wrapProgram injects `--inherit-argv0` before user args). The chat binary does no
@@ -356,7 +358,7 @@ declaratively — the grant is simply absent for that session.
 > The real gate is a **JSON rollout manifest carried in the ELF's rodata**, in
 > TWO identical copies, parsed at runtime — see `vu.mkKiroRolloutPatch` and
 > `ai.kiro.unlockedRolloutFeatures`. Its feature names are extracted into
-> `overlays/kiro-cli-extracted.json` under `rolloutFeatures`, so read that file
+> `packages/kiro-cli/extracted.json` under `rolloutFeatures`, so read that file
 > rather than re-deriving the list by hand (the extractor found two entries a
 > careful manual read had missed). Note the manifest's own `workflows`
 > description says "enable locally through KIRO_ENABLED_FEATURES" — that line is
@@ -407,10 +409,10 @@ rewrites argv: `kiro-cli --v3 acp` arrives here as an explicit
 
 **The lesson generalizes past this flag.** Each wrapper was individually correct
 and the pair was not, so any new injection has to be reasoned about against what
-the OTHER wrapper adds on the same code path. `checks/kiro-wrapper-argv.nix` now
-covers this with a launcher stub that dispatches through `PATH`; testing the two
-binaries in isolation cannot see it, which is exactly how this reached a
-release.
+the OTHER wrapper adds on the same code path.
+`packages/kiro-cli/checks/kiro-wrapper-argv.nix` now covers this with a launcher
+stub that dispatches through `PATH`; testing the two binaries in isolation
+cannot see it, which is exactly how this reached a release.
 
 ## The v3 + `acp` conflict
 
@@ -523,31 +525,32 @@ parse rejection from an accepted flag.
 
 ## Tests
 
-- `checks/kiro-fhs-contract.nix` — structurally inspects the realized upstream
-  Linux command wrappers, shared launcher, init, dispatcher, and profile. It
-  pins the `/nix` bind and inherited PATH bridge that `extraPackages` depends
-  on, then realizes a configured FHS payload and proves the selected rootfs chat
-  command carries `trustedMcpTools`, without claiming to execute bubblewrap
-  inside the Nix build sandbox.
-- `checks/kiro-wrapper-argv.nix` — the real wrapper against a stub package that
-  prints its argv. Covers which SIDE of the subcommand each flag lands on, the
-  absence of `--tui`, the value-flag skip, `--`, idempotence, and the env/PATH
-  export paths. String-matching the generated bash cannot catch a flag emitted
-  on the wrong side; running it can.
-- `checks/module-eval.nix` (`module-kiro-wrapper-*`) — pins the SHAPE of the
-  generated bash and the wrapper trigger conditions.
+- `packages/kiro-cli/checks/kiro-fhs-contract.nix` — structurally inspects the
+  realized upstream Linux command wrappers, shared launcher, init, dispatcher,
+  and profile. It pins the `/nix` bind and inherited PATH bridge that
+  `extraPackages` depends on, then realizes a configured FHS payload and proves
+  the selected rootfs chat command carries `trustedMcpTools`, without claiming
+  to execute bubblewrap inside the Nix build sandbox.
+- `packages/kiro-cli/checks/kiro-wrapper-argv.nix` — the real wrapper against a
+  stub package that prints its argv. Covers which SIDE of the subcommand each
+  flag lands on, the absence of `--tui`, the value-flag skip, `--`, idempotence,
+  and the env/PATH export paths. String-matching the generated bash cannot catch
+  a flag emitted on the wrong side; running it can.
+- `packages/kiro-cli/checks/module-eval.nix` (`module-kiro-wrapper-*`) — pins
+  the SHAPE of the generated bash and the wrapper trigger conditions.
 
 ## Do not break the exec line
 
 The wrapper ends with `exec -a "$0" <realBin> "$@"`. Keep that shape: recovering
 the real binary by reading the line back out of the generated wrapper is how you
 probe the unwrapped CLI at all (see the re-measure recipe above), and
-`checks/kiro-wrapper-argv.nix` asserts on it.
+`packages/kiro-cli/checks/kiro-wrapper-argv.nix` asserts on it.
 
 This governs THIS module's wrappers only. The darwin OVERLAY shim
-(`overlays/kiro-cli.nix`) deliberately ends in `exec -a "<bundle path>"` — the
-argv[0] override IS the bundle-discovery fix — and the check never reads that
-shim, so no carve-out is needed there. Do not "fix" its argv0 back to `"$0"`.
+(`packages/kiro-cli/packages/ai/kiro-cli/package.nix`) deliberately ends in
+`exec -a "<bundle path>"` — the argv[0] override IS the bundle-discovery fix —
+and the check never reads that shim, so no carve-out is needed there. Do not
+"fix" its argv0 back to `"$0"`.
 
 An earlier revision credited "probe scripts under `docs/plans/`" with depending
 on this. Nothing there does — `grep -rl 'exec -a' docs/plans` is empty — so the

@@ -26,7 +26,7 @@
 # option tree stays identical to the HM facet's, which is what
 # `module-glab-hm-devenv-option-parity` asserts.
 #
-# Picked up by `collectFacet ["modules" "devenv"]` in flake.nix.
+# Picked up by `native devenv module discovery` in flake.nix.
 {
   config,
   lib,

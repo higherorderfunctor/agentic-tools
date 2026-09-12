@@ -1,6 +1,6 @@
 # Applies the Home Manager transform to the chatgpt-codex app record.
 # The result is a home-manager module function the factory barrel
-# (homeManagerModules.default) imports via collectFacet.
+# (homeManagerModules.default) imports via native owner discovery.
 #
 # Composition: hmTransform takes the record and returns a module function
 # `{config, ...}: <body>`. Applying it to `args` here resolves the wrapper to

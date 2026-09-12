@@ -7,18 +7,25 @@ applyTo: "config/update-targets.nix,packages/**/*.nix"
 
 ## Naming Conventions
 
-- Package overlays: `overlays/<group>/<name>.nix` (`mcp-servers`, `lsp-servers`,
-  `git-tools`, `dev-tools`, `generic`; ungrouped ones sit at
-  `overlays/<name>.nix`)
-- Per-package overlay support files: `overlays/<group>/<name>-<kind>.json` /
-  `-<kind>.patch` beside the `.nix` — `-sources.json`, `-extracted.json`,
-  `-package-lock.json`, `-<topic>.patch`. Flat, never a subdirectory: two
-  configs (`treefmt.nix` global excludes, `devenv.nix` cspell excludes) are
-  keyed on the `<name>-package-lock.json` glob.
+> **Last verified:** 2026-09-12 — recipes, source sidecars, and registrations
+> live with their owners.
+
+- Package recipes:
+  `packages/<owner>/packages/<namespace...>/<name>/package.nix`. Directory
+  components below the inner `packages/` encode public namespaces. Source
+  sidecars and patches live with their owner; retain the existing
+  `<name>-package-lock.json` suffix while formatter/spelling excludes use it.
+- Owner metadata: `packages/<owner>/registry.nix` contributes
+  update/cache/documentation rows; derive mutable recipe paths with
+  `repoPath ./relative/package.nix`.
+- Owner source files: `sources.json`, `extracted.json`, `patches/`, and `src/`.
+  Multiple release lines may use qualified sidecars such as `sources-10.json`.
+  Package-specific extraction machinery belongs in the owner's
+  `lib/packaging.nix` or `extract/` directory.
 - Server modules: `packages/<name>/modules/mcp-server.nix` — and only for
   servers this repo runs as a managed service (they are enumerated in
   `serverNames` in `packages/mcp-services/modules/homeManager/default.nix`). A
-  client-launched stdio server is barrel-only: `packages/<name>/` with
+  client-launched stdio server needs a public helper: `packages/<name>/` with
   `lib/mk<Name>.nix` and no `modules/`. The top-level `modules/` directory named
   by earlier revisions of this list no longer exists.
 - Skills: `packages/stacked-workflows/skills/<name>/SKILL.md`
@@ -40,8 +47,8 @@ applyTo: "config/update-targets.nix,packages/**/*.nix"
 ### Nightly Packaging Pattern
 
 All binary packages track nightly/latest versions via inline hashes and
-`config.update.targets` (`config/update-targets.nix`). Never defer to nixpkgs
-upstream — always override `src` and `version` from the overlay's inline source.
+`config.update.targets` (owner `registry.nix`). Never defer to nixpkgs upstream
+— always override `src` and `version` from the overlay's inline source.
 
 When a package provides different artifacts per platform (e.g., `.tar.gz` on
 Linux, `.dmg` on Darwin):
@@ -50,7 +57,7 @@ Linux, `.dmg` on Darwin):
    `{url, hash}` entries keyed by Nix system string
 2. Select the correct source in the `.nix` overlay via
    `ourPkgs.stdenv.hostPlatform.system`
-3. Use `mkUpdateScript` from `overlays/lib.nix` to automate version bumps and
+3. Use `mkUpdateScript` from `lib/packaging.nix` to automate version bumps and
    hash prefetching for all platforms
 
 Examples:
@@ -65,10 +72,8 @@ use that one-key shape.
 
 ### Version-independent URLs need `alwaysPrefetch`
 
-> **Last verified:** 2026-07-25 (commit pending — records `mkUpdateScript`'s
-> `alwaysPrefetch` argument and why `dns-root-hints` is its only consumer). If
-> you change `mkUpdateScript`'s change-detection flow or opt another package in
-> or out, update this in the same commit.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 
 `mkUpdateScript` normally early-exits when `versionCheck.cmd`'s output equals
 the sidecar's recorded `.version`, which avoids a network prefetch per package
@@ -89,8 +94,9 @@ to move. Pass `alwaysPrefetch = true` in that case. It:
   actually moved, because the default flow's pre-prefetch
   `"$current -> $latest"` would read `X -> X` when only the hash moved.
 
-`overlays/generic/dns-root-hints.nix` is the only consumer (InterNIC re-serves
-one canonical URL; its "version" is a root-zone serial scraped out of the file
-body). It is opt-in, not the default, because it costs one prefetch per sweep
-whether or not anything moved — negligible for one ~3 KB file 4x/day, not
-negligible for a multi-hundred-MB per-platform release asset set.
+`packages/dns-root-hints/packages/ai/generic/dns-root-hints/package.nix` is the
+only consumer (InterNIC re-serves one canonical URL; its "version" is a
+root-zone serial scraped out of the file body). It is opt-in, not the default,
+because it costs one prefetch per sweep whether or not anything moved —
+negligible for one ~3 KB file 4x/day, not negligible for a multi-hundred-MB
+per-platform release asset set.

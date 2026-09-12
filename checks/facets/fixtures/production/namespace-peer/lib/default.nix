@@ -1,0 +1,3 @@
+{
+  ai.peerControl = "peer";
+}
