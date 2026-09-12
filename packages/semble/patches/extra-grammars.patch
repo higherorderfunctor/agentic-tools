@@ -72,14 +72,15 @@ diff --git a/src/semble/index/file_walker.py b/src/semble/index/file_walker.py
 diff --git a/src/semble/index/create.py b/src/semble/index/create.py
 --- a/src/semble/index/create.py
 +++ b/src/semble/index/create.py
-@@ -74 +74,2 @@
+@@ -95 +95,2 @@
 -    resolved_extensions = get_extensions(normalized)
 +    resolved_extensions = get_extensions(normalized)
 +    resolved_content = tuple(item.value for item in normalized)
-@@ -82,2 +83,2 @@
--    for file_path in walk_files(path, resolved_extensions):
+@@ -105 +106 @@
+-    files = list(walk_files(path, resolved_extensions))
++    files = list(walk_files(path, resolved_extensions, content=resolved_content))
+@@ -116 +117 @@
 -        language = detect_language(file_path)
-+    for file_path in walk_files(path, resolved_extensions, content=resolved_content):
 +        language = detect_language(file_path, path)
 diff --git a/src/semble/cache.py b/src/semble/cache.py
 --- a/src/semble/cache.py

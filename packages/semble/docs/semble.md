@@ -1,10 +1,8 @@
 # Semble integrations
 
-> **Last verified:** 2026-08-16 — Semble's inherited MCP integration has
-> canonical multi-category defaults; global CLI guidance and the typed CLI/MCP
-> subagent are independent opt-ins; Kiro can keep an agent-scoped server out of
-> the root pool; drift review follows the live JSON-RPC tool surface plus
-> package-version provenance.
+> **Last verified:** 2026-09-11 — Semble 0.6.0's reviewed derivatives support
+> searches across repositories, resolve result labels, and permit search
+> refinement and source verification within each agent's tool boundary.
 >
 > Full lineage: `git show 3dc3057b:packages/semble/docs/semble.md`.
 
@@ -127,6 +125,12 @@ categorization. Mappings participate in file discovery, parser selection, and
 cache validation, so mapped files are indexed and changes to them invalidate the
 relevant index normally.
 
+In Semble 0.6.0, index creation collects files before wrapping iteration in a
+progress bar. The customization patch passes content selection to that
+collection and the repository root to language detection inside the loop. The
+`module-semble-extra-grammars-load` check builds the customized package and
+exercises grammar loading, mapped discovery, and cache fingerprints.
+
 The customized package writes a fingerprint of its grammar and mapping set into
 index metadata and rejects caches created by a different customization. The HM
 and devenv modules additionally clear their owned cache root when the effective
@@ -194,6 +198,19 @@ prompt; `interface = "mcp"` uses the MCP prompt and restricts Claude/Kiro to
 Semble's two tool names (Codex omits its unsupported tool allowlist natively).
 Keeping separate files prevents a global CLI rule and an MCP-only agent from
 carrying mixed access instructions.
+
+Both derivatives adopt Semble 0.6.0's searches across repositories: several
+positional paths for CLI calls, or a scalar/list `repo` for MCP calls. Labeled
+result paths resolve through the returned `repos` map for reading, but remain
+labeled for related searches with the same repositories and content selection. A
+source URL identifies a repository, not a local checkout.
+
+The local prompts and agent descriptions deliberately omit upstream's blanket
+preference over read/search tools and its bans on repeated searches. Results are
+candidates requiring source verification; similarity does not prove an
+exhaustive caller list. MCP-only subagents return locations and verification
+needs to the caller when they cannot read source themselves. The upstream
+snapshot remains verbatim for provenance.
 
 ## Upstream template review gate
 

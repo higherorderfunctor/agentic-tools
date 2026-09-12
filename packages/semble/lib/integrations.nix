@@ -24,12 +24,12 @@ let
       then {source = cliInstructions;}
       else {text = renderedInstructions;};
     kiroAgent = {
-      description = "${baseDescription} Prefer over shell/read tools for any semantic or exploratory question.";
+      description = baseDescription;
       prompt = renderedInstructions;
       tools = ["shell" "read"];
     };
     semanticAgent = {
-      description = "${baseDescription} Prefer over Grep/Glob/Read for any semantic or exploratory question.";
+      description = baseDescription;
       instructions = renderedInstructions;
       tools = ["Bash" "Read"];
     };
@@ -38,12 +38,12 @@ let
   cli = mkCliRecords "semble";
   mcp = {
     kiroAgent = {
-      description = "${baseDescription} Prefer over shell/read tools for any semantic or exploratory question.";
+      description = baseDescription;
       prompt = mcpInstructions;
       tools = ["@semble"];
     };
     semanticAgent = {
-      description = "${baseDescription} Prefer over Grep/Glob/Read for any semantic or exploratory question.";
+      description = baseDescription;
       instructions = mcpInstructions;
       tools = claudeMcpTools;
     };

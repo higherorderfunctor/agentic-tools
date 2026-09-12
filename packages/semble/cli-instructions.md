@@ -1,5 +1,6 @@
-Use `semble search` to find code by describing what it does or naming a symbol
-or identifier, instead of grep:
+Use `semble search` to discover code by behavior or meaning. Use exact text
+searches, filename searches, and direct reads when you know the identifier or
+path or need to verify a result.
 
 ```bash
 semble search "authentication flow" ./my-project --max-snippet-lines 10
@@ -27,15 +28,31 @@ semble find-related src/auth.py 42 ./my-project
 
 The path defaults to the current directory when omitted; Git URLs are accepted.
 
+Pass several known paths or URLs when the question spans related repositories:
+
+```bash
+semble search "invoice endpoint" ./service-a ../service-b
+```
+
+Results from several repositories prefix `file_path` with a repository label.
+The `repos` map identifies each label's source. For a local source, replace the
+label with that source path before reading the file. For a URL, use a known
+checkout or repository read tool. When calling `semble find-related`, retain the
+returned `file_path` including its label and pass the same repository paths and
+content selection.
+
 ### Workflow
 
-1. Start with `semble search` to find relevant chunks. The index is built and
-   cached automatically.
-2. Pass `--content` when searching beyond code: `docs`, `config`, several
-   categories such as `code docs`, or `all`.
-3. Navigate directly to the returned file and line. Do not re-search or grep for
-   the same content.
+1. Search with a focused description of the behavior. Pass `--content` when
+   searching beyond code: `docs`, `config`, several categories such as
+   `code docs`, or `all`.
+2. Treat ranked results as candidates. Read enough surrounding source, callers,
+   and tests to verify their relevance before proposing an edit.
+3. Refine the query, expand the snippets or result count, or use exact text and
+   filename searches when results are incomplete or ambiguous. Search known
+   dependent or sibling repositories together when relevant.
 4. Optionally use `semble find-related` with a promising result's `file_path`
-   and `line` to discover related implementations.
-5. Use grep only when you need every occurrence of a literal string across the
-   whole repository, such as all callers of a renamed function.
+   and a `line` within its returned range, such as `start_line`, to discover
+   similar implementations. Similarity results do not enumerate every caller or
+   reference; use exact searches or language-aware reference tools when
+   completeness matters.
