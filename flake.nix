@@ -408,6 +408,7 @@
         # "attribute missing" and both files fall back to hand-editing.
         repo-contributing = instr.repoContributing;
         repo-readme = instr.repoReadme;
+        strictdoc-toolchain-source = import ./packages/strictdoc-grammar/lib/toolchainSource.nix {inherit lib pkgs;};
       });
 
     # devShells.default provided by devenv CLI (devenv shell / devenv test)
