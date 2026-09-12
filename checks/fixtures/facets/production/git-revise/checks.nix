@@ -15,7 +15,7 @@
 }: let
   owner = builtins.head (builtins.filter (candidate: candidate.name == "git-revise") index.owners);
   metadataKinds = builtins.map (entry: entry.kind) owner.metadata;
-  package = packages.git-revise;
+  package = packages.ai.gitTools.git-revise;
 in {
   git-revise-production-boundary = assert lib.isDerivation package;
   assert package.passthru.fixtureSentinel == inputs.fixture.sentinel;

@@ -49,8 +49,14 @@
       inherit (packageWorld) packages;
     };
     index = facetIndex;
+    inherit packageWorld;
   };
   overlayBase.ai.seed = inputs.fixture.sentinel;
+  overlayBase.ai.devTools.seed = inputs.fixture.sentinel;
+  overlayBase.ai.devTools.alpha-tool = {
+    type = "derivation";
+    previousPackageOnly = true;
+  };
   overlayResult = lib.fix (
     final:
       overlayBase
@@ -93,7 +99,9 @@
   outsideFixture = module: !hasPrefix "${toString fixtureRoot}/" (toString module);
   publicOverlayResult = self.overlays.default pkgs pkgs;
   publicAiLib = self.lib.ai or {};
-  gitRevise = packageWorld.packages.git-revise;
+  gitRevise = packageWorld.packages.ai.gitTools.git-revise;
+  supportedControl = packageWorld.packages.ai.devTools.supported-control;
+  originalSupportedControl = pkgs.callPackage (productionRoot + "/platform-control/packages/ai/devTools/supported-control/package.nix") {inherit pkgs;};
   sameValue = left: right: let
     compared = builtins.tryEval (
       if lib.isDerivation left && lib.isDerivation right
@@ -102,8 +110,14 @@
     );
   in
     compared.success && compared.value;
-  fixturePackageValues = filter lib.isDerivation (builtins.attrValues packageWorld.packages);
-  publicPackageValues = filter lib.isDerivation (builtins.attrValues self.packages.${system});
+  fixturePackageValues = map (claim: lib.getAttrFromPath claim.keyPath packageWorld.packages) packageWorld.eligibleClaims;
+  packageValues = tree:
+    if lib.isDerivation tree
+    then [tree]
+    else if builtins.isAttrs tree
+    then lib.concatMap packageValues (builtins.attrValues tree)
+    else [];
+  publicPackageValues = packageValues self.packages.${system};
   fixtureOverlayValues =
     map (claim: {
       inherit (claim) keyPath;
@@ -143,10 +157,12 @@
       == inputs.fixture.sentinel
       && overlayResult.ai.alpha == "${inputs.fixture.sentinel}:alpha"
       && overlayResult.ai.gitReviseObserved
-      == "${inputs.fixture.sentinel}:${inputs.fixture.sentinel}:alpha"
+      == "${inputs.fixture.sentinel}:${inputs.fixture.sentinel}:alpha:${inputs.fixture.sentinel}"
+      && overlayResult.ai.devTools.seed == inputs.fixture.sentinel
+      && !(overlayResult.ai.devTools.alpha-tool ? previousPackageOnly)
       && overlayResult.ai.gitTools.git-revise.drvPath == gitRevise.drvPath;
     package-identity =
-      packageWorld.scope.git-revise.drvPath
+      packageWorld.scopes.git-revise.ai.gitTools.git-revise.drvPath
       == gitRevise.drvPath
       && overlayResult.ai.gitTools.git-revise.drvPath == gitRevise.drvPath;
     public-output-invisibility =
@@ -169,6 +185,32 @@
       && !(self.devenvModules ? facet-mock)
       && all outsideFixture publicHomeManagerImports
       && all outsideFixture publicDevenvImports;
+    namespace-identity =
+      packageWorld.scopes.alpha.ai.devTools.alpha-tool.drvPath
+      == packageWorld.packages.ai.devTools.alpha-tool.drvPath
+      && overlayResult.ai.devTools.alpha-tool.drvPath
+      == packageWorld.packages.ai.devTools.alpha-tool.drvPath;
+    namespace-projection = let
+      clean = tree:
+        lib.isDerivation tree
+        || (
+          !(lib.any (name: builtins.elem name (builtins.attrNames tree))
+            ["callPackage" "newScope" "overrideScope" "packages" "recurseForDerivations"])
+          && lib.all clean (builtins.attrValues tree)
+        );
+    in
+      clean packageWorld.packages;
+    platform-scope-omission =
+      if system == "aarch64-darwin"
+      then packageWorld.scopes.platform-control.ai.devTools ? unsupported-control
+      else
+        !(packageWorld.scopes.platform-control.ai.devTools ? unsupported-control)
+        && !(overlayResult.ai.devTools ? unsupported-control);
+    platform-filter-preserves-source =
+      supportedControl.drvPath
+      == originalSupportedControl.drvPath
+      && packageWorld.scopes.platform-control.ai.devTools.supported-control.drvPath == supportedControl.drvPath
+      && overlayResult.ai.devTools.supported-control.drvPath == supportedControl.drvPath;
     registry-native-realization =
       all (key: registryWorld.config.facetMock.entries ? ${key}) registryClaimKeys
       && !(builtins.elem "root-policy" registryClaimKeys)
@@ -183,6 +225,7 @@
     } ''
       ${localCheckBuildCommands}
       test "$(cat ${gitRevise}/marker)" = ${lib.escapeShellArg inputs.fixture.sentinel}
+      test "$(cat ${supportedControl})" = "supported-relative-sidecar"
       mkdir -p "$out"
       touch "$out/passed"
     '';
@@ -192,7 +235,7 @@
       {facetsDir ? ${probe.facetsDir}}: let
         pkgs = import ${pkgs.path} {system = ${builtins.toJSON system};};
         lib = pkgs.lib;
-        loader = import ${../lib/facets.nix} {inherit lib;};
+        loader = import ${../lib}/facets.nix {inherit lib;};
         index = loader.index {inherit facetsDir;};
         inputs.fixture.sentinel = "facet-input-sentinel";
         context = {
@@ -214,12 +257,26 @@
             result = lib.fix (final: base // world.overlay final base);
           in builtins.deepSeq result true
         ''
+        else if probe.force == "package-overlay"
+        then ''
+          let
+            packageWorld = loader.realizePackages {
+              inherit index inputs pkgs;
+              system = ${builtins.toJSON system};
+            };
+            world = loader.realizeOverlay { inherit context index packageWorld; };
+            result = lib.fix (final: world.overlay final {});
+          in builtins.deepSeq result true
+        ''
         else if probe.force == "packages"
         then ''
-          builtins.deepSeq (loader.realizePackages {
+          let world = loader.realizePackages {
             inherit index inputs pkgs;
+            scopeArgs = builtins.fromJSON ${builtins.toJSON (builtins.toJSON probe.scopeArgs)};
             system = ${builtins.toJSON system};
-          }) true
+          }; in builtins.deepSeq (map (claim:
+            (lib.getAttrFromPath claim.keyPath world.packages).drvPath
+          ) world.eligibleClaims) true
         ''
         else if probe.force == "registry"
         then ''
@@ -238,11 +295,63 @@
     force,
     name,
     scenario ? name,
+    scopeArgs ? {},
   }: {
     facetsDir = negativeRoot + "/${scenario}";
-    inherit expected force name;
+    inherit expected force name scopeArgs;
   };
   probes = [
+    (probe {
+      name = "package-invalid-recipe";
+      force = "index";
+      expected = ["package recipe" "must be regular"];
+    })
+    (probe {
+      name = "package-prefix";
+      force = "packages";
+      expected = ["facet ownership collision in packages" "/one/packages/ai/devTools/shared" "/two/packages/ai/devTools/shared"];
+    })
+    (probe {
+      name = "package-prefix-reversed";
+      force = "packages";
+      expected = ["facet ownership collision in packages" "/one/packages/ai/devTools/shared" "/two/packages/ai/devTools/shared"];
+    })
+    (probe {
+      name = "package-nested-collision";
+      force = "packages";
+      expected = ["facet ownership collision in packages" "/one/packages/ai/devTools/shared.nix" "/two/packages/ai/devTools/shared/package.nix"];
+    })
+    (probe {
+      name = "reserved-nested";
+      force = "packages";
+      expected = ["reserved package name 'newScope'" "/one/packages/ai/devTools/newScope/package.nix"];
+    })
+    (probe {
+      name = "reserved-injected";
+      force = "packages";
+      expected = ["reserved package name 'inputs'" "/one/packages/ai/devTools/inputs/package.nix"];
+    })
+    (probe {
+      name = "package-overlay-dispute";
+      force = "package-overlay";
+      expected = ["facet ownership collision in overlay" "/one/packages/ai/devTools/shared/package.nix" "/two/overlay.nix"];
+    })
+    (probe {
+      name = "package-overlay-parent-dispute";
+      force = "package-overlay";
+      expected = ["facet ownership collision in overlay" "/one/packages/ai/devTools/shared/package.nix" "/two/overlay.nix"];
+    })
+    (probe {
+      name = "package-overlay-child-dispute";
+      force = "package-overlay";
+      expected = ["facet ownership collision in overlay" "/one/packages/ai/devTools/shared/package.nix" "/two/overlay.nix"];
+    })
+    (probe {
+      name = "reserved-scope-argument";
+      force = "packages";
+      scopeArgs.reservedControl = true;
+      expected = ["reserved package name 'reservedControl'" "/one/packages/ai/devTools/reservedControl.nix"];
+    })
     (probe {
       name = "check-collision";
       force = "checks";
@@ -361,28 +470,13 @@
         "claims unwritten leaf 'ai.shared'"
       ];
     })
-    (probe {
-      name = "package-invalid-name";
-      force = "index";
-      expected = [
-        "invalid package name 'Bad'"
-        "expected lowercase kebab-case"
-      ];
-    })
-    (probe {
-      name = "package-missing-recipe";
-      force = "index";
-      expected = [
-        "package 'shared' is missing regular recipe"
-        "/one/packages/shared/package.nix"
-      ];
-    })
+
     (probe {
       name = "package-non-directory";
       force = "index";
       expected = [
-        "package 'shared'"
-        "must be a directory"
+        "owner 'one'"
+        "is metadata-only"
       ];
     })
     (probe {
@@ -476,6 +570,16 @@
     })
   ];
   successProbes = [
+    (probe {
+      name = "package-invalid-name";
+      force = "packages";
+      expected = [];
+    })
+    (probe {
+      name = "package-missing-recipe";
+      force = "packages";
+      expected = [];
+    })
     (probe {
       name = "overlay-dotted-alias";
       force = "overlay";

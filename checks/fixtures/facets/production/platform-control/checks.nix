@@ -6,10 +6,10 @@
   ...
 }: {
   platform-omission = assert if system == "aarch64-darwin"
-  then packages ? unsupported-control
+  then packages ? ai.devTools.unsupported-control
   else
-    !(packages ? unsupported-control)
-    && builtins.elem "unsupported-control" omittedPackages;
+    !(packages ? ai.devTools.unsupported-control)
+    && builtins.elem ["ai" "devTools" "unsupported-control"] omittedPackages;
     pkgs.runCommandLocal "facet-platform-omission" {} ''
       mkdir -p "$out"
       touch "$out/passed"
