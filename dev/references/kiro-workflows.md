@@ -96,7 +96,7 @@ Consequences for adoption:
 ### 1.1 Prerequisite: the feature must be force-unlocked (Measured)
 
 `workflows` is one of **14 rollout features** listed in
-`overlays/kiro-cli-extracted.json` under `rolloutFeatures`, gated by a JSON
+`packages/kiro-cli/extracted.json` under `rolloutFeatures`, gated by a JSON
 rollout manifest carried in the chat binary's **ELF rodata** in two identical
 copies. See `packages/kiro-cli/docs/launcher-argv.md` for the full anatomy.
 

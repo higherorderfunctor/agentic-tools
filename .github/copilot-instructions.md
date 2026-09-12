@@ -181,10 +181,8 @@ Each skill's own description states which operations it covers.
 
 ## Architecture Fragments
 
-> **Last verified:** 2026-09-08 — the `Last verified` marker is now capped at
-> ONE entry; the rule and its cost are in "The marker is one entry, not a
-> changelog" below. Full lineage:
-> `git show a25e8832:dev/fragments/monorepo/architecture-fragments.md`.
+> **Last verified:** 2026-09-12 — package categories live in owner registries
+> and generation shares native metadata assembly.
 
 This repo ships path-scoped architecture fragments as dev-only context for
 agents working on it. They are SEPARATE from the published consumer-facing
@@ -200,9 +198,9 @@ content. Three location flavors are supported by `dev/generate.nix`:
   a devshell module.
 
 Scope globs (which files the fragment loads for) live separately in
-`config.fragments.categories.<category>.scopes` (declared in
-`config/fragment-categories.nix`) and are independent of where the markdown
-source lives on disk.
+`config.fragments.categories.<category>.scopes` (composed from owner
+`registry.nix` files and `config/fragment-categories.nix`) and are independent
+of where the markdown source lives on disk.
 
 Each scoped fragment emits per-ecosystem frontmatter via the
 `lib/ai/transformers/` pipeline:
@@ -297,20 +295,21 @@ sub-concern with tighter scopes.
 
 ### Generator registration
 
-New fragments are registered in `config/fragment-categories.nix` under
-`config.fragments.categories`. The attribute key is the category (which becomes
-the output filename for scoped Claude rules, Copilot instructions, and Kiro
-steering). Each category is one record with two fields: `scopes` (the path globs
-it loads for) and `sources` (the markdown fragments composed into it). A
-`sources` entry is either a bare string (legacy dev/fragments/ path) or an
-attrset with an explicit location:
+New fragments are registered under `config.fragments.categories`: use the
+owner's `registry.nix` for package-specific categories and
+`config/fragment-categories.nix` for workspace/shared categories. The attribute
+key is the category (which becomes the output filename for scoped Claude rules,
+Copilot instructions, and Kiro steering). Each category is one record with two
+fields: `scopes` (the path globs it loads for) and `sources` (the markdown
+fragments composed into it). A `sources` entry is either a bare string (legacy
+dev/fragments/ path) or an attrset with an explicit location:
 
 ```nix
 # ILLUSTRATIVE ONLY — neither category below exists. Real rows
 # live in config/fragment-categories.nix; read that file for them.
 config.fragments.categories = {
   example-dev-sourced = {
-    scopes = ["overlays/example.nix" "packages/example/**"];
+    scopes = ["packages/example/**"];
     sources = [
       # bare string: location="dev", dir defaults to the category key
       "packaging-guide"
@@ -343,9 +342,9 @@ let `config/fragment-categories.nix` be the source of real rows.
 
 `scopes` is a Nix list of globs, and `null` means always-loaded (what the
 `monorepo` orientation category uses). The option itself is declared in
-`lib/fragments-registry.nix`; `dev/generate.nix` merges the two with
-`lib.evalModules` and reads the result. The transforms handle per-ecosystem
-emission — do not hand-format frontmatter.
+`lib/fragments-registry.nix`; `lib/facets/registry.nix` composes the
+contributions with `lib.evalModules`, and `dev/generate.nix` reads its result.
+The transforms handle per-ecosystem emission — do not hand-format frontmatter.
 
 After adding or editing fragments, run
 `devenv tasks run --mode before generate:all` to regenerate instruction and
@@ -384,7 +383,7 @@ the same commit:
 - Routing tables in skills
 - README feature matrix and server reference
 - flake.nix output lists
-- config.update.targets entries (config/update-targets.nix)
+- config.update.targets entries (owner registry.nix)
 - CI workflow matrices
 - Home-manager module registrations
 - Overlay export lists
@@ -520,11 +519,8 @@ exists and WHERE, and stops there.
 
 ## Git Workflow — trunk-based, worktree-per-branch
 
-> **Last verified:** 2026-09-01 — the fix-and-re-review loop is ONE round, not
-> five. Round one is the free automatic review; a second is earned only by a
-> significant change in what there is to review, never by having applied round
-> one's findings. Operator instruction, after the five-round rule exhausted a
-> usage allowance in about ten days.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > **Settled — do not relitigate.** Each of these records an approach that was
 > TRIED and rejected, so the reasoning is not re-derived from scratch. Full
@@ -662,8 +658,8 @@ scoped to the disputed findings only.
 
 **(b) The diff touches a shared abstraction.**
 `git diff --name-only origin/main...HEAD` matches `lib/**`, `packages/*/lib/**`
-or `overlays/*.nix`; or a hunk under `modules/**` or `lib/ai/**` adds, removes
-or retypes a `mkOption`.
+or `packages/*/packages/**/*.nix`; or a hunk under `packages/*/modules/**` or
+`lib/ai/**` adds, removes or retypes a `mkOption`.
 
 Everything else uses the single-reviewer default. Run the three-role protocol:
 an agent that prosecutes, a separate agent that defends, and a third that judges
@@ -1197,28 +1193,22 @@ devshell integration.
 
 ### Key Directories
 
-```
-packages/
-  <pkg>/              Per-package facet barrel: modules/{homeManager,devenv},
-                      lib, docs, and fragments for that package
-  stacked-workflows/  Content package: skills, references, skill-routing fragment
-  coding-standards/   Content package: reusable coding standard fragments
-overlays/     Binary package overlays (all groups under pkgs.ai.*) plus per-package
-              -sources.json / -extracted.json sidecars
-  dev-tools/  Agent-adjacent development utilities (pkgs.ai.devTools.*)
-  generic/    Temporary split-ready bucket for supporting packages that have
-              not yet earned a more specific category
-  git-tools/  Git workflow utilities (pkgs.ai.gitTools.*)
-  lsp-servers/  LSP server packages and role projections
-  mcp-servers/  MCP server packages and role projections
-lib/          Shared library: the ai factory (lib/ai/*), fragments, MCP helpers,
-              credentials, devshell
-devshell/     Standalone devshell modules (mkAgenticShell)
-config/       update-targets.nix (config.update.targets) and shared configuration data
-dev/
-  fragments/    Dev-only instruction fragments (not exported)
-  references/   Dev-only reference docs (not exported)
-  skills/       Dev-only skills (index-repo-docs, repo-review)
-  generate.nix  Fragment to per-ecosystem instruction generator
-checks/       Flake checks
+```text
+packages/<owner>/
+  packages/ai/<namespace>/<name>/package.nix  Native binary recipes and roles
+  lib/                  Public default.nix plus private factories/helpers
+  modules/              Consumer Home Manager and devenv configuration
+  registry.nix          Update, cache, documentation, and architecture metadata
+  checks.nix, checks/   Owner checks and fixtures
+  sources.json          Owner-local release pins (when needed)
+  extracted.json        Measured CLI schemas (when needed)
+  docs/, patches/, src/ Documentation and build support files
+  fragments/, skills/  Published content (when applicable)
+lib/                    Shared composition, AI module engines, packaging helpers
+checks/                 Workspace validation and cross-owner integration
+config/                 Workspace policy and shared option declarations/data
+dev/                    Repo-only generation, tasks, scripts, skills, and guidance
+devshell/               Standalone shell integration (mkAgenticShell)
+flake.nix               Public assembly and repo outputs
+devenv.nix              This repository's workspace shell
 ```

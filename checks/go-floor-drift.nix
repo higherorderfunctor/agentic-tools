@@ -30,7 +30,7 @@
   pkgs,
   self,
 }: let
-  vu = import ../overlays/lib.nix;
+  vu = import ../lib/packaging.nix;
 
   goPackages =
     lib.filterAttrs

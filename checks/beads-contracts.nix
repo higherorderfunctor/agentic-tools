@@ -6,7 +6,7 @@
 {pkgs, ...}: let
   qualifiedBeads = pkgs.ai.devTools.beads;
   inherit (qualifiedBeads) dolt;
-  vu = import ../overlays/lib.nix;
+  vu = import ../lib/packaging.nix;
 in
   pkgs.runCommandLocal "beads-contracts-check" {
     nativeBuildInputs = [

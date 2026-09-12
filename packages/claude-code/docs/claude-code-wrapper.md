@@ -1,16 +1,14 @@
 ## claude-code Wrapper Chain
 
-> **Last verified:** 2026-08-25 — the `nativeSettings` option surface is now
-> GENERATED from the binary's own settings schema rather than hand-declared key
-> by key; `passthru.extracted` moved from `runCommandLocal` to `runCommand`; the
-> packaged version is 2.1.245.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > Full lineage:
 > `git show 6d2fbeef:packages/claude-code/docs/claude-code-wrapper.md`.
 
 Claude Code ships as a **pre-built compiled binary** (a Bun single-exec). The
-base package (`overlays/claude-code.nix`) installs it directly as
-`$out/bin/claude`.
+base package (`packages/claude-code/packages/ai/claude-code/package.nix`)
+installs it directly as `$out/bin/claude`.
 
 ### There is no wrapper on the live path
 
@@ -22,7 +20,7 @@ from the packaged Claude Code version:
   `finalPackage = cfg.package`, so `$out/bin/claude` is the pre-built binary
   itself. Each plugin is symlinked as a whole directory at
   `<configDir>/skills/<name>` (yes, `skills/`, not `plugins/`) and discovered
-  from there. **This is the live path** — `overlays/claude-code-sources.json`
+  from there. **This is the live path** — `packages/claude-code/sources.json`
   tracks 2.1.245.
 - **2.1.76 through 2.1.156, or a package with no detectable version — the legacy
   `--plugin-dir` wrapper.** Upstream wraps the binary in a `symlinkJoin` whose
@@ -47,10 +45,11 @@ asserts these names are unique among themselves and disjoint from skill names.
 
 ### The base package
 
-`overlays/claude-code.nix` builds a `stdenv.mkDerivation` that fetches the
-platform-specific pre-built binary from Anthropic's manifest and installs it as
-`$out/bin/claude`. Per-platform sources are tracked in
-`overlays/claude-code-sources.json`, managed by the package's `updateScript`.
+`packages/claude-code/packages/ai/claude-code/package.nix` builds a
+`stdenv.mkDerivation` that fetches the platform-specific pre-built binary from
+Anthropic's manifest and installs it as `$out/bin/claude`. Per-platform sources
+are tracked in `packages/claude-code/sources.json`, managed by the package's
+`updateScript`.
 
 `passthru.extracted` is a `runCommand` — deliberately NOT `runCommandLocal`.
 `runCommandLocal` sets `allowSubstitutes = false`, and since this derivation's
@@ -63,11 +62,11 @@ it changes the drv hash once; do not swap it back.
 `ai.claude.nativeSettings` used to be a handful of hand-written options plus a
 freeform JSON tail. It is now one typed option per path in the packaged binary's
 OWN settings schema — ~150 top level, extracted into
-`overlays/claude-code-extracted.json` by `overlays/claude-code/census.mjs` and
-turned into `lib.mkOption` declarations by
-`packages/claude-code/lib/generateSettingsOptions.nix`. The wiring lives in
-`packages/claude-code/lib/nativeSettingsOptions.nix`, which is the ONLY place
-the generated set and the hand-authored exceptions are merged.
+`packages/claude-code/extracted.json` by
+`packages/claude-code/extract/census.mjs` and turned into `lib.mkOption`
+declarations by `packages/claude-code/lib/generateSettingsOptions.nix`. The
+wiring lives in `packages/claude-code/lib/nativeSettingsOptions.nix`, which is
+the ONLY place the generated set and the hand-authored exceptions are merged.
 
 Three things follow, and each of them is a trap if you assume the old shape:
 

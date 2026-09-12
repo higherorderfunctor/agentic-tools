@@ -49,13 +49,13 @@ in {
           The cache-hit-parity check SKIPS a row whose `platforms` excludes the
           system being evaluated. That is not a way to silence drift: a
           platform-gated package is absent from `self.packages.<system>`
-          entirely (see the `lib.optionalAttrs` in overlays/default.nix), so
+          entirely (native discovery reads its `platforms.nix` sidecar), so
           looking it up there would abort the whole check with an
           attribute-missing error rather than report anything. Restricting only
           `meta.platforms` and leaving the attribute in place does not help
           either — forcing its `drvPath` throws.
 
-          Set this ONLY alongside an attribute-level gate in the overlay, and
+          Set this ONLY alongside the recipe's `platforms.nix` gate, and
           keep the two in agreement.
         '';
       };

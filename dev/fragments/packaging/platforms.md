@@ -8,8 +8,8 @@
 ### Nightly Packaging Pattern
 
 All binary packages track nightly/latest versions via inline hashes and
-`config.update.targets` (`config/update-targets.nix`). Never defer to nixpkgs
-upstream — always override `src` and `version` from the overlay's inline source.
+`config.update.targets` (owner `registry.nix`). Never defer to nixpkgs upstream
+— always override `src` and `version` from the overlay's inline source.
 
 When a package provides different artifacts per platform (e.g., `.tar.gz` on
 Linux, `.dmg` on Darwin):
@@ -18,7 +18,7 @@ Linux, `.dmg` on Darwin):
    `{url, hash}` entries keyed by Nix system string
 2. Select the correct source in the `.nix` overlay via
    `ourPkgs.stdenv.hostPlatform.system`
-3. Use `mkUpdateScript` from `overlays/lib.nix` to automate version bumps and
+3. Use `mkUpdateScript` from `lib/packaging.nix` to automate version bumps and
    hash prefetching for all platforms
 
 Examples:
@@ -33,10 +33,8 @@ use that one-key shape.
 
 ### Version-independent URLs need `alwaysPrefetch`
 
-> **Last verified:** 2026-07-25 (commit pending — records `mkUpdateScript`'s
-> `alwaysPrefetch` argument and why `dns-root-hints` is its only consumer). If
-> you change `mkUpdateScript`'s change-detection flow or opt another package in
-> or out, update this in the same commit.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 
 `mkUpdateScript` normally early-exits when `versionCheck.cmd`'s output equals
 the sidecar's recorded `.version`, which avoids a network prefetch per package
@@ -57,8 +55,9 @@ to move. Pass `alwaysPrefetch = true` in that case. It:
   actually moved, because the default flow's pre-prefetch
   `"$current -> $latest"` would read `X -> X` when only the hash moved.
 
-`overlays/generic/dns-root-hints.nix` is the only consumer (InterNIC re-serves
-one canonical URL; its "version" is a root-zone serial scraped out of the file
-body). It is opt-in, not the default, because it costs one prefetch per sweep
-whether or not anything moved — negligible for one ~3 KB file 4x/day, not
-negligible for a multi-hundred-MB per-platform release asset set.
+`packages/dns-root-hints/packages/ai/generic/dns-root-hints/package.nix` is the
+only consumer (InterNIC re-serves one canonical URL; its "version" is a
+root-zone serial scraped out of the file body). It is opt-in, not the default,
+because it costs one prefetch per sweep whether or not anything moved —
+negligible for one ~3 KB file 4x/day, not negligible for a multi-hundred-MB
+per-platform release asset set.

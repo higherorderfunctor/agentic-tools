@@ -458,12 +458,12 @@ which revset you used and why.
 worktree with no shared build or evaluation cache, so peak usage is
 `jobs x per-job footprint` — sizing it to the core count assumes jobs are cheap.
 
-Measured on this repo's own git-branchless build (`overlays/git-tools`, which
-tracks the upstream flake input rather than a release, and whose binary
+Measured on this repo's own git-branchless build (`packages/git-branchless`,
+which tracks the upstream flake input rather than a release, and whose binary
 self-reported `0.11.1`), 8 physical / 16 logical cores, with `HOME` and
 `XDG_CONFIG_HOME` pointed at a scratch dir so no real user config leaks in.
 
-Do not treat that version string as a firm anchor: the overlay sets `name`
+Do not treat that version string as a firm anchor: the recipe sets `name`
 without `version` and strips `versionCheckHook` precisely because the two can
 disagree, and the flake input advances on the normal update sweep. What the
 numbers below pin down is behavior, not a release. Only the explicit `jobs = 1`

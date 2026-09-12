@@ -1,9 +1,7 @@
 ## CI Update Workflow
 
-> **Last verified:** 2026-09-09 — hold-back means "the PR could not be written",
-> never "the build failed"; see `update-pipeline.md` § What holds a target back
-> for the table and the `errexit`-in-a-condition trap that made every one of
-> these silent.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > Full lineage:
 > `git show ff610ca0:dev/fragments/pipeline/ci-update-workflow.md`.
@@ -170,7 +168,7 @@ must normalize its own tree. The two paths differ in their **trigger**:
   moved": a package's custom updateScript can emit non-canonical output even
   when the formatter is unchanged. The motivating case is `claude-code`'s
   `extraExtract`, which `cp`'s `jq`-pretty-printed JSON (every array multi-line)
-  over `overlays/claude-code-extracted.json`; biome collapses short arrays (e.g.
+  over `packages/claude-code/extracted.json`; biome collapses short arrays (e.g.
   `effortLevels`) onto one line, so the raw `cp` drifts from treefmt-clean. That
   file now carries the binary's whole settings schema — ~3.2k lines rather than
   60 — so the reformat it needs is no longer a cosmetic one-liner, and skipping
@@ -514,7 +512,7 @@ widens with every Go absorption.
 The SECOND self-heal running through `extraExtract`, and the one to reach for
 when a bump PR fails `checks.<system>.<pkg>-extracted` rather than a build. Do
 not conflate the two: the section above repairs a HASH the sweep invalidated;
-this one keeps a committed `overlays/**/<pkg>-extracted.json` describing the
+this one keeps a committed `packages/<owner>/extracted.json` describing the
 artifact actually pinned.
 
 Four packages have a `passthru.extracted` — `chatgpt-codex`, `claude-code`,

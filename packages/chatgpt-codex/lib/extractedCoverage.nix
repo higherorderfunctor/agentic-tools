@@ -1,5 +1,5 @@
 # Human-reviewed disposition for every vocabulary currently emitted by
-# overlays/chatgpt-codex-extracted.json. This is deliberately separate from the
+# packages/chatgpt-codex/extracted.json. This is deliberately separate from the
 # generated sidecar: an update may regenerate facts, but it must not decide how
 # Nix should own a new upstream surface. checks/chatgpt-codex-coverage.nix keeps
 # every categorical union exact, so an upstream command, flag, field, or

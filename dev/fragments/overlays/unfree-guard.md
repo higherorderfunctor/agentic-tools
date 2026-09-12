@@ -1,7 +1,7 @@
 ## Unfree Package Guard (`ensureUnfreeCheck`)
 
-> **Last verified:** 2026-09-12 — legacy and adopted package assembly share one
-> guard; adopted assembly applies it only to owned leaves, preserving neighbors.
+> **Last verified:** 2026-09-12 — one composer guards only owned package leaves,
+> preserving inherited neighbors.
 
 ### The problem
 
@@ -20,10 +20,10 @@ through unchanged, and wraps unfree derivations with the consumer's
 `final.symlinkJoin`. The wrapper carries the original metadata, passthru, name,
 and version, with the pinned derivation as its sole `paths` entry.
 
-The legacy overlay maps it over its package groups. Repository facet assembly
-applies it to indexed, supported package leaves after overlay composition. It
-must not traverse namespace neighbors inherited from `prev`: those packages may
-already carry a guard and would acquire a second wrapper.
+Repository facet assembly applies it to indexed, supported package leaves after
+overlay composition. It must not traverse namespace neighbors inherited from
+`prev`: those packages may already carry a guard and would acquire a second
+wrapper.
 
 ### How it works
 

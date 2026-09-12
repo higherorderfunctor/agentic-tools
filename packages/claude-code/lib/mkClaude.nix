@@ -16,7 +16,7 @@
   # Eval-pure reads of COMMITTED source JSON (no IFD). See overlays.md
   # § IFD Patterns and memory project_claude_effort_pin_state.
   extracted =
-    builtins.fromJSON (builtins.readFile ../../../overlays/claude-code-extracted.json);
+    builtins.fromJSON (builtins.readFile ../extracted.json);
   aiCommon = import ../../../lib/ai/ai-common.nix {inherit lib;};
   unrecognizedSettings = import ./unrecognizedSettings.nix {inherit lib;};
 
@@ -306,7 +306,7 @@ in
           Claude's settings.json, as typed options plus a freeform
           passthrough. Every key the packaged binary's own settings schema
           declares (extracted into the drift-checked
-          overlays/claude-code-extracted.json) gets a typed option
+          packages/claude-code/extracted.json) gets a typed option
           automatically; a short hand-authored list overrides the generated
           type where the schema is not the surface we want (`attribution.*`
           accepts a bool, `model` is a soft enum, `tui` carries a
@@ -334,7 +334,7 @@ in
           like a brand-new key — and Claude ignores an unknown settings key
           silently, so a misspelling looks applied and does nothing. Every key
           the binary's own extracted schema
-          (overlays/claude-code-extracted.json) does not declare is therefore a
+          (packages/claude-code/extracted.json) does not declare is therefore a
           HARD FAILURE unless it is listed here:
 
           ```nix
@@ -370,7 +370,7 @@ in
           ~/.claude.json (HM only) so settings.effortLevel is honored instead of
           a newly-shipped model's launch-default effort pin. Keys are
           auto-derived from the packaged binary
-          (overlays/claude-code-extracted.json). Set a key false to deliberately
+          (packages/claude-code/extracted.json). Set a key false to deliberately
           leave that model pinned.
         '';
       };
@@ -564,7 +564,7 @@ in
 
           The event key is a soft enum: the ${toString (builtins.length extracted.hookEvents)}
           recognized events (extracted from the packaged binary into the
-          drift-checked overlays/claude-code-extracted.json — never hard-coded)
+          drift-checked packages/claude-code/extracted.json — never hard-coded)
           are ${lib.concatStringsSep ", " extracted.hookEvents}. Any string is
           accepted (forward-compatible with newer binaries).
 

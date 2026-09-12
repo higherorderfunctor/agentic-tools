@@ -41,11 +41,11 @@
   pkgs,
 }: let
   extracted =
-    builtins.fromJSON (builtins.readFile ../overlays/claude-code-extracted.json);
+    builtins.fromJSON (builtins.readFile ../packages/claude-code/extracted.json);
   # The sidecar carries no version of its own; the sources file is what the
   # extraction was run against.
   claudeVersion =
-    (builtins.fromJSON (builtins.readFile ../overlays/claude-code-sources.json)).version;
+    (builtins.fromJSON (builtins.readFile ../packages/claude-code/sources.json)).version;
   surface = import ../packages/claude-code/lib/nativeSettingsOptions.nix {
     inherit extracted lib pkgs;
   };
@@ -231,7 +231,7 @@
       remedy = ''
         The sidecar lists these as public top-level settings keys but carries
         no `settings.paths` entry describing them, so no option could be
-        generated. That is an EXTRACTOR defect (overlays/claude-code/census.mjs),
+        generated. That is an EXTRACTOR defect (packages/claude-code/extract/census.mjs),
         not a table one — the schema walk lost a subtree.
       '';
     }
@@ -297,7 +297,7 @@ in {
     then
       throw ''
         claude settings-schema guard: ${toString (builtins.length failures)} finding(s)
-        against overlays/claude-code-extracted.json (claude-code ${claudeVersion}).
+        against packages/claude-code/extracted.json (claude-code ${claudeVersion}).
 
         ${lib.concatStringsSep "\n\n" failures}
       ''

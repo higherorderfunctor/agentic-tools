@@ -1,9 +1,7 @@
 ## Kiro settings: a flat format with object values, and where the key stops
 
-> **Last verified:** 2026-09-08 (commit pending — first version, written with
-> the fix. `chat.modelDefaults` was unusable from Nix on both backends and had
-> been since `nativeSettings` existed; nothing failed, the key was just never
-> the one kiro looked for.)
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 
 `~/.kiro/settings/cli.json` is FLAT: its keys are dotted strings, not nested
 objects. `nativeSettings` lets you write the nested Nix that reads naturally and
@@ -32,7 +30,7 @@ not a devenv-scope problem, it was unusable.
 `aiCommon.flattenDotKeysUntil` takes a list of dotted paths that are complete
 setting keys and stops recursing the moment the accumulated path is one of them.
 `mkKiro.nix` passes `kiroSettingKeys` — the union of two measured lists from
-`overlays/kiro-cli-extracted.json`:
+`packages/kiro-cli/extracted.json`:
 
 - `settingKeys`: the bundle's own `SCREAMING -> "dotted.key"` registry, 52 keys
   at 2.21.1, all `chat.*`.

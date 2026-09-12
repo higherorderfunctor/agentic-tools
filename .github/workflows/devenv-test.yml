@@ -78,7 +78,7 @@ jobs:
       # This job intermittently dies during devenv's "Configuring shell"
       # phase with `error: path '/nix/store/...-references' is not valid`,
       # naming the store copy of packages/stacked-workflows/references
-      # that packages/stacked-workflows/overlay.nix interpolates. The
+      # that packages/stacked-workflows/packages/stacked-workflows-content/package.nix interpolates. The
       # failure happens during EVALUATION, before any builder starts, so
       # nothing a builder could echo can observe it. Three hypotheses are
       # live and nobody has evidence to pick one: a devenv embedded-C-Nix

@@ -13,7 +13,7 @@
 # so they resolve in every scope). Values are store-path strings, accepted by
 # the skills fanout helpers.
 #
-# Picked up by `collectFacet ["modules" "devenv"]` in flake.nix.
+# Picked up by `native devenv module discovery` in flake.nix.
 import ../../../../lib/ai/mkSkillPackageModule.nix {
   name = "stacked-workflows";
   enableDescription = "stacked workflow skills + skill-routing rule (project-local devenv scope)";

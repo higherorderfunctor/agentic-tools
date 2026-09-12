@@ -6,7 +6,7 @@
 # optionally lower keyring synchronization into activation + systemd user
 # units.
 #
-# Picked up by `collectFacet ["modules" "homeManager"]` in flake.nix.
+# Picked up by `native Home Manager module discovery` in flake.nix.
 {
   config,
   lib,

@@ -1,12 +1,7 @@
 ## Kiro workflows: three gates, all of them silent
 
-> **Last verified:** 2026-09-08 (commit pending — first version. Written after
-> `/workflow` "stopped working" on a machine whose binary was correctly patched:
-> in 2.19.0 the client's own gate quietly became two conditions and nothing
-> anywhere said so. The gate count was measured on store binaries 2.18.0,
-> 2.18.1, 2.19.0, 2.19.1, 2.19.2, 2.20.1, 2.20.2, 2.21.0 and 2.21.1; the
-> workspace-merge claim below on 2.18.1, 2.19.0, 2.19.2, 2.20.2, 2.21.0 and
-> 2.21.1. 2.20.0 was not in the store and is interpolated, not measured.)
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 
 `ai.kiro.unlockedRolloutFeatures = ["workflows"]` is necessary and **not**
 sufficient. Three independent conditions must hold, none of them errors or logs
@@ -108,10 +103,10 @@ DECLARATION is shared, which is where parity actually lives.
 
 ### The allowlist is extracted, and an empty result is a real answer
 
-`overlays/kiro-cli-extracted.json` carries `workspaceOverridableSettings`,
-produced by `kiroSettingsExtractScript` in `overlays/lib.nix`. It is extracted
-rather than curated for the same reason `rolloutFeatures` is: the set IS the
-contract.
+`packages/kiro-cli/extracted.json` carries `workspaceOverridableSettings`,
+produced by `kiroSettingsExtractScript` in
+`packages/kiro-cli/lib/packaging.nix`. It is extracted rather than curated for
+the same reason `rolloutFeatures` is: the set IS the contract.
 
 Unlike the rollout extractor, **absence is not fatal here**, and that is
 deliberate. Every release before 2.21.1 genuinely honors no workspace override,

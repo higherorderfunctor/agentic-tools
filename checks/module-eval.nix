@@ -15,24 +15,24 @@
   # lib.ai.* mirrors the flake's `baseLib` shape: mcp helpers,
   # fragment helpers, and the app factory primitives are all nested
   # under `lib.ai.*`. No top-level `lib.<helper>` exports exist.
-  mcpLib = import ./../lib/mcp.nix {inherit lib;};
-  aiBase = import ./../lib/ai {inherit lib;};
+  mcpLib = import ../lib/mcp.nix {inherit lib;};
+  aiBase = import ../lib/ai {inherit lib;};
   # The runtime registry, shared with lib/ai/sharedOptions.nix and
   # checks/options-doc.nix. Importing it rather than restating the five names
   # is what makes the tests below GROW when a sixth runtime lands: a hardcoded
   # list would keep passing while silently not covering the newcomer.
-  harnessNames = import ./../lib/ai/runtimes.nix;
-  codexExtracted = builtins.fromJSON (builtins.readFile ../overlays/chatgpt-codex-extracted.json);
+  harnessNames = import ../lib/ai/runtimes.nix;
+  codexExtracted = builtins.fromJSON (builtins.readFile ../packages/chatgpt-codex/extracted.json);
   tomlFormat = pkgs.formats.toml {};
   # Generic idempotent-flag helper shared with mkKiro's wrapper (lib/idempotentFlags.nix).
-  idempotentFlags = import ./../lib/idempotentFlags.nix {inherit lib;};
+  idempotentFlags = import ../lib/idempotentFlags.nix {inherit lib;};
   # Kiro mcp-secret preprocessor + the rendered mcp.json body the module
   # feeds into its activation/enterShell writer (mkMcpJsonScript). Tests
   # assert placeholder content via `renderedMcpJson` and template-store-
   # path parity between the two backends.
-  inherit (import ./../packages/kiro-cli/lib/mcpSecrets.nix {inherit lib;}) renderKiroSecrets;
+  inherit (import ../packages/kiro-cli/lib/mcpSecrets.nix {inherit lib;}) renderKiroSecrets;
   # Local credential-injecting reverse proxy (lib/ai/mcpProxy.nix).
-  mcpProxyLib = import ./../lib/ai/mcpProxy.nix {inherit lib pkgs;};
+  mcpProxyLib = import ../lib/ai/mcpProxy.nix {inherit lib pkgs;};
   # Exercises all three header shapes the renderer must handle: a
   # credential WITH a prefix, a credential without one, and a plain
   # literal string that is not a secret at all — plus a credential url.
@@ -264,16 +264,16 @@
         inherit (hmLib) hm;
       };
       modules = [
-        ./../lib/ai/sharedOptions.nix
-        ./../packages/chatgpt-codex/modules/homeManager
-        ./../packages/claude-code/modules/homeManager
-        ./../packages/copilot-cli/modules/homeManager
-        ./../packages/glab/modules/homeManager
-        ./../packages/kimchi/modules/homeManager
-        ./../packages/kiro-cli/modules/homeManager
-        ./../packages/mcp-services/modules/homeManager
-        ./../packages/semble/modules/homeManager
-        ./../packages/stacked-workflows/modules/homeManager
+        ../lib/ai/sharedOptions.nix
+        ../packages/chatgpt-codex/modules/homeManager
+        ../packages/claude-code/modules/homeManager
+        ../packages/copilot-cli/modules/homeManager
+        ../packages/glab/modules/homeManager
+        ../packages/kimchi/modules/homeManager
+        ../packages/kiro-cli/modules/homeManager
+        ../packages/mcp-services/modules/homeManager
+        ../packages/semble/modules/homeManager
+        ../packages/stacked-workflows/modules/homeManager
         hmStubs
         {inherit config;}
       ];
@@ -289,16 +289,16 @@
         }
         // extraSpecialArgs;
       modules = [
-        ./../lib/ai/sharedOptions.nix
-        ./../packages/beads/modules/devenv
-        ./../packages/chatgpt-codex/modules/devenv
-        ./../packages/claude-code/modules/devenv
-        ./../packages/copilot-cli/modules/devenv
-        ./../packages/glab/modules/devenv
-        ./../packages/kimchi/modules/devenv
-        ./../packages/kiro-cli/modules/devenv
-        ./../packages/semble/modules/devenv
-        ./../packages/stacked-workflows/modules/devenv
+        ../lib/ai/sharedOptions.nix
+        ../packages/beads/modules/devenv
+        ../packages/chatgpt-codex/modules/devenv
+        ../packages/claude-code/modules/devenv
+        ../packages/copilot-cli/modules/devenv
+        ../packages/glab/modules/devenv
+        ../packages/kimchi/modules/devenv
+        ../packages/kiro-cli/modules/devenv
+        ../packages/semble/modules/devenv
+        ../packages/stacked-workflows/modules/devenv
         devenvStubs
         {inherit config;}
       ];
@@ -600,7 +600,7 @@
   # skill packages after row 8. This broader guard remains because a program's
   # implementation callback can still write the wrong pool level, and because
   # non-program package contributors remain valid.
-  rootPoolSrcRoot = toString ./..;
+  rootPoolSrcRoot = toString ../.;
 
   runtimePoolProbeConfig = {
     ai = lib.genAttrs harnessNames (_: {enable = true;});
@@ -1222,7 +1222,7 @@ in {
           pkgs = pkgs // {ai = aiStubs;};
         };
         modules = [
-          ./../lib/ai/sharedOptions.nix
+          ../lib/ai/sharedOptions.nix
           ./fixtures/root-pool-writer.nix
         ];
       };
@@ -1275,7 +1275,7 @@ in {
               };
             };
           }
-          (import ./../lib/ai/mkSkillPackageModule.nix {
+          (import ../lib/ai/mkSkillPackageModule.nix {
             name = "probe-package";
             enableDescription = "presence-gate probe";
             rules = _: {probe-rule.text = "Probe guidance.";};
@@ -3205,7 +3205,7 @@ in {
 
   module-content-record-competing-writers-conflict = mkTest "content-record-competing-writers-conflict" (
     let
-      aiCommon = import ./../lib/ai/ai-common.nix {inherit lib;};
+      aiCommon = import ../lib/ai/ai-common.nix {inherit lib;};
       contextAttempt = builtins.tryEval (let
         result = lib.evalModules {
           modules = [
@@ -4412,7 +4412,7 @@ in {
     !(evalHm {}).config.glab.enable && (evalHm {}).config.home.packages == []
   );
 
-  # The settings surface is GENERATED from overlays/dev-tools/glab-extracted.json.
+  # The settings surface is GENERATED from packages/glab/extracted.json.
   # Assert the shape of what was generated rather than a count: a key that
   # upstream renames must show up as a failure here, and an option tree that
   # collapsed to nothing must not read as "fine".
@@ -4682,7 +4682,7 @@ in {
       settings = {};
       extraSettings = {};
     };
-    wrapped = import ./../packages/glab/lib/mkGlab.nix {inherit lib pkgs cfg;};
+    wrapped = import ../packages/glab/lib/mkGlab.nix {inherit lib pkgs cfg;};
   in
     pkgs.runCommand "module-test-glab-preflight-runtime" {} ''
       set -euETo pipefail
@@ -4766,7 +4766,7 @@ in {
         printf '%s\n' "$*" >> "''${GLAB_STUB_LOG:-/dev/null}"
       '')
       .overrideAttrs (_: {version = "0-test";});
-    wrapped = import ./../packages/glab/lib/mkGlab.nix {
+    wrapped = import ../packages/glab/lib/mkGlab.nix {
       inherit lib pkgs;
       cfg = {
         enable = true;
@@ -4833,7 +4833,7 @@ in {
         echo "REACHED-PROGRAM"
       '')
       .overrideAttrs (_: {version = "0-test";});
-    wrapped = import ./../packages/glab/lib/mkGlab.nix {
+    wrapped = import ../packages/glab/lib/mkGlab.nix {
       inherit lib pkgs;
       cfg = {
         enable = true;
@@ -4894,7 +4894,7 @@ in {
       '')
       .overrideAttrs (_: {version = "0-test";});
     mkWrapped = cfgDir: hostValue:
-      import ./../packages/glab/lib/mkGlab.nix {
+      import ../packages/glab/lib/mkGlab.nix {
         inherit lib pkgs;
         cfg = {
           enable = true;
@@ -5011,7 +5011,7 @@ in {
   # AIHUBMIX_API_KEY, since the server has no other config knobs.
   module-aihubmix-factory-call = mkTest "aihubmix-factory-call" (
     let
-      mkAihubmix = import ./../packages/aihubmix-mcp/lib/mkAihubmix.nix;
+      mkAihubmix = import ../packages/aihubmix-mcp/lib/mkAihubmix.nix;
       result =
         mkAihubmix {
           lib = hmLib;
@@ -5028,7 +5028,7 @@ in {
 
   module-context7-factory-call = mkTest "context7-factory-call" (
     let
-      mkContext7 = import ./../packages/context7-mcp/lib/mkContext7.nix;
+      mkContext7 = import ../packages/context7-mcp/lib/mkContext7.nix;
       result = mkContext7 {
         lib = hmLib;
         pkgs = pkgs // {ai = pkgs.ai or {};};
@@ -6094,7 +6094,7 @@ in {
     let
       result = evalHm {
         ai.claude.enable = true;
-        ai.skills.stack-fix = ./../packages/stacked-workflows/skills/stack-fix;
+        ai.skills.stack-fix = ../packages/stacked-workflows/skills/stack-fix;
       };
     in
       result.config.programs.claude-code.skills ? stack-fix
@@ -7153,7 +7153,7 @@ in {
     let
       result = evalHm {
         ai.copilot.enable = true;
-        ai.skills.stack-fix = ./../packages/stacked-workflows/skills/stack-fix;
+        ai.skills.stack-fix = ../packages/stacked-workflows/skills/stack-fix;
       };
       skillEntry = result.config.home.file.".copilot/skills/stack-fix" or null;
     in
@@ -7871,7 +7871,7 @@ in {
   # otherwise surface only as a confusing type error at the consumer.
   module-kiro-rollout-enum-from-sidecar = mkTest "kiro-rollout-enum-from-sidecar" (
     let
-      extracted = builtins.fromJSON (builtins.readFile ../overlays/kiro-cli-extracted.json);
+      extracted = builtins.fromJSON (builtins.readFile ../packages/kiro-cli/extracted.json);
     in
       lib.elem "workflows" extracted.rolloutFeatures
       && lib.elem "tangent" extracted.rolloutFeatures
@@ -8067,7 +8067,7 @@ in {
   # registry entries, so upstream naming the parent would trip this.
   module-kiro-flatten-boundary-has-no-prefix-pairs = mkTest "kiro-flatten-boundary-has-no-prefix-pairs" (
     let
-      extracted = builtins.fromJSON (builtins.readFile ../overlays/kiro-cli-extracted.json);
+      extracted = builtins.fromJSON (builtins.readFile ../packages/kiro-cli/extracted.json);
       keys = lib.unique (extracted.settingKeys ++ extracted.workspaceOverridableSettings);
       nested =
         builtins.filter (
@@ -8098,7 +8098,7 @@ in {
   # defect to route around.
   module-kiro-workspace-allowlist-from-sidecar = mkTest "kiro-workspace-allowlist-from-sidecar" (
     let
-      extracted = builtins.fromJSON (builtins.readFile ../overlays/kiro-cli-extracted.json);
+      extracted = builtins.fromJSON (builtins.readFile ../packages/kiro-cli/extracted.json);
       allowlist = extracted.workspaceOverridableSettings;
     in
       builtins.isList allowlist
@@ -8696,7 +8696,7 @@ in {
     let
       result = evalHm {
         ai.kiro.enable = true;
-        ai.skills.stack-fix = ./../packages/stacked-workflows/skills/stack-fix;
+        ai.skills.stack-fix = ../packages/stacked-workflows/skills/stack-fix;
       };
       skillEntry = result.config.home.file.".kiro/skills/stack-fix" or null;
     in
@@ -10431,7 +10431,7 @@ in {
   # must resolve away, leaving the bare source.
   module-claude-hm-plugins-route-to-upstream = mkTest "claude-hm-plugins-route-to-upstream" (
     let
-      src = ./../packages/stacked-workflows/skills/stack-fix;
+      src = ../packages/stacked-workflows/skills/stack-fix;
       result = evalHm {
         ai.claude = {
           enable = true;
@@ -10487,7 +10487,7 @@ in {
       result = evalHm {
         ai.claude = {
           enable = true;
-          marketplaces.my-shelf = ./../packages/stacked-workflows/skills/stack-fix;
+          marketplaces.my-shelf = ../packages/stacked-workflows/skills/stack-fix;
         };
       };
       upstream = result.config.programs.claude-code.marketplaces or {};
@@ -12163,7 +12163,7 @@ in {
   # and against a populated one. A grep proves the line was emitted; only
   # running it proves the line works.
   module-credential-empty-guard-aborts = let
-    credLib = import ./../lib/credentials.nix {inherit lib;};
+    credLib = import ../lib/credentials.nix {inherit lib;};
     # `mkSecretExport` bakes the path in at generation time and the test
     # needs two different files, so the path is a placeholder substituted
     # per-case below.

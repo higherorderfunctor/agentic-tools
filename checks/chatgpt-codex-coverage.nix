@@ -8,7 +8,7 @@
   pkgs,
 }: let
   coverage = import ../packages/chatgpt-codex/lib/extractedCoverage.nix;
-  extracted = builtins.fromJSON (builtins.readFile ../overlays/chatgpt-codex-extracted.json);
+  extracted = builtins.fromJSON (builtins.readFile ../packages/chatgpt-codex/extracted.json);
 
   sorted = builtins.sort builtins.lessThan;
   flattenCategories = categories: lib.concatLists (builtins.attrValues categories);

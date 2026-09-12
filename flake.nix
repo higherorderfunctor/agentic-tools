@@ -27,7 +27,7 @@
     # INSIDE a package's `ourPkgs`, the same way rust-overlay is, so the
     # toolchain still comes from this repo's pin and cache-hit parity
     # holds. Only reached when a package's declared go.mod floor outruns
-    # `ourPkgs.go` — see `goToolchainForFloor` in overlays/lib.nix.
+    # `ourPkgs.go` — see `goToolchainForFloor` in lib/packaging.nix.
     go-overlay = {
       url = "github:purpleclay/go-overlay";
       inputs = {
@@ -100,50 +100,14 @@
         pkgs = pkgsFor system;
         inherit (inputs) treefmt-nix;
       };
-    # Bind each overlay once so `overlays.<name>` and the
-    # `overlays.default` composition share the same import.
-    aiOverlay = lib.composeManyExtensions [
-      (import ./overlays {inherit inputs;})
-      repository.overlay
-    ];
-    codingStandardsOverlay = import ./packages/coding-standards {};
-    stackedWorkflowsOverlay = import ./packages/stacked-workflows/overlay.nix {};
-
-    # Barrel walker — collects non-binary facets from packages/*/default.nix.
-    packagesBarrel = import ./packages;
-
-    collectFacet = attrPath:
-      lib.pipe packagesBarrel [
-        (lib.filterAttrs (_: p: lib.hasAttrByPath attrPath p))
-        (lib.mapAttrsToList (_: p: lib.getAttrFromPath attrPath p))
-      ];
-
-    packageLibContributions = lib.foldl' lib.recursiveUpdate {} (
-      lib.mapAttrsToList (_: p: p.lib or {}) packagesBarrel
-    );
-
     repository = import ./lib/facets/repository.nix {
       inherit inputs;
       root = ./.;
       systems = supportedSystems;
-      registryModules = [
-        ./config/cache-hit-parity-targets.nix
-        ./config/update-targets.nix
-        ./overlays/mcp-servers/effect-mcp.update.nix
-      ];
     };
     updateRegistry = repository.update;
   in {
-    overlays = {
-      ai = aiOverlay;
-      coding-standards = codingStandardsOverlay;
-      default = lib.composeManyExtensions [
-        aiOverlay
-        codingStandardsOverlay
-        stackedWorkflowsOverlay
-      ];
-      stacked-workflows = stackedWorkflowsOverlay;
-    };
+    overlays.default = repository.overlay;
 
     # Declarative owner contributions and workspace policy share native options.
     updateTargets = updateRegistry.targets;
@@ -152,14 +116,12 @@
     homeManagerModules.default = {
       imports =
         [./lib/ai/sharedOptions.nix]
-        ++ collectFacet ["modules" "homeManager"]
         ++ repository.moduleImports "homeManager";
     };
 
     devenvModules.nix-agentic-tools = {
       imports =
         [./lib/ai/sharedOptions.nix]
-        ++ collectFacet ["modules" "devenv"]
         ++ repository.moduleImports "devenv";
     };
 
@@ -173,23 +135,13 @@
       # packages). Individual packages expose their own presets in
       # passthru.presets; these combine across package boundaries.
       #
-      # We invoke the overlay functions with a stub `final` that
-      # provides only `lib` and a fake `runCommand`. The overlay's
-      # `passthru.fragments` attrset doesn't depend on the
-      # derivation itself, only on `final.lib` (for the fragments
-      # library import), so this is enough to extract fragment data
-      # without instantiating a real pkgs set.
-      stubFinal = {
+      fragmentArgs = {
         inherit lib;
-        runCommand = name: _: _: {
-          inherit name;
-          type = "derivation";
-        };
+        inherit (repository) repoPath;
+        fragmentsLib = fragments;
       };
-      codingStdFragments =
-        (codingStandardsOverlay stubFinal {}).coding-standards.passthru.fragments;
-      swsContentFragments =
-        (stackedWorkflowsOverlay stubFinal {}).stacked-workflows-content.passthru.fragments;
+      codingStdFragments = import ./packages/coding-standards/lib/fragments.nix fragmentArgs;
+      swsContentFragments = import ./packages/stacked-workflows/lib/fragments.nix fragmentArgs;
       presets = {
         # Full dev environment — all coding standards + skill routing
         nix-agentic-tools-dev = fragments.compose {
@@ -199,9 +151,7 @@
           description = "Full nix-agentic-tools dev standards";
         };
       };
-      # Every flake-level helper lives under `lib.ai.*`. There are no
-      # top-level `lib.<helper>` exports — consumers access everything
-      # via `inputs.nix-agentic-tools.lib.ai.<helper>`.
+      # Shared AI primitives compose with the namespaces exported by owners.
       baseLib = {
         ai =
           aiBase
@@ -223,7 +173,7 @@
           };
       };
     in
-      lib.recursiveUpdate baseLib packageLibContributions;
+      repository.libraryFor baseLib;
 
     checks = forAllSystems (system: let
       pkgs = pkgsFor system;
@@ -309,43 +259,22 @@
       # shell entry, so a second rendering here would flip-flop the tree.
       instr = instructionsFor system;
     in
-      # Grouped namespaces under pkgs.ai are flattened here for CLI ergonomics so
-      # `nix build .#context7-mcp` works without knowing the group.
-      # Adding a new package to the overlay automatically adds it
-      # here; no flake.nix edit needed for new binaries.
-      #
-      # Legacy notes preserved for history:
-      # - pkgs.nix-mcp-servers namespace dissolved in Milestone 5
-      # - pkgs.{agnix,git-*} flat entries moved to pkgs.ai.* in Milestone 6
-      # - github-copilot-cli renamed to copilot-cli in Milestone 4
-      # - pkgs.ai.* grouped into mcpServers/lspServers/gitTools (factory arch)
-      # Flat AI CLIs (strip nested groups which aren't derivations)
-      builtins.removeAttrs pkgs.ai ["devTools" "generic" "gitTools" "lspServers" "mcpServers"]
-      // pkgs.ai.devTools
-      // pkgs.ai.generic
-      // pkgs.ai.gitTools
-      // builtins.removeAttrs pkgs.ai.mcpServers ["modelContextProtocol"]
-      // pkgs.ai.lspServers
-      // {
-        # mono-repo combined package (nix-update target)
-        modelcontextprotocol-all-mcps = pkgs.ai.mcpServers.modelContextProtocol.all-mcps;
-        modelcontextprotocol-filesystem-mcp = pkgs.ai.mcpServers.modelContextProtocol.filesystem-mcp;
-        # Future custom Semble grammars that are not already in nixpkgs must be
-        # exposed here so the authenticated package sweep publishes them to
-        # Cachix. Do not expose nixpkgs grammars again; the nixpkgs follow
-        # already supplies those store paths. Keep patched Semble check-only.
-        # Instruction file derivations (from dev/generate.nix).
-        # Each ecosystem produces a content directory consumed by the
-        # `generate:instructions:*` devenv tasks.
-        instructions-agents = instr.agents;
-        instructions-claude = instr.claude;
-        instructions-copilot = instr.copilot;
-        instructions-kiro = instr.kiro;
-        # Repo-root documents, same pipeline. The `generate:repo:*` tasks
-        # build these by name; without them the tasks fail with
-        # "attribute missing" and both files fall back to hand-editing.
-        repo-contributing = instr.repoContributing;
-        repo-readme = instr.repoReadme;
+      repository.packagesFor {
+        inherit pkgs system;
+        rootPackages = {
+          # Instruction file derivations (from dev/generate.nix).
+          # Each ecosystem produces a content directory consumed by the
+          # `generate:instructions:*` devenv tasks.
+          instructions-agents = instr.agents;
+          instructions-claude = instr.claude;
+          instructions-copilot = instr.copilot;
+          instructions-kiro = instr.kiro;
+          # Repo-root documents, same pipeline. The `generate:repo:*` tasks
+          # build these by name; without them the tasks fail with
+          # "attribute missing" and both files fall back to hand-editing.
+          repo-contributing = instr.repoContributing;
+          repo-readme = instr.repoReadme;
+        };
       });
 
     # devShells.default provided by devenv CLI (devenv shell / devenv test)

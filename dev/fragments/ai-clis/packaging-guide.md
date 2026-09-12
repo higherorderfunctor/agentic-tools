@@ -1,8 +1,11 @@
 ## AI CLI Packages
 
+> **Last verified:** 2026-09-12 — CLI recipes, extraction machinery, and
+> sidecars live in their owner directories.
+
 ### Overview
 
-AI coding CLI tools are packaged as overlays under `overlays/`:
+AI coding CLI recipes live at `packages/<owner>/packages/ai/<name>/package.nix`:
 
 - **chatgpt-codex** — OpenAI Codex CLI, pre-built static-musl binary fetched
   from GitHub releases
@@ -50,7 +53,7 @@ ones run `autoPatchelfHook` to repoint the interpreter/rpath at the nix glibc.
 
 These packages pin versions inline (binary CLIs via a per-platform
 `sources.json` sidecar). Each uses an update strategy managed by
-`config.update.targets` (see `config/update-targets.nix`):
+`config.update.targets` (see owner `registry.nix`):
 
 - `chatgpt-codex` — per-platform `sources.json` + `mkUpdateScript`; version via
   `ghLatestVersionCmd` with `tagPrefix = "rust-v"` (openai/codex cuts several
@@ -64,9 +67,9 @@ These packages pin versions inline (binary CLIs via a per-platform
 - `kiro-gateway` — inline `rev` + `hash` with `mkGitRevUpdateScript` for
   main-branch tracking; version via `mkVersion`
 
-The `overlays/lib.nix` file provides `ghLatestVersionCmd`,
+The `lib/packaging.nix` file provides `ghLatestVersionCmd`,
 `mkGitRevUpdateScript`, `mkUpdateScript`, and `mkVersion` helpers consumed by
-each overlay file. `ghLatestVersionCmd` reads the `releases/latest` redirect
+each owner recipe. `ghLatestVersionCmd` reads the `releases/latest` redirect
 rather than the GitHub API, so it needs no token and cannot be rate-limited;
 prefer it over a hand-rolled `curl … api.github.com | jq -r .tag_name` version
 check.
@@ -197,15 +200,16 @@ into `kiro-cli-unwrapped` plus a public FHS wrapper (initially a `symlinkJoin`
 of three environments, now one shared environment); the public derivation has no
 `src`, and its `buildCommand` never reaches the unwrapped package's
 `fixupPhase`, so the pin AND the `postFixup` both evaporated while the build
-stayed green. `overlays/kiro-cli.nix` therefore feature-detects
-`ourPkgs ? kiro-cli-unwrapped`, overrides the unwrapped derivation, and hands
-the result back to upstream's wrapper via `.override`. Its public passthru also
-exposes `withFhsPayload` so module configuration that must be visible inside the
-FHS root can use that same upstream expression. The public package-selection
-contract is topology-stable: `unwrapped` always names the direct payload, and
-`kiroFhsSandbox` says whether selecting it actually removes an FHS layer
-(`false` on darwin and pre-split nixpkgs). `useFhsSandbox = false` selects that
-payload explicitly instead of changing the public package's default meaning.
+stayed green. `packages/kiro-cli/packages/ai/kiro-cli/package.nix` therefore
+feature-detects `ourPkgs ? kiro-cli-unwrapped`, overrides the unwrapped
+derivation, and hands the result back to upstream's wrapper via `.override`. Its
+public passthru also exposes `withFhsPayload` so module configuration that must
+be visible inside the FHS root can use that same upstream expression. The public
+package-selection contract is topology-stable: `unwrapped` always names the
+direct payload, and `kiroFhsSandbox` says whether selecting it actually removes
+an FHS layer (`false` on darwin and pre-split nixpkgs). `useFhsSandbox = false`
+selects that payload explicitly instead of changing the public package's default
+meaning.
 
 Read the "When the attribute stops being the derivation" section of the
 overlay-pattern fragment before adding another `overrideAttrs` package — it

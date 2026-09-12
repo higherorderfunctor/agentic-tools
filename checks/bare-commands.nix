@@ -6,45 +6,11 @@
 # `env` set that uses a bare command like `cat` will fail with
 # "command not found". This check catches these before they ship.
 #
-# Scope: two scan sets, because two different things are being checked.
-#
-#   - Patterns 1 and 2 (whole-line, BARE_CMDS) scan lib/ and
-#     packages/*/lib/ — the directories that produce writeShellScript
-#     wrappers and HM activation scripts — plus the single FILE
-#     overlays/lib.nix. dev/ and devshell/ are excluded, and so is the
-#     rest of overlays/, because they primarily contain
-#     installPhase/buildPhase code that runs inside stdenv with full PATH.
-#   - Pattern 3 (versionCheck.cmd lines only, WRAPPER_CMDS) scans all of
-#     overlays/ recursively. See "The versionCheck.cmd scan" below for
-#     why that wider file set is both necessary and affordable.
-#
-# overlays/lib.nix is the exception that has to be named explicitly: it
-# is the ONLY file under overlays/ that emits writeShellScript wrappers
-# (mkUpdateScript, mkGitRevUpdateScript). Those run outside any builder
-# — the update pipeline invokes an updateScript directly — so they are
-# exactly the PATH-less case this check exists for, unlike the rest of
-# overlays/. It is added as a FILE rather than by widening the glob to
-# overlays/, which would false-positive on the legitimate bare
-# mkdir/cp/chmod in eight other overlays' build phases.
-#
-# overlays/lib.nix is nonetheless a MIXED file, and the check cannot tell
-# the two halves apart because context is a property of the CALLER, not of
-# the line:
-#
-#   - mkUpdateScript, mkGitRevUpdateScript emit `writeShellScript`
-#     wrappers — invoked directly, possibly with a replaced (PATH-less)
-#     environment. Absolute store paths REQUIRED.
-#   - mkMcpSmokeTest, mkClaudeExtract, mkCodexExtract, mkKiroExtract emit build-context
-#     script bodies (installCheckPhase, runCommand/runCommandLocal) that run
-#     inside stdenv with a full PATH from build inputs. Bare commands are
-#     CORRECT there — including ones this check's word lists do not carry,
-#     such as mkClaudeExtract's `python3` and `node`, which run out of that
-#     derivation's own nativeBuildInputs.
-#
-# So a bare command in one of the build-context helpers is a false
-# positive and gets a `# bare-commands: ok` marker on its own line rather
-# than a rewrite. Expect to add more markers as those helpers grow; that
-# is the accepted cost of scanning the file as a whole.
+# Wrapper scans cover shared lib/ and owner-private packages/*/lib/. Build
+# recipes under owner packages/ trees are excluded from whole-line scans:
+# their stdenv phases have a full PATH. Extractors that produce builder bodies
+# live in lib/packaging.nix or owner lib/packaging.nix and use the existing
+# `bare-commands: ok` suppression only for those build-context lines.
 #
 # ── The `versionCheck.cmd` scan (pattern 3) ──────────────────────────
 #
@@ -54,11 +20,11 @@
 # `latest=$(<versionCheck.cmd>)` inside a
 # `pkgs.writeShellScript "update-<pname>"` — a genuine wrapper, invoked
 # directly by the update pipeline with no builder PATH. The string is
-# authored in the PACKAGE file, so scanning only `overlays/lib.nix`
+# authored in the PACKAGE file, so scanning only `lib/packaging.nix`
 # checks the interpolation site while leaving every actual command
 # unscanned.
 #
-# Pattern 3 therefore scans EVERY `.nix` file under `overlays/`
+# Pattern 3 therefore scans EVERY `.nix` file under `packages/`
 # recursively, but ONLY lines that mention `versionCheck.cmd`. Scoping
 # by MECHANISM rather than by directory is what makes the wider scan
 # affordable: `versionCheck.cmd` is a pure PATH-less context with no
@@ -93,10 +59,10 @@
 # cannot match in the first place. Verified against the two lines most
 # likely to bite: `generic/dns-root-hints.nix`, whose string contains
 # `/bin/grep` and `/bin/head` with both `grep` and `head` in
-# WRAPPER_CMDS, and `overlays/lib.nix`'s `latest=$(<versionCheck.cmd>)`,
+# WRAPPER_CMDS, and `lib/packaging.nix`'s `latest=$(<versionCheck.cmd>)`,
 # which sits directly under the `$(` anchor. Neither matches the raw
 # regex — with the filter removed, it finds ZERO hits across all of
-# `overlays/` on a clean tree.
+# `packages/` on a clean tree.
 #
 # Pattern 2 KEEPS its `/bin/` filter. Pattern 1 never had one and needs
 # none, for the same structural reason pattern 3 does not: an absolute
@@ -107,7 +73,7 @@
 # with the sibling filters applied. Five lines, all five genuine false
 # positives:
 #
-#   overlays/lib.nix — `wc="${pkgs.coreutils}/bin/wc"` and the same for
+#   lib/packaging.nix — `wc="${pkgs.coreutils}/bin/wc"` and the same for
 #     `tr`. A variable ASSIGNMENT, not an invocation: `^\s+` then `wc`
 #     then `\b`, and `=` satisfies that word boundary. The value
 #     assigned is already absolute.
@@ -154,7 +120,7 @@
 #   - Pattern 3 is LINE-scoped. A `versionCheck.cmd` written as a
 #     multi-line Nix string, or bound through a `let` and referenced by
 #     name, would evade it. None exist today, and the encouraged path is
-#     `vu.ghLatestVersionCmd` in overlays/lib.nix — which IS scanned, by
+#     `vu.ghLatestVersionCmd` in lib/packaging.nix — which IS scanned, by
 #     patterns 1 and 2, as part of the named-file set.
 #   - `installPhase` / `buildPhase` bare commands across `overlays/`
 #     remain deliberately unscanned. They run inside stdenv with a full
@@ -218,21 +184,11 @@ pkgs.runCommandLocal "bare-commands-check" {
       fi
     done
 
-    # Plus individually named FILES outside those trees that also emit
-    # wrappers. Guarded with -f, not -d, so the directory loop above stays
-    # a directory loop. See the header for why overlays/lib.nix is here
-    # and the rest of overlays/ is not.
-    for f in overlays/lib.nix; do
-      if [ -f "$f" ]; then
-        SCAN_PATHS="$SCAN_PATHS $f"
-      fi
-    done
-
     # Pattern 3 has its own, wider scan set: every .nix file under
-    # overlays/, recursively. It is safe to widen because the pattern
+    # packages/, recursively. It is safe to widen because the pattern
     # itself is scoped to lines mentioning versionCheck.cmd — see header.
     WRAPPER_SCAN_PATHS=""
-    for d in overlays; do
+    for d in packages; do
       if [ -d "$d" ]; then
         WRAPPER_SCAN_PATHS="$WRAPPER_SCAN_PATHS $d"
       fi
@@ -289,7 +245,7 @@ pkgs.runCommandLocal "bare-commands-check" {
     fi
 
     # Pattern 3: bare commands inside a `versionCheck.cmd` string, anywhere
-    # under overlays/. mkUpdateScript interpolates that string into a
+    # under packages/. mkUpdateScript interpolates that string into a
     # writeShellScript wrapper the update pipeline invokes directly, so it
     # is exactly the PATH-less case — but it is authored in the per-package
     # file, which patterns 1 and 2 do not scan. Line-scoped and mechanism-

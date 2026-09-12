@@ -38,10 +38,19 @@
   homeManagerEvaluation = lib.evalModules {modules = homeManagerModules;};
   devenvEvaluation = lib.evalModules {modules = devenvModules;};
   registryWorld = loader.realizeRegistry {
-    claimPath = ["facetMock" "entries"];
+    claimPaths = [["facetMock" "entries"]];
     index = facetIndex;
     modules = [registryModule];
     specialArgs = {inherit inputs;};
+  };
+  library = loader.realizeLibrary {
+    context = {inherit inputs lib;};
+    index = facetIndex;
+    rootLibrary.ai.rootControl = "root";
+  };
+  lazyWorld = loader.realizePackages {
+    inherit inputs pkgs system;
+    index = loader.index {facetsDir = fixtureRoot + "/lazy";};
   };
   overlayWorld = loader.realizeOverlay {
     context = {
@@ -146,12 +155,28 @@
             ++ builtins.attrValues owner.contributions.modules
             ++ filter (value: value != null) [
               owner.contributions.checks
+              owner.contributions.library
               owner.contributions.overlay
               owner.contributions.registry
             ]
           )
       )
       facetIndex.owners;
+    library-native-interface =
+      builtins.functionArgs library.ai.mkControl
+      == {
+        optional = true;
+        required = false;
+      }
+      && library.ai.mkControl {required = "call";} == "facet-input-sentinel:call:default"
+      && library.ai.rootControl == "root"
+      && library.ai.peerControl == "peer"
+      && lib.isOption library.ai.optionControl
+      && lib.isOptionType library.ai.typeControl
+      && library.ai.callableControl "value" == "called:value";
+    package-laziness =
+      lib.isDerivation lazyWorld.packages.ai.available
+      && builtins.attrNames lazyWorld.packages.ai == ["available" "unavailable"];
     overlay-order-and-namespace =
       overlayResult.ai.seed
       == inputs.fixture.sentinel
@@ -214,7 +239,15 @@
     registry-native-realization =
       all (key: registryWorld.config.facetMock.entries ? ${key}) registryClaimKeys
       && !(builtins.elem "root-policy" registryClaimKeys)
-      && registryWorld.config.facetMock.entries.root-policy.owner == "root";
+      && registryWorld.config.facetMock.entries.root-policy.owner == "root"
+      && builtins.elem "conditional-child" registryClaimKeys
+      && registryWorld.config.facetMock.entries.conditional-child
+      == {
+        owner = "namespace-peer";
+        payload = "registry-module-argument";
+        source = toString (productionRoot + "/namespace-peer/registry.nix");
+      }
+      && builtins.any (claim: claim.keyPath == ["facetMock" "entries" "conditional-root"]) registryWorld.rootOwnershipClaims;
   };
   assertionsPass = all (value: value == true) (builtins.attrValues assertions);
 
@@ -247,6 +280,15 @@
         ${
         if probe.force == "checks"
         then "builtins.deepSeq (loader.realizeChecks { inherit context index; }) true"
+        else if probe.force == "library"
+        then "builtins.deepSeq (loader.realizeLibrary { inherit context index; }) true"
+        else if probe.force == "library-root"
+        then ''
+          builtins.deepSeq (loader.realizeLibrary {
+            inherit context index;
+            rootLibrary.ai.shared = _: "root";
+          }) true
+        ''
         else if probe.force == "index"
         then "builtins.deepSeq index true"
         else if probe.force == "overlay"
@@ -278,10 +320,25 @@
             (lib.getAttrFromPath claim.keyPath world.packages).drvPath
           ) world.eligibleClaims) true
         ''
+        else if probe.force == "flat-packages" || probe.force == "flat-root"
+        then ''
+          let packageWorld = loader.realizePackages {
+            inherit index inputs pkgs;
+            system = ${builtins.toJSON system};
+          }; in builtins.deepSeq (builtins.attrNames (loader.flattenPackages {
+            inherit packageWorld;
+            pkgs = packageWorld.packages;
+            rootPackages = ${
+            if probe.force == "flat-root"
+            then ''{shared = pkgs.runCommand "workspace-flat-control" {} "touch $out";}''
+            else "{}"
+          };
+          })) true
+        ''
         else if probe.force == "registry"
         then ''
           builtins.deepSeq (loader.realizeRegistry {
-            claimPath = ["facetMock" "entries"];
+            claimPaths = [["facetMock" "entries"]];
             inherit index;
             modules = [${registryModule}];
           }) true
@@ -301,6 +358,26 @@
     inherit expected force name scopeArgs;
   };
   probes = [
+    (probe {
+      name = "flat-collision";
+      force = "flat-packages";
+      expected = ["facet ownership collision in flat packages" "shared" "/one/packages/ai/first/shared/package.nix" "/two/packages/ai/second/shared/package.nix"];
+    })
+    (probe {
+      name = "flat-root";
+      force = "flat-root";
+      expected = ["facet ownership collision in flat packages" "shared" "<workspace>" "/one/packages/shared/package.nix"];
+    })
+    (probe {
+      name = "library-collision";
+      force = "library";
+      expected = ["facet ownership collision in library" "ai.shared" "/one/lib/default.nix" "/two/lib/default.nix"];
+    })
+    (probe {
+      name = "library-root";
+      force = "library-root";
+      expected = ["facet ownership collision in library" "ai.shared" "<root>" "/one/lib/default.nix"];
+    })
     (probe {
       name = "package-invalid-recipe";
       force = "index";
@@ -503,6 +580,16 @@
         "/one/packages/shared/package.nix"
         "/two/packages/shared/package.nix"
       ];
+    })
+    (probe {
+      name = "registry-conditional";
+      force = "registry";
+      expected = ["facet ownership collision in registry at 'facetMock.entries.shared'" "/one/registry.nix" "/two/registry.nix"];
+    })
+    (probe {
+      name = "registry-root-conditional";
+      force = "registry";
+      expected = ["facet ownership collision in registry at 'facetMock.entries.conditional-root'" "root policy" "/one/registry.nix"];
     })
     (probe {
       name = "registry-equal";

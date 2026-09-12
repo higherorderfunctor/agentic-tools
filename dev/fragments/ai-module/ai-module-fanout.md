@@ -1,8 +1,7 @@
 ## ai Module Fanout Semantics
 
-> **Last verified:** 2026-09-10 — Codex's shared native settings default to
-> GPT-6 Astra with xhigh reasoning effort on both backends. Explicit native
-> values and normalized reasoning effort override these option defaults.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > **Settled — do not relitigate.** Each of these records an approach that was
 > TRIED and rejected, or a measurement that would otherwise be re-derived
@@ -35,7 +34,7 @@ a silent no-op bug. Read this fragment before changing the gating.
 
 ### Codex extracted facts need reverse coverage
 
-`overlays/chatgpt-codex-extracted.json` is generated fact from the pinned
+`packages/chatgpt-codex/extracted.json` is generated fact from the pinned
 binary. `packages/chatgpt-codex/lib/extractedCoverage.nix` is the separate,
 human-reviewed ownership decision. Never generate the second from the first:
 `checks/chatgpt-codex-coverage.nix` intentionally fails when a bump introduces a
@@ -386,7 +385,7 @@ inline-hook ownership check.
 ### Other boundaries
 
 - The package wrapping (Bun runtime) for claude-code — handled in
-  `overlays/claude-code.nix` at overlay level.
+  `packages/claude-code/packages/ai/claude-code/package.nix` at overlay level.
 
 See the backlog item "ai.claude.\* full passthrough" for the ongoing work to
 expose more `programs.claude-code.*` options via `ai.claude.*`.

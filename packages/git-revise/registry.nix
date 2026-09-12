@@ -1,5 +1,6 @@
 {repoPath, ...}: {
   checks.cacheHitParity.git-revise.consumerPath = ["ai" "gitTools" "git-revise"];
+  documentation.gitToolDescriptions.git-revise = "In-memory commit rewriting";
   update.targets.git-revise = {
     file = repoPath ./packages/ai/gitTools/git-revise/package.nix;
     flags = ["--version" "skip"];

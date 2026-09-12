@@ -17,7 +17,7 @@
 # empty result must mean "upstream has no workspace merge" and never "upstream
 # has one and we could not read it".
 {pkgs, ...}: let
-  vu = import ../overlays/lib.nix;
+  vu = import ../packages/kiro-cli/lib/packaging.nix;
   script = vu.kiroSettingsExtractScript pkgs;
   # The registry pair every case needs: the script refuses to conclude anything
   # without it, so its absence is case 4 rather than a property of the others.

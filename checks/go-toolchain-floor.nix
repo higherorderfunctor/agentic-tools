@@ -1,5 +1,5 @@
 # go-toolchain-floor — branch coverage for `goToolchainForFloor` in
-# overlays/lib.nix, the seam that fills a Go-version gap between a
+# lib/packaging.nix, the seam that fills a Go-version gap between a
 # package's go.mod floor and this repo's nixpkgs pin.
 #
 # WHY A CHECK AND NOT A LIVE CONSUMER. This was written when every Go
@@ -45,7 +45,7 @@
   lib,
   pkgs,
 }: let
-  vu = import ../overlays/lib.nix;
+  vu = import ../lib/packaging.nix;
 
   # Same instantiation the package files use: THIS repo's pin, with
   # go-overlay applied inside it (the rust-overlay shape).

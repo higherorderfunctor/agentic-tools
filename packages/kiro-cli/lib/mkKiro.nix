@@ -43,7 +43,7 @@
   # the `trigger` soft-enum. Regenerated on bump + drift-checked
   # (checks/kiro-cli-extracted.nix). See overlays.md § IFD Patterns.
   kiroExtracted =
-    builtins.fromJSON (builtins.readFile ../../../overlays/kiro-cli-extracted.json);
+    builtins.fromJSON (builtins.readFile ../extracted.json);
 
   # Typed hook wiring (northbound), mirroring the Claude slice. S1: an
   # `action.command` accepts a package, coerced to its executable path so
@@ -750,7 +750,7 @@
   # check-meta fires on it before `withRolloutFeatures` is ever reached.
   # No canonicalization here on purpose. `withRolloutFeatures` sorts and
   # de-duplicates its own argument (see `canonFeatures` in
-  # overlays/kiro-cli.nix), because that is where derivation identity is
+  # packages/kiro-cli/packages/ai/kiro-cli/package.nix), because that is where derivation identity is
   # decided and doing it there covers direct callers too. Repeating it here
   # would be a second source of truth that can silently drift out of step.
   resolvePackage = cfg:
@@ -852,7 +852,7 @@
             `kiro-cli settings <key> <value>`.
 
             That list describes the binary this flake PINS, read out of
-            `overlays/kiro-cli-extracted.json`. It is not re-derived from an
+            `packages/kiro-cli/extracted.json`. It is not re-derived from an
             overridden `ai.kiro.package`, so a newer kiro whose allowlist has
             grown is still judged against the pinned one — bump the pin (and
             its sidecar) rather than working around this.
@@ -1389,7 +1389,7 @@ in
           eval rather than writing a file that looks applied and is not; the
           assertion names the keys the pinned kiro does honor there. That
           allowlist is extracted from the binary
-          (`overlays/kiro-cli-extracted.json`, `workspaceOverridableSettings`),
+          (`packages/kiro-cli/extracted.json`, `workspaceOverridableSettings`),
           so it tracks version bumps instead of being curated here.
         '';
       };

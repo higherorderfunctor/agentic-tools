@@ -170,7 +170,7 @@
         echo "oh-my-posh back on every sweep." >&2
         echo "" >&2
         echo "Fix: build the chain with vu.mkGoUpdateExtract and expose its script as" >&2
-        echo "passthru.goUpdateExtract. See overlays/lib.nix." >&2
+        echo "passthru.goUpdateExtract. See lib/packaging.nix." >&2
         exit 1
       ''
     else

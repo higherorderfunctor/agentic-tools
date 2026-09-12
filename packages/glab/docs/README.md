@@ -115,10 +115,10 @@ store path, even though upstream does not class it as a credential.
 
 ## Settings
 
-`glab.settings.*` is **generated** from
-`overlays/dev-tools/glab-extracted.json`, which is extracted from glab's own
-`internal/config.KeySchema` and drift-checked by `checks.glab-extracted`. Option
-names are upstream's key names, and each description is upstream's own.
+`glab.settings.*` is **generated** from `packages/glab/extracted.json`, which is
+extracted from glab's own `internal/config.KeySchema` and drift-checked by
+`checks.glab-extracted`. Option names are upstream's key names, and each
+description is upstream's own.
 
 That means the surface cannot silently disagree with the packaged version, and
 it also means env-var mapping is exact — several keys have non-obvious names

@@ -9,10 +9,8 @@ Per-platform binary packages store versions and hashes in a
 
 ### Shell Wrappers: Absolute Paths Required
 
-> **Last verified:** 2026-08-25 — `mkClaudeExtract` carries bare `python3` and
-> `node` invocations marked `# bare-commands: ok`. Neither name is in
-> `BARE_CMDS` or `WRAPPER_CMDS` yet, so the markers are documentation, not
-> suppression, against a later widening of those lists.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > Full lineage:
 > `git show 6d2fbeef:dev/fragments/nix-standards/nix-standards.md`.
@@ -56,7 +54,7 @@ over a bullet saying "optional but acceptable", so the file could be cited for
 opposite verdicts on the same bare `cp`. `checks/bare-commands.nix` is the
 authority and has always exempted the phases; this list now matches it. When an
 exempt body lives in a file the whole-line scan reads (`lib/`,
-`packages/*/lib/`, `overlays/lib.nix`), silence it with a `# bare-commands: ok`
+`packages/*/lib/`, `lib/packaging.nix`), silence it with a `# bare-commands: ok`
 marker on the line, as `mkClaudeExtract` does — never by adding a store path the
 phase does not need.
 
@@ -64,12 +62,12 @@ phase does not need.
 scans.
 
 The **whole-line scan** covers `lib/`, `packages/*/lib/`, and the single file
-`overlays/lib.nix`, looking for a coreutils command in any of four command-start
-contexts: `$(cmd`, line start, after a `|`, and after an `&&`. Anchoring only at
-line start (the original form) missed three of those four, so a file could look
-covered while most real defect shapes walked through.
+`lib/packaging.nix`, looking for a coreutils command in any of four
+command-start contexts: `$(cmd`, line start, after a `|`, and after an `&&`.
+Anchoring only at line start (the original form) missed three of those four, so
+a file could look covered while most real defect shapes walked through.
 
-The **`versionCheck.cmd` scan** covers every `.nix` file under `overlays/`, but
+The **`versionCheck.cmd` scan** covers every `.nix` file under `packages/`, but
 only lines mentioning `versionCheck.cmd`. That string is interpolated into a
 `writeShellScript` wrapper by `mkUpdateScript` and invoked directly by the
 update pipeline, so it is PATH-less — yet it is authored in the per-package
@@ -96,7 +94,7 @@ structural reason pattern 3 does not). That filter is a blind spot on the same
 MIXED-line shape, and it is kept only because the corpus says it is currently
 free — measured 2026-07-30 by enumerating every line it subtracts. Five, all
 five genuine false positives: two `wc=`/`tr=` variable ASSIGNMENTS in
-`overlays/lib.nix` whose values are already absolute, and three bare
+`lib/packaging.nix` whose values are already absolute, and three bare
 `rm -f "$out/bin/…"` in a `symlinkJoin` `postBuild`, in
 `packages/glab/lib/mkGlab.nix` and `packages/kiro-cli/lib/wrapPackage.nix` — a
 build context this check deliberately does not police, where the `/bin/` is a
@@ -109,7 +107,7 @@ reasoning about it.
 Because the scan is per-line and the wrapper-versus-build-phase distinction is a
 property of the CALLER, a legitimately bare command in build-context code inside
 a scanned file is suppressed with a `# bare-commands: ok` comment **on that same
-line** — never by rewriting correct code. `overlays/lib.nix` is the mixed case:
+line** — never by rewriting correct code. `lib/packaging.nix` is the mixed case:
 `mkUpdateScript` / `mkGitRevUpdateScript` emit real wrappers, while
 `mkClaudeExtract` / `mkKiroExtract` / `mkMcpSmokeTest` emit build-script bodies,
 which run inside stdenv with a full PATH from the derivation's own

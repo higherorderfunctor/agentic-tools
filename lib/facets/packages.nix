@@ -116,17 +116,17 @@
       foldl' (
         tree: claim:
           lib.recursiveUpdate tree (lib.setAttrByPath claim.keyPath (
-            lib.getAttrFromPath claim.keyPath scopes.${claim.owner}
+            let
+              value = lib.getAttrFromPath claim.keyPath scopes.${claim.owner};
+            in
+              assert ensure (isDerivation value) "owner '${claim.owner}' package '${lib.showAttrPath claim.keyPath}' at '${toString claim.source}' returned a non-derivation"; value
           ))
       ) {}
       eligibleClaims;
     reserved = builtins.head reservedClaims;
     reservedName = builtins.head (filter (name: elem name reservedNames) reserved.keyPath);
-    nonDerivations = filter (claim: !isDerivation (lib.getAttrFromPath claim.keyPath packages)) eligibleClaims;
-    invalid = builtins.head nonDerivations;
     validations = [
       (ensure (reservedClaims == []) "reserved package name '${reservedName}' from owner '${reserved.owner}' at '${toString reserved.source}' would overwrite a native or injected scope member")
-      (ensure (nonDerivations == []) "owner '${invalid.owner}' package '${lib.showAttrPath invalid.keyPath}' at '${toString invalid.source}' returned a non-derivation")
     ];
   in
     deepSeq [exclusive validations] {

@@ -14,7 +14,7 @@
 # appears to apply and does nothing.
 #
 # The packaged binary now hands us its own settings schema (extracted into
-# overlays/claude-code-extracted.json, `settings.paths`). That turns the
+# packages/claude-code/extracted.json, `settings.paths`). That turns the
 # freeform tail from unknowable into merely undeclared: a key is either
 # declared by the binary, or the consumer has said "I know, let it through".
 #
@@ -328,7 +328,7 @@ in rec {
         sidecar carries no settings schema, so the unrecognized-key check is not
         running and those entries suppress nothing.
 
-        Either update the package (whose overlays/claude-code-extracted.json
+        Either update the package (whose packages/claude-code/extracted.json
         then carries a `settings` record), or drop ${allowOptionPath}.
       '';
     }
@@ -358,7 +358,7 @@ in rec {
              writes it through untouched. A `*` segment is accepted in place of
              a key you chose yourself, so one entry can cover every instance.
 
-        The declared set comes from overlays/claude-code-extracted.json, which is
+        The declared set comes from packages/claude-code/extracted.json, which is
         generated from the binary's own settings schema — never hand-curated. If
         the key is real and the sidecar is stale, REGENERATING THE SIDECAR is the
         durable fix; an allowlist entry is a per-key opt-out of this check that

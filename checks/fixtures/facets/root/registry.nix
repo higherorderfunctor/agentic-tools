@@ -1,4 +1,13 @@
-{lib, ...}: {
+{
+  config,
+  lib,
+  ...
+}: {
+  options.facetMock.activate = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = "Enable configuration-dependent registry controls.";
+  };
   options.facetMock.entries = lib.mkOption {
     type = lib.types.attrsOf (lib.types.submodule {
       options = {
@@ -11,9 +20,19 @@
     description = "Native module values contributed by tracked mock facets.";
   };
 
-  config.facetMock.entries.root-policy = {
-    owner = "root";
-    payload = "root-policy";
-    source = toString ./registry.nix;
-  };
+  config.facetMock.entries =
+    {
+      root-policy = {
+        owner = "root";
+        payload = "root-policy";
+        source = toString ./registry.nix;
+      };
+    }
+    // lib.optionalAttrs config.facetMock.activate {
+      conditional-root = lib.mkForce {
+        owner = "root";
+        payload = "conditional-root";
+        source = toString ./registry.nix;
+      };
+    };
 }

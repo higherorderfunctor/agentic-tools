@@ -144,8 +144,8 @@
           # identifier fragments cut mid-token by windowed byte extraction.
           "^fixtures/kiro-primitives/evidence/"
           "^fixtures/kiro-primitives/records/"
-          "^overlays/chatgpt-codex-extracted\\.json$"
-          "^overlays/claude-code-extracted\\.json$"
+          "^packages/chatgpt-codex/extracted\\.json$"
+          "^packages/claude-code/extracted\\.json$"
           # Patch files are verbatim third-party code plus Git blob hashes.
           ".*\\.patch$"
         ];
@@ -157,7 +157,6 @@
       role = "validator";
       hook = {
         enable = true;
-        excludes = ["overlays/sources/.*"];
       };
       stop = "judgment";
       ci.backend = "git-hooks";
@@ -220,7 +219,6 @@
       role = "validator";
       hook = {
         enable = true;
-        excludes = ["overlays/sources/.*"];
       };
       stop = "judgment";
       ci.backend = "git-hooks";

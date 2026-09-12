@@ -1,28 +1,17 @@
 {
   inputs,
-  registryModules,
+  registryModules ? null,
   root,
   systems,
 }: let
   inherit (inputs.nixpkgs) lib;
   facets = import ../facets.nix {inherit lib;};
-  index = facets.index {
-    facetsDir = root + "/packages";
-    # Migration adapter: owners opt in by carrying their declarative registry.
-    # Remove the predicate when the remaining legacy owners have migrated.
-    includeOwner = path: builtins.pathExists (path + "/registry.nix");
-  };
-  repoPath = path:
-    assert lib.hasPrefix "${toString root}/" (toString path);
-      builtins.unsafeDiscardStringContext (lib.removePrefix "${toString root}/" (toString path));
-  registryFor = claimPath:
-    facets.realizeRegistry {
-      inherit claimPath index;
-      modules = [../checks.nix ../update.nix] ++ registryModules;
-      specialArgs = {inherit inputs repoPath;};
-    };
-  update = (registryFor ["update" "targets"]).config.update;
-  cacheHitParity = (registryFor ["checks" "cacheHitParity"]).config.checks.cacheHitParity;
+  registry =
+    import ./registry.nix ({inherit lib root;}
+      // lib.optionalAttrs (registryModules != null) {modules = registryModules;});
+  inherit (registry) index repoPath;
+  inherit (registry.config) update;
+  cacheHitParity = registry.config.checks.cacheHitParity;
   packageWorlds = lib.genAttrs systems (system:
     facets.realizePackages {
       inherit index inputs system;
@@ -30,7 +19,12 @@
         inherit system;
         config.allowUnfree = true;
       };
-      scopeArgs.packageLib = import ../../overlays/lib.nix;
+      scopeArgs = {
+        inherit repoPath;
+        packageLib = import ../packaging.nix;
+        fragmentsLib = import ../fragments.nix {inherit lib;};
+        traceSource = import ../traceSource.nix {inherit lib;};
+      };
     });
   # Overlay attribute names must be available before the nixpkgs fixed point
   # can supply stdenv/system. Discover the outer namespace without realization.
@@ -38,7 +32,23 @@
     lib.unique (map (claim: builtins.head claim.keyPath)
       (lib.concatMap (owner: owner.contributions.packages) index.owners));
 in {
-  inherit cacheHitParity index packageWorlds update;
+  inherit cacheHitParity index packageWorlds repoPath update;
+  libraryFor = rootLibrary:
+    facets.realizeLibrary {
+      inherit index rootLibrary;
+      rootSource = root + "/lib";
+      context = {inherit inputs lib repoPath;};
+    };
+  packagesFor = {
+    system,
+    pkgs,
+    rootPackages ? {},
+  }:
+    facets.flattenPackages {
+      inherit pkgs rootPackages;
+      packageWorld = packageWorlds.${system};
+      rootSource = root + "/flake.nix";
+    };
   overlay = final: prev: let
     system = final.stdenv.hostPlatform.system;
     context = {

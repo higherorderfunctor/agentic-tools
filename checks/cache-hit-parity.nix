@@ -52,9 +52,12 @@
   # Simulate a consumer rewriting this flake's nixpkgs input with `follows`.
   # Unlike consumerPkgs above, the overlay itself sees nixpkgs-test as its own
   # pin, so its deliberately isolated `ourPkgs` builds move with the consumer.
-  followedOverlay = import ../overlays {
-    inputs = inputs // {nixpkgs = inputs.nixpkgs-test;};
-  };
+  followedOverlay =
+    (import ../lib/facets/repository.nix {
+      inputs = inputs // {nixpkgs = inputs.nixpkgs-test;};
+      root = ../.;
+      systems = [system];
+    }).overlay;
   followedPkgs = import inputs.nixpkgs-test {
     inherit system;
     config.allowUnfree = true;
@@ -65,7 +68,7 @@
   # `consumerPkgs` for each, comes from the merged `config.checks.cacheHitParity`
   # registry — exposed as `self.cacheHitParityTargets` and declared across
   # lib/checks.nix (the option), owner registry.nix contributions, and
-  # config/cache-hit-parity-targets.nix (legacy rows and exclusion policy). Each
+  # owner registry.nix files (legacy rows and exclusion policy). Each
   # registry row is `{ consumerPath = [ ... ]; }`; the standalone side is always
   # `self.packages.${system}.<name>`.
 
@@ -106,7 +109,7 @@
 
   # A row may declare `platforms`. Absent (the default, null) means "every
   # supported system", which is every row but gluetun's. A platform-gated
-  # package is not merely unbuildable elsewhere — overlays/default.nix
+  # package is not merely unbuildable elsewhere — lib/facets/repository.nix
   # omits the ATTRIBUTE, so `self.packages.<system>.<name>` would abort
   # this whole check with attribute-missing rather than report drift.
   # Skipping costs no coverage: the package is still compared on every
@@ -134,7 +137,7 @@
     lib.optionalString (skipped != [])
     " — skipped on ${system} (platform-gated): ${lib.concatStringsSep ", " skipped}";
 
-  # agnix's CLI / LSP / MCP variants are ONE build: overlays/agnix.nix
+  # agnix's CLI / LSP / MCP variants are ONE build: packages/agnix/packages/ai/agnix/package.nix
   # compiles all three binaries, and the -lsp/-mcp attrs only re-point
   # meta.mainProgram, so the three must share a single derivation.
   # nixpkgs injects NIX_MAIN_PROGRAM=meta.mainProgram into the build
@@ -195,7 +198,7 @@ in {
               i: n: "echo '  ${n}: ${builtins.elemAt agnixDrvPaths i}' >&2\n"
             )
             agnixVariants)
-          + "echo 'They are one build (overlays/agnix.nix compiles all three binaries).' >&2\n"
+          + "echo 'They are one build (packages/agnix/packages/ai/agnix/package.nix compiles all three binaries).' >&2\n"
           + "echo 'Set mainProgram with `agnix // {meta = agnix.meta // {mainProgram = ...;};}`,' >&2\n"
           + "echo 'NOT overrideAttrs: nixpkgs injects NIX_MAIN_PROGRAM=meta.mainProgram into the' >&2\n"
           + "echo 'build env, so overrideAttrs forks the hash into 3 redundant Rust compiles.' >&2\n"

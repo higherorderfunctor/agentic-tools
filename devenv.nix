@@ -177,11 +177,11 @@ in {
   # pkgs.stacked-workflows-content are available everywhere. No manual
   # overlay composition needed.
   overlays = [
-    # Unified AI overlay (all binary-package groups under pkgs.ai.*)
-    (import ./overlays {inherit inputs;})
-    # Content packages (pkgs.coding-standards, pkgs.stacked-workflows-content)
-    (import ./packages/coding-standards {})
-    (import ./packages/stacked-workflows/overlay.nix {})
+    (import ./lib/facets/repository.nix {
+      inherit inputs;
+      root = ./.;
+      systems = [pkgs.stdenv.hostPlatform.system];
+    }).overlay
   ];
 
   # ── Binary Cache ──────────────────────────────────────────────────────
@@ -340,7 +340,7 @@ in {
       # commands are only populated when the resolved engine is `kas` —
       # patching the binary alone is not enough, and the failure is silent.
       #
-      # Names come from `overlays/kiro-cli-extracted.json` (`rolloutFeatures`),
+      # Names come from `packages/kiro-cli/extracted.json` (`rolloutFeatures`),
       # extracted from the binary rather than curated. UNCERTIFIED upstream:
       # `workflows` is documented as "Dark-shipped at 0% until release
       # certification is complete".

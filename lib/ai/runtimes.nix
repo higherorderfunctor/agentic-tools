@@ -9,7 +9,7 @@
 #     way the code runs inside a CONSUMER's own evaluation, with module args and
 #     no flake context — in particular no `self`. That is what rules out the
 #     `cacheHitParityTargets` shape
-#     (config/cache-hit-parity-targets.nix + lib/checks.nix merged by
+#     (owner registry.nix files + lib/checks.nix merged by
 #     `lib.evalModules` in flake.nix), which is reachable only as
 #     `self.cacheHitParityTargets`.
 #   - checks/options-doc.nix needs it inside a derivation's shell string.

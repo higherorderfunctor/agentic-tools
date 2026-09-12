@@ -1,8 +1,7 @@
 # kiro-cli wrapper: the argv contract
 
-> **Last verified:** 2026-09-09 — identity extraction now handles the minified
-> CLI/IDE ternary function in the installed 2.21.2 engine, alongside the older
-> named function.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > **Settled — do not relitigate.** Full lineage:
 > `git show 0057d8ed:packages/kiro-cli/docs/launcher-argv.md`.
@@ -217,7 +216,8 @@ Measured on one machine, `--v3`, all `KIRO_*` stripped (store 2.16.0, DMG
 
 Row 3 is the trap: **removing wrapProgram does not fix it** — argv[0] is not
 canonicalized, so a symlink is not enough; the string itself must be the bundle
-path. The fix is therefore in `overlays/kiro-cli.nix`: a darwin-only trailing
+path. The fix is therefore in
+`packages/kiro-cli/packages/ai/kiro-cli/package.nix`: a darwin-only trailing
 `--argv0` on the launcher's wrapProgram call naming the bundle path (makeWrapper
 documents that whichever of `--argv0`/`--inherit-argv0` comes LAST wins, and
 wrapProgram injects `--inherit-argv0` before user args). The chat binary does no
@@ -356,7 +356,7 @@ declaratively — the grant is simply absent for that session.
 > The real gate is a **JSON rollout manifest carried in the ELF's rodata**, in
 > TWO identical copies, parsed at runtime — see `vu.mkKiroRolloutPatch` and
 > `ai.kiro.unlockedRolloutFeatures`. Its feature names are extracted into
-> `overlays/kiro-cli-extracted.json` under `rolloutFeatures`, so read that file
+> `packages/kiro-cli/extracted.json` under `rolloutFeatures`, so read that file
 > rather than re-deriving the list by hand (the extractor found two entries a
 > careful manual read had missed). Note the manifest's own `workflows`
 > description says "enable locally through KIRO_ENABLED_FEATURES" — that line is
@@ -545,9 +545,10 @@ probe the unwrapped CLI at all (see the re-measure recipe above), and
 `checks/kiro-wrapper-argv.nix` asserts on it.
 
 This governs THIS module's wrappers only. The darwin OVERLAY shim
-(`overlays/kiro-cli.nix`) deliberately ends in `exec -a "<bundle path>"` — the
-argv[0] override IS the bundle-discovery fix — and the check never reads that
-shim, so no carve-out is needed there. Do not "fix" its argv0 back to `"$0"`.
+(`packages/kiro-cli/packages/ai/kiro-cli/package.nix`) deliberately ends in
+`exec -a "<bundle path>"` — the argv[0] override IS the bundle-discovery fix —
+and the check never reads that shim, so no carve-out is needed there. Do not
+"fix" its argv0 back to `"$0"`.
 
 An earlier revision credited "probe scripts under `docs/plans/`" with depending
 on this. Nothing there does — `grep -rl 'exec -a' docs/plans` is empty — so the

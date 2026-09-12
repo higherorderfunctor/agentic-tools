@@ -1,10 +1,7 @@
 ## IFD Patterns and Gotchas
 
-> **Last verified:** 2026-09-10 — a stale `pnpmDeps` hash substitutes from the
-> binary cache instead of failing, because `fetchPnpmDeps` leaves the version
-> out of its output name; `cargoDeps` carries the short rev and cannot be
-> masked. The `@napi-rs/cli` regeneration loop below was re-run end to end at
-> the 3.9.1 pin.
+> **Last verified:** 2026-09-12 — source paths and ownership guidance follow
+> native package assembly.
 >
 > **Settled — do not relitigate.** Full lineage:
 > `git show 52e86965:dev/fragments/overlays/ifd-patterns.md`.
@@ -23,7 +20,7 @@
 ### What is IFD in this repo
 
 Our overlays compute package versions at eval time by reading manifest files
-from fetched sources. `overlays/lib.nix` provides helpers like
+from fetched sources. `lib/packaging.nix` provides helpers like
 `readPackageJsonVersion`, `readCargoVersion`, and `readPyprojectVersion` that
 call `builtins.readFile` on paths inside a `fetchFromGitHub` output:
 
@@ -162,26 +159,27 @@ minutes later inside `nix-update`.
 
 ### Extracted sidecars are the IFD-free path — and their drift check is not a correctness gate
 
-`mkClaudeExtract`, `mkCodexExtract`, and `mkKiroExtract` in `overlays/lib.nix`
-probe a packaged binary at BUILD time (`passthru.extracted`) and emit a JSON
-sidecar that is COMMITTED (`overlays/<pkg>-extracted.json`). Modules
-`builtins.readFile` the committed file, never the derivation, so option surfaces
-derived from a binary cost no IFD. `checks/<pkg>-extracted.nix` then compares
-committed against freshly-built to catch a stale sidecar.
+`mkClaudeExtract`, `mkCodexExtract`, and `mkKiroExtract` in each CLI owner's
+`lib/packaging.nix` probe a packaged binary at BUILD time (`passthru.extracted`)
+and emit a JSON sidecar that is COMMITTED (`packages/<owner>/extracted.json`).
+Modules `builtins.readFile` the committed file, never the derivation, so option
+surfaces derived from a binary cost no IFD. `checks/<pkg>-extracted.nix` then
+compares committed against freshly-built to catch a stale sidecar.
 
 **Two of the four are no longer greps, and that is the direction of travel.**
 `glab`'s extract is a Go program compiled against upstream's own
-`internal/config.KeySchema`, inline in `overlays/dev-tools/glab.nix`.
-`mkClaudeExtract` unpacks the Bun single-exec's module graph
-(`overlays/claude-code/bununpack.py`), imports the settings chunk out of it and
-calls the binary's OWN schema builder, its OWN zod→JSON-Schema converter and its
-OWN `@internal` filter (`overlays/claude-code/census.mjs`), so the sidecar's
-`settings` block is upstream's own description of itself rather than anything
-this repo recognizes by eye. Everything located by that path is located by
-CONTENT — never a chunk filename, a minified identifier or a byte offset, none
-of which the macOS and Linux builds of one version agree on. That is what lets
-ONE sidecar be committed for both platforms; the darwin `build` job is the only
-place that claim is ever tested by a build.
+`internal/config.KeySchema`, inline in
+`packages/glab/packages/ai/devTools/glab/package.nix`. `mkClaudeExtract` unpacks
+the Bun single-exec's module graph
+(`packages/claude-code/extract/bununpack.py`), imports the settings chunk out of
+it and calls the binary's OWN schema builder, its OWN zod→JSON-Schema converter
+and its OWN `@internal` filter (`packages/claude-code/extract/census.mjs`), so
+the sidecar's `settings` block is upstream's own description of itself rather
+than anything this repo recognizes by eye. Everything located by that path is
+located by CONTENT — never a chunk filename, a minified identifier or a byte
+offset, none of which the macOS and Linux builds of one version agree on. That
+is what lets ONE sidecar be committed for both platforms; the darwin `build` job
+is the only place that claim is ever tested by a build.
 
 Reach for a grep only for facts that are genuinely outside the artifact's own
 schema. Two survive in `mkClaudeExtract` for exactly that reason: the launch-pin
@@ -553,8 +551,9 @@ feature maturities, and config-key extraction fail closed.
   true of the tool and false of the fetcher contract.
 
   **Packaging a pnpm major is not the same as proving it usable as a fetcher
-  argument.** This was latent in `overlays/generic/pnpm_12.nix` from the day it
-  was written: `checks/pnpm-fetcher-parity.nix` enumerates only packages that
+  argument.** This was latent in
+  `packages/pnpm/packages/ai/generic/pnpm_12/package.nix` from the day it was
+  written: `checks/pnpm-fetcher-parity.nix` enumerates only packages that
   already ship a `pnpmDeps`, and none of them used pnpm 12, so nothing evaluated
   the combination. The passthru is not a derivation input — the `pnpm_12`
   outPath is byte-identical with and without it — so adding it is inert for
@@ -572,10 +571,10 @@ feature maturities, and config-key extraction fail closed.
   someone realigned them by hand. The edit carries no judgement: it inserts one
   identical `(patch_hash=…)` token wherever pnpm names the resolved dependency,
   so encoding it positionally buys nothing and costs a held-back target per
-  reshuffle. `overlays/dev-tools/oxlint-pnpm-patch-meta.awk` does it by key, and
-  asserts loudly on the change that IS a judgement call — the dependency moving
-  off the pinned version, which invalidates both the patch target and the patch
-  hash.
+  reshuffle. `packages/oxlint/src/oxlint-pnpm-patch-meta.awk` does it by key,
+  and asserts loudly on the change that IS a judgement call — the dependency
+  moving off the pinned version, which invalidates both the patch target and the
+  patch hash.
 
   **But it is a VERSION-KEY check, not a content check, and it cannot be
   otherwise.** Every key it builds comes from `ver`, so it compares upstream's

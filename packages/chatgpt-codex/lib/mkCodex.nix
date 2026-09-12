@@ -9,7 +9,7 @@
   agent = import ../../../lib/ai/agent.nix {inherit lib;};
   aiCommon = import ../../../lib/ai/ai-common.nix {inherit lib;};
   sharedHooks = import ../../../lib/ai/hooks.nix {inherit lib;};
-  codexExtracted = builtins.fromJSON (builtins.readFile ../../../overlays/chatgpt-codex-extracted.json);
+  codexExtracted = builtins.fromJSON (builtins.readFile ../extracted.json);
   helpers = import ../../../lib/ai/hm-helpers.nix {inherit lib;};
   # Launcher wrapper — see ./wrapPackage.nix for why Codex needs one at all.
   wrapCodexPackage = import ./wrapPackage.nix {inherit lib pkgs;};

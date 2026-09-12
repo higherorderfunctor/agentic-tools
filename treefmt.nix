@@ -108,7 +108,6 @@
     ".devenv/**"
     ".direnv/**"
     ".pre-commit-config.yaml"
-    "overlays/sources/**"
     "node_modules/**"
     "result/**"
     "result-*/**"

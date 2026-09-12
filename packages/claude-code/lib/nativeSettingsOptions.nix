@@ -4,7 +4,7 @@
 #
 #   1. MACHINE-DERIVED — `generateSettingsOptions.nix` walks the settings
 #      schema the packaged binary emits about ITSELF (the drift-checked
-#      `overlays/claude-code-extracted.json`, `.settings`) and declares a typed
+#      `packages/claude-code/extracted.json`, `.settings`) and declares a typed
 #      `nullOr` option per path. Nothing here is hand-curated, so a key upstream
 #      adds arrives with the next package bump instead of waiting for someone to
 #      notice it.
@@ -104,7 +104,7 @@
       description = ''
         Persisted Claude effort level. The valid set
         (low/medium/high/xhigh) is extracted from the packaged binary
-        into overlays/claude-code-extracted.json. 'max' is session-only
+        into packages/claude-code/extracted.json. 'max' is session-only
         via /effort and cannot be persisted.
       '';
     };
@@ -129,7 +129,7 @@
         Claude model id. The ${toString (builtins.length knownClaudeModels)}
         non-retired ids in the packaged binary's model catalog
         (extracted into the drift-checked
-        overlays/claude-code-extracted.json — never hand-curated) are
+        packages/claude-code/extracted.json — never hand-curated) are
         ${lib.concatStringsSep ", " knownClaudeModels}. Any string is
         accepted (non-enforcing soft enum) — the binary's runtime model
         set is not a safe closed enum.

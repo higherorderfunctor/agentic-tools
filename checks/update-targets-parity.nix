@@ -1,10 +1,10 @@
 # Update-target completeness + parity gate (packages ↔ config.update.targets ↔
-# overlays).
+# owner recipes).
 #
 # config/update-matrix.nix was dissolved into config.update.targets, so this is
 # now the SOLE update-target gate — there is no coexisting matrix to reconcile.
 # config.update.targets composes owner registry.nix contributions with root
-# policy and remaining legacy rows. The `.#updateTargets` flake output is the
+# workspace policy. The `.#updateTargets` flake output is the
 # single source of truth the pipeline reads.
 #
 # The reverse packages → targets direction asserts that every versioned flake
@@ -13,20 +13,20 @@
 # excludePatterns exemption. This makes an absent package row visible without
 # replacing the declared update registry with package discovery.
 #
-# In the forward targets → overlays direction, every main-tracking target (one
+# In the forward targets → recipes direction, every main-tracking target (one
 # carrying a `git` URL — binary `--use-update-script` packages manage their own
-# sources and never hit resolve_overlay_file) must satisfy three assertions,
+# sources and never hit resolve_recipe_file) must satisfy three assertions,
 # folding in the old checks/overlay-target-resolution.nix regression gate:
-#   (a) `file` is non-null (main-tracking packages MUST declare an overlay).
-#   (b) `file` == resolve_overlay_file(<git>, overlays, packages) — byte-identical to the
+#   (a) `file` is non-null (main-tracking packages MUST declare a recipe).
+#   (b) `file` == resolve_recipe_file(<git>, packages) — byte-identical to the
 #       exact string update-pkg.sh consumes, so the declared path can never
 #       drift from what the deterministic resolver would otherwise pick.
 #   (c) that resolved file carries an inline 40-hex `rev = "…"`, so the rev-bump
 #       actually has something to sed (a mis-resolution to a rev-less file would
 #       silently freeze the package).
 #
-# Runs the SAME resolver (dev/scripts/resolve-overlay-file.sh) the pipeline
-# uses, against the SAME legacy overlays and owner package trees.
+# Runs the SAME resolver (dev/scripts/resolve-recipe-file.sh) the pipeline
+# uses, against the SAME owner package trees.
 {
   inputs,
   lib,
@@ -40,9 +40,11 @@
   targetPackageNames = builtins.filter (name: builtins.hasAttr name packages) (builtins.attrNames updateTargets);
   targetPackages = map (name: packages.${name}) targetPackageNames;
 
-  sourcePath = package:
-    if package ? src && builtins.isAttrs package.src && package.src ? outPath
-    then package.src.outPath
+  sourcePath = package: let
+    source = package.updateSource or (package.src or null);
+  in
+    if builtins.isAttrs source && source ? outPath
+    then source.outPath
     else null;
   updateScriptPath = package:
     if package ? updateScript && lib.isDerivation package.updateScript
@@ -135,8 +137,8 @@ in
     shopt -s inherit_errexit 2>/dev/null || :
 
     cd "$src"
-    # shellcheck source=dev/scripts/resolve-overlay-file.sh
-    source dev/scripts/resolve-overlay-file.sh
+    # shellcheck source=dev/scripts/resolve-recipe-file.sh
+    source dev/scripts/resolve-recipe-file.sh
 
     if [ "${lib.boolToString positiveControlPass}" != true ]; then
       echo "ERROR: removing the context7-mcp row did not make its package uncovered" >&2
@@ -169,18 +171,18 @@ in
     # skipped — never validated.
     while IFS=$'\t' read -r name url declared || [ -n "$name" ]; do
       [ -z "$name" ] && continue
-      # (a) main-tracking targets MUST declare an overlay file.
+      # (a) main-tracking targets MUST declare a recipe file.
       if [ -z "$declared" ]; then
         failures="$failures"$'\n'"  $name: has a git URL but config.update.targets.$name.file is null"
         continue
       fi
       # (b) declared file must be byte-identical to the resolver output.
-      if ! resolved=$(resolve_overlay_file "$url" overlays packages 2>&1); then
+      if ! resolved=$(resolve_recipe_file "$url" packages 2>&1); then
         failures="$failures"$'\n'"  $name: resolver failed: $resolved"
         continue
       fi
       if [ "$resolved" != "$declared" ]; then
-        failures="$failures"$'\n'"  $name: config.update.targets.$name.file = '$declared' but resolve_overlay_file printed '$resolved'"
+        failures="$failures"$'\n'"  $name: config.update.targets.$name.file = '$declared' but resolve_recipe_file printed '$resolved'"
         continue
       fi
       # (c) the resolved file must carry an inline 40-hex rev to sed-bump.
@@ -195,12 +197,12 @@ in
       echo "" >&2
       echo "ERROR: config.update.targets.<name>.file diverges from the" >&2
       echo "deterministic resolver the update pipeline uses, or the resolved" >&2
-      echo "overlay lacks an inline rev (see checks/update-targets-parity.nix):" >&2
+      echo "recipe lacks an inline rev (see checks/update-targets-parity.nix):" >&2
       echo "$failures" >&2
       exit 1
     fi
 
-    echo "All versioned flake packages are update-covered; main-tracking targets match resolve_overlay_file output and carry an inline rev."
+    echo "All versioned flake packages are update-covered; main-tracking targets match resolve_recipe_file output and carry an inline rev."
     mkdir -p "$out"
     touch "$out/ok"
   ''
