@@ -140,10 +140,14 @@ backend exclusion.
 toolchain, so Home Manager is out of scope. Its package barrel contributes to
 `devenvModules.nix-agentic-tools`; `checks/options-doc.nix` requires its public
 option reference and excludes only this namespace from the otherwise exact
-`ai.*` option-name/type comparison. This export preserves the existing runtime
-contract: scribe and board launchers require scripts in the consuming project.
-Grammar rendering happens at evaluation; `generate:sgra` writes those rendered
-bytes in a separate task invocation.
+`ai.*` option-name/type comparison. `ai.strictdoc.scribeSource` defaults to
+`"installed"`: CLI, client, daemon and source readers come from an explicit Nix
+source allowlist, independently of the document root. No project semantics model
+or board assets are packaged. `"project"` selects live project scripts and the
+repository-specific board; this repository opts into it for development. The
+optional semantics command remains lazy and reports an unavailable engine when
+the invoking environment supplies none. Grammar rendering happens at evaluation;
+`generate:sgra` writes those rendered bytes in a separate task invocation.
 
 Surfaces to keep aligned across all three methods: skills,
 instructions/steering, MCP servers, LSP servers, settings, hooks, agents,

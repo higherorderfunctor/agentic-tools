@@ -553,6 +553,8 @@ in {
     # type-checks values against a grammar nothing runs.
     strictdoc = {
       enable = !isCI;
+      # Live development sources retain this repo's semantics and board.
+      scribeSource = "project";
 
       # docs/sdoc/grammar.sgra is GENERATED, by the operator's 2026-08-27
       # ruling on MECH-GRAMMAR-SGRA-NOT-GENERATED: every `.sgra` in this
