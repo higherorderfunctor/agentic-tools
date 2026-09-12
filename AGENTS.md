@@ -90,6 +90,12 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`dev/fragments/devenv/ci-lean-closure.md`](dev/fragments/devenv/ci-lean-closure.md),
     [`dev/fragments/devenv/files-internals.md`](dev/fragments/devenv/files-internals.md)
 
+- **`facets`**
+  - Match: `checks/facet-*.nix`, `flake.nix`, `lib/facets.nix`, `lib/facets/**`,
+    `packages/*/checks.nix`, `packages/*/packages/**`, `packages/*/registry.nix`
+  - Read:
+    [`dev/fragments/facets/package-ownership.md`](dev/fragments/facets/package-ownership.md)
+
 - **`flake`**
   - Match: `flake.nix`, `devenv.nix`
   - Read:
@@ -103,7 +109,7 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
 - **`ifd`**
   - Match: `.github/actions/warm-ifd/**`, `.github/workflows/ci.yml`,
     `.github/workflows/devenv-test.yml`, `.github/workflows/update.yml`,
-    `overlays/*.nix`, `overlays/**/*.nix`
+    `overlays/*.nix`, `overlays/**/*.nix`, `packages/*/packages/**`
   - Read:
     [`dev/fragments/overlays/ifd-patterns.md`](dev/fragments/overlays/ifd-patterns.md)
 
@@ -176,7 +182,7 @@ documents are authoritative for content. Do not edit generated `.claude/rules/`,
     [`dev/fragments/nix-standards/nix-standards.md`](dev/fragments/nix-standards/nix-standards.md)
 
 - **`overlays`**
-  - Match: `overlays/*.nix`, `overlays/**/*.nix`
+  - Match: `overlays/*.nix`, `overlays/**/*.nix`, `packages/*/packages/**`
   - Read:
     [`dev/fragments/overlays/cache-hit-parity.md`](dev/fragments/overlays/cache-hit-parity.md),
     [`dev/fragments/overlays/overlay-pattern.md`](dev/fragments/overlays/overlay-pattern.md),

@@ -4,14 +4,17 @@ Quick-reference for how each package is sourced, built, and updated.
 
 ## Source pattern
 
-All packages pin `rev` + `hash` inline in their overlay `.nix` file. Versions
-computed at eval time via `overlays/lib.nix:mkVersion`
-(`{upstream}+{shortRev}`). Updates via the ninja DAG pipeline:
+Main-tracking packages pin `rev` + `hash` inline in their recipe. Adopted
+recipes live under `packages/<owner>/packages/`; remaining legacy recipes live
+under `overlays/`. Binary/release packages use the source sidecars described
+below. Versions are computed at eval time via `overlays/lib.nix:mkVersion`
+(`{upstream}+{shortRev}`). Updates use the composed registry and ninja DAG:
 `nix run .#generate-update-ninja && ninja -j4 -v -f .update.ninja update-report`
 
 - **Main-tracking**: `git ls-remote` for rev, `nix flake prefetch` for hash,
   `nix-update --version skip` for dep hashes. Config in `config.update.targets`
-  (`config/update-targets.nix`).
+  (owner `registry.nix` contributions plus remaining legacy rows in
+  `config/update-targets.nix`).
 - **Binary packages**: custom `updateScript` via `mkUpdateScript` in
   `overlays/lib.nix`. Per-platform hashes in `<name>-sources.json`.
 - **GitHub repo-archive tarballs** (`fetchzip` consumers):

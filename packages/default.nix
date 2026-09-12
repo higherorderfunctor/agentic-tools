@@ -15,7 +15,6 @@
   git-branchless = import ./git-branchless;
   git-intel-mcp = import ./git-intel-mcp;
   git-mcp = import ./git-mcp;
-  git-revise = import ./git-revise;
   github-mcp = import ./github-mcp;
   gitlab-mcp = import ./gitlab-mcp;
   glab = import ./glab;

@@ -3,10 +3,9 @@
 #
 # config/update-matrix.nix was dissolved into config.update.targets, so this is
 # now the SOLE update-target gate — there is no coexisting matrix to reconcile.
-# config.update.targets (lib/update.nix + config/update-targets.nix + the
-# co-located overlays/mcp-servers/effect-mcp.update.nix, exposed as the
-# `.#updateTargets` flake output) is the single source of truth the pipeline
-# reads.
+# config.update.targets composes owner registry.nix contributions with root
+# policy and remaining legacy rows. The `.#updateTargets` flake output is the
+# single source of truth the pipeline reads.
 #
 # The reverse packages → targets direction asserts that every versioned flake
 # package is updated by a same-name row, a row covering the same derivation,
@@ -19,7 +18,7 @@
 # sources and never hit resolve_overlay_file) must satisfy three assertions,
 # folding in the old checks/overlay-target-resolution.nix regression gate:
 #   (a) `file` is non-null (main-tracking packages MUST declare an overlay).
-#   (b) `file` == resolve_overlay_file(<git>, overlays) — byte-identical to the
+#   (b) `file` == resolve_overlay_file(<git>, overlays, packages) — byte-identical to the
 #       exact string update-pkg.sh consumes, so the declared path can never
 #       drift from what the deterministic resolver would otherwise pick.
 #   (c) that resolved file carries an inline 40-hex `rev = "…"`, so the rev-bump
@@ -27,7 +26,7 @@
 #       silently freeze the package).
 #
 # Runs the SAME resolver (dev/scripts/resolve-overlay-file.sh) the pipeline
-# uses, against the SAME overlays tree.
+# uses, against the SAME legacy overlays and owner package trees.
 {
   inputs,
   lib,
@@ -176,7 +175,7 @@ in
         continue
       fi
       # (b) declared file must be byte-identical to the resolver output.
-      if ! resolved=$(resolve_overlay_file "$url" overlays 2>&1); then
+      if ! resolved=$(resolve_overlay_file "$url" overlays packages 2>&1); then
         failures="$failures"$'\n'"  $name: resolver failed: $resolved"
         continue
       fi

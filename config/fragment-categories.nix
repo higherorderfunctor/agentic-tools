@@ -209,6 +209,18 @@ _: {
       ];
       sources = ["ci-lean-closure" "files-internals"];
     };
+    facets = {
+      scopes = [
+        "checks/facet-*.nix"
+        "flake.nix"
+        "lib/facets.nix"
+        "lib/facets/**"
+        "packages/*/checks.nix"
+        "packages/*/packages/**"
+        "packages/*/registry.nix"
+      ];
+      sources = ["package-ownership"];
+    };
     # flake: binary cache config + flake-level settings. Scoped to
     # files that touch nixConfig or cachix settings so consumers
     # editing their flake inputs get the rule, and consumers
@@ -249,6 +261,7 @@ _: {
         ".github/workflows/update.yml"
         "overlays/*.nix"
         "overlays/**/*.nix"
+        "packages/*/packages/**"
       ];
       sources = [
         {
@@ -469,6 +482,7 @@ _: {
       scopes = [
         "overlays/*.nix"
         "overlays/**/*.nix"
+        "packages/*/packages/**"
       ];
       sources = [
         "cache-hit-parity"

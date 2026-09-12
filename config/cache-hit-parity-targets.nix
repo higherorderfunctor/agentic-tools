@@ -1,15 +1,15 @@
 # config/cache-hit-parity-targets.nix — central config.checks.cacheHitParity
 # contribution.
 #
-# Declares every package's cache-hit-parity consumer attr-path: the dotted
+# Declares legacy packages' cache-hit-parity consumer attr-path: the dotted
 # lookup under `consumerPkgs` that mirrors where the overlay actually exposes
 # the package to downstream users. Merged with lib/checks.nix (the option
 # declaration) by lib.evalModules into the `.#cacheHitParityTargets` flake
 # output — the single source of truth that replaced the six hardcoded lists in
 # checks/cache-hit-parity.nix.
 #
-# Per-package co-location (each package carrying its own row alongside its
-# overlay) is deferred Track B; for now add rows here.
+# Adopted owners carry this row in packages/<owner>/registry.nix; their
+# contributions merge with these legacy rows through the facet composer.
 #
 # Two classes of package are intentionally absent, carried over from the old
 # check's comments so a future editor knows why:
@@ -38,7 +38,6 @@ _: {
     # ── Git tools — live at `consumerPkgs.ai.gitTools.<name>` ──
     git-absorb = {consumerPath = ["ai" "gitTools" "git-absorb"];};
     git-branchless = {consumerPath = ["ai" "gitTools" "git-branchless"];};
-    git-revise = {consumerPath = ["ai" "gitTools" "git-revise"];};
 
     # ── Dev tools — live at `consumerPkgs.ai.devTools.<name>` ──
     beads = {consumerPath = ["ai" "devTools" "beads"];};

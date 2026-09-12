@@ -135,12 +135,15 @@
   in
     module // {_file = toString claim.source;};
 in rec {
-  index = {facetsDir}: let
+  index = {
+    facetsDir,
+    includeOwner ? _: true,
+  }: let
     rootEntries =
       if pathExists facetsDir
       then readDir facetsDir
       else {};
-    ownerNames = sortNames (attrNames rootEntries);
+    ownerNames = filter (name: includeOwner (facetsDir + "/${name}")) (sortNames (attrNames rootEntries));
     contributionEntryNames = [
       "checks.nix"
       "modules"
@@ -428,10 +431,19 @@ in rec {
   realizeChecks = {
     context,
     index,
+    rootChecks ? {},
+    rootSource ? "<root checks>",
   }: let
     sourceClaims = contributionsFor index "checks";
+    rootClaims = map (name: {
+      keyPath = [name];
+      owner = "<root>";
+      source = rootSource;
+      value = rootChecks.${name};
+    }) (attrNames rootChecks);
     checkClaims =
-      concatMap (
+      rootClaims
+      ++ concatMap (
         claim: let
           factory = import claim.source;
           checks =

@@ -857,10 +857,9 @@ aggregate but skips its dependency leaves.
 
 ## Update Pipeline Architecture
 
-> **Last verified:** 2026-09-09 — a target is HELD BACK only when the PR cannot
-> be WRITTEN; a failing build ships as a red PR instead. Target bodies are
-> standalone subshells so `errexit` is genuinely armed, gated by
-> `checks/target-subshell-shape.nix`.
+> **Last verified:** 2026-09-12 — adopted owners contribute update rows through
+> their registry modules and derive repository paths from their source location.
+> The deterministic resolver searches legacy overlays and co-located recipes.
 >
 > **Settled — do not relitigate.** Gating the PR on a passing build was tried
 > and rejected. It parks every later bump of that input behind one broken
@@ -937,14 +936,15 @@ receives the repo URL as a trailing argument:
    `nix eval --raw .#updateTargets.<name>.file`. Every main-tracking package
    declares one, so this is the live path; `resolve_overlay_file`
    (`dev/scripts/resolve-overlay-file.sh`) is a retained safety-net fallback
-   that deterministically locates the single overlay `.nix` pinning this
-   upstream by matching the fetch block's identity — either
+   that searches legacy overlays and owner package trees for the single `.nix`
+   recipe pinning this upstream by matching the fetch block's identity — either
    `fetchFromGitHub { owner = "<owner>"; repo = "<repo>"; }` or
-   `fetchgit { url = "…github.com/<owner>/<repo>.git"; }` — and requiring
-   **exactly one** match. 0 or >1 matches ⇒ the target is reported `HELD BACK`
-   (never a silent guess). `checks.update-targets-parity` asserts the declared
-   `file` is byte-identical to what the resolver would print, so the two paths
-   can never diverge. `sed` then replaces the old `rev` in that resolved file.
+   `fetchgit { url = "…github.com/<owner>/<repo>.git"; }` — and requiring an
+   inline 40-hex revision and **exactly one** match. 0 or >1 matches ⇒ the
+   target is reported `HELD BACK` (never a silent guess).
+   `checks.update-targets-parity` asserts the declared `file` is byte-identical
+   to what the resolver would print, so the two paths can never diverge. `sed`
+   then replaces the old `rev` in that resolved file.
 3. `nix flake prefetch github:<owner>/<repo>/<new-rev>` fetches the new source
    hash.
 4. `sed` replaces the old `hash` in the overlay `.nix` file.
@@ -984,13 +984,13 @@ registry every package contributes a row to. It replaced the flat, top-level
   `private/slice-fixture/lib/concerns.nix` instead; `/private/` is gitignored
   local working material, so that pointer resolves for nobody but its author.
   The fixture itself is described in `docs/package-restructure.md`.
-- **`config/update-targets.nix`** — the central contribution: every package's
-  row EXCEPT effect-mcp, plus the `excludePatterns` list carried over from the
-  dissolved matrix. Rows split into main-tracking (a `git` URL and a non-null
-  `file`) and binary (`git = null`, `file = null`). **No total is written here
-  on purpose.** A hardcoded one rots by construction — this bullet carried "29
-  packages — 16 main-tracking + 13 binary" long after the sweep had grown past
-  it. Derive it instead:
+- **`config/update-targets.nix`** — the legacy contribution: each remaining
+  legacy row EXCEPT effect-mcp, plus the `excludePatterns` list carried over
+  from the dissolved matrix. Rows split into main-tracking (a `git` URL and a
+  non-null `file`) and binary (`git = null`, `file = null`). **No total is
+  written here on purpose.** A hardcoded one rots by construction — this bullet
+  carried "29 packages — 16 main-tracking + 13 binary" long after the sweep had
+  grown past it. Derive it instead:
 
   ```bash
   nix eval --json .#updateTargets --apply 'ts: with builtins;
@@ -1014,14 +1014,15 @@ registry every package contributes a row to. It replaced the flat, top-level
   The sidecar carries its own `git` URL; `resolve_overlay_file` skips
   `*.update.nix` files (update metadata, never source-pinning overlays), so the
   URL does not make it a second match for `tim-smart/effect-mcp`.
-- **`.#updateTargets`** — a top-level flake output selected from an internal
-  `updateRegistry` built from an explicit 3-module `lib.evalModules` list
-  (`./lib/update.nix` + `./config/update-targets.nix` +
-  `./overlays/mcp-servers/effect-mcp.update.nix`). Keeping the merged sibling
-  `excludePatterns` in that internal binding lets the completeness check consume
-  both halves without evaluating the modules twice. The barrel walker that would
-  `readDir` every `<pkg>.update.nix` is deferred Track B — new contributions are
-  added to that list by hand for now.
+- **`packages/<owner>/registry.nix`** — adopted owners carry their own rows.
+  `file = repoPath ./packages/<namespace>/<package>/package.nix` derives the
+  mutable repository-relative path from the module's actual location, so an
+  owner-directory rename needs no central registration edit.
+- **`.#updateTargets`** — selected from `lib/facets/repository.nix`'s native
+  module evaluation. It merges discovered owner registries with workspace policy
+  and legacy rows; ownership validation rejects competing package keys before
+  priorities can hide them. `excludePatterns` remains available to the
+  completeness check through the same result.
 - **Consumers** — `config/generate-update-ninja.nix` reads `updateTargets` for
   the ninja DAG (flags space-joined, git, and `dependsOn` → `update-<dep>`
   edges); `update-pkg.sh` reads `.#updateTargets.<name>.file` for the rev-bump
@@ -1039,11 +1040,11 @@ registry every package contributes a row to. It replaced the flat, top-level
   an in-repo package with no upstream release to sweep, has no current
   instance.) Targets → overlays: every main-tracking target (with a `git` URL)
   must declare a non-null `file` equal to
-  `resolve_overlay_file(<git>, overlays)`, and the resolved overlay must carry
-  an inline 40-hex `rev`. A positive control removes the real, uniquely sourced
-  `context7-mcp` row in memory and requires that its package become uncovered;
-  this proves the reverse direction can fail without mutating the registry on
-  disk.
+  `resolve_overlay_file(<git>, overlays, packages)`, and the resolved overlay
+  must carry an inline 40-hex `rev`. A positive control removes the real,
+  uniquely sourced `context7-mcp` row in memory and requires that its package
+  become uncovered; this proves the reverse direction can fail without mutating
+  the registry on disk.
 
 ### Report format
 
@@ -1110,17 +1111,17 @@ not the mechanism.
 
 ### Key files
 
-| File                                         | Role                                                               |
-| -------------------------------------------- | ------------------------------------------------------------------ |
-| `checks/update-targets-parity.nix`           | Flake check: declared `file` == resolver output + inline rev       |
-| `config/generate-update-ninja.nix`           | Generates `.update.ninja` DAG from flake.lock + updateTargets      |
-| `config/update-targets.nix`                  | Central `config.update.targets` rows (all packages but effect-mcp) |
-| `dev/scripts/resolve-overlay-file.sh`        | Deterministic overlay resolution (fetch-block identity + guard)    |
-| `dev/scripts/update-common.sh`               | Shared functions (worktree, version, report, colors)               |
-| `dev/scripts/update-init.sh`                 | Pipeline initialization (clean stale state)                        |
-| `dev/scripts/update-input.sh`                | Per-input update script                                            |
-| `dev/scripts/update-pkg.sh`                  | Per-package update script (rev bump + nix-update)                  |
-| `dev/scripts/update-report.sh`               | Report printer                                                     |
-| `lib/update.nix`                             | Declares `config.update.targets` (the option declaration)          |
-| `overlays/mcp-servers/effect-mcp.update.nix` | effect-mcp's co-located update-target contribution row             |
-| `.github/workflows/update.yml`               | CI workflow (Renovate-style per-dependency PRs)                    |
+| File                                         | Role                                                            |
+| -------------------------------------------- | --------------------------------------------------------------- |
+| `checks/update-targets-parity.nix`           | Flake check: declared `file` == resolver output + inline rev    |
+| `config/generate-update-ninja.nix`           | Generates `.update.ninja` DAG from flake.lock + updateTargets   |
+| `config/update-targets.nix`                  | Legacy `config.update.targets` rows and workspace exclusions    |
+| `dev/scripts/resolve-overlay-file.sh`        | Deterministic overlay resolution (fetch-block identity + guard) |
+| `dev/scripts/update-common.sh`               | Shared functions (worktree, version, report, colors)            |
+| `dev/scripts/update-init.sh`                 | Pipeline initialization (clean stale state)                     |
+| `dev/scripts/update-input.sh`                | Per-input update script                                         |
+| `dev/scripts/update-pkg.sh`                  | Per-package update script (rev bump + nix-update)               |
+| `dev/scripts/update-report.sh`               | Report printer                                                  |
+| `lib/update.nix`                             | Declares `config.update.targets` (the option declaration)       |
+| `overlays/mcp-servers/effect-mcp.update.nix` | effect-mcp's co-located update-target contribution row          |
+| `.github/workflows/update.yml`               | CI workflow (Renovate-style per-dependency PRs)                 |

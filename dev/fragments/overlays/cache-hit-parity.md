@@ -1,9 +1,8 @@
 ## Overlay Cache-Hit Parity
 
-> **Last verified:** 2026-08-24 — Beads pins its nested Dolt runtime through the
-> same `ourPkgs` instance and passes that exact derivation into nixpkgs' Beads
-> wrapper, so the grouped release cadence adds no consumer-pinned build input
-> and stays covered by Beads' existing parity row.
+> **Last verified:** 2026-09-12 — adopted owner recipes receive pinned `pkgs`
+> from repository assembly; legacy overlay recipes instantiate the same pin
+> locally. Both preserve the cached build independently of consumer policy.
 >
 > **Settled — do not relitigate.** Full lineage:
 > `git show db6df0dd:dev/fragments/overlays/cache-hit-parity.md`.
@@ -14,10 +13,12 @@
 
 ### The rule
 
-**Every compiled overlay package in this repo must instantiate its own `pkgs`
-from `inputs.nixpkgs` and use THAT for all build inputs and the base
-derivation.** Do not use the `final` / `prev` arguments for anything other than
-discovering `final.system`.
+**Every compiled package must use this flake's `inputs.nixpkgs` pin for its base
+derivation and build inputs.** Adopted owner recipes receive that instance as
+`pkgs` from repository assembly, with shared helpers injected as `packageLib`.
+Legacy overlay recipes instantiate `ourPkgs` locally from `inputs.nixpkgs`.
+Recipes needing additional toolchain overlays may instantiate that same pin with
+those overlays. Consumer `final` / `prev` must not supply build inputs.
 
 If you use `final` or `prev` for build inputs, the derivation binds to the
 **consumer's** nixpkgs pin. CI builds against this repo's own nixpkgs pin.
@@ -25,7 +26,7 @@ Different pins → different store paths → `nix-agentic-tools.cachix.org` does
 serve the consumer because the hash they're asking for was never computed. Cache
 miss on every consumer rebuild.
 
-### The pattern
+### The legacy overlay pattern
 
 ```nix
 # overlays/git-tools/git-absorb.nix — CORRECT
@@ -75,8 +76,10 @@ in
   `final`/`prev`.
 - Version is computed at eval time via `mkVersion`, producing `"x.y.z+debdcd2"`
   (upstream version + short rev).
-- The per-package file takes `{inputs, final, ...}` and is imported by
-  `overlays/default.nix` which composes all packages into the unified overlay.
+- This legacy per-package file takes `{inputs, final, ...}` and is imported by
+  `overlays/default.nix`. Adopted `packages/<owner>/packages/**/package.nix`
+  recipes instead use the native package scope with injected pinned `pkgs` and
+  `packageLib`; no explicit root import entry is needed.
 
 **Why this vehicle, and not `git-branchless`.** This example was headed
 `overlays/git-tools/git-branchless.nix` for a long time after that file stopped

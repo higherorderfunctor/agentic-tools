@@ -64,12 +64,12 @@
   # The set of packages to compare, and the `consumerPath` attr-path under
   # `consumerPkgs` for each, comes from the merged `config.checks.cacheHitParity`
   # registry — exposed as `self.cacheHitParityTargets` and declared across
-  # lib/checks.nix (the option) + config/cache-hit-parity-targets.nix (the rows,
-  # plus the notes on which package classes are intentionally excluded). Each
+  # lib/checks.nix (the option), owner registry.nix contributions, and
+  # config/cache-hit-parity-targets.nix (legacy rows and exclusion policy). Each
   # registry row is `{ consumerPath = [ ... ]; }`; the standalone side is always
   # `self.packages.${system}.<name>`.
 
-  # For packages wrapped by `ensureUnfreeCheck` (overlays/default.nix:guard),
+  # For packages wrapped by `ensureUnfreeCheck` (lib/facets/unfree-guard.nix),
   # the top-level outPath is a `final.symlinkJoin` of the real derivation.
   # The symlinkJoin is built by whichever pkgs set is doing the eval, so
   # its outPath naturally differs between our pin and the consumer pin.

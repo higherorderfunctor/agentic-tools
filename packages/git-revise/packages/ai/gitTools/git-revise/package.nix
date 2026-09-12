@@ -5,18 +5,16 @@
 # hatchling, so we override src/version AND the build system via
 # overridePythonAttrs (which re-evaluates format handling).
 #
-# Instantiates `ourPkgs` from `inputs.nixpkgs` for cache-hit parity
+# The facet composer supplies `pkgs` from this flake's pin for cache-hit parity
 # (see dev/fragments/overlays/overlay-pattern.md).
 {
-  inputs,
-  final,
+  packageLib,
+  pkgs,
   ...
 }: let
-  ourPkgs = import inputs.nixpkgs {
-    inherit (final.stdenv.hostPlatform) system;
-  };
+  ourPkgs = pkgs;
   inherit (ourPkgs) fetchFromGitHub;
-  vu = import ../lib.nix;
+  vu = packageLib;
 
   rev = "a5bdbe420521a7784dd16c8f22b374b2f1d2d167";
   src = fetchFromGitHub {

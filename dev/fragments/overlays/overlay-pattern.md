@@ -1,17 +1,16 @@
 ## Overlay Grouping under `pkgs.ai`
 
-> **Last verified:** 2026-09-01 — `pnpm_12` is a standalone prebuilt-binary
-> derivation, not a `pnpm-major.nix` caller: pnpm 12 moved its implementation
-> out of the npm package and into per-platform native binaries, so the
-> several-majors section's shared-builder shape no longer applies to every major
-> of one package.
+> **Last verified:** 2026-09-12 — adopted owners declare package namespaces
+> through their co-located recipe trees; legacy owners retain the grouped
+> overlay until migration. The package recipe and cache-policy boundary is
+> unchanged.
 >
 > Full lineage: `git show 4705317b:dev/fragments/overlays/overlay-pattern.md`.
 
-`overlays/default.nix` aggregates every binary package under the single
-`pkgs.ai` namespace. Flat AI CLIs live directly below it; supporting categories
-are `devTools`, `generic`, `gitTools`, `lspServers`, and `mcpServers`. Every
-group is built the same way — an attrset of
+`overlays/default.nix` aggregates the remaining legacy binary packages under the
+single `pkgs.ai` namespace. Flat AI CLIs live directly below it; supporting
+categories are `devTools`, `generic`, `gitTools`, `lspServers`, and
+`mcpServers`. Every group is built the same way — an attrset of
 `import ./<dir>/<name>.nix {inherit inputs final;}` entries, passed through
 `guard` (the unfree wrapper) in the output set, and flattened into
 `packages.<system>` in `flake.nix` for CLI ergonomics. The overlay never writes
@@ -31,18 +30,12 @@ Obvious classifications should move out incrementally; `gh` and `glab` are the
 worked example, living together under `overlays/dev-tools/` and
 `pkgs.ai.devTools`.
 
-Repo-local implementation sources consumed by an overlay derivation belong
-beside that derivation under `overlays/`, even when a package module is their
-only runtime consumer. An overlay must not import build sources from
-`packages/`: that outbound edge prevents lifting the overlay tree as a clean
-directory move.
-
-The worked examples were `overlays/kiro-memory-distiller/` and
-`overlays/mcp-servers/openmemory-mem/`, both removed on 2026-09-01. NO OVERLAY
-CARRIES REPO-LOCAL BUILD SOURCES TODAY, so the rule is currently unillustrated —
-which is exactly when it is easiest to violate by accident. The next overlay
-that needs a repo-local `.ts`/`.py`/`.sh` implementation file puts it beside the
-overlay under `overlays/`, not under `packages/`.
+Adopted owners keep recipes and build sources under
+`packages/<owner>/packages/<namespace>/...`, with updates and checks beside that
+tree. The composer discovers the namespace from the recipe path and supplies
+this flake's pinned `pkgs` and shared `packageLib`. Legacy recipes still live
+under `overlays/`; co-location replaces that historical separation. See the
+package-ownership fragment for the native composition boundaries.
 
 ### Absorption is about CADENCE. Never re-open it on a version comparison
 

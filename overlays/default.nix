@@ -24,33 +24,7 @@
 # the only one and was removed 2026-09-01. The shape stays documented
 # because nothing about it was wrong — it simply has no consumer.
 {inputs, ...}: final: _prev: let
-  # Unfree guard. Checks if the derivation has an unfree license and
-  # wraps it so the consumer's allowUnfree config is respected. If the
-  # package is free, returns the original derivation unwrapped.
-  #
-  # Why: ourPkgs builds with allowUnfree (internal to the overlay for
-  # cache-hit parity). Without this guard, unfree derivations produced
-  # by ourPkgs would silently bypass the consumer's unfree preference.
-  # The wrapper uses final.symlinkJoin (consumer's nixpkgs) with the
-  # unfree meta.license, triggering the standard check at eval time.
-  # See memory/project_unfree_guard_pattern.md for rationale.
-  isUnfree = drv: let
-    license = drv.meta.license or {};
-  in
-    if builtins.isList license
-    then builtins.any (l: !(l.free or true)) license
-    else !(license.free or true);
-
-  ensureUnfreeCheck = drv:
-    if isUnfree drv
-    then
-      final.symlinkJoin {
-        inherit (drv) name version;
-        paths = [drv];
-        meta = drv.meta or {};
-        passthru = drv.passthru or {};
-      }
-    else drv;
+  ensureUnfreeCheck = import ../lib/facets/unfree-guard.nix final;
 
   # Bound once and shared, so `kiro-cli` and `kiro-cli-workflows` below are
   # provably the same instantiation rather than two that merely ought to agree.
@@ -246,9 +220,6 @@
       inherit inputs final;
     };
     git-branchless = import ./git-tools/git-branchless.nix {
-      inherit inputs final;
-    };
-    git-revise = import ./git-tools/git-revise.nix {
       inherit inputs final;
     };
   };

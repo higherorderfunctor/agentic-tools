@@ -43,8 +43,8 @@ if [ -n "$git_url" ]; then
     # See dev/scripts/resolve-overlay-file.sh.
     # config.update.targets is the single source of truth (config/update-matrix
     # .nix was dissolved): read the declared overlay file for this package via
-    # `nix eval --raw .#updateTargets.<name>.file` (lib/update.nix +
-    # config/update-targets.nix + the co-located <pkg>.update.nix). Every
+    # `nix eval --raw .#updateTargets.<name>.file` (owner registry.nix
+    # contributions plus root policy and remaining legacy rows). Every
     # main-tracking package declares one, so resolve_overlay_file below is a
     # retained safety-net fallback. Only `file` is consumed here; `flags`/`git`
     # flow positionally from the same registry via the ninja DAG.
@@ -56,7 +56,7 @@ if [ -n "$git_url" ]; then
     if [ -n "$declared_file" ]; then
       target_file="$wt/$declared_file"
       log_info "Target from config.update.targets: $declared_file"
-    elif ! target_file=$(resolve_overlay_file "$git_url" "$wt/overlays"); then
+    elif ! target_file=$(resolve_overlay_file "$git_url" "$wt/overlays" "$wt/packages"); then
       report_held_back "$name" "could not uniquely resolve overlay file"
       exit 0
     fi

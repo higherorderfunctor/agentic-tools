@@ -102,7 +102,10 @@
       };
     # Bind each overlay once so `overlays.<name>` and the
     # `overlays.default` composition share the same import.
-    aiOverlay = import ./overlays {inherit inputs;};
+    aiOverlay = lib.composeManyExtensions [
+      (import ./overlays {inherit inputs;})
+      repository.overlay
+    ];
     codingStandardsOverlay = import ./packages/coding-standards {};
     stackedWorkflowsOverlay = import ./packages/stacked-workflows/overlay.nix {};
 
@@ -119,15 +122,17 @@
       lib.mapAttrsToList (_: p: p.lib or {}) packagesBarrel
     );
 
-    updateRegistry =
-      (lib.evalModules {
-        modules = [
-          ./lib/update.nix
-          ./config/update-targets.nix
-          ./overlays/mcp-servers/effect-mcp.update.nix
-        ];
-      })
-      .config.update;
+    repository = import ./lib/facets/repository.nix {
+      inherit inputs;
+      root = ./.;
+      systems = supportedSystems;
+      registryModules = [
+        ./config/cache-hit-parity-targets.nix
+        ./config/update-targets.nix
+        ./overlays/mcp-servers/effect-mcp.update.nix
+      ];
+    };
+    updateRegistry = repository.update;
   in {
     overlays = {
       ai = aiOverlay;
@@ -140,41 +145,22 @@
       stacked-workflows = stackedWorkflowsOverlay;
     };
 
-    # Merged update-target registry — the single source of truth for
-    # per-package update config (config/update-matrix.nix was dissolved into
-    # this). Explicit 3-module import list (the barrel walker is deferred Track
-    # B): lib/update.nix declares the option, config/update-targets.nix carries
-    # the non-effect-mcp rows, and the co-located effect-mcp.update.nix
-    # contributes its row. Consumed by config/generate-update-ninja.nix
-    # (the ninja DAG) and update-pkg.sh (via
-    # `nix eval --raw .#updateTargets.<name>.file`), and asserted
-    # byte-identical to resolve_overlay_file by checks.update-targets-parity.
+    # Declarative owner contributions and workspace policy share native options.
     updateTargets = updateRegistry.targets;
-
-    # Merged cache-hit-parity registry — the six hardcoded package lists in
-    # checks/cache-hit-parity.nix were dissolved into this. lib/checks.nix
-    # declares the option and config/cache-hit-parity-targets.nix carries the
-    # rows; lib.evalModules merges them. Consumed by checks/cache-hit-parity.nix
-    # via self.cacheHitParityTargets.
-    cacheHitParityTargets =
-      (lib.evalModules {
-        modules = [
-          ./lib/checks.nix
-          ./config/cache-hit-parity-targets.nix
-        ];
-      })
-      .config.checks.cacheHitParity;
+    cacheHitParityTargets = repository.cacheHitParity;
 
     homeManagerModules.default = {
       imports =
         [./lib/ai/sharedOptions.nix]
-        ++ collectFacet ["modules" "homeManager"];
+        ++ collectFacet ["modules" "homeManager"]
+        ++ repository.moduleImports "homeManager";
     };
 
     devenvModules.nix-agentic-tools = {
       imports =
         [./lib/ai/sharedOptions.nix]
-        ++ collectFacet ["modules" "devenv"];
+        ++ collectFacet ["modules" "devenv"]
+        ++ repository.moduleImports "devenv";
     };
 
     lib = let
@@ -264,6 +250,7 @@
       # #1019 mock-pilot bootstrap: evaluate the prospective facet composer
       # here while live package, overlay, and module aggregation stays unchanged.
       facetMockChecks = import ./checks/facet-mock.nix {inherit lib pkgs self;};
+      facetProductionCheck = {facet-owner-relocation = import ./checks/facet-production.nix {inherit pkgs;};};
       factoryChecks = import ./checks/factory-eval.nix {inherit lib pkgs;};
       formattingCheck = import ./checks/formatting.nix {inherit inputs pkgs self;};
       fragmentsChecks = import ./checks/fragments-eval.nix {inherit lib pkgs;};
@@ -303,8 +290,9 @@
       updateTargetsParityCheck = {update-targets-parity = import ./checks/update-targets-parity.nix {inherit inputs lib pkgs self updateRegistry;};};
       prWatchAtStopCheck = {pr-watch-at-stop = import ./checks/pr-watch-at-stop.nix {inherit pkgs;};};
       validateAtStopCheck = {validate-at-stop = import ./checks/validate-at-stop.nix {inherit pkgs;};};
+      rootChecks = facetProductionCheck // bareCommandsCheck // beadsContractsCheck // beadsLifecycleCheck // cacheHitParityCheck // claudeDelegationClampCheck // claudeDevenvHooksRealTypeCheck // claudeExtractedCheck // claudeHeronBrookCheck // claudeMemoryCollisionGuardCheck // claudeSettingsSchemaCheck // codexCoverageCheck // codexExtractedCheck // copilotWrapperArgvCheck // doubledWordsCheck // doubledWordsFixturesCheck // markdownTableCellsFixturesCheck // facetMockChecks // factoryChecks // formattingCheck // fragmentsChecks // glabExtractedCheck // goFloorDriftChecks // goFloorExtractOrderChecks // goToolchainFloorChecks // instructionMaterializationCheck // instructionsDriftCheck // isolatePrekHooksCheck // kiroExtractedCheck // kiroFhsContractCheck // kiroIdentitySpliceCheck // kiroWorkspaceSettingsFixturesCheck // kiroWrapperArgvCheck // moduleChecks // optionsDocsCheck // pnpmFetcherContractCheck // pnpmFetcherParityCheck // repoValidationChecks // sembleTemplatesCheck // splitCodeSpansCheck // targetSubshellShapeCheck // updateTargetsParityCheck // prWatchAtStopCheck // validateAtStopCheck;
     in
-      bareCommandsCheck // beadsContractsCheck // beadsLifecycleCheck // cacheHitParityCheck // claudeDelegationClampCheck // claudeDevenvHooksRealTypeCheck // claudeExtractedCheck // claudeHeronBrookCheck // claudeMemoryCollisionGuardCheck // claudeSettingsSchemaCheck // codexCoverageCheck // codexExtractedCheck // copilotWrapperArgvCheck // doubledWordsCheck // doubledWordsFixturesCheck // markdownTableCellsFixturesCheck // facetMockChecks // factoryChecks // formattingCheck // fragmentsChecks // glabExtractedCheck // goFloorDriftChecks // goFloorExtractOrderChecks // goToolchainFloorChecks // instructionMaterializationCheck // instructionsDriftCheck // isolatePrekHooksCheck // kiroExtractedCheck // kiroFhsContractCheck // kiroIdentitySpliceCheck // kiroWorkspaceSettingsFixturesCheck // kiroWrapperArgvCheck // moduleChecks // optionsDocsCheck // pnpmFetcherContractCheck // pnpmFetcherParityCheck // repoValidationChecks // sembleTemplatesCheck // splitCodeSpansCheck // targetSubshellShapeCheck // updateTargetsParityCheck // prWatchAtStopCheck // validateAtStopCheck);
+      repository.checksFor {inherit pkgs rootChecks self;});
 
     # devShells.default provided by devenv CLI (devenv shell / devenv test)
     # from devenv.nix; nothing in this flake constructs it.

@@ -11,7 +11,7 @@
 set -euETo pipefail
 shopt -s inherit_errexit 2>/dev/null || :
 
-# resolve_overlay_file <git-url> <overlays-root>
+# resolve_overlay_file <git-url> <recipe-root> [recipe-root ...]
 #
 # Print, on stdout, the single overlay .nix file that pins the upstream
 # repo named by <git-url>. Return 0 on exactly one match; return 1 with a
@@ -35,7 +35,8 @@ shopt -s inherit_errexit 2>/dev/null || :
 # and require exactly one match, so an ambiguous/missing mapping fails
 # loudly (HELD BACK) instead of silently corrupting a sibling overlay.
 resolve_overlay_file() {
-  local git_url="$1" root="$2"
+  local git_url="$1"
+  shift
 
   # Parse github.com/<owner>/<repo> from the matrix git URL (always the
   # https form: https://github.com/<owner>/<repo>.git).
@@ -65,12 +66,17 @@ resolve_overlay_file() {
   local f
   local -a matches=()
   while IFS= read -r f; do
+    # Metadata and modules may mention an upstream URL, but only a source
+    # recipe with an inline revision can be a rev-bump target.
+    if ! grep -qE '^[[:space:]]*rev = "[a-f0-9]{40}";' "$f"; then
+      continue
+    fi
     if { grep -qF "owner = \"${owner}\"" "$f" &&
       grep -qF "repo = \"${repo}\"" "$f"; } ||
       grep -qF "github.com/${owner}/${repo}" "$f"; then
       matches+=("$f")
     fi
-  done < <(find "$root" -type f -name '*.nix' ! -name '*.update.nix' | sort)
+  done < <(find "$@" -type f -name '*.nix' ! -name '*.update.nix' | sort)
 
   if [ "${#matches[@]}" -eq 1 ]; then
     printf '%s\n' "${matches[0]}"

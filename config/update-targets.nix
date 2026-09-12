@@ -1,6 +1,7 @@
 # config/update-targets.nix — central config.update.targets contribution.
 #
-# Declares every package's update row EXCEPT effect-mcp, which carries its own
+# Legacy update rows. Adopted owners contribute through their registry.nix.
+# effect-mcp still carries its own
 # co-located overlays/mcp-servers/effect-mcp.update.nix (disjoint keys, no
 # collision). Merged with lib/update.nix (the option declaration) and the
 # effect-mcp contribution by lib.evalModules into the `.#updateTargets` flake
@@ -37,11 +38,6 @@ _: {
       file = "overlays/mcp-servers/git-intel-mcp.nix";
       flags = ["--version" "skip"];
       git = "https://github.com/hoangsonww/GitIntel-MCP-Server.git";
-    };
-    git-revise = {
-      file = "overlays/git-tools/git-revise.nix";
-      flags = ["--version" "skip"];
-      git = "https://github.com/mystor/git-revise.git";
     };
     github-mcp = {
       file = "overlays/mcp-servers/github-mcp.nix";
