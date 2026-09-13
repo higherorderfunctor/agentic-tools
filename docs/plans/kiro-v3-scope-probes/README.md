@@ -61,8 +61,16 @@ because the repo moved steering back to a symlink sink after a spike on 2.18.1
 without a recorded re-verification afterwards. This re-run closes that gap for
 workspace scope at 2.21.4.
 
-**Global steering is still unmeasured.** No saved script covers it. Treat the
-workspace result as indicative, not as proof for the global path.
+**Global steering was measured at 2.13.0 and has NOT been re-verified at
+2.21.4.** It is not unmeasured — the 2026-07-23 round covered both scopes and
+found both dropped (see the historical section below). What is missing is a
+re-run at the current pin, and no SAVED script covers the global path: that
+round used an ad-hoc real-home probe. Re-verifying means splicing
+`probe-steering.sh`'s method onto `probe-global-realhome.sh`'s scope.
+
+Since workspace flipped from drop to follow, global probably flipped too — same
+loader — but "probably" is not a delivery decision. Treat the global path as
+unverified at 2.21.4 rather than as either answer.
 
 ## Four harness bugs (the expensive part — do not re-hit)
 
@@ -111,7 +119,13 @@ workspace result as indicative, not as proof for the global path.
   fired.log                               markers appended here when a hook fires
 ```
 
-## Settled findings (kiro-cli 2.13.0)
+## Historical findings (kiro-cli 2.13.0) — steering rows SUPERSEDED
+
+> Everything below is the 2026-07-23 round against 2.13.0. The two steering rows
+> no longer describe current behaviour: workspace steering was re-measured on
+> 2.21.4 and now FOLLOWS symlinks, and global steering has not been re-run.
+> Hooks, agents and skills rows are untouched by that re-run and stand as
+> recorded.
 
 **v3 symlink handling is surface-specific — not universal:**
 
@@ -127,14 +141,19 @@ workspace result as indicative, not as proof for the global path.
 Steering was re-verified directly 2026-07-23 (`probe-steering.sh` + an additive
 real-home global probe): the symlinked steering file is absent from
 `/context show` on both scopes while the real one loads — confirming
-`kirodotdev/Kiro#9787` independently of the stale `run-probe.sh`. Skill
+`kirodotdev/Kiro#9787` independently of the stale `run-probe.sh`. **That is the
+2.13.0 result and the workspace half is now superseded** — see the 2.21.4
+section above. The global half stands only as a 2.13.0 observation. Skill
 dir-symlinks and file-symlinks both loaded; the model reading files via
 `fs_read` can mask the loader's behavior, so trust `/context show`, not a "can
 you see skill X" question.
 
-**Consequences for the factory:** hooks and steering must be delivered as **real
-files** (copy materialization); agents and skills may stay cheap symlinks.
-Global hooks read the real `~/.kiro/hooks` and honor real files — so
-`autoMemory`, delivered there as a **store symlink** on the live system, is
-silently dropped under v3; the on-branch real-file delivery restores it once
-activated.
+**Consequences for the factory, as understood at 2.13.0:** hooks and steering
+must be delivered as **real files** (copy materialization); agents and skills
+may stay cheap symlinks. **The steering half of that no longer holds at 2.21.4**
+— workspace steering follows symlinks, so the symlink sink is correct for it,
+and the global path is unverified rather than known-broken. Hooks are unaffected
+by the re-run and still require copy. Global hooks read the real `~/.kiro/hooks`
+and honor real files — so `autoMemory`, delivered there as a **store symlink**
+on the live system, is silently dropped under v3; the on-branch real-file
+delivery restores it once activated.

@@ -10,9 +10,10 @@
 # after 2.13.0, where this probe originally recorded a drop; do not read the old
 # conclusion as current. Re-run on a Kiro bump rather than trusting either.
 #
-# Global steering is NOT covered here — no saved script tests it. To cover it,
-# place a symlinked file in the REAL ~/.kiro/steering and run in a neutral cwd
-# (additive, trap-cleaned — mirror probe-global-realhome.sh).
+# Global steering is NOT covered here — no SAVED script tests it, though the
+# 2026-07-23 round did measure it ad hoc at 2.13.0 and found it dropped. To
+# re-cover it, place a symlinked file in the REAL ~/.kiro/steering and run in a
+# neutral cwd (additive, trap-cleaned — mirror probe-global-realhome.sh).
 set -euETo pipefail
 shopt -s inherit_errexit 2>/dev/null || :
 
@@ -57,9 +58,14 @@ echo
 echo "=== /context show — steering files kiro LOADED (real vs symlink) ==="
 grep -iE 'real-steer|symfile-steer' "$R/context.cap" 2>/dev/null | sort -u | sed 's/^/  /' || echo "  (neither listed)"
 echo
-echo "Read:"
-echo "  both listed     -> v3 FOLLOWS symlinked steering. This is the 2.21.4 result;"
-echo "                     symlink delivery is safe and copy is not required."
-echo "  real-steer only -> v3 DROPS symlinked steering. This was the 2.13.0 result;"
-echo "                     seeing it again means the behaviour regressed and Kiro"
-echo "                     steering needs copy delivery like Kiro hooks already do."
+echo "Read (WORKSPACE steering only — this rig builds no global steering):"
+echo "  both listed     -> v3 FOLLOWS symlinked WORKSPACE steering. This is the"
+echo "                     2.21.4 result; the symlink sink is correct for that"
+echo "                     surface and copy delivery is not required for it."
+echo "  real-steer only -> v3 DROPS symlinked WORKSPACE steering. This was the"
+echo "                     2.13.0 result; seeing it again means the behaviour"
+echo "                     regressed and workspace steering needs copy delivery"
+echo "                     like Kiro hooks already do."
+echo
+echo "Do NOT carry either outcome to GLOBAL steering (~/.kiro/steering). That"
+echo "scope was measured at 2.13.0 (dropped) and has not been re-run since."
