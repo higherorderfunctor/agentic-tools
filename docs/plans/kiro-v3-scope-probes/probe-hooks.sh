@@ -22,7 +22,7 @@ tmux kill-session -t "$S" 2>/dev/null || true
 : >"$CAP.hooks"
 
 tmux new-session -d -s "$S" -x 220 -y 60 -c "$RIG/work" \
-  env KIRO_HOME="$RIG/home/.kiro" kiro-cli chat
+  env KIRO_HOME="$RIG/home/.kiro" kiro-cli chat --model gpt-5.6-luna
 
 ready=0
 for _ in $(seq 1 45); do

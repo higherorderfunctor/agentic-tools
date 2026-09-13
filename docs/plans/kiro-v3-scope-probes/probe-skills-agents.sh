@@ -34,7 +34,7 @@ ln -s "$R/src/symfile-agent.json" "$R/work/.kiro/agents/symfile-agent.json"
 # --- probe ---
 tmux kill-session -t "$S" 2>/dev/null || true
 tmux new-session -d -s "$S" -x 220 -y 60 -c "$R/work" \
-  env KIRO_HOME="$R/home/.kiro" kiro-cli chat
+  env KIRO_HOME="$R/home/.kiro" kiro-cli chat --model gpt-5.6-luna
 
 ready=0
 for _ in $(seq 1 50); do
