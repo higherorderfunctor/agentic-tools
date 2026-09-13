@@ -175,9 +175,10 @@ this paragraph would rot the next time one is added.)
 
 ## devenv `files` Option Internals
 
-> **Last verified:** 2026-08-29 — the instruction-copy materializer is one
-> packaged helper shared by both shell-entry tasks and the flake contract test;
-> it also repairs symlinks/modes and refuses to prune an empty source.
+> **Last verified:** 2026-09-12 — devenv's `createFileScript` is now a
+> `copyMode` dispatcher, not the symlink writer this fragment used to quote. The
+> quoted body is `createSymlinkScript`; `createCopyScript` is the other branch
+> and it DOES recurse.
 >
 > Full lineage: `git show 2ac8d522:dev/fragments/devenv/files-internals.md`.
 
@@ -208,24 +209,45 @@ source = {
 };
 ```
 
-Whatever path you provide becomes the symlink target verbatim. No recursion, no
-enumeration, no per-file generation.
+Whatever path you provide is passed through verbatim: the format itself never
+walks, enumerates, or expands it.
+
+Keep source GENERATION separate from MATERIALIZATION, because only the second
+one varies. Generation is identity in every mode. Materialization is where
+`copyMode` decides: under the default `symlink` the path becomes the symlink
+target and nothing recurses, while under `copy` or `seed` that same path goes to
+`cp -RL`, so a directory source is copied through as a tree. "No recursion" is
+therefore a property of the symlink branch, not of the `source` format — see the
+dispatcher below.
 
 **The submodule has no recursive field:**
 
-`fileType` has `format`, `data`, `file`, `executable`, plus one option per
-format (`ini`, `json`, `yaml`, `toml`, `text`, `source`). Notably **missing**:
+`fileType` has `format`, `data`, `file`, `executable`, `copyMode`, plus one
+option per format (`ini`, `json`, `yaml`, `toml`, `text`, `source`). Notably
+**missing**:
 
 - No `recursive` field
 - No `tree` / `walk` field
 - No file-level enumeration hook
 
-Each `files.<name>` is exactly one on-disk entry.
+Each `files.<name>` is exactly one DECLARED entry. Under the default
+`copyMode = "symlink"` that is also exactly one on-disk entry; under
+`copyMode = "copy"` a directory source lands as a copied tree, so the
+one-entry-one-inode reading does not survive that mode.
 
-**Create script does one `ln -s` per entry:**
+**`createFileScript` is a dispatcher, not the writer:**
+
+```nix
+createFileScript = filename: fileOption:
+  if fileOption.copyMode == "symlink"
+  then createSymlinkScript filename fileOption
+  else createCopyScript filename fileOption;
+```
+
+**The symlink branch does one `ln -s` per entry:**
 
 ```bash
-createFileScript = filename: fileOption: ''
+createSymlinkScript = filename: fileOption: ''
   if [ -L "${filename}" ]; then
     # Update symlink target if it changed
     if [ "$(readlink "${filename}")" != "${fileOption.file}" ]; then
@@ -242,7 +264,14 @@ createFileScript = filename: fileOption: ''
 '';
 ```
 
-No recursion. One `ln -s` per entry.
+No recursion in this branch — one `ln -s` per entry.
+
+The other branch does recurse. `createCopyScript` drops a previous
+store-symlink, then materializes with `cp -RL` followed by `chmod -R u+w`, so a
+directory source is copied through and the result is WRITABLE. `copyMode`
+accepts `symlink` (default), `seed` (create only when absent, preserving user
+edits) and `copy` (overwrite every entry). This repo sets `copyMode` nowhere —
+see the rejection recorded further down, which still holds.
 
 ### Silent-fail behavior (important)
 
